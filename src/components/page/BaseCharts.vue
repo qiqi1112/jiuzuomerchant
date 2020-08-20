@@ -8,142 +8,91 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="plugins-tips">
-                vue-schart：vue.js封装sChart.js的图表组件。
-                访问地址：
-                <a
-                    href="https://github.com/lin-xin/vue-schart"
-                    target="_blank"
-                >vue-schart</a>
-            </div>
-            <div class="schart-box">
-                <div class="content-title">柱状图</div>
-                <schart class="schart" canvasId="bar" :options="options1"></schart>
-            </div>
-            <div class="schart-box">
-                <div class="content-title">折线图</div>
-                <schart class="schart" canvasId="line" :options="options2"></schart>
-            </div>
-            <div class="schart-box">
-                <div class="content-title">饼状图</div>
-                <schart class="schart" canvasId="pie" :options="options3"></schart>
-            </div>
-            <div class="schart-box">
-                <div class="content-title">环形图</div>
-                <schart class="schart" canvasId="ring" :options="options4"></schart>
-            </div>
+            <div id="main" style="width: 600px;height:400px;"></div>
         </div>
     </div>
 </template>
 
 <script>
-import Schart from 'vue-schart';
 export default {
-    name: 'basecharts',
-    components: {
-        Schart
-    },
     data() {
-        return {
-            options1: {
-                type: 'bar',
-                title: {
-                    text: '最近一周各品类销售图'
-                },
-                bgColor: '#fbfbfb',
-                labels: ['周一', '周二', '周三', '周四', '周五'],
-                datasets: [
-                    {
-                        label: '家电',
-                        fillColor: 'rgba(241, 49, 74, 0.5)',
-                        data: [234, 278, 270, 190, 230]
-                    },
-                    {
-                        label: '百货',
-                        data: [164, 178, 190, 135, 160]
-                    },
-                    {
-                        label: '食品',
-                        data: [144, 198, 150, 235, 120]
-                    }
-                ]
+        return {};
+    },
+
+    mounted() {
+        var echarts = require('echarts');
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: 'ECharts 入门示例'
             },
-            options2: {
-                type: 'line',
-                title: {
-                    text: '最近几个月各品类销售趋势图'
-                },
-                bgColor: '#fbfbfb',
-                labels: ['6月', '7月', '8月', '9月', '10月'],
-                datasets: [
-                    {
-                        label: '家电',
-                        data: [234, 278, 270, 190, 230]
-                    },
-                    {
-                        label: '百货',
-                        data: [164, 178, 150, 135, 160]
-                    },
-                    {
-                        label: '食品',
-                        data: [114, 138, 200, 235, 190]
-                    }
-                ]
+            tooltip: {},
+            legend: {
+                data: ['销量']
             },
-            options3: {
-                type: 'pie',
-                title: {
-                    text: '服装品类销售饼状图'
-                },
-                legend: {
-                    position: 'left'
-                },
-                bgColor: '#fbfbfb',
-                labels: ['T恤', '牛仔裤', '连衣裙', '毛衣', '七分裤', '短裙', '羽绒服'],
-                datasets: [
-                    {
-                        data: [334, 278, 190, 235, 260, 200, 141]
-                    }
-                ]
+            xAxis: {
+                data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
             },
-            options4: {
-                type: 'ring',
-                title: {
-                    text: '环形三等分'
-                },
-                showValue: false,
-                legend: {
-                    position: 'bottom',
-                    bottom: 40
-                },
-                bgColor: '#fbfbfb',
-                labels: ['vue', 'react', 'angular'],
-                datasets: [
-                    {
-                        data: [500, 500, 500]
-                    }
-                ]
-            }
+            yAxis: {},
+            series: [
+                {
+                    name: '销量',
+                    type: 'bar',
+                    data: [5, 20, 36, 10, 10, 20]
+                }
+            ]
         };
+
+        option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 10,
+                data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+            },
+            series: [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: ['50%', '70%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '30',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { value: 335, name: '直接访问' },
+                        { value: 310, name: '邮件营销' },
+                        { value: 234, name: '联盟广告' },
+                        { value: 135, name: '视频广告' },
+                        { value: 1548, name: '搜索引擎' }
+                    ]
+                }
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
     }
 };
 </script>
 
 <style scoped>
-.schart-box {
-    display: inline-block;
-    margin: 20px;
-}
-.schart {
-    width: 600px;
-    height: 400px;
-}
-.content-title {
-    clear: both;
-    font-weight: 400;
-    line-height: 50px;
-    margin: 10px 0;
-    font-size: 22px;
-    color: #1f2f3d;
-}
 </style>

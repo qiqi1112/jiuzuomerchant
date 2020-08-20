@@ -4,7 +4,11 @@
             <div class="ms-title">后台管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username">
+                    <el-input
+                        v-model="param.username"
+                        placeholder="username"
+                        @keyup.enter.native="submitForm()"
+                    >
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
@@ -29,33 +33,56 @@
 
 <script>
 export default {
-    data: function() {
+    data: function () {
         return {
             param: {
                 username: 'admin',
-                password: '123123',
+                password: '123456'
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-                password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-            },
+                password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+            }
         };
     },
     methods: {
         submitForm() {
-            this.$refs.login.validate(valid => {
-                if (valid) {
-                    this.$message.success('登录成功');
-                    localStorage.setItem('ms_username', this.param.username);
-                    this.$router.push('/');
-                } else {
-                    this.$message.error('请输入账号和密码');
-                    console.log('error submit!!');
-                    return false;
+            // this.$refs.login.validate((valid) => {
+            //     if (valid) {
+            //         this.$message.success('登录成功');
+            //         localStorage.setItem('ms_username', this.param.username);
+            //         this.$router.push('/');
+            //     } else {
+            //         this.$message.error('请输入账号和密码');
+            //         console.log('error submit!!');
+            //         return false;
+            //     }
+            // });
+
+            let data = {
+                nameOrPhone: this.param.username,
+                password: this.param.password
+            };
+            this.$post('/text/admin/system/login', data).then(
+                (res) => {
+                    console.log(res);
+                    if (res.code == 0) {
+                        localStorage.setItem('userInfo', JSON.stringify(res.data));
+                        this.$message.success('登录成功');
+                        this.$router.push('/dashboard');
+                    } else {
+                        this.$message.error(res.msg);
+                        return false;
+                    }
+                },
+                (err) => {
+                    console.log(err);
                 }
-            });
-        },
-    },
+            );
+
+
+        }
+    }
 };
 </script>
 

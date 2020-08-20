@@ -2,15 +2,22 @@ module.exports = {
     baseUrl: './',
     assetsDir: 'static',
     productionSourceMap: false,
-    // devServer: {
-    //     proxy: {
-    //         '/api':{
-    //             target:'http://jsonplaceholder.typicode.com',
-    //             changeOrigin:true,
-    //             pathRewrite:{
-    //                 '/api':''
-    //             }
-    //         }
-    //     }
-    // }
+    devServer: {
+        proxy: {
+            '/api':{
+                target:'http://musicapi.leanapp.cn',
+                changeOrigin:true,
+                pathRewrite:{
+                    '^/api':''
+                }
+            },
+            '/text':{
+                target:'http://192.168.31.91:8078',
+                changeOrigin:true,
+                pathRewrite:{
+                    '^/text':''
+                }
+            },
+        }
+    }
 }
