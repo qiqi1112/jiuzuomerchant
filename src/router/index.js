@@ -101,7 +101,39 @@ export default new Router({
                     path: '/donate',
                     component: () => import(/* webpackChunkName: "donate" */ '../components/page/Donate.vue'),
                     meta: { title: '支持作者' }
-                }
+                },
+
+                //--------------自己添加的组件-----------------------
+                {
+                    path: '/myshop',
+                    component : () => import('../pages/MyShop/MyShop.vue'),
+
+                },
+                {
+                    path: '/shopmanage',
+                    component : () => import('../pages/ShopManage/ShopManage.vue'),
+                    
+                },
+                {
+                    path: '/clientmanage',
+                    component : () => import('../pages/ClientManage/ClientManage.vue'),
+                    
+                },
+                {
+                    path: '/ordermanage',
+                    component : () => import('../pages/OrderManage/OrderManage.vue'),
+                    
+                },
+                {
+                    path: '/nummanage',
+                    component : () => import('../pages/NumManage/NumManage.vue'),
+                    
+                },
+                {
+                    path: '/adveractivity',
+                    component : () => import('../pages/AdverActivity/AdverActivity.vue'),
+                    
+                },
             ]
         },
         {

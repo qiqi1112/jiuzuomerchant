@@ -47,40 +47,42 @@ export default {
     },
     methods: {
         submitForm() {
-            // this.$refs.login.validate((valid) => {
-            //     if (valid) {
-            //         this.$message.success('登录成功');
-            //         localStorage.setItem('ms_username', this.param.username);
-            //         this.$router.push('/');
-            //     } else {
-            //         this.$message.error('请输入账号和密码');
-            //         console.log('error submit!!');
-            //         return false;
-            //     }
-            // });
-
-            let data = {
-                nameOrPhone: this.param.username,
-                password: this.param.password
-            };
-            this.$post('/text/admin/system/login', data).then(
-                (res) => {
-                    console.log(res);
-                    if (res.code == 0) {
-                        localStorage.setItem('userInfo', JSON.stringify(res.data));
-                        this.$message.success('登录成功');
-                        this.$router.push('/dashboard');
-                    } else {
-                        this.$message.error(res.msg);
-                        return false;
-                    }
-                },
-                (err) => {
-                    console.log(err);
+            this.$refs.login.validate((valid) => {
+                if (valid) {
+                    let data = {
+                        nameOrPhone: this.param.username,
+                        password: this.param.password
+                    };
+                    this.$message.success('登录成功');
+                    localStorage.setItem('userInfo', JSON.stringify(data));
+                    this.$router.push('/');
+                } else {
+                    this.$message.error('请输入账号和密码');
+                    console.log('error submit!!');
+                    return false;
                 }
-            );
+            });
 
-
+            // let data = {
+            //     nameOrPhone: this.param.username,
+            //     password: this.param.password
+            // };
+            // this.$post('/text/admin/system/login', data).then(
+            //     (res) => {
+            //         console.log(res);
+            //         if (res.code == 0) {
+            //             localStorage.setItem('userInfo', JSON.stringify(res.data));
+            //             this.$message.success('登录成功');
+            //             this.$router.push('/dashboard');
+            //         } else {
+            //             this.$message.error(res.msg);
+            //             return false;
+            //         }
+            //     },
+            //     (err) => {
+            //         console.log(err);
+            //     }
+            // );
         }
     }
 };

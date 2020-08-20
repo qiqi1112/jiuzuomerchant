@@ -4,18 +4,14 @@ import router from './router';
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import { messages } from './components/common/i18n';
-// import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
-import './assets/css/theme-green/index.css'; // 浅绿色主题
+import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
+// import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
-import { fetchData,post,get } from './api/index';
+import { post,get } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
-import axios from 'axios'
 
-Vue.prototype.axios = axios;
-
-Vue.prototype.$fetch=fetchData;
 Vue.prototype.$post=post;
 Vue.prototype.$get=get;
 
