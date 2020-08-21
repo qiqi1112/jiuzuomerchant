@@ -3,19 +3,33 @@ import App from './App.vue';
 import router from './router';
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
-import { messages } from './components/common/i18n';
+import {
+    messages
+} from './components/common/i18n';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 // import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
-import { post,get } from './api/index';
+import {
+    post,
+    get,
+    timestampToTime
+} from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
 
-Vue.prototype.$regular=regular
-Vue.prototype.$post=post;
-Vue.prototype.$get=get;
+Vue.prototype.$regular = regular
+Vue.prototype.$post = post;
+Vue.prototype.$get = get;
+Vue.prototype.$timestampToTime = timestampToTime;
+
+
+//手机号过滤器
+Vue.filter("phoneNum", function (oldVal) {
+    let newVal = oldVal.replace(oldVal.slice(3, 7), "****");
+    return newVal;
+});
 
 
 Vue.config.productionTip = false;
