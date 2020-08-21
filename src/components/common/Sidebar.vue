@@ -88,8 +88,18 @@ export default {
                 },
                 {
                     icon: 'el-icon-s-flag',
-                    index: 'adveractivity',
-                    title: '广告活动'
+                    title: '广告活动',
+                    index: 'AdverActivity',
+                    subs: [
+                        {
+                            index: 'AdverActivity',
+                            title: '活动列表'
+                        },
+                        {
+                            index: 'Advertising',
+                            title: '广告栏'
+                        }
+                    ]
                 },
 
 

@@ -11,7 +11,9 @@ import './components/common/directives';
 import 'babel-polyfill';
 import { post,get } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
+import regular from './utils/regular'
 
+Vue.prototype.$regular=regular
 Vue.prototype.$post=post;
 Vue.prototype.$get=get;
 
