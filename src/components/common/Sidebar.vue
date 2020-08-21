@@ -58,6 +58,47 @@ export default {
             items: [
                 {
                     icon: 'el-icon-lx-home',
+                    index: 'index',
+                    title: '系统首页'
+                },
+                {
+                    icon: 'el-icon-s-shop',
+                    index: 'myshop',
+                    title: '我的店铺'
+                },
+                {
+                    icon: 'el-icon-goods',
+                    index: 'shopmanage',
+                    title: '商品管理'
+                },
+                {
+                    icon: 'el-icon-s-custom',
+                    index: 'clientmanage',
+                    title: '客户管理'
+                },
+                {
+                    icon: 'el-icon-s-order',
+                    index: 'ordermanage',
+                    title: '订单管理'
+                },
+                {
+                    icon: 'el-icon-s-grid',
+                    index: 'nummanage',
+                    title: '排号管理'
+                },
+                {
+                    icon: 'el-icon-s-flag',
+                    index: 'adveractivity',
+                    title: '广告活动'
+                },
+
+
+
+
+
+
+                {
+                    icon: 'el-icon-lx-home',
                     index: 'dashboard',
                     title: '系统首页'
                 },

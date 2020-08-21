@@ -61,8 +61,10 @@ export default {
     },
     computed: {
         username() {
-            let username = JSON.parse(localStorage.getItem('userInfo')).nameOrPhone;
-            return username ? username : this.name;
+            // let username = JSON.parse(localStorage.getItem('userInfo')).nameOrPhone;
+            //   return username ? username : this.name;
+            return this.name;
+          
         }
     },
     methods: {
