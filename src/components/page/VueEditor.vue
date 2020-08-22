@@ -6,11 +6,11 @@
                 <el-breadcrumb-item>编辑器</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <el-upload class="avatar-uploader-editor" action="serverUrl"  name="files"  :show-file-list="false"
+        <el-upload class="avatar-uploader-editor" :action="serverUrl"  name="files"  :show-file-list="false"
             :on-success="uploadSuccess" :on-error="uploadError" style="display:none"> </el-upload>
             <el-upload 
                 class="avatar-uploader-editor-video" 
-                action="serverUrl" 
+                :action="serverUrl" 
                  
                 name="files"  :show-file-list="false"
                 :on-success="uploadSuccessVideo" 
