@@ -12,7 +12,7 @@ module.exports = {
                 }
             },
             '/text':{
-                target:'http://192.168.31.91:8078',
+                target:'http://192.168.31.93:8078',
                 changeOrigin:true,
                 pathRewrite:{
                     '^/text':''
