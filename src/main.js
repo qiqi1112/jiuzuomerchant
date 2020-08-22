@@ -18,7 +18,8 @@ import {
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
-
+import less from 'less'
+Vue.use(less)
 Vue.prototype.$regular = regular
 Vue.prototype.$post = post;
 Vue.prototype.$get = get;
