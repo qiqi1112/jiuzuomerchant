@@ -73,7 +73,7 @@
                     <el-form-item label="用户昵称" :label-width="formLabelWidth">
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
-                    <el-form-item label="用户手机" :label-width="formLabelWidth">
+                    <el-form-item label="用户手机" :label-width="formLabelWidth" prop="number">
                         <el-input v-model.number="form.number"></el-input>
                     </el-form-item>
                     <el-form-item label="到店消费次数" :label-width="formLabelWidth" prop="conNum">
@@ -122,13 +122,13 @@
                             style="width:100%"
                         ></el-date-picker>
                     </el-form-item>
-                    <el-form-item label="本店累计消费金额" :label-width="formLabelWidth">
+                    <el-form-item label="本店累计消费金额" :label-width="formLabelWidth" prop="conMoney">
                         <el-input v-model="form.conMoney"></el-input>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="handleCancel">取 消</el-button>
-                    <el-button type="primary" @click="handleSure">确 定</el-button>
+                    <el-button @click="handleCancel('form')">取 消</el-button>
+                    <el-button type="primary" @click="submitForm('form')">确 定</el-button>
                 </div>
             </el-dialog>
 
@@ -147,143 +147,147 @@
 </template>
 
 <script>
+// import Message from 'element-ui/packages/message/index.js';
+// import { inputText, phone } from '../../utils/regular';
+
 export default {
     data() {
+        //验证整形
+        function isInteger(rule, value, callback) {
+            if (!Number.isInteger(value)) {
+                callback(new Error('请输入整数值'));
+            } else {
+                callback();
+            }
+        }
+
+        //验证电话
+        function isPhone(rule, value, callback) {
+            if (!/^1[3456789]\d{9}$/.test(value)) {
+                callback(new Error('请输入正确的手机号'));
+            } else {
+                callback();
+            }
+        }
+
+        //验证金额
+        function isMoney(rule, value, callback) {
+            if (!/^\d+(\.\d{1,2})?$/.test(value.trim())) {
+                callback(new Error('请输入正确的金额（最多保留两位有效小数）'));
+            } else {
+                callback();
+            }
+        }
+
         //表单验证规则函数
-        let checkConNum = (rule, value, callback) => {
+        let checkNumber = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
+                if (value !== 0) {
+                    return callback(new Error('用户手机不能为空'));
                 } else {
-                    return callback(new Error('到店消费次数不能为空'));
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
+            isPhone(rule, value, callback);
+        };
+
+        let checkMoney = (rule, value, callback) => {
+            if (!value) {
+                if (value !== 0) {
+                    return callback(new Error('消费金额不能为空'));
                 } else {
                     callback();
                 }
-            }, 1000);
+            }
+            isMoney(rule, value, callback);
+        };
+
+        let checkConNum = (rule, value, callback) => {
+            if (!value) {
+                if (value !== 0) {
+                    return callback(new Error('到店消费次数不能为空'));
+                } else {
+                    callback();
+                }
+            }
+            isInteger(rule, value, callback);
         };
 
         let checkAANum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('AA拼单次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         let checkReserveNum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('预定桌消费次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         let checkRowNum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('排号次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         let checkVaildNum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('生效排号次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         let checkCancelNum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('取消排号次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         let checkEvalNum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('评价次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         let checkVisitNum = (rule, value, callback) => {
             if (!value) {
-                if (value == 0) {
-                    callback();
-                } else {
+                if (value !== 0) {
                     return callback(new Error('访问店铺次数不能为空'));
+                } else {
+                    callback();
                 }
             }
-            setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入整数值'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            isInteger(rule, value, callback);
         };
 
         return {
@@ -523,7 +527,9 @@ export default {
                 vaildNum: [{ validator: checkVaildNum, trigger: 'blur' }],
                 cancelNum: [{ validator: checkCancelNum, trigger: 'blur' }],
                 evalNum: [{ validator: checkEvalNum, trigger: 'blur' }],
-                visitNum: [{ validator: checkVisitNum, trigger: 'blur' }]
+                visitNum: [{ validator: checkVisitNum, trigger: 'blur' }],
+                number: [{ validator: checkNumber, trigger: 'blur' }],
+                conMoney: [{ validator: checkMoney, trigger: 'blur' }]
             }
         };
     },
@@ -590,6 +596,7 @@ export default {
 
         //对话框关闭的操作
         handleClose() {
+            this.$refs["form"].resetFields();
             this.emptyForm();
         },
 
@@ -601,22 +608,22 @@ export default {
         //添加按钮
         addInfo() {
             this.dialogFormVisible = true;
-            this.tableData.push({
-                name: this.form.name,
-                number: this.form.number,
-                AANum: this.form.AANum,
-                conNum: this.form.conNum,
-                reserveNum: this.form.reserveNum,
-                rowNum: this.form.rowNum,
-                vaildNum: this.form.vaildNum,
-                cancelNum: this.form.cancelNum,
-                collect: this.form.collect,
-                evalNum: this.form.evalNum,
-                visitNum: this.form.visitNum,
-                conDate: this.form.conDate,
-                visitDate: this.form.visitDate,
-                conMoney: this.form.conMoney
-            });
+            // this.tableData.unshift({
+            //     name: this.form.name,
+            //     number: this.form.number,
+            //     AANum: this.form.AANum,
+            //     conNum: this.form.conNum,
+            //     reserveNum: this.form.reserveNum,
+            //     rowNum: this.form.rowNum,
+            //     vaildNum: this.form.vaildNum,
+            //     cancelNum: this.form.cancelNum,
+            //     collect: this.form.collect,
+            //     evalNum: this.form.evalNum,
+            //     visitNum: this.form.visitNum,
+            //     conDate: this.form.conDate,
+            //     visitDate: this.form.visitDate,
+            //     conMoney: this.form.conMoney
+            // });
         },
 
         //搜索按钮
@@ -633,33 +640,44 @@ export default {
         },
 
         //对话框里的取消按钮
-        handleCancel() {
+        handleCancel(formName) {
+            this.$refs[formName].resetFields();
             this.emptyForm();
             this.dialogFormVisible = false;
         },
 
         //对话框里的确认按钮
-        handleSure() {
-            this.tableData[this.rowNumber].name = this.form.name;
-            this.tableData[this.rowNumber].number = this.form.number;
-            this.tableData[this.rowNumber].conNum = this.form.conNum;
-            this.tableData[this.rowNumber].AANum = this.form.AANum;
-            this.tableData[this.rowNumber].reserveNum = this.form.reserveNum;
-            this.tableData[this.rowNumber].rowNum = this.form.rowNum;
-            this.tableData[this.rowNumber].vaildNum = this.form.vaildNum;
-            this.tableData[this.rowNumber].cancelNum = this.form.cancelNum;
-            this.tableData[this.rowNumber].collect = this.form.collect;
-            this.tableData[this.rowNumber].evalNum = this.form.evalNum;
-            this.tableData[this.rowNumber].visitNum = this.form.visitNum;
-            this.tableData[this.rowNumber].conDate = this.$timestampToTime(this.form.conDate.getTime());
-            this.tableData[this.rowNumber].visitDate = this.form.visitDate;
-            this.tableData[this.rowNumber].conMoney = this.form.conMoney;
+        submitForm(formName) {
+            // this.tableData[this.rowNumber].name = this.form.name;
+            // this.tableData[this.rowNumber].number = this.form.number;
+            // this.tableData[this.rowNumber].conNum = this.form.conNum;
+            // this.tableData[this.rowNumber].AANum = this.form.AANum;
+            // this.tableData[this.rowNumber].reserveNum = this.form.reserveNum;
+            // this.tableData[this.rowNumber].rowNum = this.form.rowNum;
+            // this.tableData[this.rowNumber].vaildNum = this.form.vaildNum;
+            // this.tableData[this.rowNumber].cancelNum = this.form.cancelNum;
+            // this.tableData[this.rowNumber].collect = this.form.collect;
+            // this.tableData[this.rowNumber].evalNum = this.form.evalNum;
+            // this.tableData[this.rowNumber].visitNum = this.form.visitNum;
+            // this.tableData[this.rowNumber].conDate = this.form.conDate;
+            // // this.tableData[this.rowNumber].conDate = this.$timestampToTime(this.form.conDate.getTime());
+            // this.tableData[this.rowNumber].visitDate = this.form.visitDate;
+            // this.tableData[this.rowNumber].conMoney = this.form.conMoney;
 
-            console.log('zzzz', this.$timestampToTime(this.form.conDate.getTime()));
+            // console.log('zzzz', this.$timestampToTime(this.form.conDate.getTime()));
 
-            this.emptyForm();
-            this.dialogFormVisible = false;
-        },
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    alert('submit!');
+
+                    this.emptyForm();
+                    this.dialogFormVisible = false;
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
+        }
     }
 };
 </script>
