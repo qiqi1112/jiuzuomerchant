@@ -62,8 +62,9 @@ function timeData(timestamp, type = 1) {
         2.年月日
         3.年月日时分
         4.时分
+        5.年月
     */
-    var date = new Date(timestamp * 1000); //10位*1000
+    var date = new Date(timestamp); //10位*1000
     var Y = date.getFullYear();
     var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1);
     var D = date.getDate();
@@ -74,6 +75,7 @@ function timeData(timestamp, type = 1) {
     if (type == 2) return Y + '-' + M + '-' + addZero(D);
     if (type == 3) return Y + '-' + M + '-' + addZero(D) + ' ' + addZero(h) + ':' + addZero(m);
     if (type == 4) return addZero(h) + ':' + addZero(m);
+    if (type == 5) return Y + '-' + M;
 }
 
 function addZero(num) {

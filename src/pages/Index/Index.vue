@@ -1,13 +1,5 @@
 <template>
     <div>
-        <!-- <div class="crumbs">
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item>
-                    <i class="el-icon-lx-calendar"></i> 首页
-                </el-breadcrumb-item>
-            </el-breadcrumb>
-        </div> -->
-
         <div class="container">
             <div class="top_box">
                 <div class="evaluation">
@@ -23,7 +15,7 @@
                         </div>
                         <div class="st star ">
                             <span>店铺评分</span>
-                            <el-rate v-model="value" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
+                            <el-rate disabled-void-icon-class="not el-icon-star-on"  disabled-void-color='#b1b1b1!important' v-model="value" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
                         </div>
                     </div>
                 </div>
@@ -32,7 +24,7 @@
                     <span class="line lw2"></span> <span>今日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
                     </div>
                     <div class="comp">
-                        <span class="line lw2"></span><span class="jg">今日客访数 <i class="xtc">19</i> 次，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>次</span>
+                        <span class="line lw2"></span><span class="jg">今日客访数 <i class="xtc">19</i> 次，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
                         <span class="line lw2"></span><span>店铺曝光量<i class="xtc"> 19538 </i> 次，同比昨日 <i class="xtc">234234 P</i></span>
                     </div>
                 </div>
@@ -44,17 +36,76 @@
             <div class="main_box">
                 <div class="m_l">
                     <div class="broken_box">
-                        <div class="column">营业额</div>
-                        <div ref='broken' id="brokenline" style="width: 85%;height: 500px;"> </div>        
+                        <div class="column">
+                            <span class="line lw2"></span>
+                            <span>营业额</span>
+                        </div>
+                        <div ref='broken' id="brokenline" style="width: 90%;height: 500px;"> </div>        
                     </div>
 
                     <div class="columnar_box">
-                        <div class="column">开台数据统计</div>
-                        <div ref='columnar' id="columnarLine" style="width: 100%;height: 500px;"> </div> 
+                        <div class="column">
+                            <span class="line lw2"></span>
+                            <span>开台数据统计</span>
+                        </div>
+                        <div ref='columnar' id="columnarLine" style="width: 90%;height: 500px;"></div> 
                     </div>
                 </div>
-                <div class="m_m"></div>
-                <div class="m_r"></div>
+                <div class="m_m">
+                    <div class="bread_box">
+                        <div class="column">
+                            <span class="line lw2"></span>
+                            <span>排号统计 (2020-09-08)</span>
+                        </div>
+                        <div ref='bread' id="breadLine" style="width: 90%;height: 500px;"></div> 
+                    </div>
+
+                    <div class="Top_goods">
+                        <div class="column">
+                            <span class="line lw2"></span>
+                            <span>热销TOP榜 (2020-09-08)</span>
+                        </div>
+
+                        <div class="goods_list">
+                            <el-tabs v-model="activeName" @tab-click="handleClick">
+                                <el-tab-pane label="套餐" name="first">
+                                    <ul>
+                                        <li class="top_li" v-for="(item,index) in good_list" :key="index">
+                                            <div class="tl">
+                                                <img src="../../assets/img/img.jpg" alt="">
+                                            </div>
+                                            <div class="tr">
+                                                <p class="tit">{{item.title}}</p>
+                                                <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 今日已售{{item.sold}}瓶</p>
+                                                <div class="pro" :style="{width:item.sold/10+'px'}"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </el-tab-pane>
+                                <el-tab-pane label="香槟" name="second">香槟</el-tab-pane>
+                                <el-tab-pane label="啤酒" name="third">啤酒</el-tab-pane>
+                                <el-tab-pane label="小吃" name="fourth">小吃</el-tab-pane>
+                            </el-tabs>
+                        </div>
+                    </div>
+                </div>
+                <div class="m_r">
+                    <div class="timeData">
+                        <div class="block">
+                            <el-date-picker
+                                v-model="time_now"
+                                type="month"
+                                :placeholder="time_now">
+                            </el-date-picker>
+                        </div>
+                        <div class="day_li">
+                            <ul>
+                                
+                                <li :class="active==index?'choose':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -67,26 +118,76 @@ export default {
         return {
             day_mon:1,
             value: 3.7,
-            brokenline:'',
-            columnarLine:'',
+            // brokenline:'',
+            // columnarLine:'',
+            activeName: 'first',
+            value2: '',
+            time_now:'',
+            days:'',
+            active:'7',
+            good_list:[
+                {
+                    id:1,
+                    title:'Dom Perignon法国唐培里侬香槟王',
+                    img:'../../assets/img/img.jpg',
+                    ml:'150',
+                    sold:42,
+                },
+                {
+                    id:2,
+                    title:'Dom Perignon法国唐培里侬香槟王',
+                    img:'../../assets/img/img.jpg',
+                    ml:'80',
+                    sold:1380,
+                },
+                {
+                    id:3,
+                    title:'Dom Perignon法国唐培里侬香槟王',
+                    img:'../../assets/img/img.jpg',
+                    ml:'170',
+                    sold:2506,
+                },
+                {
+                    id:4,
+                    title:'Dom Perignon法国唐培里侬香槟王',
+                    img:'../../assets/img/img.jpg',
+                    ml:'150',
+                    sold:770,
+                },
+            ]
         };
     },
     created(){
-
+        this.time_now = this.$regular.timeData(new Date().getTime(),5)
+        this.days = this.timeDay(this.time_now)
+    },
+    watch: {
+        time_now(val) {
+            this.time_now = this.$regular.timeData(val,5)
+            this.days = this.timeDay(this.time_now)        
+        }
     },
     mounted(){
         this.brokenChart()
         this.columnarChart()
-
+        this.breadChart()
     },
     methods:{
+        // 日期选择
+        timeDay(time){
+            let trr = time.split('-')
+            let day = new Date(trr[0],trr[1],0).getDate()
+            return day
+        },
+        timeChange(i){
+            this.active = i
+        },
         // 折现图
         brokenChart(){
-            this.brokenChart = echarts.init(this.$refs.broken);
-            var option = {
+            let brokenline = echarts.init(this.$refs.broken);
+            let option = {
                 dataZoom: {
                     type: 'inside',
-                
                 },
                 tooltip: {
                     trigger: 'axis'
@@ -148,13 +249,85 @@ export default {
             };
     
             // 使用刚指定的配置项和数据显示图表。
-            this.brokenChart.setOption(option);
+            brokenline.setOption(option);
         },
         // 柱状图
         columnarChart(){
-
+            let columnarLine = echarts.init(this.$refs.columnar)
+            let option = {
+                legend: {},
+                tooltip: {},
+                dataZoom: {
+                    type: 'inside',
+                },
+                dataset: {
+                    source: [
+                        ['product', '2015', '2016', '2017'],
+                        ['Matcha Latte', 43.3, 85.8, 93.7],
+                        ['Milk Tea', 83.1, 73.4, 55.1],
+                        ['Cheese Cocoa', 86.4, 65.2, 82.5],
+                        ['Walnut Brownie', 72.4, 53.9, 39.1]
+                    ]
+                },
+                xAxis: {type: 'category'},
+                yAxis: {},
+                // Declare several bar series, each will be mapped
+                // to a column of dataset.source by default.
+                series: [
+                    {type: 'bar'},
+                    {type: 'bar'},
+                    {type: 'bar'}
+                ]
+            };
+            columnarLine.setOption(option);
         },
         // 饼图
+        breadChart(){
+            let breadLine = echarts.init(this.$refs.bread)
+            let option = {
+                title: {
+                    // text: '排号',
+                    // subtext: '纯属虚构',
+                    // left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+                },
+                series: [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data: [
+                            {value: 335, name: '直接访问'},
+                            {value: 310, name: '邮件营销'},
+                            {value: 234, name: '联盟广告'},
+                            {value: 135, name: '视频广告'},
+                            {value: 1548, name: '搜索引擎'}
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            breadLine.setOption(option);
+        },
+        // top
+         handleClick(tab, event) {
+            // console.log(tab, event);
+        },
         // 切换统计方式
         dayOrMon(num){
             this.day_mon = num
@@ -167,6 +340,7 @@ export default {
 @font-14:14px;
 @font-15:15px;
 @def-color:#000;
+@line-bg-color:rgb(138, 143, 134);
 .top_box{
     font-size: @font-14;
     height: 120px;
@@ -242,24 +416,64 @@ export default {
     }
     .m_m{
         flex: .4;
+        .top_li{
+            height: 120px;
+            margin-bottom: 20px;
+            display: flex;
+            .tl{
+                flex: .2;
+                img{
+                    width: 100%;
+                    border-radius: 5px;
+                }
+            }
+            .tr{
+                flex: .8;
+                padding: 20px 0 20px 20px;
+                .tit{
+                    font-weight: bold;
+                }
+                .good_ifo{
+                    margin: 10px 0;
+                }
+                .pro{
+                    width: 100px;
+                    background: seagreen;
+                    height: 15px;
+                }
+            }
+
+            
+        }
     }
     .m_r{
         flex: .2;
+        .timeData{
+            width: 125px;
+            margin:0 auto ;
+            margin-top: 100px;
+            .day_li{
+                height: 420px;
+                overflow-y: scroll;
+                li{
+                    height: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    cursor: pointer;
+                }
+            }
+            .day_li::-webkit-scrollbar {display:none}
+        }
     }
     .column{
         display: flex;
         margin: 20px 0;
     }
-
-
-
-
-
 }
 // 公用
 .line{
     width: 5px;
-    background: rgb(138, 143, 134);
+    background: @line-bg-color;
     margin-right: 10px;
     display: inline-block;
 }
@@ -281,19 +495,49 @@ export default {
     color: rgb(55, 55, 177);
     font-weight: 600;
 }
+.choose{
+    position: relative;
+    font-weight: bold;
+    font-size: 16px;
+}
+.choose::before{
+    content: '';
+    width: 40px;
+    height: 1px;
+    border-bottom: 2px solid #676767;
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 14px;
+}
+.choose::after{
+    content: '';
+    width: 40px;
+    height: 1px;
+    border-bottom: 2px solid #676767;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 14px;
+}
 // element  
 .el-rate{
     display: inline-block;
     // position: relative;
     position: absolute;
     left: 136px;
+    top: -7px;
     /deep/.el-rate__icon{
+        color: red!important;
+        font-size: 27px;
+    }
+    /deep/ .el-rate__decimal{
         color: red!important;
     }
     /deep/ .el-rate__text{
         position: absolute;
         left: -48px;
-        top: -8px;
+        top: -2px;
         font-size: 30px;
         font-weight: bold;
         color: #000!important;
@@ -301,5 +545,33 @@ export default {
     }
 
 }
-
+/deep/ .el-tabs__active-bar{
+    background-color: @line-bg-color;
+}
+/deep/ .el-tabs__item.is-active{
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+}
+/deep/ .el-tabs__nav-wrap::after{
+    background: none;
+}
+/deep/ .el-tabs__item:hover{
+    color: @line-bg-color;
+}
+/deep/ .el-tab-pane{
+    height: 420px;
+    overflow-y: scroll;
+}
+/deep/ .el-input__inner{
+    border: none;
+    font-size: 16px;
+    color: #000;
+}
+/deep/ .el-date-editor{
+    width: 120px;
+}
+/deep/ .el-input__prefix{
+    display: none;
+}
 </style>
