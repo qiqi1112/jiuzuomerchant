@@ -1,4 +1,12 @@
+/*
+ * @Author: xuxiao 
+ * @Date: 2020-08-24 18:02:13 
+ * @Last Modified by: xu.xiao
+ * @Last Modified time: 2020-08-24 18:02:33
+ */
+
 import Message from "element-ui/packages/message/index.js";
+// 
 // 手机号码验证
 function phone(val) {
     if (!(/^1[3456789]\d{9}$/.test(val))) {

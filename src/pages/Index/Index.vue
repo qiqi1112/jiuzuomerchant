@@ -1,4 +1,11 @@
 <template>
+<!-- 
+    /*
+    *author:xuxiao
+    *date：2020-7-1
+    *des：商家端后台展示首页
+    */
+ -->
     <div>
         <div class="container">
             <div class="top_box">
@@ -95,12 +102,17 @@
                             <el-date-picker
                                 v-model="time_now"
                                 type="month"
+                                :clearable="false"
+                                :editable="false"
+                                @focus="focSta=true"
+                                @blur="focSta=false"
+                                :time-arrow-control='true'
                                 :placeholder="time_now">
                             </el-date-picker>
+                            <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
                         <div class="day_li">
                             <ul>
-                                
                                 <li :class="active==index?'choose':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li>
                             </ul>
                         </div>
@@ -117,7 +129,8 @@ export default {
     data() {
         return {
             day_mon:1,
-            value: 3.7,
+            focSta:false,
+            value: 2.6,
             // brokenline:'',
             // columnarLine:'',
             activeName: 'first',
@@ -262,11 +275,11 @@ export default {
                 },
                 dataset: {
                     source: [
-                        ['product', '2015', '2016', '2017'],
-                        ['Matcha Latte', 43.3, 85.8, 93.7],
-                        ['Milk Tea', 83.1, 73.4, 55.1],
-                        ['Cheese Cocoa', 86.4, 65.2, 82.5],
-                        ['Walnut Brownie', 72.4, 53.9, 39.1]
+                        ['product', '开台数', '预定桌数', '访问记录'],
+                        ['7', 43.3, 85.8, 93.7],
+                        ['8', 83.1, 73.4, 55.1],
+                        ['9', 86.4, 65.2, 82.5],
+                        ['10', 72.4, 53.9, 39.1]
                     ]
                 },
                 xAxis: {type: 'category'},
@@ -295,9 +308,9 @@ export default {
                     formatter: '{a} <br/>{b} : {c} ({d}%)'
                 },
                 legend: {
-                    orient: 'vertical',
-                    left: 'left',
-                    data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+                    // orient: 'vertical',
+                    // left: 'left',
+                    // data: ['排号数 25% （29座）', '取消排号数', '生效排号数']
                 },
                 series: [
                     {
@@ -306,11 +319,9 @@ export default {
                         radius: '55%',
                         center: ['50%', '60%'],
                         data: [
-                            {value: 335, name: '直接访问'},
-                            {value: 310, name: '邮件营销'},
-                            {value: 234, name: '联盟广告'},
-                            {value: 135, name: '视频广告'},
-                            {value: 1548, name: '搜索引擎'}
+                            {value: 335, name: '排号数 25% （29座）'},
+                            {value: 310, name: '取消排号数 25% （29座）'},
+                            {value: 234, name: '生效排号数 25% （29座）'},
                         ],
                         emphasis: {
                             itemStyle: {
@@ -452,6 +463,14 @@ export default {
             width: 125px;
             margin:0 auto ;
             margin-top: 100px;
+            .block{
+                position: relative;
+                .jt{
+                    position: absolute;
+                    top: 7px;
+                    right: 18px;
+                }
+            }
             .day_li{
                 height: 420px;
                 overflow-y: scroll;
@@ -523,7 +542,6 @@ export default {
 // element  
 .el-rate{
     display: inline-block;
-    // position: relative;
     position: absolute;
     left: 136px;
     top: -7px;
@@ -570,6 +588,7 @@ export default {
 }
 /deep/ .el-date-editor{
     width: 120px;
+    
 }
 /deep/ .el-input__prefix{
     display: none;

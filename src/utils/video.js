@@ -1,3 +1,10 @@
+/*
+ * @Author: xuxiao 
+ * @Date: 2020-08-24 18:02:54 
+ * @Last Modified by:   xu.xiao 
+ * @Last Modified time: 2020-08-24 18:02:54 
+ */
+
 import { Quill } from 'vue-quill-editor'
  
 // 源码中是import直接倒入，这里要用Quill.import引入
