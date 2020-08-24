@@ -11,19 +11,35 @@
         <div class="container">
             <!-- 头部模块 -->
             <div class="handle-box">
-                <el-button
+                <!-- <el-button
                     type="primary"
                     icon="el-icon-delete"
                     class="handle-del mr10"
                     @click="delAllSelection"
-                >批量删除</el-button>
-                <el-button
+                >批量删除</el-button>-->
+                <!-- <el-button
                     type="success"
                     icon="el-icon-delete"
                     class="handle-del mr10"
                     @click="addInfo"
-                >添加</el-button>
-                <el-input v-model="searchVal" placeholder="请输入" class="handle-input mr10"></el-input>
+                >添加</el-button>-->
+                <el-input v-model="searchName" placeholder="用户昵称" class="handle-input mr10"></el-input>
+                <el-select v-model="value1" placeholder="收藏本店" style="width:100px" class="mr10">
+                    <el-option
+                        v-for="item in options1"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    ></el-option>
+                </el-select>
+                <el-select v-model="value2" placeholder="本店会员" style="width:100px" class="mr10">
+                    <el-option
+                        v-for="item in options2"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    ></el-option>
+                </el-select>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
 
@@ -33,9 +49,7 @@
                 :data="tableData"
                 tooltip-effect="dark"
                 style="width: 100%"
-                @selection-change="handleSelectionChange"
             >
-                <el-table-column type="selection"></el-table-column>
                 <el-table-column label="编号" type="index" fixed></el-table-column>
                 <el-table-column prop="name" label="用户昵称"></el-table-column>
                 <el-table-column label="用户手机" min-width="100">
@@ -55,21 +69,26 @@
                 <el-table-column prop="conDate" label="最近一次消费时间" min-width="135"></el-table-column>
                 <el-table-column prop="visitDate" label="最近一次访问店铺时间" min-width="135"></el-table-column>
                 <el-table-column prop="conMoney" label="本店累计消费金额" min-width="75"></el-table-column>
-                <el-table-column label="操作" fixed="right" min-width="160">
+                <el-table-column label="操作" fixed="right" min-width="80">
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button
+                            type="primary"
+                            size="mini"
+                            @click="lookInfo(scope.$index, scope.row)"
+                        >查看</el-button>
+                        <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button
                             size="mini"
                             type="danger"
                             @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>
+                        >删除</el-button>-->
                     </template>
                 </el-table-column>
             </el-table>
 
             <!-- 对话框 -->
-            <el-dialog title="修改信息" :visible.sync="dialogFormVisible" @close="handleClose">
-                <el-form :model="form" :rules="rules" ref="form">
+            <el-dialog title="用户信息" :visible.sync="dialogFormVisible">
+                <!-- <el-form :model="form" :rules="rules" ref="form">
                     <el-form-item label="用户昵称" :label-width="formLabelWidth">
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
@@ -125,10 +144,11 @@
                     <el-form-item label="本店累计消费金额" :label-width="formLabelWidth" prop="conMoney">
                         <el-input v-model="form.conMoney"></el-input>
                     </el-form-item>
-                </el-form>
+                </el-form>-->
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="handleCancel('form')">取 消</el-button>
-                    <el-button type="primary" @click="submitForm('form')">确 定</el-button>
+                    <el-button type="primary" @click="sure('form')">确 定</el-button>
+                    <!-- <el-button @click="handleCancel('form')">取 消</el-button> -->
+                    <!-- <el-button type="primary" @click="submitForm('form')">确 定</el-button> -->
                 </div>
             </el-dialog>
 
@@ -147,157 +167,46 @@
 </template>
 
 <script>
-// import Message from 'element-ui/packages/message/index.js';
-// import { inputText, phone } from '../../utils/regular';
-
 export default {
     data() {
-        //验证整形
-        function isInteger(rule, value, callback) {
-            if (!Number.isInteger(value)) {
-                callback(new Error('请输入整数值'));
-            } else {
-                callback();
-            }
-        }
-
-        //验证电话
-        function isPhone(rule, value, callback) {
-            if (!/^1[3456789]\d{9}$/.test(value)) {
-                callback(new Error('请输入正确的手机号'));
-            } else {
-                callback();
-            }
-        }
-
-        //验证金额
-        function isMoney(rule, value, callback) {
-            if (!/^\d+(\.\d{1,2})?$/.test(value.trim())) {
-                callback(new Error('请输入正确的金额（最多保留两位有效小数）'));
-            } else {
-                callback();
-            }
-        }
-
-        //表单验证规则函数
-        let checkNumber = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('用户手机不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isPhone(rule, value, callback);
-        };
-
-        let checkMoney = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('消费金额不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isMoney(rule, value, callback);
-        };
-
-        let checkConNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('到店消费次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkAANum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('AA拼单次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkReserveNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('预定桌消费次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkRowNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('排号次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkVaildNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('生效排号次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkCancelNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('取消排号次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkEvalNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('评价次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
-        let checkVisitNum = (rule, value, callback) => {
-            if (!value) {
-                if (value !== 0) {
-                    return callback(new Error('访问店铺次数不能为空'));
-                } else {
-                    callback();
-                }
-            }
-            isInteger(rule, value, callback);
-        };
-
         return {
             // 头部模块---------------------------------------
-            searchVal: '',
+            searchName: '', //用户昵称输入框
+            options1: [
+                {
+                    value: '不限',
+                    label: '不限'
+                },
+                {
+                    value: '是',
+                    label: '是'
+                },
+                {
+                    value: '否',
+                    label: '否'
+                }
+            ],
+            value1: '',
+            options2: [
+                {
+                    value: '不限',
+                    label: '不限'
+                },
+                {
+                    value: '是',
+                    label: '是'
+                },
+                {
+                    value: '否',
+                    label: '否'
+                }
+            ],
+            value2: '',
 
             // 表格相关属性------------------------------------
             tableData: [
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三1',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -313,7 +222,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三2',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -329,7 +238,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三3',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -345,7 +254,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三4',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -361,7 +270,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三5',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -377,7 +286,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三6',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -393,7 +302,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三7',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -409,7 +318,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三8',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -425,7 +334,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三9',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -441,7 +350,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三10',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -457,7 +366,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三11',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -473,7 +382,7 @@ export default {
                     conMoney: '2899.99'
                 },
                 {
-                    name: '你说的覅好久开始',
+                    name: '张三12',
                     number: '14781828227',
                     AANum: '289',
                     conNum: '292',
@@ -489,8 +398,7 @@ export default {
                     conMoney: '2899.99'
                 }
             ],
-            multipleSelection: [], //勾选中的信息数组
-            rowNumber: 0,
+            // multipleSelection: [], //勾选中的信息数组
 
             // 分页相关属性------------------------------------
             dataListCount: 0, //默认当前要显示的数据条数
@@ -516,31 +424,25 @@ export default {
                 visitDate: '',
                 conMoney: ''
             },
-            formLabelWidth: '160px', //表单标题的宽度
+            formLabelWidth: '160px' //表单标题的宽度
 
             //验证规则------------------------------------------
-            rules: {
-                conNum: [{ validator: checkConNum, trigger: 'blur' }],
-                AANum: [{ validator: checkAANum, trigger: 'blur' }],
-                reserveNum: [{ validator: checkReserveNum, trigger: 'blur' }],
-                rowNum: [{ validator: checkRowNum, trigger: 'blur' }],
-                vaildNum: [{ validator: checkVaildNum, trigger: 'blur' }],
-                cancelNum: [{ validator: checkCancelNum, trigger: 'blur' }],
-                evalNum: [{ validator: checkEvalNum, trigger: 'blur' }],
-                visitNum: [{ validator: checkVisitNum, trigger: 'blur' }],
-                number: [{ validator: checkNumber, trigger: 'blur' }],
-                conMoney: [{ validator: checkMoney, trigger: 'blur' }]
-            }
+            // rules: {
+            //     conNum: [{ validator: checkConNum, trigger: 'blur' }],
+            //     AANum: [{ validator: checkAANum, trigger: 'blur' }],
+            //     reserveNum: [{ validator: checkReserveNum, trigger: 'blur' }],
+            //     rowNum: [{ validator: checkRowNum, trigger: 'blur' }],
+            //     vaildNum: [{ validator: checkVaildNum, trigger: 'blur' }],
+            //     cancelNum: [{ validator: checkCancelNum, trigger: 'blur' }],
+            //     evalNum: [{ validator: checkEvalNum, trigger: 'blur' }],
+            //     visitNum: [{ validator: checkVisitNum, trigger: 'blur' }],
+            //     number: [{ validator: checkNumber, trigger: 'blur' }],
+            //     conMoney: [{ validator: checkMoney, trigger: 'blur' }]
+            // }
         };
     },
 
     methods: {
-        //勾选中的数据
-        handleSelectionChange(val) {
-            this.multipleSelection = val;
-            console.log(val);
-        },
-
         // 页码发生变化后
         handleCurrentChange(val) {
             //将当前跳转的页码赋给显在页面上的页码
@@ -555,129 +457,154 @@ export default {
             }
         },
 
-        //清空表单属性值
-        emptyForm() {
-            this.form.name = '';
-            this.form.number = '';
-            this.form.conNum = '';
-            this.form.AANum = '';
-            this.form.reserveNum = '';
-            this.form.rowNum = '';
-            this.form.vaildNum = '';
-            this.form.cancelNum = '';
-            this.form.collect = '';
-            this.form.evalNum = '';
-            this.form.visitNum = '';
-            this.form.conDate = '';
-            this.form.visitDate = '';
-            this.form.conMoney = '';
-        },
-
-        //编辑按钮
-        handleEdit(index, row) {
+        //查看按钮
+        lookInfo(index, row) {
             this.dialogFormVisible = true;
-            this.rowNumber = index; //当前编辑的是第几行
-            //回显数据
-            this.form.name = row.name;
-            this.form.number = row.number;
-            this.form.conNum = row.conNum;
-            this.form.AANum = row.AANum;
-            this.form.reserveNum = row.reserveNum;
-            this.form.rowNum = row.rowNum;
-            this.form.vaildNum = row.vaildNum;
-            this.form.cancelNum = row.cancelNum;
-            this.form.collect = row.collect;
-            this.form.evalNum = row.evalNum;
-            this.form.visitNum = row.visitNum;
-            this.form.conDate = row.conDate;
-            this.form.visitDate = row.visitDate;
-            this.form.conMoney = row.conMoney;
-        },
-
-        //对话框关闭的操作
-        handleClose() {
-            this.$refs["form"].resetFields();
-            this.emptyForm();
-        },
-
-        //批量删除操作
-        delAllSelection() {
-            this.$message.success(`删除成功`);
-        },
-
-        //添加按钮
-        addInfo() {
-            this.dialogFormVisible = true;
-            // this.tableData.unshift({
-            //     name: this.form.name,
-            //     number: this.form.number,
-            //     AANum: this.form.AANum,
-            //     conNum: this.form.conNum,
-            //     reserveNum: this.form.reserveNum,
-            //     rowNum: this.form.rowNum,
-            //     vaildNum: this.form.vaildNum,
-            //     cancelNum: this.form.cancelNum,
-            //     collect: this.form.collect,
-            //     evalNum: this.form.evalNum,
-            //     visitNum: this.form.visitNum,
-            //     conDate: this.form.conDate,
-            //     visitDate: this.form.visitDate,
-            //     conMoney: this.form.conMoney
-            // });
         },
 
         //搜索按钮
         handleSearch() {
-            console.log(this.searchVal);
-        },
+            let searchName = this.searchName;
+            if (searchName) {
+                // this.tableData.filter(item => {
+                //     if(item.name == searchName) {
+                //         this.tableData = item;
+                //     }
+                //     return item
+                // });
 
-        //删除按钮
-        handleDelete(index, row) {
-            console.log(index, row);
-            if (confirm('确定要删除吗')) {
-                this.tableData.splice(index, 1);
+                let fragArr = [];
+                this.tableData.forEach((item, i) => {
+                    if (item.name.indexOf(searchName) !== -1) {
+                        console.log('xxx', item);
+                        // this.tableData.slice(0,3);
+
+                        fragArr.push(item);
+                        // this.tableData.push(item);
+                    }
+                });
+                this.tableData = [];
+                this.tableData = fragArr;
+
+                console.log(this.tableData);
             }
-        },
 
-        //对话框里的取消按钮
-        handleCancel(formName) {
-            this.$refs[formName].resetFields();
-            this.emptyForm();
-            this.dialogFormVisible = false;
+            this.searchName = ''; //清空输入框
         },
 
         //对话框里的确认按钮
-        submitForm(formName) {
-            // this.tableData[this.rowNumber].name = this.form.name;
-            // this.tableData[this.rowNumber].number = this.form.number;
-            // this.tableData[this.rowNumber].conNum = this.form.conNum;
-            // this.tableData[this.rowNumber].AANum = this.form.AANum;
-            // this.tableData[this.rowNumber].reserveNum = this.form.reserveNum;
-            // this.tableData[this.rowNumber].rowNum = this.form.rowNum;
-            // this.tableData[this.rowNumber].vaildNum = this.form.vaildNum;
-            // this.tableData[this.rowNumber].cancelNum = this.form.cancelNum;
-            // this.tableData[this.rowNumber].collect = this.form.collect;
-            // this.tableData[this.rowNumber].evalNum = this.form.evalNum;
-            // this.tableData[this.rowNumber].visitNum = this.form.visitNum;
-            // this.tableData[this.rowNumber].conDate = this.form.conDate;
-            // // this.tableData[this.rowNumber].conDate = this.$timestampToTime(this.form.conDate.getTime());
-            // this.tableData[this.rowNumber].visitDate = this.form.visitDate;
-            // this.tableData[this.rowNumber].conMoney = this.form.conMoney;
-
-            // console.log('zzzz', this.$timestampToTime(this.form.conDate.getTime()));
-
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    alert('submit!');
-
-                    this.emptyForm();
-                    this.dialogFormVisible = false;
-                } else {
-                    console.log('error submit!!');
-                    return false;
-                }
-            });
+        sure() {
+            this.dialogFormVisible = false;
         }
+
+        //批量删除操作
+        // delAllSelection() {
+        //     this.$message.success(`删除成功`);
+        // },
+
+        //添加按钮
+        // addInfo() {
+        //     this.dialogFormVisible = true;
+        // },
+
+        //勾选中的数据
+        // handleSelectionChange(val) {
+        //     this.multipleSelection = val;
+        //     console.log(val);
+        // },
+
+        //清空表单属性值
+        // emptyForm() {
+        //     this.form.name = '';
+        //     this.form.number = '';
+        //     this.form.conNum = '';
+        //     this.form.AANum = '';
+        //     this.form.reserveNum = '';
+        //     this.form.rowNum = '';
+        //     this.form.vaildNum = '';
+        //     this.form.cancelNum = '';
+        //     this.form.collect = '';
+        //     this.form.evalNum = '';
+        //     this.form.visitNum = '';
+        //     this.form.conDate = '';
+        //     this.form.visitDate = '';
+        //     this.form.conMoney = '';
+        // },
+
+        //对话框关闭的操作
+        // handleClose() {
+        // this.emptyForm();
+        // this.$refs['form'].resetFields();
+        // },
+
+        //编辑按钮
+        // handleEdit(index, row) {
+        //     this.dialogFormVisible = true;
+        //     this.rowNumber = index; //当前编辑的是第几行
+        //     //回显数据
+        //     this.form.name = row.name;
+        //     this.form.number = row.number;
+        //     this.form.conNum = row.conNum;
+        //     this.form.AANum = row.AANum;
+        //     this.form.reserveNum = row.reserveNum;
+        //     this.form.rowNum = row.rowNum;
+        //     this.form.vaildNum = row.vaildNum;
+        //     this.form.cancelNum = row.cancelNum;
+        //     this.form.collect = row.collect;
+        //     this.form.evalNum = row.evalNum;
+        //     this.form.visitNum = row.visitNum;
+        //     this.form.conDate = row.conDate;
+        //     this.form.visitDate = row.visitDate;
+        //     this.form.conMoney = row.conMoney;
+        // },
+
+        //删除按钮
+        // handleDelete(index, row) {
+        //     console.log(index, row);
+        //     if (confirm('确定要删除吗')) {
+        //         this.tableData.splice(index, 1);
+        //     }
+        // },
+
+        //对话框里的取消按钮
+        // handleCancel(formName) {
+        //     this.$refs[formName].resetFields();
+        //     this.emptyForm();
+        //     this.dialogFormVisible = false;
+        // },
+
+        //对话框里的确认按钮
+        // submitForm(formName) {
+        //     // this.tableData[this.rowNumber].name = this.form.name;
+        //     // this.tableData[this.rowNumber].number = this.form.number;
+        //     // this.tableData[this.rowNumber].conNum = this.form.conNum;
+        //     // this.tableData[this.rowNumber].AANum = this.form.AANum;
+        //     // this.tableData[this.rowNumber].reserveNum = this.form.reserveNum;
+        //     // this.tableData[this.rowNumber].rowNum = this.form.rowNum;
+        //     // this.tableData[this.rowNumber].vaildNum = this.form.vaildNum;
+        //     // this.tableData[this.rowNumber].cancelNum = this.form.cancelNum;
+        //     // this.tableData[this.rowNumber].collect = this.form.collect;
+        //     // this.tableData[this.rowNumber].evalNum = this.form.evalNum;
+        //     // this.tableData[this.rowNumber].visitNum = this.form.visitNum;
+        //     // this.tableData[this.rowNumber].conDate = this.form.conDate;
+        //     // // this.tableData[this.rowNumber].conDate = this.$timestampToTime(this.form.conDate.getTime());
+        //     // this.tableData[this.rowNumber].visitDate = this.form.visitDate;
+        //     // this.tableData[this.rowNumber].conMoney = this.form.conMoney;
+
+        //     // console.log('zzzz', this.$timestampToTime(this.form.conDate.getTime()));
+
+        //     this.$refs[formName].validate((valid) => {
+        //         if (valid) {
+        //             alert('submit!');
+
+        //             this.emptyForm();
+        //             this.dialogFormVisible = false;
+        //         } else {
+        //             console.log('error submit!!');
+        //             return false;
+        //         }
+        //     });
+        // }
     }
 };
 </script>
@@ -698,7 +625,7 @@ export default {
 }
 
 .handle-input {
-    width: 300px;
+    width: 170px;
     display: inline-block;
 }
 
