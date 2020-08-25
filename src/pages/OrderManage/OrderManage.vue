@@ -31,19 +31,19 @@
                 @row-dblclick="lineDb"
             >
                 <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="order_id" min-width="200" label="订单号"></el-table-column>
-                <el-table-column prop="user_name" min-width="200" label="用户昵称"></el-table-column>
-                <el-table-column prop="order_type" min-width="200" label="订单类型"></el-table-column>
-                <el-table-column prop="tel" min-width="200" label="手机号"></el-table-column>
-                <el-table-column prop="creat_time" min-width="200" label="发起时间"></el-table-column>
-                <el-table-column prop="order_state" min-width="200" label="支付状态"></el-table-column>
-                <el-table-column prop="remark" min-width="200" label="备注"></el-table-column>
-                <el-table-column prop="pay_type" min-width="200" label="支付类型"></el-table-column>
-                <el-table-column prop="pay_time" min-width="200" label="实付时间"></el-table-column>
-                <el-table-column prop="total" min-width="200" label="实付金额"></el-table-column>
-                <el-table-column prop="order_detail" min-width="200" label="订单内容"></el-table-column>
-                <el-table-column prop="is_coupons" min-width="200" label="是否使用优惠券"></el-table-column>
-                <el-table-column prop="coupons_total" min-width="200" label="优惠券金额"></el-table-column>
+                <el-table-column prop="order_id" min-width="200" label="预定用户"></el-table-column>
+                <el-table-column prop="user_name" min-width="200" label="预定手机"></el-table-column>
+                <el-table-column prop="order_type" min-width="200" label="订单类型"></el-table-column>  
+                <el-table-column prop="tel" min-width="200" label="订单号"></el-table-column>
+                <el-table-column prop="creat_time" min-width="200" label="支付状态"></el-table-column>
+                <el-table-column prop="order_state" min-width="200" label="支付类型"></el-table-column>
+                <el-table-column prop="remark" min-width="200" label="实付金额"></el-table-column>
+                <el-table-column prop="pay_type" min-width="200" label="优惠卷"></el-table-column>
+                <el-table-column prop="pay_time" min-width="200" label="备注信息"></el-table-column>
+                <el-table-column prop="total" min-width="200" label="订单发起时间"></el-table-column>
+                <el-table-column prop="order_detail" min-width="200" label="订单支付时间"></el-table-column>
+                <el-table-column prop="is_coupons" min-width="200" label="订单信息"></el-table-column>
+                <!-- <el-table-column prop="coupons_total" min-width="200" label="优惠券金额"></el-table-column> -->
                 <!-- <el-table-column label="活动发布" min-width="100">
                     <template slot-scope="scope">{{scope.row.act_release}}</template>
                 </el-table-column>
@@ -56,8 +56,8 @@
                 <el-table-column prop="act_content"  class-name="beyond" min-width="320" :show-overflow-tooltip='true' label="活动内容"></el-table-column> -->
                 <el-table-column label="操作" width="180" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" >编辑</el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" >删除</el-button>
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" >查看</el-button>
+                        <!-- <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" >删除</el-button> -->
                     </template>
                 </el-table-column>
             </el-table>
@@ -75,9 +75,53 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog :title="doing" :visible.sync="editVisible" width="32%">
-            <el-form ref="form" :model='form'  label-width="100px" :rules='rules'>
-                    <el-form-item prop="user_name" label="用户昵称"><el-input v-model="form.user_name"></el-input></el-form-item>
-                    <el-form-item prop="order_id" label="订单号"><el-input v-model="form.order_id"></el-input></el-form-item>   
+            <el-form ref="form" :model='form'  label-width="100px" ><!--:rules='rules'-->
+                    <div class="column">
+                        <span class="line lw2"></span>
+                        <span>订单信息</span>
+                    </div>
+
+                    <div class="order_detail">
+                        <div class="ol">
+                            <div class="or_li">
+                                <span class="or_lab">预定用户：</span>
+                                <span class="or_info">张十周年</span>
+                            </div>
+                            <div class="or_li">
+                                <span class="or_lab">预定手机：</span>
+                                <span class="or_info">19999999999</span>
+                            </div>
+                            <div class="or_li">
+                                <span class="or_lab">预定备注信息：</span>
+                                <span class="or_info">帮我提前打理好卫生吧，我这里来的是比较重要的领导，会早点来</span>
+                            </div>
+                            <div class="or_li">
+                                <span class="or_lab">订单号：</span>
+                                <span class="or_info">Mugabsj587416594KSJD54</span>
+                            </div>
+                            <div>
+                                <span>订单类型：&nbsp;</span>
+                                <span class="ors">预定桌</span>
+                                <span>支付状态：&nbsp;</span>
+                                <span class="ors sta">已支付</span>
+                                <span>支付方式：&nbsp;</span>
+                                <span>微信</span>
+                            </div>
+
+                            <div>
+                                <div>
+                                    <span>支付金额：</span><span class="total">￥1298.00</span>
+                                    <span>商品原价：</span><span class="total">￥1298.00</span>
+                                </div>
+                                <div>
+                                    <span>优惠券优惠：  </span><span class="total">￥1298.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="or"></div>
+                    </div>
+                    <!-- <el-form-item prop="user_name" label="用户昵称"><el-input v-model="form.user_name"></el-input></el-form-item> -->
+                    <!-- <el-form-item prop="order_id" label="订单号"><el-input v-model="form.order_id"></el-input></el-form-item>   
                     <el-form-item prop="order_type" label="订单类型"><el-input v-model="form.order_type"></el-input></el-form-item>   
                     <el-form-item prop="tel" label="手机号"><el-input v-model="form.tel"></el-input></el-form-item>   
                     <el-form-item prop="creat_time" label="发起时间"><el-input v-model="form.creat_time"></el-input></el-form-item>   
@@ -88,24 +132,8 @@
                     <el-form-item prop="remark" label="备注"><el-input v-model="form.remark"></el-input></el-form-item>   
                     <el-form-item prop="order_detail" label="订单内容"><el-input v-model="form.order_detail"></el-input></el-form-item>   
                     <el-form-item prop="is_coupons" label="使用优惠券"><el-input v-model="form.is_coupons"></el-input></el-form-item>   
-                    <el-form-item prop="coupons_total" label="优惠券金额"><el-input v-model="form.coupons_total"></el-input></el-form-item>   
+                    <el-form-item prop="coupons_total" label="优惠券金额"><el-input v-model="form.coupons_total"></el-input></el-form-item>    -->
 
-                <!-- <el-form-item label="活动名称">
-                    <el-input v-model="form.act_name"></el-input>
-                </el-form-item>
-                <el-form-item label="活动发布">
-                     <div class="block">
-                        <el-date-picker
-                        v-model="form.act_release"
-                        type="datetime"
-                        placeholder="选择日期时间">
-                        </el-date-picker>
-                    </div>
-                </el-form-item>
-                <el-form-item label="活动简介"><el-input v-model="form.act_introduce"></el-input></el-form-item>
-                <el-form-item label="活动内容">
-                    <el-input v-model="form.act_content"></el-input>
-                </el-form-item> -->
                 <!-- <el-form-item label="活动标签">
                     <el-input v-model="form.act_lable"></el-input>
                 </el-form-item> -->
@@ -129,10 +157,10 @@
                     <el-button @click="editVisible = false">取 消</el-button>
                     <el-button type="primary" @click="saveEdit">确 定</el-button>
                 </span> -->
-                <el-form-item>
+                <!-- <el-form-item>
                     <el-button @click="editVisible = false">取消</el-button>
                     <el-button type="primary" @click="saveEdit">确定</el-button>
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
         </el-dialog>
     </div>
@@ -253,7 +281,6 @@ export default {
                 coupons_total: [
                     { required: true, message: '请输入优惠券金额', trigger: 'blur' }
                 ],
-
             }
         };
     },
@@ -352,7 +379,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang='less'>
 .handle-box {
     margin-bottom: 20px;
 }
@@ -394,4 +421,41 @@ export default {
     -webkit-box-orient:vertical;
     -webkit-line-clamp:2; 
 } */
+/* 弹窗 */
+.order_detail{
+    display: flex;
+    .ol{
+        flex: 1;
+        .or_li{
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .or_lab{
+            flex: .3;
+            width: 100px;
+        }
+        .or_info{
+            flex: .7;
+            width: 100px;
+            border: 1px solid #8c8c8c;
+            border-radius: 5px;
+            padding:7px  10px;
+            box-sizing: border-box;
+        }
+        .ors{
+            margin-right: 41px;
+        }
+        .sta{
+            color: #488c05;
+        }
+    }
+    .or{
+        flex: 1;
+    }
+}
+
+// element
+/deep/.el-dialog{
+    width: 46%!important;
+}
 </style>

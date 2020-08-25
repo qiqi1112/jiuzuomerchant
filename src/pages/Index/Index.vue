@@ -31,8 +31,8 @@
                     <span class="line lw2"></span> <span>今日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
                     </div>
                     <div class="comp">
-                        <span class="line lw2"></span><span class="jg">今日客访数 <i class="xtc">19</i> 次，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
-                        <span class="line lw2"></span><span>店铺曝光量<i class="xtc"> 19538 </i> 次，同比昨日 <i class="xtc">234234 P</i></span>
+                        <span class="line lw2"></span><span class="jg">今日新增访客 <i class="xtc">19</i> 人，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
+                        <span class="line lw2"></span><span>店铺曝光量 <i class="xtc">234234 P</i></span>
                     </div>
                 </div>
                 <div class="to_view">
@@ -111,9 +111,11 @@
                             </el-date-picker>
                             <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
-                        <div class="day_li">
+                        <div class="day_li" ref="day_li">
                             <ul>
-                                <li :class="active==index?'choose':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li>
+                                <div class="choose" ref="choose" ></div>
+                                <!-- <li :class="active==index?'choose':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li> -->
+                                <li ref="day" :style="{top:scrollY * 30 +'px'}"  :class="active==index?'onAct':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li>
                             </ul>
                         </div>
                     </div>
@@ -167,12 +169,26 @@ export default {
                     ml:'150',
                     sold:770,
                 },
-            ]
+            ],
+            currentId:1,
+            i:0,
+            scrollY:0,
         };
     },
     created(){
         this.time_now = this.$regular.timeData(new Date().getTime(),5)
         this.days = this.timeDay(this.time_now)
+        // this.$nextTick(() => {
+        //     let day = this.$refs.day
+        //     for(let i=0;i<day.length;i++){
+        //         if(day[i].offsetTop == this.$refs.choose.offsetTop){
+        //             console.log(day[i])
+        //             console.log(i)
+        //             this.acitive = i
+        //             break;
+        //         }
+        //     }
+        // })
     },
     watch: {
         time_now(val) {
@@ -184,8 +200,18 @@ export default {
         this.brokenChart()
         this.columnarChart()
         this.breadChart()
+        this.$refs.day_li.addEventListener("wheel", this.myFunction,true);
     },
     methods:{
+        myFunction(e){
+            e.stopPropagation()
+            e.preventDefault(); 
+            if(e.wheelDelta>0){
+                this.scrollY -=1
+            }else{
+                this.scrollY +=1
+            }
+        },
         // 日期选择
         timeDay(time){
             let trr = time.split('-')
@@ -398,7 +424,7 @@ export default {
         .comp{
             display: flex;
             .jg{
-                margin-right: 20px;
+                margin-right: 30px;
             }
         }
     }
@@ -459,12 +485,12 @@ export default {
     }
     .m_r{
         flex: .2;
+        position: relative;
         .timeData{
             width: 125px;
             margin:0 auto ;
             margin-top: 100px;
             .block{
-                position: relative;
                 .jt{
                     position: absolute;
                     top: 7px;
@@ -472,38 +498,46 @@ export default {
                 }
             }
             .day_li{
-                height: 420px;
+                height: 450px;
                 overflow-y: scroll;
+                ul{
+                    // position: relative;
+                }
                 li{
                     height: 30px;
                     line-height: 30px;
                     text-align: center;
                     cursor: pointer;
+                    position: relative;
+                }
+                .onAct{
+                    color: #000;
+                    font-weight: bold;
                 }
             }
             .day_li::-webkit-scrollbar {display:none}
         }
     }
-    .column{
-        display: flex;
-        margin: 20px 0;
-    }
+    // .column{
+    //     display: flex;
+    //     margin: 20px 0;
+    // }
 }
 // 公用
-.line{
-    width: 5px;
-    background: @line-bg-color;
-    margin-right: 10px;
-    display: inline-block;
-}
-.lw1{
-    height: 30px;
+// .line{
+//     width: 5px;
+//     background: @line-bg-color;
+//     margin-right: 10px;
+//     display: inline-block;
+// }
+// .lw1{
+//     height: 30px;
 
-}
-.lw2{
-    height: 20px;
+// }
+// .lw2{
+//     height: 20px;
     
-}
+// }
 .xtc{
     color: rgb(255, 102, 0);
     font-weight: 600;
@@ -515,9 +549,13 @@ export default {
     font-weight: 600;
 }
 .choose{
-    position: relative;
+    position: absolute;
     font-weight: bold;
     font-size: 16px;
+    width:125px;
+    height:30px;
+    // top: 210px;
+    top: 340px;
 }
 .choose::before{
     content: '';
@@ -581,10 +619,13 @@ export default {
     height: 420px;
     overflow-y: scroll;
 }
+/deep/ .el-tab-pane::-webkit-scrollbar {display:none}
 /deep/ .el-input__inner{
     border: none;
     font-size: 16px;
     color: #000;
+    height: 30px;
+    line-height: 30px;
 }
 /deep/ .el-date-editor{
     width: 120px;
