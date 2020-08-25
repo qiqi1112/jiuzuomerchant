@@ -109,58 +109,71 @@
                             </div>
 
                             <div>
-                                <div>
+                                <div class="dl">
                                     <span>支付金额：</span><span class="total">￥1298.00</span>
-                                    <span>商品原价：</span><span class="total">￥1298.00</span>
+                                    <span class="old_t">商品原价：</span><span class="total">￥1298.00</span>
                                 </div>
-                                <div>
-                                    <span>优惠券优惠：  </span><span class="total">￥1298.00</span>
+                                <div class="dl tr">
+                                    <span>优惠券优惠：</span><span class="total">￥1298.00</span>
+                                </div>
+                            </div>
+
+                            <div class="or_li">
+                                <span class="or_lab">下单时间：</span>
+                                <span class="or_t">2020-09-23 09:56:28 星期三</span>
+                            </div>
+                            <div class="or_li">
+                                <span class="or_lab">支付时间：</span>
+                                <span class="or_t">2020-09-23 09:56:28 星期三</span>
+                            </div>
+                        </div>
+                        <div class="or">
+                            <div class="orl">
+                                清单详情：
+                            </div>
+                            <div class="orr">
+                                <div class="seat">
+                                    <p class="tit">座位信息</p>
+                                    <div class="oli">
+                                        <span class="olil">座位号</span>
+                                        <span class="olir">K5座</span>
+                                    </div>
+                                    <div class="oli">
+                                        <span class="olil">容纳人数</span>
+                                        <span class="olir">8人</span>
+                                    </div>
+                                    <div class="oli">
+                                        <span class="olil">保留时间</span>
+                                        <span class="olir">最晚至 20：30</span>
+                                    </div>
+                                    <div class="oli">
+                                        <span class="olil">抵消金额</span>
+                                        <span class="olir">￥ 1000.00</span>
+                                    </div>
+                                </div>
+                                <div class="coupons">
+                                    <p class="tit">优惠卷</p>
+                                    <div class="oli">满1000减50</div>
+                                </div>
+                                <div class="drinks">
+                                    <p class="tit">酒水清单</p>
+                                     <div class="oli">
+                                        <span class="olil">商品名称</span>
+                                        <span class="olir">￥246.00 <span>￥246.00</span></span>
+                                    </div>
+                                    <div class="onu"><span class="olil">*1</span></div>
+                                     <div class="oli">
+                                        <span class="olil">抵消金额</span>
+                                        <span class="olir">￥246.00 <span>￥246.00</span></span>
+                                    </div>
+                                    <div class="onu"><span class="olil">*2</span></div>
+                                </div>
+                                <div class="save">
+                                    <el-button type="primary">返回</el-button>
                                 </div>
                             </div>
                         </div>
-                        <div class="or"></div>
                     </div>
-                    <!-- <el-form-item prop="user_name" label="用户昵称"><el-input v-model="form.user_name"></el-input></el-form-item> -->
-                    <!-- <el-form-item prop="order_id" label="订单号"><el-input v-model="form.order_id"></el-input></el-form-item>   
-                    <el-form-item prop="order_type" label="订单类型"><el-input v-model="form.order_type"></el-input></el-form-item>   
-                    <el-form-item prop="tel" label="手机号"><el-input v-model="form.tel"></el-input></el-form-item>   
-                    <el-form-item prop="creat_time" label="发起时间"><el-input v-model="form.creat_time"></el-input></el-form-item>   
-                    <el-form-item prop="order_state" label="支付状态"><el-input v-model="form.order_state"></el-input></el-form-item>   
-                    <el-form-item prop="pay_type" label="支付类型"><el-input v-model="form.pay_type"></el-input></el-form-item>   
-                    <el-form-item prop="pay_time" label="实付时间"><el-input v-model="form.pay_time"></el-input></el-form-item>   
-                    <el-form-item prop="total" label="实付金额"><el-input v-model="form.total"></el-input></el-form-item>   
-                    <el-form-item prop="remark" label="备注"><el-input v-model="form.remark"></el-input></el-form-item>   
-                    <el-form-item prop="order_detail" label="订单内容"><el-input v-model="form.order_detail"></el-input></el-form-item>   
-                    <el-form-item prop="is_coupons" label="使用优惠券"><el-input v-model="form.is_coupons"></el-input></el-form-item>   
-                    <el-form-item prop="coupons_total" label="优惠券金额"><el-input v-model="form.coupons_total"></el-input></el-form-item>    -->
-
-                <!-- <el-form-item label="活动标签">
-                    <el-input v-model="form.act_lable"></el-input>
-                </el-form-item> -->
-                <!-- <el-form-item label="banner">
-                    <el-upload
-                        action="fakeaction"
-                        multiple
-                        list-type="picture-card"
-                        :http-request="uploadSectionFile"
-                        :on-change="handleChange"
-                        :limit='5'  
-                        :auto-upload="false"
-                        :on-remove="handleRemove">
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                    <el-dialog :visible.sync="dialogVisible">
-                        <img width="100%" :src="dialogImageUrl" alt="" >
-                    </el-dialog>
-                </el-form-item> -->
-                <!-- <span slot="footer" class="dialog-footer">
-                    <el-button @click="editVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
-                </span> -->
-                <!-- <el-form-item>
-                    <el-button @click="editVisible = false">取消</el-button>
-                    <el-button type="primary" @click="saveEdit">确定</el-button>
-                </el-form-item> -->
             </el-form>
         </el-dialog>
     </div>
@@ -380,6 +393,7 @@ export default {
 </script>
 
 <style scoped lang='less'>
+@border-color:#7a7a7a;
 .handle-box {
     margin-bottom: 20px;
 }
@@ -428,7 +442,7 @@ export default {
         flex: 1;
         .or_li{
             display: flex;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         .or_lab{
             flex: .3;
@@ -437,7 +451,7 @@ export default {
         .or_info{
             flex: .7;
             width: 100px;
-            border: 1px solid #8c8c8c;
+            border: 1px solid @border-color;
             border-radius: 5px;
             padding:7px  10px;
             box-sizing: border-box;
@@ -448,14 +462,81 @@ export default {
         .sta{
             color: #488c05;
         }
+        .total{
+            display: inline-block;
+            border: 1px solid @border-color;
+            padding: 5px 7px;
+            border-radius: 5px;
+            margin-left:20px;
+        }
+        .or_t{
+            flex: .7;
+        }
+        .dl{
+            margin: 20px 0;
+            .old_t{
+                margin-left: 75px;
+            }
+        }
+        .tr{
+            text-align: right;
+        }
     }
     .or{
         flex: 1;
+        // text-indent: 50px;
+        display: flex;
+        .orl{
+            flex: .2;
+            padding-left:50px ;
+        }
+        .orr{
+            flex: .65;
+            .seat,.coupons{
+               border-bottom:1px solid @border-color ; 
+               margin-bottom: 10px;
+            }
+            .drinks{
+                height: 220px;
+                overflow-y:scroll;
+            }
+            .drinks::-webkit-scrollbar {display:none}
+            .tit{
+                color: rgb(236, 126, 0);
+                margin-bottom: 10px;
+            }
+            .oli{
+                line-height: 32px;
+                span{
+                    display: inline-block;
+                }
+                .olil{
+                    width: 42%;
+                }
+                .olir{
+                    width: 58%;
+                    span{
+                        text-decoration: line-through;
+                        color: rgb(138, 138, 138);
+                    }
+                }
+            }
+            .save{
+                text-align: right;
+            }
+            .onu{
+                line-height: 20px;
+            }
+        }
     }
 }
 
 // element
 /deep/.el-dialog{
     width: 46%!important;
+    min-width: 876px;
+}
+/deep/ .el-dialog__body{
+    padding-top: 0;
 }
 </style>
