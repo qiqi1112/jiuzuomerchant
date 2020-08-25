@@ -54,19 +54,18 @@
                             @change="handleChange"
                         ></el-cascader>
                     </div>
-                    <div id="container" style="width:600px;height:500px;"></div>
                 </div>
                 <div class="service-phone">
                     <p>客服电话</p>
                     <span>028-0000 0000</span>
                 </div>
                 <p class="per-con">
-                    小店人均消费：
+                    店铺人均消费：
                     <span>500</span>元/人
                 </p>
                 <div class="shop-type">
                     <p>
-                        小店类型
+                        店铺类型
                         <span class="red-font">（用于客户筛选出本店）</span>
                     </p>
                     <div class="type-box">
@@ -78,26 +77,14 @@
                         </el-row>
                     </div>
                 </div>
+                <div class="shop-brief">
+                    <span>商品店面简介：</span>
+                    <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                </div>
             </div>
             <div class="right-wrap">
                 <h4>店铺Banner展示图</h4>
                 <div class="shop-info">
-                    <!-- <p>
-                        <img src="img/2.jpg" alt />
-                    </p>
-                    <p>
-                        <img src="img/3.jpg" alt />
-                    </p>
-                    <p>
-                        <img src="img/4.jpg" alt />
-                    </p>
-                    <p>
-                        <img src="img/5.jpg" alt />
-                    </p>
-                    <p>
-                        <img src="img/6.jpg" alt />
-                    </p>-->
-                    <!-- <p> -->
                     <el-upload
                         action="https://jsonplaceholder.typicode.com/posts/"
                         list-type="picture-card"
@@ -185,7 +172,24 @@
                         </div>
                         <div class="snacks">
                             <span class="seat-detail-span">零食</span>
-                            <div class="snacks-detail">水果拼盘 x 2</div>
+                            <div class="snacks-detail">
+                                <div>
+                                    <span>水果拼盘</span>
+                                    <span>x2</span>
+                                </div>
+                                <div>
+                                    <span>水果拼盘</span>
+                                    <span>x2</span>
+                                </div>
+                                <div>
+                                    <span>水果拼盘</span>
+                                    <span>x2</span>
+                                </div>
+                                <el-input style="width:100px" v-model="goodName" placeholder="名称"></el-input>
+                                <span class="mult">x</span>
+                                <el-input style="width:100px" v-model="goodNum" placeholder="数量"></el-input>
+                                <el-button type="primary">确定</el-button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -215,8 +219,10 @@ export default {
 
             radio: '1',
 
-            seatStyle: 'hasBook'
-            // chooseSeatArr: []
+            seatStyle: 'hasBook',
+
+            goodName: '',
+            goodNum: ''
         };
     },
     methods: {
@@ -266,31 +272,14 @@ export default {
         handleChange(value) {
             console.log(value);
             // 楼主选择江苏省南京市江宁区 打印value结果 ["320000", "320100", "320114"]
-        },
-
-        init() {
-            //步骤：定义map变量 调用 qq.maps.Map() 构造函数 获取地图显示容器
-            //设置地图中心点
-            var myLatlng = new qq.maps.LatLng(39.916527, 116.397128);
-            //定义工厂模式函数
-            var myOptions = {
-                zoom: 8, //设置地图缩放级别
-                center: myLatlng, //设置中心点样式
-                mapTypeId: qq.maps.MapTypeId.ROADMAP //设置地图样式详情参见MapType
-            };
-            //获取dom元素添加地图信息
-            var map = new qq.maps.Map(document.getElementById('container'), myOptions);
-            console.log(map);
         }
     },
 
-    created() {
-        this.Tmap();
-    },
+    watch: {},
 
-    mounted() {
-        this.init();
-    }
+    created() {},
+
+    mounted() {}
 };
 </script>
 
@@ -300,18 +289,16 @@ export default {
 }
 
 .container {
-    /* height: 100%; */
     box-sizing: border-box;
     display: flex;
-    justify-content: center;
+    /* justify-content: space-between; */
     padding: 30px;
 }
 
 .left-wrap {
-    /* border: 1px solid black; */
     width: 50%;
     height: 100%;
-    /* padding: 20px; */
+    margin-right: 50px;
 }
 
 .left-wrap h4 {
@@ -337,7 +324,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 30px;
-    /* border: 1px solid black; */
 }
 
 .left-wrap .shop-info .left-info {
@@ -381,7 +367,6 @@ export default {
 
 .left-wrap .shop-label {
     margin-bottom: 30px;
-    /* border: 1px solid black; */
 }
 
 .left-wrap .shop-label > p {
@@ -390,7 +375,6 @@ export default {
 
 .left-wrap .bussiness-hours {
     margin-bottom: 30px;
-    /* border: 1px solid black; */
 }
 
 .left-wrap .bussiness-hours > p {
@@ -399,7 +383,6 @@ export default {
 
 .left-wrap .shop-address {
     margin-bottom: 30px;
-    /* border: 1px solid black; */
 }
 
 .left-wrap .shop-address > p {
@@ -407,7 +390,6 @@ export default {
 }
 
 .left-wrap .service-phone {
-    /* border: 1px solid black; */
     margin-bottom: 30px;
 }
 
@@ -416,12 +398,15 @@ export default {
 }
 
 .left-wrap .per-con {
-    /* border: 1px solid black; */
     margin-bottom: 30px;
 }
 
 .red-font {
     color: #f00;
+}
+
+.shop-type {
+    margin-bottom: 30px;
 }
 
 .shop-type > p {
@@ -434,7 +419,6 @@ export default {
 }
 
 .right-wrap {
-    /* border: 1px solid black; */
     width: 50%;
     height: 100%;
 }
@@ -458,11 +442,9 @@ export default {
 }
 
 .right-wrap .shop-info {
-    /* border: 1px solid black; */
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    /* width: 310px; */
 }
 
 .right-wrap .shop-info {
@@ -471,9 +453,7 @@ export default {
 
 .right-wrap .shop-seat .left-box {
     float: left;
-    margin-right: 50px;
-    /* display: flex;
-    justify-content: space-between; */
+    /* margin-right: 50px; */
 }
 
 .right-wrap .shop-seat .left-box .seat-title {
@@ -607,6 +587,14 @@ export default {
     margin-right: 20px;
 }
 
+.snacks .snacks-detail {
+    float: left;
+}
+
+.snacks .snacks-detail div span:first-child {
+    margin-right: 30px;
+}
+
 .shop-seat .right-box .seat-prop .prop-box {
     float: left;
     padding: 10px;
@@ -647,5 +635,9 @@ export default {
 
 .shop-seat .right-box .mahjong {
     margin-bottom: 30px;
+}
+
+.mult {
+    margin: 0 10px;
 }
 </style>

@@ -11,18 +11,6 @@
         <div class="container">
             <!-- 头部模块 -->
             <div class="handle-box">
-                <!-- <el-button
-                    type="primary"
-                    icon="el-icon-delete"
-                    class="handle-del mr10"
-                    @click="delAllSelection"
-                >批量删除</el-button>-->
-                <!-- <el-button
-                    type="success"
-                    icon="el-icon-delete"
-                    class="handle-del mr10"
-                    @click="addInfo"
-                >添加</el-button>-->
                 <el-input v-model="searchName" placeholder="用户昵称" class="handle-input mr10"></el-input>
                 <el-select v-model="value1" placeholder="收藏本店" style="width:100px" class="mr10">
                     <el-option
