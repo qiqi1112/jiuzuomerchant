@@ -6,20 +6,19 @@
             </el-breadcrumb>
         </div>
         <el-upload class="avatar-uploader-editor" :action="serverUrl"  name="files"  :show-file-list="false"
-            :on-success="uploadSuccess" :on-error="uploadError" style="display:none"> </el-upload>
+            :on-success="uploadSuccess"  :on-error="uploadError" style="display:none"> </el-upload>
             <el-upload 
                 class="avatar-uploader-editor-video" 
                 :action="serverUrl" 
-                 
                 name="files"  :show-file-list="false"
                 :on-success="uploadSuccessVideo" 
                 :on-error="uploadError" 
                 :on-change="handleChange"
                 style="display:none"> 
             </el-upload>
-            <!-- <el-upload class="avatar-uploader-editor-voice" :action="serverUrl" name="voice" :headers="header" :show-file-list="false"
-                    :on-success="uploadSuccessVoice" :on-error="uploadError"> </el-upload>
-            -->
+            <!-- <el-upload class="avatar-uploader-editor-voice" :action="serverUrl" name="voice"  :show-file-list="false"
+                    :on-success="uploadSuccessVoice" :on-error="uploadError" style="display:none"> </el-upload> -->
+           
         <div class="container">
             <quill-editor  v-model="content" ref="myQuillEditor" :options="editorOption">
                 <div id="toolbar" slot="toolbar"> 
@@ -69,8 +68,10 @@
                 </div>  
             </quill-editor>
         </div>
-        <el-button class="editor-btn" @click="submit">重置</el-button>
-        <el-button class="editor-btn" type="primary" @click="submit">确定</el-button>
+        <div class="btn_bom">
+            <el-button class="editor-btn" @click="submit">重置</el-button>
+            <el-button class="editor-btn" type="primary" @click="submit">确定</el-button>
+        </div>
 
     </div>
 </template>
@@ -159,11 +160,12 @@
             // 富文本图片上传成功
             uploadSuccess(res,file) {
                 let quill = this.$refs.myQuillEditor.quill
+                console.log(res)
                 if (res.code == 0) {
                 // 获取光标所在位置          
                 let length = quill.getSelection().index;
                 // 插入图片res.url为服务器返回的图片地址
-                quill.insertEmbed(length, 'image', res.data.url)
+                quill.insertEmbed(length, 'image', '/text/admin/system/upload/down?keyName=' + res.data[0])
                 // 调整光标到最后         
                 quill.setSelection(length + 1)
                 } else {
@@ -322,5 +324,8 @@
     
     .ql-font-sans-serif {
         font-family: "sans-serif";
+    }
+    .btn_bom{
+        text-align: right;
     }
 </style>

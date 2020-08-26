@@ -88,8 +88,13 @@ export default {
                 },
                 {
                     icon: 'el-icon-s-flag',
-                    index: 'AdverActivity',
+                    index: 'adverActivity',
                     title: '广告活动'
+                },
+                {
+                    icon: 'el-icon-lx-commentfill',
+                    index: 'log',
+                    title: '操作日志'
                 },
                 // {
                 //     icon: 'el-icon-s-flag',

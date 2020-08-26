@@ -65,6 +65,13 @@ export default new Router({
                         title: '广告活动'
                     }
                 },
+                {
+                    path: '/log',
+                    component: () => import('../pages/Log/Log.vue'),
+                    meta: {
+                        title: '操作日志'
+                    }
+                },
                 // {
                 //     path: '/Advertising',
                 //     component: () => import('../pages/AdverActivity/Advertising.vue'),

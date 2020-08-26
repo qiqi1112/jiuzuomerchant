@@ -148,10 +148,10 @@
                     <editor :formData="dynamicValidateForm"></editor>
                 </div>
             </el-form>
-            <span slot="footer" class="dialog-footer">
+            <!-- <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">重置</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
+            </span> -->
         </el-dialog>
     </div>
 </template>
