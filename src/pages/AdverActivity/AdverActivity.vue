@@ -7,20 +7,15 @@
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
+
         <div class="container">
             <div class="handle-box">
-                <el-button
-                    type="primary"
-                    icon="el-icon-delete"
-                    class="handle-del mr10"
-                    @click="delAllSelection"
-                >申请广告栏</el-button>
                  <el-button
                     type="primary"
                     icon="el-icon-delete"
                     class="handle-del mr10"
                     @click="handleEdit()"
-                >新增广告</el-button>
+                >新增活动</el-button>
                 <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
                     <el-option key="1" label="广东省" value="广东省"></el-option>
                     <el-option key="2" label="湖南省" value="湖南省"></el-option>
@@ -37,11 +32,17 @@
                 @selection-change="handleSelectionChange"
             >
                 <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="act_name" min-width="200" label="活动名称"></el-table-column>
-                <el-table-column label="活动发布" min-width="100">
+                <el-table-column prop="act_name" min-width="200" label="活动主题"></el-table-column>
+                <el-table-column label="活动简介" min-width="100">
                     <template slot-scope="scope">{{scope.row.act_release}}</template>
                 </el-table-column>
-                <!-- <el-table-column label="banner" align="center" min-width="300">
+                <el-table-column prop="act_introduce" label="活动开始时间" min-width="220"></el-table-column>
+                <el-table-column label="标签" prop="act_lable" min-width="150" align="center">
+                    <template slot-scope="scope">
+                        <span  v-for="(item,index) in scope.row.act_lable" :key="index">{{item}} </span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="活动缩略图" align="center" min-width="300">
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
@@ -49,13 +50,6 @@
                             :src="item"
                             :preview-src-list="scope.row.banner_list"
                         ></el-image>
-                    </template>
-                </el-table-column> -->
-                <!-- <el-table-column prop="act_url" label="跳转地址" min-width="150"></el-table-column> -->
-                <el-table-column prop="act_introduce" label="活动简介" min-width="220"></el-table-column>
-                <el-table-column label="活动标签" prop="act_lable" min-width="150" align="center">
-                    <template slot-scope="scope">
-                        <span  v-for="(item,index) in scope.row.act_lable" :key="index">{{item}} </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="act_content"  class-name="beyond" min-width="320" :show-overflow-tooltip='true' label="活动内容"></el-table-column>
@@ -90,47 +84,72 @@
         <!-- 编辑弹出框 -->
         <el-dialog :title="doing" :visible.sync="editVisible" width="32%">
             <el-form ref="form" :model='form'  label-width="70px">
-                <el-form-item label="活动名称">
-                    <el-input v-model="form.act_name"></el-input>
-                </el-form-item>
-                <el-form-item label="活动发布">
-                    <!-- <el-input v-model="form.act_release"></el-input> -->
-                     <div class="block">
-                        <el-date-picker
-                        v-model="form.act_release"
-                        type="datetime"
-                        placeholder="选择日期时间">
-                        </el-date-picker>
+                <div class="column">
+                    <span class="line lw2"></span>
+                    <span>活动详情</span>
+                </div>
+                <div class="top_info">
+                    <div class="activity">
+                        <div class="in_act">
+                            <el-form-item label="活动名称">
+                                <el-input v-model="dynamicValidateForm.dio_name"></el-input>
+                            </el-form-item>
+                            <el-form-item label="活动简介">
+                                <el-input type="textarea" v-model="dynamicValidateForm.dio_introduce"></el-input>
+                            </el-form-item>
+                            <div class="lab_box">
+                                <label class="label">活动标签</label>
+                                <div class="iptList">
+                                    <el-form :model="dynamicValidateForm" ref="dynamicValidateForm"  class="demo-dynamic">
+                                        <el-form-item
+                                            v-for="(domain, index) in dynamicValidateForm.domains"
+                                            :key="domain.key"
+                                            :prop="'domains.' + index + '.value'"
+                                            :rules="{
+                                            required: true, message: '标签不能为空', trigger: 'blur'
+                                            }"
+                                        >
+                                            <el-input v-model="domain.value"></el-input>
+                                            <i class="el-icon-error" @click.prevent="removeDomain(domain)"></i>
+                                        </el-form-item>
+                                        <el-form-item>
+                                            <!-- <el-button type="primary" @click="submitForm('dynamicValidateForm')">提交</el-button> -->
+                                            <img  src="../../assets/img/jia.png" @click="addDomain" class="addLab">
+                                            <!-- <el-button @click="resetForm('dynamicValidateForm')">重置</el-button> -->
+                                        </el-form-item>
+                                    </el-form>
+                                    <!-- <input type="text" v-for="(item,index) in addNum"   :key="index"> -->
+                                    <!--  -->
+                                </div>
+                            </div>
+                        </div>                   
                     </div>
-                </el-form-item>
-                <el-form-item label="活动简介">
-                    <el-input v-model="form.act_introduce"></el-input>
-                </el-form-item>
-                <el-form-item label="活动内容">
-                    <el-input v-model="form.act_content"></el-input>
-                </el-form-item>
-                <!-- <el-form-item label="活动标签">
-                    <el-input v-model="form.act_lable"></el-input>
-                </el-form-item> -->
-                <!-- <el-form-item label="banner">
-                    <el-upload
-                        action="fakeaction"
-                        multiple
-                        list-type="picture-card"
-                        :http-request="uploadSectionFile"
-                        :on-change="handleChange"
-                        :limit='5'  
-                        :auto-upload="false"
-                        :on-remove="handleRemove">
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                    <el-dialog :visible.sync="dialogVisible">
-                        <img width="100%" :src="dialogImageUrl" alt="" >
-                    </el-dialog>
-                </el-form-item> -->
+                    <div class="banner">
+                        <div class="imgs">
+                            <p>活动Banner图:</p>
+                            <el-upload
+                                action="fakeaction"
+                                multiple
+                                list-type="picture-card"
+                                :http-request="uploadSectionFile"
+                                :on-change="handleChange"
+                                :limit='5'
+                                :auto-upload="false"
+                                :on-remove="handleRemove">
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible">
+                                <img width="100%" :src="dialogImageUrl" alt="" >
+                            </el-dialog>
+                        </div>
+                    </div> 
+                </div>
+                <div class="editor">
+                    <editor :formData="dynamicValidateForm"></editor>
+                </div>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false">重置</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -138,6 +157,7 @@
 </template>
 
 <script>
+import editor from '../../components/common/editor'
 export default {
     name: 'basetable',
     data() {
@@ -180,6 +200,8 @@ export default {
                     act_content:'企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示',
                 },
             ],
+            dio_name:'',
+            dio_introduce:'',
             multipleSelection: [],
             delList: [],
             editVisible: false,
@@ -192,13 +214,50 @@ export default {
             dialogVisible: false,   
             doing:'',
             value1: '',
-        };
+            addNum:1,
+            dynamicValidateForm: {
+                domains: [{
+                    value: ''
+                }],
+                dio_name:'',
+                dio_introduce:'',
+                fromdata:[]
+            }
+        }
+    },  
+    components:{
+        editor        
     },
     created() {
         this.getData();
         this.pageTotal = this.tableData.length
     },
     methods: {
+        // 新增活动标签相关
+        submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+            if (valid) {
+                alert('submit!');
+            } else {
+                console.log('error submit!!');
+                return false;
+            }
+            });
+        },
+        resetForm(formName) {
+            this.$refs[formName].resetFields();
+        },
+        removeDomain(item) {
+            var index = this.dynamicValidateForm.domains.indexOf(item)
+            if (index !== -1) {
+            this.dynamicValidateForm.domains.splice(index, 1)
+            }
+        },
+        addDomain() {
+            this.dynamicValidateForm.domains.push({
+                value: '',
+            });
+        },
         // 获取 easy-mock 的模拟数据
         getData() {
             
@@ -260,7 +319,7 @@ export default {
                 "Content-Type":"multipart/form-data"
             };
             let fromdata = new FormData();
-            var files = this.formData;
+            var files = this.dynamicValidateForm.fromdata;
             for(let file of  files){
                 fromdata.append("files",file.raw);
             }
@@ -269,10 +328,15 @@ export default {
             })
         },
         handleRemove(file, fileList) {
-            console.log(file, fileList);
+            this.dynamicValidateForm.fromdata.forEach((i,index)=>{
+                if(file.name == i.name){
+                    this.dynamicValidateForm.fromdata.splice(index,1)
+                }
+            })
         },
         handleChange(file, fileList) {
             this.formData.push(file)
+            this.dynamicValidateForm.fromdata = this.formData
         },
         uploadSectionFile(file){
         },
@@ -280,7 +344,55 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang='less'>
+
+.top_info{
+    display: flex;
+    .activity{
+        flex: 1;
+        .in_act{
+            width: 85%;
+        }
+        .lab_box{
+            display: flex;
+            input{
+                width: 100px;
+                height: 32px;
+                text-indent: 10px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #DCDFE6;
+                border-radius: 4px;
+                color: #606266;
+                background:none;  
+                outline:none;  
+            }
+            input:focus{
+                border: 1px solid #409EFF;
+            }
+            label{
+                width: 70px;
+            }
+            .iptList{
+                width: calc(100% - 70px);
+            }
+        }
+        .addLab{
+            height: 32px;
+            width: 32px;
+            vertical-align: middle;
+        }
+    }
+    .banner{
+        flex: 1;
+        padding-left: 10px;
+        .imgs{
+            p{
+                margin-bottom: 15px;
+            }
+        }
+    }
+}
 .handle-box {
     margin-bottom: 20px;
 }
@@ -306,20 +418,33 @@ export default {
 .table-td-thumb {
     display: inline-block;
     margin: auto;
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     margin-right: 10px;
-
 }
 .table-td-thumb img{
     width: 100%;
     height: 100%;
 }
-/* /deep/ .beyond{
-    overflow:hidden; 
-    text-overflow:ellipsis;
-    display:-webkit-box; 
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:2; 
-} */
+// element
+/deep/ .el-dialog{
+    width: 55%;
+    min-width:850px ;
+}
+/deep/ .el-dialog__body{
+    padding-top: 0;
+}
+/deep/.lab_box{
+    .el-form-item--small{
+        display: inline-block;
+        margin-right: 15px;
+    }
+    .el-input--small{
+        width: 100px;
+    }
+    .el-icon-error{
+        margin-left: 5px;
+    }
+}
+
 </style>

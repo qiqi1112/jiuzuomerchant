@@ -88,19 +88,24 @@ export default {
                 },
                 {
                     icon: 'el-icon-s-flag',
-                    title: '广告活动',
                     index: 'AdverActivity',
-                    subs: [
-                        {
-                            index: 'AdverActivity',
-                            title: '活动列表'
-                        },
-                        {
-                            index: 'Advertising',
-                            title: '广告栏'
-                        }
-                    ]
+                    title: '广告活动'
                 },
+                // {
+                //     icon: 'el-icon-s-flag',
+                //     title: '广告活动',
+                //     index: 'AdverActivity',
+                //     subs: [
+                //         {
+                //             index: 'AdverActivity',
+                //             title: '活动列表'
+                //         },
+                //         {
+                //             index: 'Advertising',
+                //             title: '广告栏'
+                //         }
+                //     ]
+                // },
 
 
 

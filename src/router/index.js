@@ -62,16 +62,16 @@ export default new Router({
                     path: '/adveractivity',
                     component: () => import('../pages/AdverActivity/AdverActivity.vue'),
                     meta: {
-                        title: '活动列表'
+                        title: '广告活动'
                     }
                 },
-                {
-                    path: '/Advertising',
-                    component: () => import('../pages/AdverActivity/Advertising.vue'),
-                    meta: {
-                        title: '广告栏'
-                    }
-                },
+                // {
+                //     path: '/Advertising',
+                //     component: () => import('../pages/AdverActivity/Advertising.vue'),
+                //     meta: {
+                //         title: '广告栏'
+                //     }
+                // },
 
 
 

@@ -2,8 +2,7 @@
     <div id="editor">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-calendar"></i> 表单</el-breadcrumb-item>
-                <el-breadcrumb-item>编辑器</el-breadcrumb-item>
+                <el-breadcrumb-item>活动详情</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <el-upload class="avatar-uploader-editor" :action="serverUrl"  name="files"  :show-file-list="false"
@@ -69,8 +68,10 @@
                     <!-- <button class="ql-audio" title="音频"><i class="el-icon-headset"></i></button>  -->
                 </div>  
             </quill-editor>
-            <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
         </div>
+        <el-button class="editor-btn" @click="submit">重置</el-button>
+        <el-button class="editor-btn" type="primary" @click="submit">确定</el-button>
+
     </div>
 </template>
 
@@ -121,6 +122,17 @@
                 serverUrl: '/text/admin/system/upload/createBatch',
             }
         },
+        props:{
+            formData: {
+            } 
+        },
+        watch:{
+            formData:{
+                deep: true,
+                handler(newValue, oldValue) {
+                },
+            },
+        },
         components: {
             quillEditor
         },
@@ -140,6 +152,7 @@
                 this.content = html;
             },
             submit(){
+                console.log(this.formData)
                 console.log(this.content);
                 this.$message.success('提交成功！');
             },
