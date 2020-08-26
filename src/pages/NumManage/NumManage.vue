@@ -17,60 +17,30 @@
                         <span class="line lw2"></span>
                         <span>当前排号</span>
                     </div>
-                    <ul>
-                        <li class='li_n now_num'>
+                    <ul class="scl_box">
+                        <li class='li_n now_num' v-for="(item,index) in nowNumList" :key="index">
                             <div class="now_l">
                                 <div>
                                     <i class="el-icon-s-custom"></i>
                                     <span class="info">预计人数</span>
-                                    <span>7人</span>
+                                    <span>{{item.num}}人</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-marketing"></i>
                                     <span class="info">预约座位</span>
-                                    <span>沙发软座</span>
+                                    <span>{{item.seat_type==1?'沙发软座':'硬座'}}</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-release"></i>
                                     <span class="info">手机号码</span>
-                                    <span>135****4726</span>
+                                    <span>{{item.tel}}</span>
                                 </div>
                             </div>
                             <div class="now_r">
-                                <div>当前位于第<span class="num"> 1 </span>位 （A03）</div>
-                                <div>取号时间 <span class="tl">2020-11-19  23:54:03</span></div>
-                                <div>等待时常 <span class="tl"> 01:09:12</span></div>
-                                <div>
-                                    <span class="stat">处于呼叫中....</span>
-                                    <span class="btn">确定</span>
-                                    <span class="btn">续牌</span>
-                                    <span class="btn">取消</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class='li_n now_num'>
-                            <div class="now_l">
-                                <div>
-                                    <i class="el-icon-s-custom"></i>
-                                    <span class="info">预计人数</span>
-                                    <span>7人</span>
-                                </div>
-                                <div>
-                                    <i class="el-icon-s-marketing"></i>
-                                    <span class="info">预约座位</span>
-                                    <span>沙发软座</span>
-                                </div>
-                                <div>
-                                    <i class="el-icon-s-release"></i>
-                                    <span class="info">手机号码</span>
-                                    <span>135****4726</span>
-                                </div>
-                            </div>
-                            <div class="now_r">
-                                <div>当前位于第<span class="num"> 1 </span>位 （A03）</div>
-                                <div>取号时间 <span class="tl">2020-11-19  23:54:03</span></div>
-                                <div>等待时常 <span class="tl"> 01:09:12</span></div>
-                                <div>
+                                <div>当前位于第<span class="num"> {{index+1}} </span>位 （{{item.seat_num}}）</div>
+                                <div>取号时间 <span class="tl">{{item.take_time}}</span></div>
+                                <div>等待时常 <span class="tl"> {{item.wait_time}}</span></div>
+                                <div v-if="index==0">
                                     <span class="stat">处于呼叫中....</span>
                                     <span class="btn">确定</span>
                                     <span class="btn">续牌</span>
@@ -85,16 +55,16 @@
                         <span class="line lw2"></span>
                         <span>成功排号记录</span>
                         <el-date-picker
-                                v-model="time_now"
-                                type="month"
-                                :clearable="false"
-                                :editable="false"
-                                @focus="focSta=true"
-                                @blur="focSta=false"
-                                :time-arrow-control='true'
-                                :placeholder="time_now">
-                            </el-date-picker>
-                            <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
+                            v-model="time_now"
+                            :clearable="false"
+                            type="date"
+                            @focus="focSta=true"
+                            :editable="false"
+                            @blur="focSta=false"
+                            :time-arrow-control='true'
+                            placeholder="请选择时间">
+                        </el-date-picker>
+                        <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                     </div>
                     <ul>
                         <li class='li_n suc_num'>
@@ -133,6 +103,17 @@
                     <div class="column">
                         <span class="line lw2"></span>
                         <span>取消排号记录</span>
+                        <el-date-picker
+                            v-model="time_now_no"
+                            :clearable="false"
+                            type="date"
+                            @focus="focSta=true"
+                            :editable="false"
+                            @blur="focSta=false"
+                            :time-arrow-control='true'
+                            placeholder="请选择时间">
+                        </el-date-picker>
+                        <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                     </div>
                     <ul>
                         <li class='li_n fail_num'>
@@ -177,19 +158,52 @@ export default {
     data() {
         return {
             time_now:'',
+            time_now_no:'',
+            focSta:false,
+            nowNumList:[
+                {
+                    id:1,
+                    num:7, 
+                    seat_type:1,   
+                    tel:199999999,
+                    take_time:'2020-11-19  23:54:03',
+                    wait_time:'01:09:12',
+                    seat_num:'A03'
+                },
+                {
+                    id:2,
+                    num:2, 
+                    seat_type:2,   
+                    tel:17777777777,
+                    take_time:'2020-11-19  23:54:03',
+                    wait_time:'01:09:12',
+                    seat_num:'B03'
+                },
+                {
+                    id:3,
+                    num:11, 
+                    seat_type:1,   
+                    tel:199999999,
+                    take_time:'2020-11-19  23:54:03',
+                    wait_time:'01:09:12',
+                    seat_num:'C103'
+                }
+            ],
         };
     },
     created(){
-        this.time_now = this.$regular.timeData(new Date(),2)
-        console.log(this.time_now)
+        this.time_now = new Date()
+        this.time_now_no = new Date()
     },
     methods:{
-        // 日期选择
-        // timeDay(time){
-        //     let trr = time.split('-')
-        //     let day = new Date(trr[0],trr[1],0).getDate()
-        //     return day
-        // },
+        ensure(){
+        },
+        nextOne(){
+
+        },
+        fail(){
+
+        },
     }
 };
 </script>
@@ -230,7 +244,7 @@ export default {
             .now_num{
                 display: flex;
                 .now_l{
-                    flex: 1;
+                    flex: .45;
                     div{
                         margin-bottom: 10px;
                         i{
@@ -238,11 +252,11 @@ export default {
                         }
                     }
                     .info{
-                        margin: 0 30px 0 10px;
+                        margin: 0 10% 0 10px;
                     }
                 }
                 .now_r{
-                    flex: 1;
+                    flex: .55;
                     div{
                         margin-bottom: 6px;
                     }
@@ -298,7 +312,15 @@ export default {
                     }
                 }
             }
+            .jt{
+                margin-top: 3px;
+            }
         }
+        .scl_box{
+            overflow-y: scroll;
+            height: 700px;
+        }
+        .scl_box::-webkit-scrollbar {display:none}
     }
 }
 ul,li{
@@ -348,14 +370,15 @@ ul,li{
 /deep/ .el-tab-pane::-webkit-scrollbar {display:none}
 /deep/ .el-input__inner{
     border: none;
-    font-size: 16px;
+    font-size: 15px;
     color: #000;
-    height: 30px;
-    line-height: 30px;
+    height: 20px;
+    line-height: 20px;
+    padding-right: 0;
 }
 /deep/ .el-date-editor{
-    width: 120px;
-    
+    width: 114px;
+    margin-left: 52%;
 }
 /deep/ .el-input__prefix{
     display: none;

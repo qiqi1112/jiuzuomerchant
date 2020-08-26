@@ -114,7 +114,6 @@
                         <div class="day_li" ref="day_li">
                             <ul>
                                 <div class="choose" ref="choose" ></div>
-                                <!-- <li :class="active==index?'choose':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li> -->
                                 <li ref="day" :style="{top:scrollY * 30 +'px'}"  :class="active==index?'onAct':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li>
                             </ul>
                         </div>
@@ -139,7 +138,7 @@ export default {
             value2: '',
             time_now:'',
             days:'',
-            active:'7',
+            active:7,
             good_list:[
                 {
                     id:1,
@@ -178,17 +177,15 @@ export default {
     created(){
         this.time_now = this.$regular.timeData(new Date().getTime(),5)
         this.days = this.timeDay(this.time_now)
-        // this.$nextTick(() => {
-        //     let day = this.$refs.day
-        //     for(let i=0;i<day.length;i++){
-        //         if(day[i].offsetTop == this.$refs.choose.offsetTop){
-        //             console.log(day[i])
-        //             console.log(i)
-        //             this.acitive = i
-        //             break;
-        //         }
-        //     }
-        // })
+        this.$nextTick(() => {
+            let day = this.$refs.day
+            for(let i=0;i<day.length;i++){
+                if(day[i].offsetTop == this.$refs.choose.offsetTop){
+                    this.acitive = i
+                    break;
+                }
+            }
+        })
     },
     watch: {
         time_now(val) {
@@ -207,9 +204,19 @@ export default {
             e.stopPropagation()
             e.preventDefault(); 
             if(e.wheelDelta>0){
+                if(this.active == this.days-1){
+                    this.active = this.days-1
+                    return
+                }
                 this.scrollY -=1
+                this.active +=1
             }else{
+                if(this.active == 0){
+                    this.active = 0
+                    return
+                }
                 this.scrollY +=1
+                this.active -=1
             }
         },
         // 日期选择
@@ -479,8 +486,6 @@ export default {
                     height: 15px;
                 }
             }
-
-            
         }
     }
     .m_r{
@@ -491,6 +496,7 @@ export default {
             margin:0 auto ;
             margin-top: 100px;
             .block{
+                position: relative;
                 .jt{
                     position: absolute;
                     top: 7px;
