@@ -12,17 +12,17 @@
             <!-- 头部模块 -->
             <div class="handle-box">
                 <el-input v-model="searchName" placeholder="用户昵称" class="handle-input mr10"></el-input>
-                <el-select v-model="value1" placeholder="收藏本店" style="width:100px" class="mr10">
+                <el-select v-model="collectVal" placeholder="收藏本店" style="width:100px" class="mr10">
                     <el-option
-                        v-for="item in options1"
+                        v-for="item in collectValOpt"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value"
                     ></el-option>
                 </el-select>
-                <el-select v-model="value2" placeholder="本店会员" style="width:100px" class="mr10">
+                <el-select v-model="isVipVal" placeholder="本店会员" style="width:100px" class="mr10">
                     <el-option
-                        v-for="item in options2"
+                        v-for="item in isVipOpt"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value"
@@ -38,14 +38,14 @@
                 tooltip-effect="dark"
                 style="width: 100%"
             >
-                <el-table-column label="编号" type="index" fixed></el-table-column>
+                <el-table-column label="ID" type="index" fixed></el-table-column>
                 <el-table-column prop="name" label="用户昵称"></el-table-column>
                 <el-table-column label="用户手机" min-width="100">
                     <template slot-scope="scope">
                         <span>{{scope.row.number | phoneNum}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="conNum" label="到店消费次数" min-width="100"></el-table-column>
+                <el-table-column prop="isVip" label="本店会员" min-width="80"></el-table-column>
                 <el-table-column prop="AANum" label="AA拼单次数" min-width="90"></el-table-column>
                 <el-table-column prop="reserveNum" label="预定桌消费次数" min-width="110"></el-table-column>
                 <el-table-column prop="rowNum" label="排号次数"></el-table-column>
@@ -55,8 +55,8 @@
                 <el-table-column prop="evalNum" label="评价次数"></el-table-column>
                 <el-table-column prop="visitNum" label="访问店铺次数" min-width="100"></el-table-column>
                 <el-table-column prop="conDate" label="最近一次消费时间" min-width="135"></el-table-column>
-                <el-table-column prop="visitDate" label="最近一次访问店铺时间" min-width="135"></el-table-column>
-                <el-table-column prop="conMoney" label="本店累计消费金额" min-width="75"></el-table-column>
+                <el-table-column prop="visitDate" label="最近一次访问时间" min-width="135"></el-table-column>
+                <el-table-column prop="conMoney" label="本店累计消费金额" min-width="135"></el-table-column>
                 <el-table-column label="操作" fixed="right" min-width="80">
                     <template slot-scope="scope">
                         <el-button
@@ -64,83 +64,273 @@
                             size="mini"
                             @click="lookInfo(scope.$index, scope.row)"
                         >查看</el-button>
-                        <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                        <el-button
-                            size="mini"
-                            type="danger"
-                            @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>-->
                     </template>
                 </el-table-column>
             </el-table>
 
             <!-- 对话框 -->
-            <el-dialog title="用户信息" :visible.sync="dialogFormVisible">
-                <!-- <el-form :model="form" :rules="rules" ref="form">
-                    <el-form-item label="用户昵称" :label-width="formLabelWidth">
-                        <el-input v-model="form.name"></el-input>
-                    </el-form-item>
-                    <el-form-item label="用户手机" :label-width="formLabelWidth" prop="number">
-                        <el-input v-model.number="form.number"></el-input>
-                    </el-form-item>
-                    <el-form-item label="到店消费次数" :label-width="formLabelWidth" prop="conNum">
-                        <el-input v-model.number="form.conNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="AA拼单次数" :label-width="formLabelWidth" prop="AANum">
-                        <el-input v-model.number="form.AANum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="预定桌消费次数" :label-width="formLabelWidth" prop="reserveNum">
-                        <el-input v-model.number="form.reserveNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="排号次数" :label-width="formLabelWidth" prop="rowNum">
-                        <el-input v-model.number="form.rowNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="生效排号次数" :label-width="formLabelWidth" prop="vaildNum">
-                        <el-input v-model.number="form.vaildNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="取消排号次数" :label-width="formLabelWidth" prop="cancelNum">
-                        <el-input v-model.number="form.cancelNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="是否收藏本店" :label-width="formLabelWidth">
-                        <el-select v-model="form.collect" placeholder="请选择" style="width:100%">
-                            <el-option label="是" value="1"></el-option>
-                            <el-option label="否" value="0"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="评价次数" :label-width="formLabelWidth" prop="evalNum">
-                        <el-input v-model.number="form.evalNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="访问店铺次数" :label-width="formLabelWidth" prop="visitNum">
-                        <el-input v-model.number="form.visitNum"></el-input>
-                    </el-form-item>
-                    <el-form-item label="最近一次消费时间" :label-width="formLabelWidth">
-                        <el-date-picker
-                            v-model="form.conDate"
-                            type="datetime"
-                            placeholder="选择日期时间"
-                            style="width:100%"
-                        ></el-date-picker>
-                    </el-form-item>
-                    <el-form-item label="最近一次访问店铺时间" :label-width="formLabelWidth">
-                        <el-date-picker
-                            v-model="form.visitDate"
-                            type="datetime"
-                            placeholder="选择日期时间"
-                            style="width:100%"
-                        ></el-date-picker>
-                    </el-form-item>
-                    <el-form-item label="本店累计消费金额" :label-width="formLabelWidth" prop="conMoney">
-                        <el-input v-model="form.conMoney"></el-input>
-                    </el-form-item>
-                </el-form>-->
+            <el-dialog :visible.sync="dialogFormVisible">
+                <span class="add-classify-title">用户信息</span>
+                <div class="basic-info">
+                    <div>
+                        <p>
+                            <span>昵称：</span>
+                            <span>{{userInfo.name}}</span>
+                        </p>
+                        <p>
+                            <span>手机：</span>
+                            <span>{{userInfo.number}}</span>
+                        </p>
+                    </div>
+                    <div>
+                        <p>
+                            <span>本店会员：</span>
+                            <span>{{userInfo.isVip}}</span>
+                        </p>
+                        <p>
+                            <span>收藏本店：</span>
+                            <span>{{userInfo.collect}}</span>
+                        </p>
+                        <p>
+                            <span>累计消费：</span>
+                            <span>{{userInfo.conMoney}}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 对话框里的标签页 -->
+                <el-tabs
+                    style="margin-top:20px"
+                    v-model="activeName"
+                    type="border-card"
+                    @tab-click="handleClick"
+                >
+                    <el-tab-pane label="排号记录" name="rowRecord">
+                        <ul class="tabs-box">
+                            <li>
+                                <p>
+                                    <span>排号预计人数：</span>
+                                    <span>5人</span>
+                                </p>
+                                <p>
+                                    <span>座位选择：</span>
+                                    <span>无要求</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>排号预计人数：</span>
+                                    <span>5人</span>
+                                </p>
+                                <p>
+                                    <span>座位选择：</span>
+                                    <span>无要求</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>排号预计人数：</span>
+                                    <span>5人</span>
+                                </p>
+                                <p>
+                                    <span>座位选择：</span>
+                                    <span>无要求</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>排号预计人数：</span>
+                                    <span>5人</span>
+                                </p>
+                                <p>
+                                    <span>座位选择：</span>
+                                    <span>无要求</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                        </ul>
+                    </el-tab-pane>
+                    <el-tab-pane label="评价记录" name="evalRecord">
+                        <ul class="tabs-box">
+                            <li>
+                                <p>
+                                    <span>消费类型：</span>
+                                    <span>AA拼桌</span>
+                                </p>
+                                <p>
+                                    <span>打分：</span>
+                                    <span>5.0</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>消费类型：</span>
+                                    <span>AA拼桌</span>
+                                </p>
+                                <p>
+                                    <span>打分：</span>
+                                    <span>5.0</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>消费类型：</span>
+                                    <span>AA拼桌</span>
+                                </p>
+                                <p>
+                                    <span>打分：</span>
+                                    <span>5.0</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>消费类型：</span>
+                                    <span>AA拼桌</span>
+                                </p>
+                                <p>
+                                    <span>打分：</span>
+                                    <span>5.0</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                        </ul>
+                    </el-tab-pane>
+                    <el-tab-pane label="访问记录" name="visitRecord">
+                        <ul class="visit-tab tabs-box">
+                            <li>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                        </ul>
+                    </el-tab-pane>
+                    <el-tab-pane label="消费记录" name="conRecord">
+                        <ul class="tabs-box">
+                            <li>
+                                <p>
+                                    <span>支付方式：</span>
+                                    <span>支付宝</span>
+                                </p>
+                                <p>
+                                    <span>金额：</span>
+                                    <span>264.00</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>支付方式：</span>
+                                    <span>会员积分</span>
+                                </p>
+                                <p>
+                                    <span>金额：</span>
+                                    <span>264.00</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>支付方式：</span>
+                                    <span>支付宝</span>
+                                </p>
+                                <p>
+                                    <span>金额：</span>
+                                    <span>264.00</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span>支付方式：</span>
+                                    <span>会员积分</span>
+                                </p>
+                                <p>
+                                    <span>金额：</span>
+                                    <span>264.00</span>
+                                </p>
+                                <p>
+                                    <span>2020-09-29 23:46:41</span>
+                                    <span>星期五</span>
+                                </p>
+                            </li>
+                        </ul>
+                    </el-tab-pane>
+
+                    <!-- 对话框里的标签页数据分页 -->
+                    <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        @current-change="handleCurrentChange2"
+                        :total="dataListCount2"
+                        :current-page="currentPage2"
+                        :page-size="pagesize2"
+                        class="page"
+                    ></el-pagination>
+                </el-tabs>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="sure('form')">确 定</el-button>
-                    <!-- <el-button @click="handleCancel('form')">取 消</el-button> -->
-                    <!-- <el-button type="primary" @click="submitForm('form')">确 定</el-button> -->
+                    <el-button type="primary" @click="handleSure">确 定</el-button>
                 </div>
             </el-dialog>
 
-            <!-- 分页 -->
+            <!-- 表格数据分页 -->
             <el-pagination
                 background
                 layout="prev, pager, next"
@@ -158,9 +348,11 @@
 export default {
     data() {
         return {
-            // 头部模块---------------------------------------
+            // 头部模块----------------------------------------------
             searchName: '', //用户昵称输入框
-            options1: [
+            collectVal: '', //收藏本店下拉框选择值
+            //收藏本店下拉框数组
+            collectValOpt: [
                 {
                     value: '不限',
                     label: '不限'
@@ -174,8 +366,9 @@ export default {
                     label: '否'
                 }
             ],
-            value1: '',
-            options2: [
+            isVipVal: '', //本店会员下拉框选择值
+            //本店下拉框数组
+            isVipOpt: [
                 {
                     value: '不限',
                     label: '不限'
@@ -189,15 +382,14 @@ export default {
                     label: '否'
                 }
             ],
-            value2: '',
 
-            // 表格相关属性------------------------------------
+            // 表格相关属性--------------------------------------------
             tableData: [
                 {
                     name: '张三1',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -213,7 +405,7 @@ export default {
                     name: '张三2',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -229,7 +421,7 @@ export default {
                     name: '张三3',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -245,7 +437,7 @@ export default {
                     name: '张三4',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '否',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -261,7 +453,7 @@ export default {
                     name: '张三5',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '否',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -277,7 +469,7 @@ export default {
                     name: '张三6',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '否',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -293,7 +485,7 @@ export default {
                     name: '张三7',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -309,7 +501,7 @@ export default {
                     name: '张三8',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '否',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -325,7 +517,7 @@ export default {
                     name: '张三9',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -341,7 +533,7 @@ export default {
                     name: '张三10',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -357,7 +549,7 @@ export default {
                     name: '张三11',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '是',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -373,7 +565,7 @@ export default {
                     name: '张三12',
                     number: '14781828227',
                     AANum: '289',
-                    conNum: '292',
+                    isVip: '否',
                     reserveNum: '282',
                     rowNum: '322',
                     vaildNum: '229',
@@ -386,52 +578,31 @@ export default {
                     conMoney: '2899.99'
                 }
             ],
-            // multipleSelection: [], //勾选中的信息数组
-
-            // 分页相关属性------------------------------------
+            // 表格数据分页相关属性
             dataListCount: 0, //默认当前要显示的数据条数
             currentPage: 1, //默认显示的页码所在位置（第一页）
             pagesize: 10, //默认每页要显示多少条数据
 
-            // 对话框相关属性-----------------------------------
+            // 对话框里的相关属性---------------------------------------
             dialogFormVisible: false, //对话框的开启与隐藏
-            //表单属性
-            form: {
+            activeName: 'rowRecord', //默认显示的标签页
+            //用户相关属性
+            userInfo: {
                 name: '',
                 number: '',
-                conNum: '',
-                AANum: '',
-                reserveNum: '',
-                rowNum: '',
-                vaildNum: '',
-                cancelNum: '',
+                isVip: '',
                 collect: '',
-                evalNum: '',
-                visitNum: '',
-                conDate: '',
-                visitDate: '',
                 conMoney: ''
             },
-            formLabelWidth: '160px' //表单标题的宽度
-
-            //验证规则------------------------------------------
-            // rules: {
-            //     conNum: [{ validator: checkConNum, trigger: 'blur' }],
-            //     AANum: [{ validator: checkAANum, trigger: 'blur' }],
-            //     reserveNum: [{ validator: checkReserveNum, trigger: 'blur' }],
-            //     rowNum: [{ validator: checkRowNum, trigger: 'blur' }],
-            //     vaildNum: [{ validator: checkVaildNum, trigger: 'blur' }],
-            //     cancelNum: [{ validator: checkCancelNum, trigger: 'blur' }],
-            //     evalNum: [{ validator: checkEvalNum, trigger: 'blur' }],
-            //     visitNum: [{ validator: checkVisitNum, trigger: 'blur' }],
-            //     number: [{ validator: checkNumber, trigger: 'blur' }],
-            //     conMoney: [{ validator: checkMoney, trigger: 'blur' }]
-            // }
+            //标签页数据分页相关属性
+            dataListCount2: 0, //默认当前要显示的数据条数
+            currentPage2: 1, //默认显示的页码所在位置（第一页）
+            pagesize2: 10 //默认每页要显示多少条数据
         };
     },
 
     methods: {
-        // 页码发生变化后
+        //表格数据页码发生变化后
         handleCurrentChange(val) {
             //将当前跳转的页码赋给显在页面上的页码
             this.currentPage = val;
@@ -445,9 +616,17 @@ export default {
             }
         },
 
+        //标签页数据发生变化后
+        handleCurrentChange2() {},
+
         //查看按钮
         lookInfo(index, row) {
             this.dialogFormVisible = true;
+            this.userInfo.name = row.name;
+            this.userInfo.number = row.number;
+            this.userInfo.isVip = row.isVip;
+            this.userInfo.collect = row.collect;
+            this.userInfo.conMoney = row.conMoney;
         },
 
         //搜索按钮
@@ -481,118 +660,14 @@ export default {
         },
 
         //对话框里的确认按钮
-        sure() {
+        handleSure() {
             this.dialogFormVisible = false;
+        },
+
+        //标签页切换操作
+        handleClick(tab, event) {
+            console.log(this.activeName);
         }
-
-        //批量删除操作
-        // delAllSelection() {
-        //     this.$message.success(`删除成功`);
-        // },
-
-        //添加按钮
-        // addInfo() {
-        //     this.dialogFormVisible = true;
-        // },
-
-        //勾选中的数据
-        // handleSelectionChange(val) {
-        //     this.multipleSelection = val;
-        //     console.log(val);
-        // },
-
-        //清空表单属性值
-        // emptyForm() {
-        //     this.form.name = '';
-        //     this.form.number = '';
-        //     this.form.conNum = '';
-        //     this.form.AANum = '';
-        //     this.form.reserveNum = '';
-        //     this.form.rowNum = '';
-        //     this.form.vaildNum = '';
-        //     this.form.cancelNum = '';
-        //     this.form.collect = '';
-        //     this.form.evalNum = '';
-        //     this.form.visitNum = '';
-        //     this.form.conDate = '';
-        //     this.form.visitDate = '';
-        //     this.form.conMoney = '';
-        // },
-
-        //对话框关闭的操作
-        // handleClose() {
-        // this.emptyForm();
-        // this.$refs['form'].resetFields();
-        // },
-
-        //编辑按钮
-        // handleEdit(index, row) {
-        //     this.dialogFormVisible = true;
-        //     this.rowNumber = index; //当前编辑的是第几行
-        //     //回显数据
-        //     this.form.name = row.name;
-        //     this.form.number = row.number;
-        //     this.form.conNum = row.conNum;
-        //     this.form.AANum = row.AANum;
-        //     this.form.reserveNum = row.reserveNum;
-        //     this.form.rowNum = row.rowNum;
-        //     this.form.vaildNum = row.vaildNum;
-        //     this.form.cancelNum = row.cancelNum;
-        //     this.form.collect = row.collect;
-        //     this.form.evalNum = row.evalNum;
-        //     this.form.visitNum = row.visitNum;
-        //     this.form.conDate = row.conDate;
-        //     this.form.visitDate = row.visitDate;
-        //     this.form.conMoney = row.conMoney;
-        // },
-
-        //删除按钮
-        // handleDelete(index, row) {
-        //     console.log(index, row);
-        //     if (confirm('确定要删除吗')) {
-        //         this.tableData.splice(index, 1);
-        //     }
-        // },
-
-        //对话框里的取消按钮
-        // handleCancel(formName) {
-        //     this.$refs[formName].resetFields();
-        //     this.emptyForm();
-        //     this.dialogFormVisible = false;
-        // },
-
-        //对话框里的确认按钮
-        // submitForm(formName) {
-        //     // this.tableData[this.rowNumber].name = this.form.name;
-        //     // this.tableData[this.rowNumber].number = this.form.number;
-        //     // this.tableData[this.rowNumber].conNum = this.form.conNum;
-        //     // this.tableData[this.rowNumber].AANum = this.form.AANum;
-        //     // this.tableData[this.rowNumber].reserveNum = this.form.reserveNum;
-        //     // this.tableData[this.rowNumber].rowNum = this.form.rowNum;
-        //     // this.tableData[this.rowNumber].vaildNum = this.form.vaildNum;
-        //     // this.tableData[this.rowNumber].cancelNum = this.form.cancelNum;
-        //     // this.tableData[this.rowNumber].collect = this.form.collect;
-        //     // this.tableData[this.rowNumber].evalNum = this.form.evalNum;
-        //     // this.tableData[this.rowNumber].visitNum = this.form.visitNum;
-        //     // this.tableData[this.rowNumber].conDate = this.form.conDate;
-        //     // // this.tableData[this.rowNumber].conDate = this.$timestampToTime(this.form.conDate.getTime());
-        //     // this.tableData[this.rowNumber].visitDate = this.form.visitDate;
-        //     // this.tableData[this.rowNumber].conMoney = this.form.conMoney;
-
-        //     // console.log('zzzz', this.$timestampToTime(this.form.conDate.getTime()));
-
-        //     this.$refs[formName].validate((valid) => {
-        //         if (valid) {
-        //             alert('submit!');
-
-        //             this.emptyForm();
-        //             this.dialogFormVisible = false;
-        //         } else {
-        //             console.log('error submit!!');
-        //             return false;
-        //         }
-        //     });
-        // }
     }
 };
 </script>
@@ -618,6 +693,65 @@ export default {
 }
 
 .mr10 {
+    margin-right: 10px;
+}
+
+.el-dialog__header {
+    padding: 0;
+}
+
+.add-classify-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.add-classify-title::before {
+    display: inline-block;
+    content: '';
+    width: 4px;
+    height: 20px;
+    margin-right: 10px;
+    background-color: #999;
+}
+
+.basic-info div {
+    display: flex;
+}
+
+.basic-info div p {
+    margin-bottom: 20px;
+    /* margin-right: 50px; */
+    display: flex;
+    min-width: 230px;
+}
+
+.basic-info div p span:first-child {
+    display: block;
+    min-width: 100px;
+}
+
+.tabs-box li {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed #ddd;
+    padding: 14px 0;
+}
+
+.tabs-box li p {
+    width: 33.3333%;
+}
+
+.tabs-box li p:last-child {
+    text-align: right;
+}
+
+.visit-tab.tabs-box li p:last-child {
+    width: 100%;
+    text-align: right;
+}
+
+.tabs-box li p span:first-child {
     margin-right: 10px;
 }
 </style>

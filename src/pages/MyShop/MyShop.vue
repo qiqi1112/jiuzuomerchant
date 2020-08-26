@@ -5,17 +5,24 @@
                 <h4>店铺信息</h4>
                 <div class="shop-info">
                     <div class="left-info">
-                        <p>我的招牌logo</p>
-                        <img src="img/img.jpg" alt />
+                        <p>店铺招牌logo</p>
+                        <el-upload
+                            class="avatar-uploader"
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :show-file-list="false"
+                        >
+                            <img v-if="logoImageUrl" :src="logoImageUrl" class="avatar" />
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
                     </div>
                     <div class="right-info">
                         <p class="shop-name">
                             店名：
-                            <span>PlayHouse</span>
+                            <span>{{shopName}}</span>
                         </p>
                         <p class="shop-brief">
                             店铺简介：
-                            <span>每一份属于夜晚的美丽心情，都不应该被雨水淋湿而打断——成都play house</span>
+                            <span>{{shopBrief}}</span>
                         </p>
                     </div>
                 </div>
@@ -40,51 +47,83 @@
                         <i class="el-icon-plus"></i>
                     </el-button>
                 </div>
-                <div class="bussiness-hours">
-                    <p>营业时间</p>
-                    <span>20:00</span> ~
-                    <span>03:00</span>
-                </div>
-                <div class="shop-address">
-                    <p>店铺地址</p>
-                    <div>
-                        <el-cascader
-                            :options="options"
-                            v-model="regionValue"
-                            @change="handleChange"
-                        ></el-cascader>
+                <div class="shop-div">
+                    <div class="shop-div1">
+                        <div class="bussiness-hours">
+                            <p>营业时间</p>
+                            <span>{{startBussTime}}</span> ~
+                            <span>{{endBussTime}}</span>
+                            <!-- <el-time-picker
+                        is-range
+                        v-model="bussTimeVal"
+                        range-separator="~"
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        placeholder="选择时间范围"
+                            ></el-time-picker>-->
+                        </div>
+                        <div class="service-phone">
+                            <p>客服电话</p>
+                            <span>{{servicePhone}}</span>
+                        </div>
+                    </div>
+                    <div class="shop-div2">
+                        <div class="shop-address">
+                            <p>店铺地址</p>
+                            <p class="shop-add">
+                                <span>{{country}}</span>
+                                <span>{{street}}</span>
+                                <span>{{detailAdd}}</span>
+                            </p>
+                            <!-- <div>
+                                <el-cascader
+                                    :options="addressOptions"
+                                    v-model="regionValue"
+                                    @change="handleAddChange"
+                                ></el-cascader>
+                            </div>-->
+                        </div>
+                        <div class="shop-type">
+                            <p>
+                                店铺类型
+                                <span class="red-font">（用于客户筛选出本店）</span>
+                            </p>
+                            <div class="type-box">
+                                <span v-for="(item,index) of shopType" :key="index">{{item}}</span>
+                                <!-- <el-row>
+                                    <el-button type="primary">酷嗨</el-button>
+                                    <el-button type="success">演奏</el-button>
+                                    <el-button type="info">蹦迪</el-button>
+                                    <el-button type="warning">歌手</el-button>
+                                </el-row>-->
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="service-phone">
-                    <p>客服电话</p>
-                    <span>028-0000 0000</span>
-                </div>
+
                 <p class="per-con">
                     店铺人均消费：
                     <span>500</span>元/人
                 </p>
-                <div class="shop-type">
-                    <p>
-                        店铺类型
-                        <span class="red-font">（用于客户筛选出本店）</span>
-                    </p>
-                    <div class="type-box">
-                        <el-row>
-                            <el-button type="primary">酷嗨</el-button>
-                            <el-button type="success">演奏</el-button>
-                            <el-button type="info">蹦迪</el-button>
-                            <el-button type="warning">歌手</el-button>
-                        </el-row>
+                <div class="shop-desc">
+                    <div class="shop-brief">
+                        <span>商品店面简介：</span>
+                        <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
                     </div>
-                </div>
-                <div class="shop-brief">
-                    <span>商品店面简介：</span>
-                    <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                    <div class="shop-matter">
+                        <span>订桌注意事项：</span>
+                        <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                    </div>
+                    <div class="shop-remind">
+                        <span>排号商家提醒：</span>
+                        <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                    </div>
                 </div>
             </div>
             <div class="right-wrap">
-                <h4>店铺Banner展示图</h4>
+                <h4>店铺展示图</h4>
                 <div class="shop-info">
+                    <!-- banner展示图 -->
                     <el-upload
                         action="https://jsonplaceholder.typicode.com/posts/"
                         list-type="picture-card"
@@ -96,7 +135,30 @@
                     <el-dialog :visible.sync="dialogVisible">
                         <img width="100%" :src="dialogImageUrl" alt />
                     </el-dialog>
-                    <!-- </p> -->
+
+                    <!-- 商家布局图 -->
+                    <el-upload
+                        class="avatar-uploader"
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload"
+                    >
+                        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+
+                    <!-- 排号banner图 -->
+                    <el-upload
+                        class="avatar-uploader"
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload"
+                    >
+                        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
                 </div>
                 <h4>店铺卡座</h4>
                 <div class="shop-seat">
@@ -199,27 +261,48 @@
 </template>
 
 <script>
-import { regionData } from 'element-china-area-data';
+import { regionData } from 'element-china-area-data'; //引入外部地址选择器
 
 export default {
     data() {
         return {
-            dynamicTags: ['美女超多', '来了就不想回家', '现场嗨到爆炸'],
-            inputVisible: false,
-            inputValue: '',
+            // 店铺主要信息模块------------------------------------------------
+            logoImageUrl: '', //店铺logo
+            shopName: 'PlayHouse', //店铺名称
+            shopBrief: '每一份属于夜晚的美丽心情，都不应该被雨水淋湿而打断——成都play house', //店铺简介
 
-            options: regionData,
+            // 店铺标签模块---------------------------------------------------------
+            dynamicTags: ['美女超多', '来了就不想回家', '现场嗨到爆炸'], //店铺标签
+            inputVisible: false, //添加店铺标签的输入框
+            inputValue: '', //店铺标签输入框的输入值
+
+            // 店铺营业时间模块-----------------------------------------
+            startBussTime: '20:00', //开始时间
+            endBussTime: '03:00', //结束时间
+            bussTimeVal: [new Date(), new Date()], //营业时间选择器
+
+            // 店铺地址模块-------------------------------------------
+            addressOptions: regionData, //使用外部地址数组
             regionValue: [],
+            country: '锦江区', //区县
+            street: '蜀都大道', //街道
+            detailAdd: '锦江区水碾河路48号', //详细地址
+
+            // 客服电话模块--------------------------
+            servicePhone: '028-0000 0000',
+
+            // 店铺类型模块--------------------------
+            shopType: ['酷嗨', '演奏', '蹦迪', '歌手','酷嗨', '演奏', '蹦迪', '歌手'],
 
             dialogImageUrl: '',
             dialogVisible: false,
 
+            // 选座模块-----------------------------------------
             x: 10,
             y: 10,
+            seatStyle: 'hasBook', //默认的选座样式
 
             radio: '1',
-
-            seatStyle: 'hasBook',
 
             goodName: '',
             goodNum: ''
@@ -269,13 +352,12 @@ export default {
             this.seatStyle = style;
         },
 
-        handleChange(value) {
+        //地址选择器切换地址
+        handleAddChange(value) {
             console.log(value);
-            // 楼主选择江苏省南京市江宁区 打印value结果 ["320000", "320100", "320114"]
+            console.log('xxx', this.regionValue);
         }
     },
-
-    watch: {},
 
     created() {},
 
@@ -291,7 +373,6 @@ export default {
 .container {
     box-sizing: border-box;
     display: flex;
-    /* justify-content: space-between; */
     padding: 30px;
 }
 
@@ -327,15 +408,49 @@ export default {
 }
 
 .left-wrap .shop-info .left-info {
-    margin-right: 60px;
+    margin-right: 40px;
 }
 
 .left-wrap .shop-info .left-info > p {
     margin-bottom: 10px;
 }
 
-.left-wrap .shop-info .left-info > img {
-    border-radius: 8px;
+>>> .left-info .el-upload.el-upload--text {
+    width: 120px;
+    height: 120px;
+}
+
+>>> .left-wrap .shop-info .left-info .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+>>> .left-wrap .shop-info .left-info .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+}
+
+>>> .left-wrap .shop-info .left-info .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
+}
+
+>>> .left-wrap .shop-info .left-info .avatar {
+    width: 120px;
+    height: 120px;
+    display: block;
+}
+
+.left-wrap .shop-info .right-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .left-wrap .shop-info .right-info .shop-name {
@@ -365,6 +480,18 @@ export default {
     line-height: 32px;
 }
 
+.left-wrap .shop-div {
+    display: flex;
+}
+
+.left-wrap .shop-desc > div {
+    margin-bottom: 30px;
+}
+
+.left-wrap .shop-div .shop-div1 {
+    margin-right: 140px;
+}
+
 .left-wrap .shop-label {
     margin-bottom: 30px;
 }
@@ -387,6 +514,10 @@ export default {
 
 .left-wrap .shop-address > p {
     margin-bottom: 10px;
+}
+
+.left-wrap .shop-address .shop-add span {
+    margin-right: 20px;
 }
 
 .left-wrap .service-phone {
@@ -413,10 +544,27 @@ export default {
     margin-bottom: 10px;
 }
 
-.shop-type .el-button--small,
+.shop-type .type-box::after {
+    display: block;
+    content:  "";
+    clear: both;
+}
+
+.shop-type .type-box > span {
+    display: block;
+    border: 1px solid #409eff;
+    color: #409eff;
+    border-radius: 6px;
+    padding: 6px 20px;
+    float: left;
+    margin: 0 10px 10px 0;
+    background-color: #ecf5ff;
+}
+
+/* .shop-type .el-button--small,
 .el-button--small.is-round {
     padding: 12px 20px;
-}
+} */
 
 .right-wrap {
     width: 50%;
