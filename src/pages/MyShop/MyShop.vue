@@ -32,24 +32,30 @@
                 </div>
                 <div class="shop-label">
                     <p>店铺标签</p>
-                    <el-tag
-                        :key="tag"
-                        closable
-                        v-for="tag in dynamicTags"
-                        :disable-transitions="false"
-                        @close="handleClose(tag)"
-                    >{{tag}}</el-tag>
-                    <el-input
-                        class="input-new-tag"
-                        v-if="inputVisible"
-                        v-model="inputValue"
-                        ref="saveTagInput"
-                        @keyup.enter.native="handleInputConfirm"
-                        @blur="handleInputConfirm"
-                    ></el-input>
-                    <el-button v-else class="button-new-tag" @click="showInput">
-                        <i class="el-icon-plus"></i>
-                    </el-button>
+                    <div class="labels clearfix" v-if="shopLabels">
+                        <span v-for="(item,index) in shopLabels" :key="index">{{item}}</span>
+                    </div>
+
+                    <div class="change-labels" v-else>
+                        <el-tag
+                            :key="tag"
+                            closable
+                            v-for="tag in dynamicTags"
+                            :disable-transitions="false"
+                            @close="handleClose(tag)"
+                        >{{tag}}</el-tag>
+                        <el-input
+                            class="input-new-tag"
+                            v-if="inputVisible"
+                            v-model="inputValue"
+                            ref="saveTagInput"
+                            @keyup.enter.native="handleInputConfirm"
+                            @blur="handleInputConfirm"
+                        ></el-input>
+                        <el-button v-else class="button-new-tag" @click="showInput">
+                            <i class="el-icon-plus"></i>
+                        </el-button>
+                    </div>
                 </div>
                 <div class="shop-div">
                     <div class="shop-div1">
@@ -131,8 +137,6 @@
                     <el-upload
                         action="https://jsonplaceholder.typicode.com/posts/"
                         list-type="picture-card"
-                        :on-preview="handlePictureCardPreview"
-                        :on-remove="handleRemove"
                     >
                         <i class="el-icon-plus"></i>
                     </el-upload>
@@ -145,8 +149,6 @@
                         class="avatar-uploader"
                         action="https://jsonplaceholder.typicode.com/posts/"
                         :show-file-list="false"
-                        :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload"
                     >
                         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -157,8 +159,6 @@
                         class="avatar-uploader"
                         action="https://jsonplaceholder.typicode.com/posts/"
                         :show-file-list="false"
-                        :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload"
                     >
                         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -276,6 +276,7 @@ export default {
             shopBrief: '每一份属于夜晚的美丽心情，都不应该被雨水淋湿而打断——成都play house', //店铺简介
 
             // 店铺标签模块---------------------------------------------------------
+            shopLabels: '', //返回的店铺标签字符串
             dynamicTags: ['美女超多', '来了就不想回家', '现场嗨到爆炸'], //店铺标签
             inputVisible: false, //添加店铺标签的输入框
             inputValue: '', //店铺标签输入框的输入值
@@ -309,7 +310,9 @@ export default {
             radio: '1',
 
             goodName: '',
-            goodNum: ''
+            goodNum: '',
+
+            imageUrl: ''
         };
     },
     methods: {
@@ -360,16 +363,46 @@ export default {
         handleAddChange(value) {
             console.log(value);
             console.log('xxx', this.regionValue);
+        },
+
+        //将返回的字符串转为数组
+        strChangeArr(str) {
+            return str.split(',');
         }
     },
 
-    created() {},
+    created() {
+        this.$get('/dev/merchant/store/getStoreInfo').then(
+            (res) => {
+                console.log(res.data);
+                let result = res.data;
+                this.shopName = result.name;
+                this.shopBrief = result.synopsis;
+                this.shopLabels = this.strChangeArr(result.labels);
+                console.log(this.shopLabels);
+            },
+            (err) => {
+                console.log(err);
+            }
+        );
+    },
 
-    mounted() {}
+    mounted() {
+        // let userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        // let data = {
+        // }
+        // console.log("xxx",userInfo);
+    }
 };
 </script>
 
 <style scoped>
+.clearfix::after {
+    display: block;
+    content: "";
+    clear: both;
+}
+
 .con-wrap {
     height: 100%;
 }
@@ -381,7 +414,7 @@ export default {
 }
 
 .left-wrap {
-    width: 50%;
+    width: 35%;
     height: 100%;
     margin-right: 50px;
 }
@@ -404,7 +437,7 @@ export default {
     background-color: #000;
 }
 
-.left-wrap h4>span {
+.left-wrap h4 > span {
     margin-right: 30px;
 }
 
@@ -498,7 +531,7 @@ export default {
 
 .left-wrap .shop-div .shop-div1 {
     /* margin-right: 140px; */
-    width: 30%;
+    width: 40%;
 }
 
 .left-wrap .shop-label {
@@ -574,13 +607,23 @@ export default {
     background-color: #ecf5ff;
 }
 
+.shop-label .labels > span {
+    display: block;
+    border: 1px solid #409eff;
+    color: #409eff;
+    border-radius: 6px;
+    padding: 6px 20px;
+    float: left;
+    margin: 0 10px 10px 0;
+    background-color: #ecf5ff;
+}
+
 /* .shop-type .el-button--small,
 .el-button--small.is-round {
     padding: 12px 20px;
 } */
 
 .right-wrap {
-    width: 50%;
     height: 100%;
 }
 
@@ -612,9 +655,13 @@ export default {
     margin-bottom: 60px;
 }
 
+.right-wrap .shop-seat {
+    display: flex;
+}
+
 .right-wrap .shop-seat .left-box {
-    float: left;
-    /* margin-right: 50px; */
+    /* float: left; */
+    margin-right: 50px;
 }
 
 .right-wrap .shop-seat .left-box .seat-title {
@@ -730,7 +777,7 @@ export default {
 }
 
 .shop-seat .right-box {
-    float: left;
+    /* float: left; */
 }
 
 .shop-seat .right-box .seat-detail {
