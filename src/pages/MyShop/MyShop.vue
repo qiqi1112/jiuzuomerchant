@@ -5,9 +5,9 @@
                 <h4>
                     <span>店铺信息</span>
                     <el-button type="primary" @click="showInput">编辑信息</el-button>
-                    <el-button @click="showInput">确定</el-button>
+                    <el-button @click="showInput">保存</el-button>
                 </h4>
-                <div class="shop-info">
+                <div class="shop-info clearfix">
                     <div class="left-info">
                         <p>店铺招牌logo</p>
                         <el-upload
@@ -21,12 +21,26 @@
                     </div>
                     <div class="right-info">
                         <p class="shop-name">
-                            店名：
-                            <span>{{shopName}}</span>
+                            <span>店名：</span>
+                            <el-input
+                                v-model="shopName"
+                                placeholder="请输入店名"
+                                style="width:70%"
+                                :readonly="isReadonly"
+                            ></el-input>
+                            <!-- <span>{{shopName}}</span> -->
                         </p>
                         <p class="shop-brief">
-                            店铺简介：
-                            <span>{{shopBrief}}</span>
+                            <span>店铺简介：</span>
+                            <el-input
+                                type="textarea"
+                                :rows="3"
+                                placeholder="请输入店铺简介"
+                                v-model="shopBrief"
+                                style="width:76%"
+                                :readonly="isReadonly"
+                            ></el-input>
+                            <!-- <span>{{shopBrief}}</span> -->
                         </p>
                     </div>
                 </div>
@@ -61,16 +75,16 @@
                     <div class="shop-div1">
                         <div class="bussiness-hours">
                             <p>营业时间</p>
-                            <span>{{startBussTime}}</span> ~
-                            <span>{{endBussTime}}</span>
-                            <!-- <el-time-picker
+                            <!-- <span>{{startBussTime}}</span> ~
+                            <span>{{endBussTime}}</span> -->
+                            <el-time-picker
                         is-range
                         v-model="bussTimeVal"
                         range-separator="~"
                         start-placeholder="开始时间"
                         end-placeholder="结束时间"
                         placeholder="选择时间范围"
-                            ></el-time-picker>-->
+                            ></el-time-picker>
                         </div>
                         <div class="service-phone">
                             <p>客服电话</p>
@@ -116,7 +130,7 @@
                     <span>500</span>元/人
                 </p>
                 <div class="shop-desc">
-                    <div class="shop-brief">
+                    <div class="goods-brief">
                         <span>商品店面简介：</span>
                         <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
                     </div>
@@ -312,7 +326,9 @@ export default {
             goodName: '',
             goodNum: '',
 
-            imageUrl: ''
+            imageUrl: '',
+
+            isReadonly: false
         };
     },
     methods: {
@@ -399,7 +415,7 @@ export default {
 <style scoped>
 .clearfix::after {
     display: block;
-    content: "";
+    content: '';
     clear: both;
 }
 
@@ -443,13 +459,25 @@ export default {
 
 .left-wrap .shop-info {
     height: 160px;
-    display: flex;
-    justify-content: space-between;
+    /* display: flex; */
+    /* justify-content: space-between; */
     margin-bottom: 30px;
 }
 
+.shop-brief {
+    /* float: left; */
+    display: flex;
+    align-items: center;
+}
+
+.shop-brief>span {
+    /* margin-right:  30px; */
+}
+
 .left-wrap .shop-info .left-info {
-    margin-right: 40px;
+    width: 30%;
+    float: left;
+    /* margin-right: 40px; */
 }
 
 .left-wrap .shop-info .left-info > p {
@@ -489,13 +517,20 @@ export default {
 }
 
 .left-wrap .shop-info .right-info {
+    /* float: left; */
+    width: 70%;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .left-wrap .shop-info .right-info .shop-name {
+    float: left;
     margin-bottom: 40px;
+}
+
+.left-wrap .shop-info .right-info .shop-name>span {
+    margin-right: 30px;
 }
 
 .el-tag + .el-tag {

@@ -71,7 +71,6 @@ export default {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
-                let id = JSON.parse(localStorage.getItem('userInfo')).id;
                 this.$get('/dev/merchant/store/logout').then(
                     (res) => {
                         console.log(res);
