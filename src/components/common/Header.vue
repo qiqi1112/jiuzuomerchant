@@ -50,6 +50,7 @@
 </template>
 <script>
 import bus from '../common/bus';
+
 export default {
     data() {
         return {
@@ -61,18 +62,27 @@ export default {
     },
     computed: {
         username() {
-            // let username = JSON.parse(localStorage.getItem('userInfo')).nameOrPhone;
-            //   return username ? username : this.name;
-            return this.name;
-          
+            let username = JSON.parse(localStorage.getItem('userInfo')).loginName;
+            return username ? username : this.name;
+            // return this.name;
         }
     },
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
-                localStorage.removeItem('userInfo');
-                this.$router.push('/login');
+                let id = JSON.parse(localStorage.getItem('userInfo')).id;
+                this.$get('/dev/merchant/store/logout').then(
+                    (res) => {
+                        console.log(res);
+                        localStorage.removeItem('userInfo');
+                        this.$message.success('退出成功');
+                        this.$router.push('/login');
+                    },
+                    (err) => {
+                        console.log(err);
+                    }
+                );
             }
         },
         // 侧边栏折叠

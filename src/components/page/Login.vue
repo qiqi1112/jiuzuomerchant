@@ -71,9 +71,15 @@ export default {
                 (res) => {
                     console.log(res);
                     if (res.code == 0) {
-                        localStorage.setItem('userInfo', JSON.stringify(res.data));
+                        let obj = {
+                            id : res.data.id,
+                            loginName: res.data.loginName,
+                            token: res.data.token
+                        };
+
+                        localStorage.setItem('userInfo', JSON.stringify(obj));
                         this.$message.success('登录成功');
-                        this.$router.push('/dashboard');
+                        this.$router.push('/index');
                     } else {
                         this.$message.error(res.msg);
                         return false;

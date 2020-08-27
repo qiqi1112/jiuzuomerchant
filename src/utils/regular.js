@@ -1,8 +1,8 @@
 /*
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
- * @Last Modified by: xu.xiao
- * @Last Modified time: 2020-08-24 18:02:33
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2020-08-27 11:22:15
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -90,6 +90,18 @@ function addZero(num) {
     return num < 10 ? '0' + num : num
 }
 
+//时间戳转换
+function timestampToTime(timestamp) {
+    let date = new Date(timestamp.length == 10 ? timestamp * 1000 : timestamp); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
+    let Y = date.getFullYear() + '-';
+    let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+    let D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
+    let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+    let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+    let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+    return Y + M + D + h + m + s;
+}
+
 
 export default {
     phone,
@@ -97,4 +109,5 @@ export default {
     email,
     timeData,
     inputText,
+    timestampToTime
 }
