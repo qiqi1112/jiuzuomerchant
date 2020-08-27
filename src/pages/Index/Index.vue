@@ -301,6 +301,7 @@ export default {
         columnarChart(){
             let columnarLine = echarts.init(this.$refs.columnar)
             let option = {
+                color: ['#c23531','#2f4554', '#61a0a8'],
                 legend: {},
                 tooltip: {},
                 dataZoom: {

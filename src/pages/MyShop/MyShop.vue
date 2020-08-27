@@ -388,22 +388,28 @@ export default {
     },
 
     created() {
-        this.$get('/dev/merchant/store/getStoreInfo').then(
-            (res) => {
-                console.log(res.data);
-                let result = res.data;
-                this.shopName = result.name;
-                this.shopBrief = result.synopsis;
-                this.shopLabels = this.strChangeArr(result.labels);
-                console.log(this.shopLabels);
-            },
-            (err) => {
-                console.log(err);
-            }
-        );
+        
+    },
+    methods:{
+        getInfo(){  
+            this.$get('/dev/merchant/store/getStoreInfo').then(
+                (res) => {
+                    console.log(res.data);
+                    let result = res.data;
+                    this.shopName = result.name;
+                    this.shopBrief = result.synopsis;
+                    this.shopLabels = this.strChangeArr(result.labels);
+                    console.log(this.shopLabels);
+                },
+                (err) => {
+                    console.log(err);
+                }
+            );
+        }
     },
 
     mounted() {
+        this.getInfo()
         // let userInfo = JSON.parse(localStorage.getItem("userInfo"));
         // let data = {
         // }
