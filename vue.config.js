@@ -26,6 +26,14 @@ module.exports = {
                     '^/dev': ''
                 }
             },
+            '/map': {
+                target: "http://apis.map.qq.com",
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/map': ''
+                }
+            },
+            
         }
     }
 

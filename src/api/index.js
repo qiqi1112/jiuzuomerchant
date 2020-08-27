@@ -22,7 +22,7 @@ axios.interceptors.response.use(
     function (response) {
         if (response.data.code == 0) {
             return response;
-        } else if (response.data.code == 500) {
+        } else if (response.data.code == 700) {
             //未登录 登录失效
             Message.error(response.data.msg);
             // sessionStorage.clear(); //清除token等保存在本地的参数

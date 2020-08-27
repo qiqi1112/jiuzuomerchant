@@ -9,10 +9,10 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-select v-model="query.address" placeholder="订单类型" class="handle-select mr10">
+                <!-- <el-select v-model="query.address" placeholder="订单类型" class="handle-select mr10">
                     <el-option key="1" label="预定" value="预定"></el-option>
                     <el-option key="2" label="AA拼单" value="AA拼单"></el-option>
-                </el-select>
+                </el-select> -->
                 <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-input v-model="query.tel" placeholder="手机号" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
@@ -21,7 +21,6 @@
                 :data="tableData" border class="table" 
                 ref="multipleTable" 
                 header-cell-class-name="table-header" 
-                @selection-change="handleSelectionChange" 
                 @row-dblclick="lineDb"
             >
                 <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
