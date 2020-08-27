@@ -7,14 +7,12 @@ import Message from "element-ui/packages/message/index.js";
 
 // axios.defaults.timeout = 10000; //请求超时时间 单位(毫秒)
 
+var token = ''
 // axios.defaults.baseURL = './baseUrl'; //默认地址
 axios.interceptors.request.use(config => {
-    var token = ''
-    localStorage.getItem('userInfo') ? token = JSON.parse(localStorage.getItem('userInfo')).token : token = ''
-    console.log(token,11111)
-    axios.defaults.headers.common["X-Store-Token"] = token;
-    // let token = JSON.parse(localStorage.getItem('userinfo')).token
-    // config.headers.X-Admin-Token = token;
+    token = localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).token:''
+    // axios.defaults.headers.common["X-Store-Token"] = token;
+    config.headers.common['X-Store-Token'] = token
     return config;
 });
 
@@ -27,8 +25,9 @@ axios.interceptors.response.use(
         } else if (response.data.code == 700) {
             //未登录 登录失效
             Message.error(response.data.msg);
-            // sessionStorage.clear(); //清除token等保存在本地的参数
-            // router.push("/login");
+            return
+            localStorage.removeItem('userInfo'); //清除token等保存在本地的参数
+            router.push("/login");
             return Promise.reject(response.data);
         } else {
             Message.error(response.data.msg);
