@@ -9,11 +9,25 @@
             </el-breadcrumb>
         </div>
 
+        <!-- 图片 -->
+        <el-upload
+            class="avatar-uploader"
+            action="http://api_dev.wanxikeji.cn/api/savePic"
+            :data="imgdata2"
+            :on-success="handleAvatarSuccess2"
+            :before-upload="beforeAvatarUpload2"
+            :show-file-list="false"
+        >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+
+        <!-- 图集 -->
         <el-upload
             list-type="picture-card"
             action="http://api_dev.wanxikeji.cn/api/savePic"
-            :before-upload="beforeAvatarUpload"
             :data="imgdata"
+            :before-upload="beforeAvatarUpload"
             :on-preview="handlePictureCardPreview"
             :on-success="handleAvatarSuccess"
             :on-remove="handleRemove"
@@ -25,7 +39,7 @@
             <img width="100%" :src="dialogImageUrl" alt />
         </el-dialog>
 
-         <el-button type="primary" @click="submit">提交</el-button>
+        <el-button type="primary" @click="submit">提交</el-button>
 
         <!-- <div class="container">
             <div class="content-title">支持拖拽</div>
@@ -108,6 +122,11 @@ export default {
             imgdata: {
                 img: ''
             },
+            imageUrl: '', //添加与修改对话框里的图片上传
+            //上传时附带的额外参数（图片地址）
+            imgdata2: {
+                img: ''
+            },
             dialogImageUrlBox: [] //要上传的文件列表
         };
     },
@@ -123,7 +142,7 @@ export default {
         //点击查看图集时
         handlePictureCardPreview(file) {
             this.dialogVisible = true; //展示图集的对话框开启
-            // this.dialogImageUrl = file.url; //将返回的图集地址展示到页面上
+            this.dialogImageUrl = file.url; //将返回的图集地址展示到页面上
         },
 
         //删除图集后
@@ -140,10 +159,21 @@ export default {
             // console.log(file, '图集上传完返回的file');
         },
 
-        //提交
-        submit() {
+        //-----------------------------------------------------------
 
+        //上传文件完成之前的操作
+        beforeAvatarUpload2(file) {
+            this.imgdata2.img = file; //上传图片完成之前就把这个图片的相关信息赋给一个对象里的属性，然后上面上传时就通过:data将这个imgdata对象携带过去，这样下面就能获取到这个图片的地址信息等
         },
+
+        //上传图片完成的操作
+        handleAvatarSuccess2(res, file) {
+            this.imageUrl = 'http://api_dev.wanxikeji.cn/' + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            console.log(this.imageUrl);
+        },
+
+        //提交
+        submit() {},
 
         setImage(e) {
             const file = e.target.files[0];

@@ -32,6 +32,19 @@ Vue.filter("phoneNum", function (oldVal) {
     return newVal;
 });
 
+//店铺类型过滤器
+Vue.filter("shopType", function (oldVal) {
+    let newVal = "";
+    if (oldVal == 1) {
+        newVal = "夜店"
+    } else if (oldVal == 2) {
+        newVal = "清吧"
+    } else if (oldVal == 3) {
+        newVal = "ktv";
+    }
+    return newVal;
+});
+
 
 Vue.config.productionTip = false;
 Vue.use(VueI18n);

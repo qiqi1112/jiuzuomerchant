@@ -19,6 +19,14 @@ module.exports = {
                 }
             },
 
+            '/file': {
+                target: 'http://47.108.204.66:8078',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/file': ''
+                }
+            },
+
             '/dev': {
                 target: "http://47.108.204.66:8077",
                 changeOrigin: true,

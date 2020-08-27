@@ -4,19 +4,25 @@
             <div class="left-wrap">
                 <h4>
                     <span>店铺信息</span>
-                    <el-button type="primary" @click="showInput">编辑信息</el-button>
-                    <el-button @click="showInput">保存</el-button>
+                    <el-button type="primary" @click="editShopInfo">编辑</el-button>
+                    <el-button type="primary" @click="submitShopInfo">保存</el-button>
                 </h4>
                 <div class="shop-info clearfix">
                     <div class="left-info">
                         <p>店铺招牌logo</p>
+                        <img v-if="isReadonly" :src="logoImageUrl" class="avatar" />
                         <el-upload
+                            v-else
                             class="avatar-uploader"
-                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :action="serverUrl"
                             :show-file-list="false"
+                            :data="avatarImg"
+                            :on-success="uploadAvatarSuccess"
+                            :before-upload="beforeAvatarUpload"
+                            :on-error="uploadError"
                         >
                             <img v-if="logoImageUrl" :src="logoImageUrl" class="avatar" />
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            <i class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </div>
                     <div class="right-info">
@@ -28,7 +34,6 @@
                                 style="width:70%"
                                 :readonly="isReadonly"
                             ></el-input>
-                            <!-- <span>{{shopName}}</span> -->
                         </p>
                         <p class="shop-brief">
                             <span>店铺简介：</span>
@@ -46,14 +51,10 @@
                 </div>
                 <div class="shop-label">
                     <p>店铺标签</p>
-                    <div class="labels clearfix" v-if="shopLabels">
-                        <span v-for="(item,index) in shopLabels" :key="index">{{item}}</span>
-                    </div>
-
-                    <div class="change-labels" v-else>
+                    <div class="change-labels">
                         <el-tag
                             :key="tag"
-                            closable
+                            :closable="!isReadonly"
                             v-for="tag in dynamicTags"
                             :disable-transitions="false"
                             @close="handleClose(tag)"
@@ -66,7 +67,13 @@
                             @keyup.enter.native="handleInputConfirm"
                             @blur="handleInputConfirm"
                         ></el-input>
-                        <el-button v-else class="button-new-tag" @click="showInput">
+                        <!-- @blur="handleInputConfirm" -->
+
+                        <el-button
+                            v-else-if="!isReadonly"
+                            class="button-new-tag"
+                            @click="showInput"
+                        >
                             <i class="el-icon-plus"></i>
                         </el-button>
                     </div>
@@ -75,29 +82,54 @@
                     <div class="shop-div1">
                         <div class="bussiness-hours">
                             <p>营业时间</p>
-                            <!-- <span>{{startBussTime}}</span> ~
-                            <span>{{endBussTime}}</span> -->
-                            <el-time-picker
-                        is-range
-                        v-model="bussTimeVal"
-                        range-separator="~"
-                        start-placeholder="开始时间"
-                        end-placeholder="结束时间"
-                        placeholder="选择时间范围"
-                            ></el-time-picker>
+                            <div class="time-select">
+                                <el-time-select
+                                    v-model="startBussTime"
+                                    :readonly="isReadonly"
+                                    :picker-options="{
+                                    start: '00:00',
+                                    step: '00:15',
+                                    end: '23:45'
+                                }"
+                                    placeholder="开始"
+                                ></el-time-select>
+                                <span>~</span>
+                                <el-time-select
+                                    v-model="endBussTime"
+                                    :readonly="isReadonly"
+                                    :picker-options="{
+                                    start: '00:00',
+                                  step: '00:15',
+                                  end: '23:45'
+                                }"
+                                    placeholder="结束"
+                                ></el-time-select>
+                            </div>
                         </div>
                         <div class="service-phone">
                             <p>客服电话</p>
-                            <span>{{servicePhone}}</span>
+                            <el-input
+                                v-model="servicePhone"
+                                placeholder="客服电话"
+                                style="width:70%"
+                                :readonly="isReadonly"
+                            ></el-input>
                         </div>
                     </div>
                     <div class="shop-div2">
                         <div class="shop-address">
                             <p>店铺地址</p>
-                            <p class="shop-add">
+                            <p class="shop-add clearfix">
                                 <span>{{country}}</span>
                                 <span>{{street}}</span>
-                                <span>{{detailAdd}}</span>
+
+                                <el-input
+                                    v-model="detailAdd"
+                                    placeholder="请输入店铺详细地址"
+                                    :readonly="isReadonly"
+                                ></el-input>
+
+                                <!-- <span class="detail-address">{{detailAdd}}</span> -->
                             </p>
                             <!-- <div>
                                 <el-cascader
@@ -110,37 +142,71 @@
                         <div class="shop-type">
                             <p>
                                 店铺类型
-                                <span class="red-font">（用于客户筛选出本店）</span>
+                                <span>（用于客户筛选出本店）</span>
                             </p>
                             <div class="type-box">
-                                <span v-for="(item,index) of shopType" :key="index">{{item}}</span>
-                                <!-- <el-row>
-                                    <el-button type="primary">酷嗨</el-button>
-                                    <el-button type="success">演奏</el-button>
-                                    <el-button type="info">蹦迪</el-button>
-                                    <el-button type="warning">歌手</el-button>
-                                </el-row>-->
+                                <span v-if="isReadonly">{{shopType}}</span>
+
+                                <el-select v-else v-model="shopType" placeholder="请选择">
+                                    <el-option
+                                        v-for="item in shopTypeOpt"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.value"
+                                    ></el-option>
+                                </el-select>
+                                <!-- <span
+                                    v-else
+                                    v-for="(item,index) of shopTypeOpt"
+                                    :key="index"
+                                >{{item}}</span>-->
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <p class="per-con">
                     店铺人均消费：
-                    <span>500</span>元/人
+                    <el-input
+                        v-model="perCon"
+                        placeholder="人均消费"
+                        style="width:20%;margin-right:6px"
+                        :readonly="isReadonly"
+                    ></el-input>元/人
+                    <!-- <span>{{perCon}}</span>元/人 -->
                 </p>
                 <div class="shop-desc">
                     <div class="goods-brief">
                         <span>商品店面简介：</span>
-                        <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                        <el-input
+                            type="textarea"
+                            :rows="3"
+                            placeholder="请输入商品店面简介"
+                            v-model="goodsBrief"
+                            style="width:76%"
+                            :readonly="isReadonly"
+                        ></el-input>
                     </div>
                     <div class="shop-matter">
                         <span>订桌注意事项：</span>
-                        <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                        <el-input
+                            type="textarea"
+                            :rows="3"
+                            placeholder="请输入订桌注意事项"
+                            v-model="shopMatter"
+                            style="width:76%"
+                            :readonly="isReadonly"
+                        ></el-input>
                     </div>
                     <div class="shop-remind">
                         <span>排号商家提醒：</span>
-                        <span>最新引进欧美国家的，普朗克朗姆酒，恢复 MP2% 哦</span>
+                        <el-input
+                            type="textarea"
+                            :rows="3"
+                            placeholder="请输入排号商家提醒"
+                            v-model="shopRemind"
+                            style="width:76%"
+                            :readonly="isReadonly"
+                        ></el-input>
                     </div>
                 </div>
             </div>
@@ -148,15 +214,19 @@
                 <h4>店铺展示图</h4>
                 <div class="shop-info">
                     <!-- banner展示图 -->
-                    <el-upload
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        list-type="picture-card"
-                    >
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                    <el-dialog :visible.sync="dialogVisible">
-                        <img width="100%" :src="dialogImageUrl" alt />
-                    </el-dialog>
+
+                    <div class="banner-box">
+                        <img :src="dialogImageUrl" alt />
+                        <el-upload
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            list-type="picture-card"
+                        >
+                            <i class="el-icon-plus"></i>
+                        </el-upload>
+                        <el-dialog :visible.sync="dialogVisible">
+                            <img :src="dialogImageUrl" alt />
+                        </el-dialog>
+                    </div>
 
                     <!-- 商家布局图 -->
                     <el-upload
@@ -204,6 +274,7 @@
                             </p>
                         </div>
                         <div
+                            v-if="x&&y"
                             class="seat-box"
                             ref="seatBox"
                             :style="{width:32 * x + 30 + 'px'}"
@@ -211,7 +282,7 @@
                         >
                             <div v-for="(itemX,index) in Number(x)" :key="index">
                                 <div v-for="(itemY,index) in Number(y)" :key="index">
-                                    <span class="seat" @click="changeStauts($event,seatStyle)"></span>
+                                    <span class="seat" @click="changeStauts($event,seatStyle)" @contextmenu.prevent="changeStauts($event,'canBook')"></span>
                                 </div>
                             </div>
                         </div>
@@ -284,41 +355,54 @@ import { regionData } from 'element-china-area-data'; //引入外部地址选择
 export default {
     data() {
         return {
-            // 店铺主要信息模块------------------------------------------------
+            serverUrl: '/file/admin/system/upload/create',
+            // serverUrl : 'http://api_dev.wanxikeji.cn/api/savePic',
+            isReadonly: true, //编辑信息开关（默认只读）
             logoImageUrl: '', //店铺logo
-            shopName: 'PlayHouse', //店铺名称
-            shopBrief: '每一份属于夜晚的美丽心情，都不应该被雨水淋湿而打断——成都play house', //店铺简介
-
-            // 店铺标签模块---------------------------------------------------------
-            shopLabels: '', //返回的店铺标签字符串
-            dynamicTags: ['美女超多', '来了就不想回家', '现场嗨到爆炸'], //店铺标签
-            inputVisible: false, //添加店铺标签的输入框
+            //上传头像时附带的额外参数（头像地址）
+            avatarImg: {
+                img: ''
+            },
+            shopName: '', //店铺名称
+            shopBrief: '', //店铺简介
+            dynamicTags: [], //店铺标签数组
+            inputVisible: false, //添加店铺标签的输入框开关
             inputValue: '', //店铺标签输入框的输入值
-
-            // 店铺营业时间模块-----------------------------------------
-            startBussTime: '20:00', //开始时间
-            endBussTime: '03:00', //结束时间
-            bussTimeVal: [new Date(), new Date()], //营业时间选择器
-
-            // 店铺地址模块-------------------------------------------
+            startBussTime: '', //开始营业时间
+            endBussTime: '', //结束营业时间
             addressOptions: regionData, //使用外部地址数组
-            regionValue: [],
+            regionValue: [], //地址选择器选择后的地址编号
             country: '锦江区', //区县
             street: '蜀都大道', //街道
             detailAdd: '锦江区水碾河路48号', //详细地址
-
-            // 客服电话模块--------------------------
-            servicePhone: '028-0000 0000',
-
-            // 店铺类型模块--------------------------
-            shopType: ['酷嗨', '演奏', '蹦迪', '歌手', '酷嗨', '演奏', '蹦迪', '歌手'],
+            servicePhone: '028-0000 0000', //客服电话
+            shopType: '', //选择的店铺类型
+            //所有店铺类型
+            shopTypeOpt: [
+                {
+                    label: '1',
+                    value: '夜店'
+                },
+                {
+                    label: '2',
+                    value: '清吧'
+                },
+                {
+                    label: '3',
+                    value: 'ktv'
+                }
+            ],
+            perCon: 0, //人均消费
+            goodsBrief: '', //商品店面简介
+            shopMatter: '', //订桌注意事项
+            shopRemind: '', //排号商家提醒
 
             dialogImageUrl: '',
             dialogVisible: false,
 
             // 选座模块-----------------------------------------
-            x: 20,
-            y: 20,
+            x: 20, //座位列数
+            y: 20, //座位行数
             seatStyle: 'hasBook', //默认的选座样式
 
             radio: '1',
@@ -326,12 +410,36 @@ export default {
             goodName: '',
             goodNum: '',
 
-            imageUrl: '',
-
-            isReadonly: false
+            imageUrl: ''
         };
     },
     methods: {
+        //上传头像完成之前
+        beforeAvatarUpload(file) {
+            this.avatarImg.img = file; //上传图片完成之前就把这个图片的相关信息赋给一个对象里的属性，然后上面上传时就通过:data将这个imgdata对象携带过去，这样下面就能获取到这个图片的地址信息等
+        },
+
+        //上传头像成功
+        uploadAvatarSuccess(res, file) {
+            this.logoImageUrl = 'http://47.108.204.66:8078/' + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            console.log(this.logoImageUrl);
+        },
+
+        //编辑商铺信息
+        editShopInfo() {
+            this.isReadonly = false;
+        },
+
+        //提交修改并保存
+        submitShopInfo() {
+            this.isReadonly = true;
+            if (this.isReadonly == true) {
+                this.$message.success('保存成功');
+
+                console.log('zzz', this.shopTypeChangeNum(this.shopType));
+            }
+        },
+
         //删除当前标签
         handleClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
@@ -384,36 +492,64 @@ export default {
         //将返回的字符串转为数组
         strChangeArr(str) {
             return str.split(',');
+        },
+
+        //转换店铺类型（文字转数字）
+        shopTypeChangeNum(type) {
+            let shopType = '';
+            if (type == '夜店') {
+                shopType = 1;
+            } else if (type == '清吧') {
+                shopType = 2;
+            } else if (type == 'ktv') {
+                shopType = 3;
+            }
+            return shopType;
+        },
+
+        //转换店铺类型（数字转文字）
+        shopTypeChangeWord(type) {
+            let shopType = '';
+            if (type == 1) {
+                shopType = '夜店';
+            } else if (type == 2) {
+                shopType = '清吧';
+            } else if (type == 3) {
+                shopType = 'ktv';
+            }
+            return shopType;
+        },
+
+        //图片上传失败时
+        uploadError() {
+            this.$message.error('插入失败');
+        },
+
+        getStoreInfo() {
+            this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
+                console.log(res.data);
+                let result = res.data;
+                this.logoImageUrl = 'img/' + result.logo;
+                // console.log(this.logoImageUrl);
+                this.shopName = result.name;
+                this.shopBrief = result.synopsis;
+                this.dynamicTags = this.strChangeArr(result.labels);
+                this.servicePhone = result.customerServicePhone;
+                this.shopType = this.shopTypeChangeWord(result.type);
+                this.perCon = result.perCapitaConsumption;
+                this.goodsBrief = result.goodsStoreSynopsis;
+                this.shopMatter = result.tableReservationNotes;
+                this.shopRemind = result.businessReminder;
+                this.startBussTime = result.startTime;
+                this.endBussTime = result.endTime;
+            });
         }
     },
 
-    created() {
-        
-    },
-    methods:{
-        getInfo(){  
-            this.$get('/dev/merchant/store/getStoreInfo').then(
-                (res) => {
-                    console.log(res.data);
-                    let result = res.data;
-                    this.shopName = result.name;
-                    this.shopBrief = result.synopsis;
-                    this.shopLabels = this.strChangeArr(result.labels);
-                    console.log(this.shopLabels);
-                },
-                (err) => {
-                    console.log(err);
-                }
-            );
-        }
-    },
+    created() {},
 
     mounted() {
-        this.getInfo()
-        // let userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        // let data = {
-        // }
-        // console.log("xxx",userInfo);
+        this.getStoreInfo();
     }
 };
 </script>
@@ -476,7 +612,7 @@ export default {
     align-items: center;
 }
 
-.shop-brief>span {
+.shop-brief > span {
     /* margin-right:  30px; */
 }
 
@@ -519,6 +655,7 @@ export default {
 >>> .left-wrap .shop-info .left-info .avatar {
     width: 120px;
     height: 120px;
+    border-radius: 6px;
     display: block;
 }
 
@@ -535,7 +672,7 @@ export default {
     margin-bottom: 40px;
 }
 
-.left-wrap .shop-info .right-info .shop-name>span {
+.left-wrap .shop-info .right-info .shop-name > span {
     margin-right: 30px;
 }
 
@@ -560,19 +697,28 @@ export default {
 .el-tag--small {
     height: 32px;
     line-height: 32px;
+    margin-bottom: 10px;
+}
+
+>>> .input-new-tag {
+    vertical-align: middle !important;
 }
 
 .left-wrap .shop-desc > div {
+    display: flex;
+    align-items: center;
     margin-bottom: 30px;
 }
 
 .left-wrap .shop-div {
     display: flex;
+    margin-bottom: 30px;
 }
 
 .left-wrap .shop-div .shop-div1 {
     /* margin-right: 140px; */
-    width: 40%;
+    width: 42%;
+    margin-right: 30px;
 }
 
 .left-wrap .shop-label {
@@ -591,6 +737,15 @@ export default {
     margin-bottom: 10px;
 }
 
+.left-wrap .bussiness-hours .time-select {
+    display: flex;
+    align-items: center;
+}
+
+.left-wrap .bussiness-hours .time-select > span {
+    margin: 0 10px;
+}
+
 .left-wrap .shop-address {
     margin-bottom: 30px;
 }
@@ -600,7 +755,26 @@ export default {
 }
 
 .left-wrap .shop-address .shop-add span {
-    margin-right: 20px;
+    /* display: block; */
+    /* border: 1px solid #409eff;
+    color: #409eff;
+    border-radius: 6px;
+    padding: 6px 20px;
+    float: left;
+    margin: 0 10px 10px 0;
+    background-color: #ecf5ff; */
+    background-color: #ecf5ff;
+    display: inline-block;
+    height: 32px;
+    padding: 0 10px;
+    line-height: 30px;
+    font-size: 12px;
+    color: #409eff;
+    border: 1px solid #d9ecff;
+    border-radius: 4px;
+    margin: 0 10px 10px 0;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 
 .left-wrap .service-phone {
@@ -613,10 +787,6 @@ export default {
 
 .left-wrap .per-con {
     margin-bottom: 30px;
-}
-
-.red-font {
-    color: #f00;
 }
 
 .shop-type {
@@ -633,19 +803,27 @@ export default {
     clear: both;
 }
 
-.shop-type .type-box {
-    /* width: 80%; */
-}
-
 .shop-type .type-box > span {
-    display: block;
+    /* display: block;
     border: 1px solid #409eff;
     color: #409eff;
     border-radius: 6px;
     padding: 6px 20px;
     float: left;
     margin: 0 10px 10px 0;
+    background-color: #ecf5ff; */
     background-color: #ecf5ff;
+    display: inline-block;
+    height: 32px;
+    padding: 0 10px;
+    line-height: 30px;
+    font-size: 12px;
+    color: #409eff;
+    border: 1px solid #d9ecff;
+    border-radius: 4px;
+    margin: 0 10px 10px 0;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 
 .shop-label .labels > span {
@@ -694,6 +872,14 @@ export default {
 
 .right-wrap .shop-info {
     margin-bottom: 60px;
+}
+
+.right-wrap .shop-info .banner-box {
+}
+
+.right-wrap .shop-info .banner-box img {
+    width: 160px;
+    height: 40px;
 }
 
 .right-wrap .shop-seat {
