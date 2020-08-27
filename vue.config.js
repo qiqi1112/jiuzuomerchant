@@ -17,7 +17,15 @@ module.exports = {
                 pathRewrite: {
                     '^/text': ''
                 }
-            }
+            },
+
+            '/dev': {
+                target: "http://47.108.204.66:8077",
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/dev': ''
+                }
+            },
         }
     }
 

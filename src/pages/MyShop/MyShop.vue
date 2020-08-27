@@ -2,7 +2,11 @@
     <div class="con-wrap">
         <div class="container">
             <div class="left-wrap">
-                <h4>店铺信息</h4>
+                <h4>
+                    <span>店铺信息</span>
+                    <el-button type="primary" @click="showInput">编辑信息</el-button>
+                    <el-button @click="showInput">确定</el-button>
+                </h4>
                 <div class="shop-info">
                     <div class="left-info">
                         <p>店铺招牌logo</p>
@@ -292,14 +296,14 @@ export default {
             servicePhone: '028-0000 0000',
 
             // 店铺类型模块--------------------------
-            shopType: ['酷嗨', '演奏', '蹦迪', '歌手','酷嗨', '演奏', '蹦迪', '歌手'],
+            shopType: ['酷嗨', '演奏', '蹦迪', '歌手', '酷嗨', '演奏', '蹦迪', '歌手'],
 
             dialogImageUrl: '',
             dialogVisible: false,
 
             // 选座模块-----------------------------------------
-            x: 10,
-            y: 10,
+            x: 20,
+            y: 20,
             seatStyle: 'hasBook', //默认的选座样式
 
             radio: '1',
@@ -400,6 +404,10 @@ export default {
     background-color: #000;
 }
 
+.left-wrap h4>span {
+    margin-right: 30px;
+}
+
 .left-wrap .shop-info {
     height: 160px;
     display: flex;
@@ -480,16 +488,17 @@ export default {
     line-height: 32px;
 }
 
-.left-wrap .shop-div {
-    display: flex;
-}
-
 .left-wrap .shop-desc > div {
     margin-bottom: 30px;
 }
 
+.left-wrap .shop-div {
+    display: flex;
+}
+
 .left-wrap .shop-div .shop-div1 {
-    margin-right: 140px;
+    /* margin-right: 140px; */
+    width: 30%;
 }
 
 .left-wrap .shop-label {
@@ -546,8 +555,12 @@ export default {
 
 .shop-type .type-box::after {
     display: block;
-    content:  "";
+    content: '';
     clear: both;
+}
+
+.shop-type .type-box {
+    /* width: 80%; */
 }
 
 .shop-type .type-box > span {
