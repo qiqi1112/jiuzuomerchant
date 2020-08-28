@@ -67,32 +67,24 @@
                                             border
                                             style="margin-right:20px"
                                         ></el-checkbox>
-                                        <el-select
-                                            v-model="comboForm.weight"
-                                            placeholder="Banner位权重"
-                                            style="width:140px"
-                                        >
-                                            <el-option
-                                                v-for="item in comboForm.options"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            ></el-option>
-                                        </el-select>
                                     </p>
                                     <!-- banner图 -->
                                     <el-upload
-                                        class="avatar-uploader"
-                                        action="https://jsonplaceholder.typicode.com/posts/"
-                                        :show-file-list="false"
+                                        action="/file/admin/system/upload/createBatch"
+                                        list-type="picture-card"
+                                        :data="comboForm.bannerImg"
+                                        :before-upload="beforeComboBannerUpload"
+                                        :on-preview="comboBannerPreview"
+                                        :on-success="uploadComboBannerSuccess"
+                                        :on-remove="comboBannerRemove"
+                                        :file-list="comboForm.bannerImgBox"
+                                        :on-error="uploadError"
                                     >
-                                        <img
-                                            v-if="comboForm.comboBannerImageUrl"
-                                            :src="comboForm.comboBannerImageUrl"
-                                            class="avatar"
-                                        />
-                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                        <i class="el-icon-plus"></i>
                                     </el-upload>
+                                    <el-dialog :visible.sync="comboForm.bannerDialog">
+                                        <img :src="comboForm.bannerImageUrl" alt />
+                                    </el-dialog>
                                     <span>（*如需商店轮播推荐，请添加Banner图片）</span>
                                 </div>
                                 <div class="right-box">
@@ -101,12 +93,16 @@
                                         <span>套餐缩略图：</span>
                                         <el-upload
                                             class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
+                                            :action="serverUrl"
                                             :show-file-list="false"
+                                            :data="comboForm.thumImg"
+                                            :on-success="uploadComboThumSuccess"
+                                            :before-upload="beforeComboThumUpload"
+                                            :on-error="uploadError"
                                         >
                                             <img
-                                                v-if="comboForm.comboThumImageUrl"
-                                                :src="comboForm.comboThumImageUrl"
+                                                v-if="comboForm.thumImageUrl"
+                                                :src="comboForm.thumImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -117,12 +113,16 @@
                                         <span>套餐详情图：</span>
                                         <el-upload
                                             class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
+                                            :action="serverUrl"
                                             :show-file-list="false"
+                                            :data="comboForm.detailImg"
+                                            :on-success="uploadComboDetailSuccess"
+                                            :before-upload="beforeComboDetailUpload"
+                                            :on-error="uploadError"
                                         >
                                             <img
-                                                v-if="comboForm.comboDetailImageUrl"
-                                                :src="comboForm.comboDetailImageUrl"
+                                                v-if="comboForm.detailImageUrl"
+                                                :src="comboForm.detailImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -184,7 +184,6 @@
                                         </p>
                                         <p class="drinks-spec">
                                             <span>酒水规格：</span>
-
                                             <el-form
                                                 :model="dynamicValidateForm"
                                                 ref="dynamicValidateForm"
@@ -222,14 +221,14 @@
                                         <div class="banner-box">
                                             <el-checkbox
                                                 v-model="drinksForm.checkedBanner"
-                                                label="放至商店Banner位"
+                                                label="放至商家推荐位"
                                                 border
                                                 style="margin-right:20px"
                                             ></el-checkbox>
                                             <el-select
                                                 v-model="drinksForm.weight"
-                                                placeholder="Banner位权重"
-                                                style="width:140px;margin-right:60px"
+                                                placeholder="推荐位位权重"
+                                                style="width:140px"
                                             >
                                                 <el-option
                                                     v-for="item in drinksForm.options"
@@ -246,33 +245,8 @@
                                                     :show-file-list="false"
                                                 >
                                                     <img
-                                                        v-if="drinksForm.drinksBannerImageUrl"
-                                                        :src="drinksForm.drinksBannerImageUrl"
-                                                        class="avatar"
-                                                    />
-                                                    <i
-                                                        v-else
-                                                        class="el-icon-plus avatar-uploader-icon"
-                                                    ></i>
-                                                </el-upload>
-                                                <span>（*如需商店轮播推荐，请添加Banner图片）</span>
-                                            </div>
-                                        </div>
-                                        <div class="reco-box">
-                                            <el-checkbox
-                                                v-model="drinksForm.checkedReco"
-                                                label="放至商家推荐位"
-                                                border
-                                            ></el-checkbox>
-                                            <div class="drinks-div">
-                                                <el-upload
-                                                    class="avatar-uploader"
-                                                    action="https://jsonplaceholder.typicode.com/posts/"
-                                                    :show-file-list="false"
-                                                >
-                                                    <img
-                                                        v-if="drinksForm.drinksRecoImageUrl"
-                                                        :src="drinksForm.drinksRecoImageUrl"
+                                                        v-if="drinksForm.recoImageUrl"
+                                                        :src="drinksForm.recoImageUrl"
                                                         class="avatar"
                                                     />
                                                     <i
@@ -281,6 +255,32 @@
                                                     ></i>
                                                 </el-upload>
                                                 <span>（*如需商家推荐，请添加推荐位图片）</span>
+                                            </div>
+                                        </div>
+                                        <div class="reco-box">
+                                            <el-checkbox
+                                                v-model="drinksForm.checkedReco"
+                                                label="放至商店Banner位"
+                                                border
+                                            ></el-checkbox>
+
+                                            <div class="drinks-div">
+                                                <el-upload
+                                                    class="avatar-uploader"
+                                                    action="https://jsonplaceholder.typicode.com/posts/"
+                                                    :show-file-list="false"
+                                                >
+                                                    <img
+                                                        v-if="drinksForm.bannerImageUrl"
+                                                        :src="drinksForm.bannerImageUrl"
+                                                        class="avatar"
+                                                    />
+                                                    <i
+                                                        v-else
+                                                        class="el-icon-plus avatar-uploader-icon"
+                                                    ></i>
+                                                </el-upload>
+                                                <span>（*如需商店轮播推荐，请添加Banner图片）</span>
                                             </div>
                                         </div>
                                     </div>
@@ -295,8 +295,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="drinksForm.drinksThumImageUrl"
-                                                :src="drinksForm.drinksThumImageUrl"
+                                                v-if="drinksForm.thumImageUrl"
+                                                :src="drinksForm.thumImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -311,8 +311,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="drinksForm.drinksDetailImageUrl"
-                                                :src="drinksForm.drinksDetailImageUrl"
+                                                v-if="drinksForm.detailImageUrl"
+                                                :src="drinksForm.detailImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -368,7 +368,7 @@
                                             border
                                             style="margin-right:20px"
                                         ></el-checkbox>
-                                        <el-select
+                                        <!-- <el-select
                                             v-model="drinksForm.weight"
                                             placeholder="Banner位权重"
                                             style="width:140px"
@@ -379,7 +379,7 @@
                                                 :label="item.label"
                                                 :value="item.value"
                                             ></el-option>
-                                        </el-select>
+                                        </el-select> -->
                                     </p>
                                     <!-- banner图 -->
                                     <el-upload
@@ -388,8 +388,8 @@
                                         :show-file-list="false"
                                     >
                                         <img
-                                            v-if="snackForm.snackBannerImageUrl"
-                                            :src="snackForm.snackBannerImageUrl"
+                                            v-if="snackForm.bannerImageUrl"
+                                            :src="snackForm.bannerImageUrl"
                                             class="avatar"
                                         />
                                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -406,8 +406,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="snackForm.snackThumImageUrl"
-                                                :src="snackForm.snackThumImageUrl"
+                                                v-if="snackForm.thumImageUrl"
+                                                :src="snackForm.thumImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -422,8 +422,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="snackForm.snackDetailImageUrl"
-                                                :src="snackForm.snackDetailImageUrl"
+                                                v-if="snackForm.detailImageUrl"
+                                                :src="snackForm.detailImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -479,7 +479,7 @@
                                             border
                                             style="margin-right:20px"
                                         ></el-checkbox>
-                                        <el-select
+                                        <!-- <el-select
                                             v-model="otherForm.weight"
                                             placeholder="Banner位权重"
                                             style="width:140px"
@@ -490,7 +490,7 @@
                                                 :label="item.label"
                                                 :value="item.value"
                                             ></el-option>
-                                        </el-select>
+                                        </el-select> -->
                                     </p>
                                     <!-- banner图 -->
                                     <el-upload
@@ -499,8 +499,8 @@
                                         :show-file-list="false"
                                     >
                                         <img
-                                            v-if="otherForm.otherBannerImageUrl"
-                                            :src="otherForm.otherBannerImageUrl"
+                                            v-if="otherForm.bannerImageUrl"
+                                            :src="otherForm.bannerImageUrl"
                                             class="avatar"
                                         />
                                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -517,8 +517,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="otherForm.otherThumImageUrl"
-                                                :src="otherForm.otherThumImageUrl"
+                                                v-if="otherForm.thumImageUrl"
+                                                :src="otherForm.thumImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -533,8 +533,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="otherForm.otherDetailImageUrl"
-                                                :src="otherForm.otherDetailImageUrl"
+                                                v-if="otherForm.detailImageUrl"
+                                                :src="otherForm.detailImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -597,7 +597,7 @@
                                             border
                                             style="margin-right:20px"
                                         ></el-checkbox>
-                                        <el-select
+                                        <!-- <el-select
                                             v-model="vipCardForm.weight"
                                             placeholder="Banner位权重"
                                             style="width:140px"
@@ -608,7 +608,7 @@
                                                 :label="item.label"
                                                 :value="item.value"
                                             ></el-option>
-                                        </el-select>
+                                        </el-select> -->
                                     </p>
                                     <!-- banner图 -->
                                     <el-upload
@@ -617,8 +617,8 @@
                                         :show-file-list="false"
                                     >
                                         <img
-                                            v-if="vipCardForm.vipCardBannerImageUrl"
-                                            :src="vipCardForm.vipCardBannerImageUrl"
+                                            v-if="vipCardForm.bannerImg"
+                                            :src="vipCardForm.bannerImg"
                                             class="avatar"
                                         />
                                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -635,8 +635,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="vipCardForm.vipCardThumImageUrl"
-                                                :src="vipCardForm.vipCardThumImageUrl"
+                                                v-if="vipCardForm.thumImageUrl"
+                                                :src="vipCardForm.thumImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -651,8 +651,8 @@
                                             :show-file-list="false"
                                         >
                                             <img
-                                                v-if="vipCardForm.vipCardDetailImageUrl"
-                                                :src="vipCardForm.vipCardDetailImageUrl"
+                                                v-if="vipCardForm.detailImageUrl"
+                                                :src="vipCardForm.detailImageUrl"
                                                 class="avatar"
                                             />
                                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -836,6 +836,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 翻页区域 -->
+            <div>
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    @current-change="handleCurrentChange"
+                    :total="dataListCount"
+                    :current-page="currentPage"
+                    :page-size="pagesize"
+                    class="page"
+                ></el-pagination>
+            </div>
         </div>
     </div>
 </template>
@@ -844,11 +857,18 @@
 export default {
     data() {
         return {
+            serverUrl: '/file/admin/system/upload/create', //上传文件
             searchName: '', //商品名称输入框
-            value: '', //商品分类下拉框
+            value: '', //商品酒水分类下拉框
 
             dialogVisible: false, //添加商品的对话框
             activeName: 'combo', //默认展示的标签页
+            activeNum: 1, //标签页对应的下标，默认为1
+
+            // 表格数据分页相关属性
+            dataListCount: 100, //默认当前要显示的数据条数
+            currentPage: 1, //默认显示的页码所在位置（第一页）
+            pagesize: 16, //默认每页要显示多少条数据
 
             //套餐标签页表单---------------------------------
             comboForm: {
@@ -856,61 +876,33 @@ export default {
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
-                checkedBanner: false,
-                weight: '',
                 spec: ['默认'],
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
-                comboBannerImageUrl: '', //套餐banner图
-                comboThumImageUrl: '', //套餐缩略图
-                comboDetailImageUrl: '' //套餐详情图
+                checkedBanner: false,
+
+                bannerImageUrl: '', //banner图
+                bannerDialog: false, //查看图集时的对话框
+                //banner图上传时携带的参数
+                bannerImg: {
+                    img: ''
+                },
+
+                thumImageUrl: '', //缩略图
+                //缩略图上传时携带的参数
+                thumImg: {
+                    img: ''
+                },
+
+                detailImageUrl: '', //详情图
+                //详情图上传时携带的参数
+                detailImg: {
+                    img: ''
+                }
             },
 
             //酒水标签页表单-----------------------------------------
             drinksForm: {
                 name: '',
                 classify: '',
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                checkedBanner: false,
-                checkedReco: false,
-                weight: '',
-                spec: ['1杯', '1瓶', '1打', '半打', '1箱'],
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
                 classifyOptions: [
                     {
                         label: '啤酒',
@@ -929,18 +921,63 @@ export default {
                         value: '矿泉水'
                     }
                 ],
-                drinksBannerImageUrl: '', //酒水banner图
-                drinksRecoImageUrl: '', //酒水推荐位图
-                drinksThumImageUrl: '', //酒水缩略图
-                drinksDetailImageUrl: '' //酒水详情图
-            },
+                desc: '',
+                originPrice: '',
+                nowPrice: '',
+                checkedBanner: false,
+                checkedReco: false,
+                weight: '',
+                options: [
+                    {
+                        label: '0',
+                        value: '0'
+                    },
+                    {
+                        label: '1',
+                        value: '1'
+                    },
+                    {
+                        label: '2',
+                        value: '2'
+                    },
+                    {
+                        label: '3',
+                        value: '3'
+                    }
+                ],
 
+                bannerImageUrl: '', //banner图
+                bannerDialog: false, //查看图集时的对话框
+                //banner图上传时携带的参数
+                bannerImg: {
+                    img: ''
+                },
+
+                recoImageUrl: '', //推荐位图
+                recoDialog: false, //查看图集时的对话框
+                //推荐位图上传时携带的参数
+                RecoImg: {
+                    img: ''
+                },
+
+                thumImageUrl: '', //缩略图
+                //缩略图上传时携带的参数
+                thumImg: {
+                    img: ''
+                },
+
+                detailImageUrl: '', //详情图
+                //详情图上传时携带的参数
+                detailImg: {
+                    img: ''
+                }
+            },
             //酒水新增规格
             dynamicValidateForm: {
                 domains: [
                     {
                         spec: '', //规格
-                        price: '' //g规格价格
+                        price: '' //规格价格
                     }
                 ]
             },
@@ -951,30 +988,27 @@ export default {
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
-                checkedBanner: false,
-                weight: '',
                 spec: ['小份', '中份', '大份'],
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
-                snackBannerImageUrl: '', //小吃banner图
-                snackThumImageUrl: '', //小吃缩略图
-                snackDetailImageUrl: '' //小吃详情图
+                checkedBanner: false,
+
+                bannerImageUrl: '', //banner图
+                bannerDialog: false, //查看图集时的对话框
+                //banner图上传时携带的参数
+                bannerImg: {
+                    img: ''
+                },
+
+                thumImageUrl: '', //缩略图
+                //缩略图上传时携带的参数
+                thumImg: {
+                    img: ''
+                },
+
+                detailImageUrl: '', //详情图
+                //详情图上传时携带的参数
+                detailImg: {
+                    img: ''
+                }
             },
 
             //其他标签页表单--------------------------------------------
@@ -983,30 +1017,27 @@ export default {
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
-                checkedBanner: false,
-                weight: '',
                 spec: ['1份', '1盒'],
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
-                otherBannerImageUrl: '', //其他banner图
-                otherThumImageUrl: '', //其他缩略图
-                otherDetailImageUrl: '' //其他详情图
+                checkedBanner: false,
+
+                bannerImageUrl: '', //banner图
+                bannerDialog: false, //查看图集时的对话框
+                //banner图上传时携带的参数
+                bannerImg: {
+                    img: ''
+                },
+
+                thumImageUrl: '', //缩略图
+                //缩略图上传时携带的参数
+                thumImg: {
+                    img: ''
+                },
+
+                detailImageUrl: '', //详情图
+                //详情图上传时携带的参数
+                detailImg: {
+                    img: ''
+                }
             },
 
             //会员卡标签页表单--------------------------------------------
@@ -1015,55 +1046,72 @@ export default {
                 desc: '',
                 integral: '', //积分
                 nowPrice: '',
-                checkedBanner: false,
-                weight: '',
                 spec: ['默认'],
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
-                vipCardBannerImageUrl: '', //会员卡banner图
-                vipCardThumImageUrl: '', //会员卡缩略图
-                vipCardDetailImageUrl: '' //会员卡详情图
+                checkedBanner: false,
+
+                bannerImageUrl: '', //banner图
+                bannerDialog: false, //查看图集时的对话框
+                //banner图上传时携带的参数
+                bannerImg: {
+                    img: ''
+                },
+
+                thumImageUrl: '', //缩略图
+                //缩略图上传时携带的参数
+                thumImg: {
+                    img: ''
+                },
+
+                detailImageUrl: '', //详情图
+                //详情图上传时携带的参数
+                detailImg: {
+                    img: ''
+                }
             },
 
             //商品分类下拉框
             options: [
                 {
-                    label: '套餐',
-                    value: '套餐'
+                    label: '红酒',
+                    value: '1'
                 },
                 {
-                    label: '香槟',
-                    value: '香槟'
+                    label: '白酒',
+                    value: '2'
                 },
                 {
                     label: '啤酒',
-                    value: '啤酒'
+                    value: '3'
                 },
                 {
-                    label: '小吃',
-                    value: '小吃'
+                    label: '香槟',
+                    value: '4'
+                },
+                {
+                    label: '洋酒',
+                    value: '5'
+                },
+                {
+                    label: '调制酒',
+                    value: '6'
+                },
+                {
+                    label: '饮料',
+                    value: '7'
                 }
-            ]
+            ],
+
+            showImgPrefix: '/file/admin/system/upload/down?keyName=' //回显图片的前缀
         };
     },
 
     methods: {
+        //翻页
+        handleCurrentChange(val) {
+            this.currentPage = val; //将当前跳转的页码赋给显在页面上的页码
+            this.getGoodsInfo({ pageNo: this.currentPage }); //请求翻页后的数据
+        },
+
         //酒水规格添加按钮
         addDomain() {
             this.dynamicValidateForm.domains.push({
@@ -1080,7 +1128,12 @@ export default {
             }
         },
 
-        handleSearch() {},
+        //搜索按钮
+        handleSearch() {
+            this.getGoodsInfo({ category: this.value, name: this.searchName });
+            this.searchName = '';
+            this.value = '';
+        },
 
         //添加商品
         handleAdd() {
@@ -1092,17 +1145,100 @@ export default {
             this.dialogVisible = false;
         },
 
+        //添加套餐-------------------------------------------------------
+        setComboInfo() {
+            let data = {
+                type: this.activeNum,
+                name: this.comboForm.name,
+                synopsis: this.comboForm.desc,
+                originalPrice: this.comboForm.originPrice,
+                presentPrice: this.comboForm.nowPrice,
+                recommendAdStatus: 2,
+                recommendStatus: 2,
+                listPicture: 'shangzuo-dev/20200828/edk8f3v5b9j1d6s16y2p.jpg',
+                infoPicture: 'shangzuo-dev/20200828/wa2wu8b47raagzp6cn5f.jpg'
+            };
+            this.$post('/dev/merchant/store/goods/save', data).then((res) => {
+                console.log(res);
+            });
+        },
+
+        //上传套餐banner图之前
+        beforeComboBannerUpload(file) {
+            this.comboForm.bannerImg.img = file;
+        },
+        //上传套餐banner图成功之后
+        uploadComboBannerSuccess(res, file) {
+            this.comboForm.bannerImageUrl += this.showImgPrefix + res.data + ',';
+            console.log(this.comboForm.bannerImageUrl, '图集上传完成之后返回的地址');
+        },
+        //点击查看套餐banner图时
+        comboBannerPreview(file) {
+            this.comboForm.bannerDialog = true; //展示图集的对话框开启
+            this.comboForm.bannerImageUrl = file.url; //将返回的图集地址展示到页面上
+        },
+        //移除套餐banner图时
+        comboBannerRemove(file, fileList) {
+            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
+            console.log(file, fileList);
+        },
+
+        //上传套餐缩略图之前
+        beforeComboThumUpload(file) {
+            this.comboForm.thumImg.img = file;
+        },
+        //上传套餐缩略图成功之后
+        uploadComboThumSuccess(res, file) {
+            this.comboForm.thumImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            console.log(this.comboForm.thumImageUrl);
+        },
+
+        //上传套餐详情图之前
+        beforeComboDetailUpload(file) {
+            this.comboForm.detailImg.img = file;
+        },
+        //上传套餐详情图成功之后
+        uploadComboDetailSuccess(res, file) {
+            this.comboForm.detailImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            console.log(this.comboForm.detailImageUrl);
+        },
+
+        //添加酒水----------------------------------
+        setDrinksInfo() {},
+
+        //添加小吃-----------------------------------
+        setSnackInfo() {},
+
+        //添加其他----------------------------------
+        setOtherInfo() {},
+
+        //添加会员卡----------------------------------
+        setVipCardInfo() {},
+
         //添加商品对话框里的确定按钮
         handleSure() {
             this.dialogVisible = false;
-
-            if (this.activeName == 'drinks') {
-                console.log(this.dynamicValidateForm.domains);
+            switch (this.activeName) {
+                case 'combo':
+                    this.setComboInfo();
+                    break;
+                case 'drinks':
+                    this.setDrinksInfo();
+                    break;
+                case 'snack':
+                    this.setSnackInfo();
+                    break;
+                case 'other':
+                    this.setOtherInfo();
+                case 'vipCard':
+                    this.setVipCardInfo();
             }
         },
 
         //标签页切换事件
         handleClick(tab, event) {
+            this.activeNum = Number(tab.index) + 1;
+            console.log(this.activeNum);
             console.log(this.activeName);
         },
 
@@ -1113,7 +1249,45 @@ export default {
         handleEdit() {},
 
         //商品删除
-        handleDelete() {}
+        handleDelete() {
+            let id = "1299275571139633153";
+            this.$confirm('确认要删除此商品吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+                .then(() => {
+                    this.$Delete(`/dev/merchant/store/goods/deleteById/${id}`).then((res) => {
+                        console.log(res);
+                        this.$message.success('删除成功');
+                    });
+                })
+                .catch(() => {
+                    this.$message.info('已取消删除');
+                });
+        },
+
+        //图片上传失败时
+        uploadError() {
+            this.$message.error('插入失败');
+        },
+
+        //获取商品信息
+        getGoodsInfo() {
+            let data = {
+                pageNo: 1,
+                pageSize: this.pagesize,
+                category: '',
+                name: ''
+            };
+            this.$post('/dev/merchant/store/goods/goodsLimit', data).then((res) => {
+                console.log(res);
+            });
+        }
+    },
+
+    mounted() {
+        this.getGoodsInfo(); //请求首页数据
     }
 };
 </script>
@@ -1123,6 +1297,15 @@ export default {
     content: '';
     display: block;
     clear: both;
+}
+
+.el-upload--picture-card {
+    background-color: #fff;
+}
+
+.page {
+    text-align: right;
+    margin-top: 20px;
 }
 
 .left-handle {
@@ -1161,6 +1344,10 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.banner-box {
+    margin-right: 60px;
 }
 
 .el-form-item__content {
@@ -1266,9 +1453,10 @@ export default {
     width: 60px;
     height: 30px;
     border-radius: 5px;
-    cursor: pointer;
     margin-right: 10px;
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
+    background-color: #999;
+    color: #fff;
 }
 
 .combo-spec {

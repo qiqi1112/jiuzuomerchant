@@ -42,10 +42,9 @@
                                 :rows="3"
                                 placeholder="请输入店铺简介"
                                 v-model="shopBrief"
-                                style="width:76%"
+                                style="width:76%;"
                                 :readonly="isReadonly"
                             ></el-input>
-                            <!-- <span>{{shopBrief}}</span> -->
                         </p>
                     </div>
                 </div>
@@ -67,8 +66,6 @@
                             @keyup.enter.native="handleInputConfirm"
                             @blur="handleInputConfirm"
                         ></el-input>
-                        <!-- @blur="handleInputConfirm" -->
-
                         <el-button
                             v-else-if="!isReadonly"
                             class="button-new-tag"
@@ -214,39 +211,68 @@
                 <h4>店铺展示图</h4>
                 <div class="shop-info">
                     <!-- banner展示图 -->
-
                     <div class="banner-box">
-                        <img :src="dialogImageUrl" alt />
+                        <div v-if="isReadonly">
+                            <img v-for="(item,index) in bannerShowBox" :key="index" :src="item" />
+                        </div>
+
+                        <!-- :data="bannerImg" -->
                         <el-upload
-                            action="https://jsonplaceholder.typicode.com/posts/"
+                            v-else
+                            action="123"
                             list-type="picture-card"
+                            :http-request="uploadSectionFile"
+                            :before-upload="beforeBannerUpload"
+                            :on-preview="bannerPreview"
+                            :on-success="uploadBannerSuccess"
+                            :on-remove="bannerRemove"
+                            :file-list="bannerImgBox"
+                            :on-error="uploadError"
                         >
                             <i class="el-icon-plus"></i>
                         </el-upload>
                         <el-dialog :visible.sync="dialogVisible">
-                            <img :src="dialogImageUrl" alt />
+                            <img :src="bannerImageUrl" alt />
                         </el-dialog>
                     </div>
 
                     <!-- 商家布局图 -->
-                    <el-upload
-                        class="avatar-uploader"
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        :show-file-list="false"
-                    >
-                        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
+                    <div class="overall-box">
+                        <p>商家布局图</p>
+                        <img v-if="isReadonly" :src="overallImageUrl" class="avatar" />
+                        <el-upload
+                            v-else
+                            class="avatar-uploader"
+                            :action="serverUrl"
+                            :show-file-list="false"
+                            :data="overallImg"
+                            :on-success="uploadOverallSuccess"
+                            :before-upload="beforeOverallUpload"
+                            :on-error="uploadError"
+                        >
+                            <img v-if="overallImageUrl" :src="overallImageUrl" class="avatar" />
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                    </div>
 
                     <!-- 排号banner图 -->
-                    <el-upload
-                        class="avatar-uploader"
-                        action="https://jsonplaceholder.typicode.com/posts/"
-                        :show-file-list="false"
-                    >
-                        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
+                    <div class="rowNum-box">
+                        <p>排号banner图</p>
+                        <img v-if="isReadonly" :src="rowNumImageUrl" class="avatar" />
+                        <el-upload
+                            v-else
+                            class="avatar-uploader"
+                            :action="serverUrl"
+                            :show-file-list="false"
+                            :data="rowNumImg"
+                            :on-success="uploadRowNumSuccess"
+                            :before-upload="beforeRowNumUpload"
+                            :on-error="uploadError"
+                        >
+                            <img v-if="rowNumImageUrl" :src="rowNumImageUrl" class="avatar" />
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                    </div>
                 </div>
                 <h4>店铺卡座</h4>
                 <div class="shop-seat">
@@ -282,7 +308,11 @@
                         >
                             <div v-for="(itemX,index) in Number(x)" :key="index">
                                 <div v-for="(itemY,index) in Number(y)" :key="index">
-                                    <span class="seat" @click="changeStauts($event,seatStyle)" @contextmenu.prevent="changeStauts($event,'canBook')"></span>
+                                    <span
+                                        class="seat"
+                                        @click="changeStauts($event,seatStyle)"
+                                        @contextmenu.prevent="changeStauts($event,'canBook')"
+                                    ></span>
                                 </div>
                             </div>
                         </div>
@@ -300,15 +330,15 @@
                         </div>
                         <div class="acc-people">
                             <span class="seat-detail-span">容纳人数</span>
-                            <span>100</span>人
+                            <span>{{accomPeo}}</span>人
                         </div>
                         <div class="min-charge">
                             <span class="seat-detail-span">最低消费</span>
-                            <span>￥100元</span>
+                            <span>￥{{minCharge}}元</span>
                         </div>
                         <div class="lon-retain">
                             <span class="seat-detail-span">卡座保留最晚时间</span>
-                            <span>20:30</span>
+                            <span>{{longRetainTime}}</span>
                         </div>
                         <div class="is-toilet">
                             <span class="seat-detail-span">独立卫生间</span>
@@ -319,7 +349,7 @@
                         </div>
                         <div class="mahjong">
                             <span class="seat-detail-span">机麻</span>
-                            <span>1</span>桌
+                            <span>{{mahjong}}</span>桌
                         </div>
                         <div class="snacks">
                             <span class="seat-detail-span">零食</span>
@@ -355,8 +385,7 @@ import { regionData } from 'element-china-area-data'; //引入外部地址选择
 export default {
     data() {
         return {
-            serverUrl: '/file/admin/system/upload/create',
-            // serverUrl : 'http://api_dev.wanxikeji.cn/api/savePic',
+            serverUrl: '/file/admin/system/upload/create', //上传文件
             isReadonly: true, //编辑信息开关（默认只读）
             logoImageUrl: '', //店铺logo
             //上传头像时附带的额外参数（头像地址）
@@ -397,32 +426,125 @@ export default {
             shopMatter: '', //订桌注意事项
             shopRemind: '', //排号商家提醒
 
-            dialogImageUrl: '',
-            dialogVisible: false,
+            bannerImageUrl: '', //图集地址
+            dialogVisible: false, //点击查看图集时的对话框开关
+            //上传图集时附带的额外参数（图集地址）
+            // bannerImg: {
+            //     img: ''
+            // },
+
+            bannerImg: '',
+
+            bannerShowBox: [], //要回显的banner图集（可以显示在自定义的地方）
+            bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
+
+            overallImageUrl: '', //商家布局图
+            //上传布局图时附带的额外参数（图片地址）
+            overallImg: {
+                img: ''
+            },
+
+            rowNumImageUrl: '', //排号banner图
+            //上传排号图时附带的额外参数（图片地址）
+            rowNumImg: {
+                img: ''
+            },
 
             // 选座模块-----------------------------------------
             x: 20, //座位列数
             y: 20, //座位行数
             seatStyle: 'hasBook', //默认的选座样式
 
-            radio: '1',
+            accomPeo: 0, //容纳人数
+            minCharge: 0, //最低消费
+            longRetainTime: '00.00', //卡座最晚保留时间
+            radio: '1', //有无独立卫生间
+            mahjong: 0, //机麻桌数
 
             goodName: '',
             goodNum: '',
 
-            imageUrl: ''
+            imageUrl: '',
+
+            showImgPrefix: '/file/admin/system/upload/down?keyName=' //回显图片的前缀
         };
     },
     methods: {
-        //上传头像完成之前
-        beforeAvatarUpload(file) {
-            this.avatarImg.img = file; //上传图片完成之前就把这个图片的相关信息赋给一个对象里的属性，然后上面上传时就通过:data将这个imgdata对象携带过去，这样下面就能获取到这个图片的地址信息等
+        uploadSectionFile(file) {
+            console.log(file);
+            this.bannerImg = file.file;
+
+            let a = new FormData();
+            a.append("files",this.bannerImg);
+
+            console.log(a);
+
+            this.$post("/file/admin/system/upload/createBatch",a).then(res => {
+                console.log(res);
+            })
         },
 
-        //上传头像成功
+        // 上传图集---------------------------------------
+        // 上传banner图集完成之前
+        beforeBannerUpload(file) {
+            this.bannerImg = file; //上传图集完成之前就把这个图集的相关flie信息赋给一个对象里的属性，然后上面上传时就通过:data将这个对象携带过去
+        },
+
+        // banner图集上传成功返回图集地址
+        uploadBannerSuccess(res, file) {
+            this.bannerImageUrl += this.showImgPrefix + res.data + ',';
+            console.log(this.bannerImageUrl, '图集上传完成之后返回的地址');
+        },
+
+        // 点击查看banner图集
+        bannerPreview(file) {
+            // let a = new FormData()
+
+            // a = append('files',this.bannerImageUrl)
+            this.dialogVisible = true; //展示图集的对话框开启
+            this.bannerImageUrl = file.url; //将返回的图集地址展示到页面上
+        },
+
+        // 删除banner图集
+        bannerRemove(file, fileList) {
+            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
+            console.log(file, fileList);
+        },
+
+        // 上传头像----------------------------------------
+        // 上传头像完成之前
+        beforeAvatarUpload(file) {
+            this.avatarImg.img = file; //上传图片完成之前就把这个图片的相关信息赋给一个对象里的属性，然后上面上传时就通过:data将这个对象携带过去
+        },
+
+        // 上传头像成功返回图片地址
         uploadAvatarSuccess(res, file) {
-            this.logoImageUrl = 'http://47.108.204.66:8078/' + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            this.logoImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
             console.log(this.logoImageUrl);
+        },
+
+        // 上传商家布局图----------------------------------------
+        // 上传商家布局图完成之前
+        beforeOverallUpload(file) {
+            this.overallImg.img = file; //上传图片完成之前就把这个图片的相关信息赋给一个对象里的属性，然后上面上传时就通过:data将这个对象携带过去
+        },
+
+        // 上传商家布局图成功返回图片地址
+        uploadOverallSuccess(res, file) {
+            this.overallImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            console.log(this.overallImageUrl);
+        },
+
+        // 上传排号banner图----------------------------------------
+        // 上传排号banner图完成之前
+        beforeRowNumUpload(file) {
+            this.rowNumImg.img = file; //上传图片完成之前就把这个图片的相关信息赋给一个对象里的属性，然后上面上传时就通过:data将这个对象携带过去
+        },
+
+        // 上传排号banner图成功返回图片地址
+        uploadRowNumSuccess(res, file) {
+            this.rowNumImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
+            console.log(this.rowNumImageUrl);
         },
 
         //编辑商铺信息
@@ -464,15 +586,6 @@ export default {
             this.inputValue = '';
         },
 
-        handleRemove(file, fileList) {
-            console.log(file, fileList);
-        },
-
-        handlePictureCardPreview(file) {
-            this.dialogImageUrl = file.url;
-            this.dialogVisible = true;
-        },
-
         //座位点击事件
         changeStauts(e, style) {
             e.target.className = style;
@@ -497,12 +610,16 @@ export default {
         //转换店铺类型（文字转数字）
         shopTypeChangeNum(type) {
             let shopType = '';
-            if (type == '夜店') {
-                shopType = 1;
-            } else if (type == '清吧') {
-                shopType = 2;
-            } else if (type == 'ktv') {
-                shopType = 3;
+            switch (type) {
+                case '夜店':
+                    shopType = 1;
+                    break;
+                case '清吧':
+                    shopType = 2;
+                    break;
+                case 'ktv':
+                    shopType = 3;
+                    break;
             }
             return shopType;
         },
@@ -510,12 +627,16 @@ export default {
         //转换店铺类型（数字转文字）
         shopTypeChangeWord(type) {
             let shopType = '';
-            if (type == 1) {
-                shopType = '夜店';
-            } else if (type == 2) {
-                shopType = '清吧';
-            } else if (type == 3) {
-                shopType = 'ktv';
+            switch (type) {
+                case 1:
+                    shopType = '夜店';
+                    break;
+                case 2:
+                    shopType = '清吧';
+                    break;
+                case 3:
+                    shopType = 'ktv';
+                    break;
             }
             return shopType;
         },
@@ -525,12 +646,12 @@ export default {
             this.$message.error('插入失败');
         },
 
+        //回显店铺数据
         getStoreInfo() {
             this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
                 console.log(res.data);
                 let result = res.data;
                 this.logoImageUrl = 'img/' + result.logo;
-                // console.log(this.logoImageUrl);
                 this.shopName = result.name;
                 this.shopBrief = result.synopsis;
                 this.dynamicTags = this.strChangeArr(result.labels);
@@ -542,14 +663,41 @@ export default {
                 this.shopRemind = result.businessReminder;
                 this.startBussTime = result.startTime;
                 this.endBussTime = result.endTime;
+
+                // 回显banner图集
+                let picture = 'img/2.jpg,img/3.jpg,img/4.jpg';
+                this.bannerShowBox = this.strChangeArr(picture); //可以显示在自定义的地方
+
+                let pictureArr = this.strChangeArr(picture); //只能显示在上传图集的容器中
+                pictureArr.forEach((item) => {
+                    let obj = {};
+                    obj.url = item;
+                    this.bannerImgBox.push(obj);
+                });
+
+                this.overallImageUrl = result.layoutPicture;
+                this.rowNumImageUrl = result.rowNumberBanner;
+
+                // this.x = result.layoutList[0].seatColumn;
+                // this.y = result.layoutList[0].seatRow;
+                // this.accomPeo = result.layoutList[0].numberOfPeople;
+
+                // this.minCharge = result.;
+                // this.longRetainTime = result.
+                // this.radio = result.
+                // this.mahjong = result.
+                // 零食没有
             });
-        }
+        },
+
+        //修改店铺数据
+        setStoreInfo() {}
     },
 
     created() {},
 
     mounted() {
-        this.getStoreInfo();
+        this.getStoreInfo(); //回显所有店铺数据
     }
 };
 </script>
@@ -865,9 +1013,9 @@ export default {
 }
 
 .right-wrap .shop-info {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
 }
 
 .right-wrap .shop-info {
@@ -875,11 +1023,17 @@ export default {
 }
 
 .right-wrap .shop-info .banner-box {
+    width: 40%;
 }
 
-.right-wrap .shop-info .banner-box img {
-    width: 160px;
-    height: 40px;
+>>> .el-textarea__inner {
+    resize: none !important;
+}
+
+.right-wrap .shop-info .banner-box > div img {
+    width: 170px;
+    height: 90px;
+    margin: 0 10px 10px 0;
 }
 
 .right-wrap .shop-seat {

@@ -14,7 +14,8 @@ import 'babel-polyfill';
 import {
     post,
     get,
-    timestampToTime
+    Delete,
+    put
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
@@ -23,7 +24,8 @@ Vue.use(less)
 Vue.prototype.$regular = regular
 Vue.prototype.$post = post;
 Vue.prototype.$get = get;
-Vue.prototype.$timestampToTime = timestampToTime;
+Vue.prototype.$Delete = Delete;
+Vue.prototype.$put = put;
 
 
 //手机号过滤器
@@ -35,12 +37,16 @@ Vue.filter("phoneNum", function (oldVal) {
 //店铺类型过滤器
 Vue.filter("shopType", function (oldVal) {
     let newVal = "";
-    if (oldVal == 1) {
-        newVal = "夜店"
-    } else if (oldVal == 2) {
-        newVal = "清吧"
-    } else if (oldVal == 3) {
-        newVal = "ktv";
+    switch (oldVal) {
+        case 1:
+            newVal = "夜店";
+            break;
+        case 2:
+            newVal = "清吧";
+            break;
+        case 3:
+            newVal = "ktv";
+            break;
     }
     return newVal;
 });

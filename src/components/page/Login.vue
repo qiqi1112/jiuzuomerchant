@@ -84,9 +84,6 @@ export default {
                         this.$message.error(res.msg);
                         return false;
                     }
-                },
-                (err) => {
-                    console.log(err);
                 }
             );
         }

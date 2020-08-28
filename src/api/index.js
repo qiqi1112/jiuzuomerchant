@@ -10,7 +10,7 @@ import Message from "element-ui/packages/message/index.js";
 var token = ''
 // axios.defaults.baseURL = './baseUrl'; //默认地址
 axios.interceptors.request.use(config => {
-    token = localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).token:''
+    token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''
     // axios.defaults.headers.common["X-Store-Token"] = token;
     config.headers.common['X-Store-Token'] = token
     return config;
@@ -19,7 +19,7 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(
     function (response) {
-        
+
         if (response.data.code == 0) {
             return response;
         } else if (response.data.code == 700) {
@@ -73,8 +73,30 @@ function get(url, data = {}) {
     })
 }
 
+function Delete(url, data = {}) {
+    return new Promise((resolve, reject) => {
+        axios.delete(url, data).then(response => {
+            resolve(response.data);
+        }, err => {
+            reject(err)
+        })
+    })
+}
+
+function put(url, data = {}) {
+    return new Promise((resolve, reject) => {
+        axios.put(url, data).then(response => {
+            resolve(response.data);
+        }, err => {
+            reject(err)
+        })
+    })
+}
+
 
 export {
     post,
     get,
+    Delete,
+    put
 }
