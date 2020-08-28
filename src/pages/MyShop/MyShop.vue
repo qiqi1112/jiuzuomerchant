@@ -222,9 +222,7 @@
                             action="123"
                             list-type="picture-card"
                             :http-request="uploadSectionFile"
-                            :before-upload="beforeBannerUpload"
                             :on-preview="bannerPreview"
-                            :on-success="uploadBannerSuccess"
                             :on-remove="bannerRemove"
                             :file-list="bannerImgBox"
                             :on-error="uploadError"
@@ -470,37 +468,24 @@ export default {
         };
     },
     methods: {
+        // 上传图集---------------------------------------
+        //覆盖自动上传
         uploadSectionFile(file) {
             console.log(file);
             this.bannerImg = file.file;
 
             let a = new FormData();
-            a.append("files",this.bannerImg);
+            a.append('files', this.bannerImg);
 
             console.log(a);
 
-            this.$post("/file/admin/system/upload/createBatch",a).then(res => {
+            this.$post('/file/admin/system/upload/createBatch', a).then((res) => {
                 console.log(res);
-            })
-        },
-
-        // 上传图集---------------------------------------
-        // 上传banner图集完成之前
-        beforeBannerUpload(file) {
-            this.bannerImg = file; //上传图集完成之前就把这个图集的相关flie信息赋给一个对象里的属性，然后上面上传时就通过:data将这个对象携带过去
-        },
-
-        // banner图集上传成功返回图集地址
-        uploadBannerSuccess(res, file) {
-            this.bannerImageUrl += this.showImgPrefix + res.data + ',';
-            console.log(this.bannerImageUrl, '图集上传完成之后返回的地址');
+            });
         },
 
         // 点击查看banner图集
         bannerPreview(file) {
-            // let a = new FormData()
-
-            // a = append('files',this.bannerImageUrl)
             this.dialogVisible = true; //展示图集的对话框开启
             this.bannerImageUrl = file.url; //将返回的图集地址展示到页面上
         },
