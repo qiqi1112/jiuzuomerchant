@@ -431,8 +431,11 @@ export default {
     width: 55%;
     min-width:850px ;
 }
+/deep/.el-dialog__header{
+    padding: 0;
+}
 /deep/ .el-dialog__body{
-    padding-top: 0;
+    padding-top: 10px;
 }
 /deep/.lab_box{
     .el-form-item--small{
@@ -446,5 +449,7 @@ export default {
         margin-left: 5px;
     }
 }
-
+/deep/.handle-input{
+    width: 150px;
+}
 </style>

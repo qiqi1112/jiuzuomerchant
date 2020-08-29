@@ -30,11 +30,16 @@
                 @selection-change="handleSelectionChange" 
                 @row-dblclick="lineDb"
             >
+            <!-- phoneNum -->
                 <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
                 <el-table-column prop="order_id" min-width="200" label="预定用户"></el-table-column>
-                <el-table-column prop="user_name" min-width="200" label="预定手机"></el-table-column>
+                <el-table-column prop="tel" min-width="200" label="预定手机">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.tel | phoneNum}}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="order_type" min-width="200" label="订单类型"></el-table-column>  
-                <el-table-column prop="tel" min-width="200" label="订单号"></el-table-column>
+                <el-table-column prop="user_name" min-width="200" label="订单号"></el-table-column>
                 <el-table-column prop="creat_time" min-width="200" label="支付状态"></el-table-column>
                 <el-table-column prop="order_state" min-width="200" label="支付类型"></el-table-column>
                 <el-table-column prop="remark" min-width="200" label="实付金额"></el-table-column>
@@ -197,7 +202,7 @@ export default {
                     order_id:'20184512120',
                     user_name:'张三',
                     order_type:'预定',
-                    tel:19999999999,
+                    tel:'18825255252',
                     creat_time:'2020-08-12 22:00',
                     order_state:'1',
                     pay_type:'微信支付',
@@ -213,7 +218,7 @@ export default {
                     order_id:'20184512120',
                     user_name:'李四',
                     order_type:'预定',
-                    tel:19999999999,
+                    tel:'18825255252',
                     creat_time:'2020-08-12 22:00',
                     order_state:'1',
                     pay_type:'微信支付',
@@ -229,7 +234,7 @@ export default {
                     order_id:'20184512120',
                     user_name:'李四斯',
                     order_type:'预定',
-                    tel:19999999999,
+                    tel:'18825255252',
                     creat_time:'2020-08-12 22:00',
                     order_state:'1',
                     pay_type:'微信支付',
@@ -536,7 +541,13 @@ export default {
     width: 46%!important;
     min-width: 876px;
 }
+/deep/.el-dialog__header{
+    padding: 0;
+}
 /deep/ .el-dialog__body{
-    padding-top: 0;
+    padding-top: 10px;
+}
+/deep/.handle-input{
+    width: 150px;
 }
 </style>

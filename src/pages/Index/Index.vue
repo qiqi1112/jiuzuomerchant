@@ -64,7 +64,7 @@
                             <span class="line lw2"></span>
                             <span>排号统计 (2020-09-08)</span>
                         </div>
-                        <div ref='bread' id="breadLine" style="width: 90%;height: 500px;"></div> 
+                        <div ref='bread' id="breadLine" style="width: 95%;height: 500px;"></div> 
                     </div>
 
                     <div class="Top_goods">
@@ -114,7 +114,7 @@
                         <div class="day_li" ref="day_li">
                             <ul>
                                 <div class="choose" ref="choose" ></div>
-                                <li ref="day" :style="{top:scrollY * 30 +'px'}"  :class="active==index?'onAct':''" @click="timeChange(index)" v-for="(day,index) in days" :key="index">{{day}}</li>
+                                <li ref="day"  :style="{top:scrollY * 30 +'px'}"  :class="active==index?'onAct':''" v-for="(day,index) in days" :key="index">{{day}}</li>
                             </ul>
                         </div>
                     </div>
@@ -161,13 +161,6 @@ export default {
                     ml:'170',
                     sold:2506,
                 },
-                {
-                    id:4,
-                    title:'Dom Perignon法国唐培里侬香槟王',
-                    img:'../../assets/img/img.jpg',
-                    ml:'150',
-                    sold:770,
-                },
             ],
             currentId:1,
             i:0,
@@ -175,6 +168,7 @@ export default {
         };
     },
     created(){
+
         this.time_now = this.$regular.timeData(new Date().getTime(),5)
         this.days = this.timeDay(this.time_now)
         this.$nextTick(() => {
@@ -186,6 +180,8 @@ export default {
                 }
             }
         })
+
+        
     },
     watch: {
         time_now(val) {
@@ -194,6 +190,7 @@ export default {
         }
     },
     mounted(){
+        // console.log(this.$refs.day[this.active].innerText)
         this.brokenChart()
         this.columnarChart()
         this.breadChart()
@@ -225,9 +222,6 @@ export default {
             let day = new Date(trr[0],trr[1],0).getDate()
             return day
         },
-        timeChange(i){
-            this.active = i
-        },
         // 折现图
         brokenChart(){
             let brokenline = echarts.init(this.$refs.broken);
@@ -238,6 +232,7 @@ export default {
                 tooltip: {
                     trigger: 'axis'
                 },
+                color: ['#0081ff','#1cbbb4','#e54d42','#a5673f','#39b54a','#f37b1d'],
                 legend: {
                     // data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
                 },
@@ -255,7 +250,7 @@ export default {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['6', '7', '8', '9', '10', '11', '12']
+                    data: ['6', '7', '8', '9', '10', '11', '12','13', '14', '15', '16', '17', '18', '19']
                 },
                 yAxis: {
                     type: 'value'
@@ -265,31 +260,31 @@ export default {
                         name: '邮件营销',
                         type: 'line',
                         stack: '总量',
-                        data: [120, 132, 101, 134, 90, 230, 210]
+                        data: [120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '联盟广告',
                         type: 'line',
                         stack: '总量',
-                        data: [220, 182, 191, 234, 290, 330, 310]
+                        data: [220, 182, 191, 234, 290, 330, 310,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '视频广告',
                         type: 'line',
                         stack: '总量',
-                        data: [150, 232, 201, 154, 190, 330, 410]
+                        data: [150, 232, 201, 154, 190, 330, 410,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '直接访问',
                         type: 'line',
                         stack: '总量',
-                        data: [320, 332, 301, 334, 390, 330, 320]
+                        data: [320, 332, 301, 334, 390, 330, 320,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '搜索引擎',
                         type: 'line',
                         stack: '总量',
-                        data: [820, 932, 901, 934, 1290, 1330, 1320]
+                        data: [820, 932, 901, 934, 1290, 1330, 1320,120, 132, 101, 134, 90, 230, 210]
                     }
                 ]
             };
@@ -301,7 +296,7 @@ export default {
         columnarChart(){
             let columnarLine = echarts.init(this.$refs.columnar)
             let option = {
-                color: ['#c23531','#2f4554', '#61a0a8'],
+                color:[ '#f0d264','#82c8a0','#7fccde', '#6698cb', '#cb99c5'],
                 legend: {},
                 tooltip: {},
                 dataZoom: {
@@ -321,7 +316,9 @@ export default {
                 // Declare several bar series, each will be mapped
                 // to a column of dataset.source by default.
                 series: [
-                    {type: 'bar'},
+                    {
+                        type: 'bar',
+                    },
                     {type: 'bar'},
                     {type: 'bar'}
                 ]
@@ -337,6 +334,7 @@ export default {
                     // subtext: '纯属虚构',
                     // left: 'center'
                 },
+                color:['#c23531','#2f4554', '#61a0a8','#61a0a8','#61a0a8'],
                 tooltip: {
                     trigger: 'item',
                     formatter: '{a} <br/>{b} : {c} ({d}%)'
@@ -346,6 +344,7 @@ export default {
                     // left: 'left',
                     // data: ['排号数 25% （29座）', '取消排号数', '生效排号数']
                 },
+                color:['#f37b1d','#1cbbb4','#6739b6','#e03997','#9c26b0'],
                 series: [
                     {
                         name: '访问来源',
@@ -392,7 +391,7 @@ export default {
     border-bottom: 1px solid #000;
     display: flex;
     .evaluation{
-        flex: .4;
+        flex: .45;
         .title{
             height: 50%;
             display: flex;
@@ -404,7 +403,7 @@ export default {
             display: flex;
             height: 50%;
             .star{
-                width: 50%;
+                width: 60%;
                 height: auto;
                 margin-top:24px ;
                 position: relative;
@@ -415,7 +414,7 @@ export default {
             }
         }
         .st{
-            width: 25%;
+            width: 20%;
             display: inline-block;
             text-align: center;
             height: 100%;
@@ -425,7 +424,7 @@ export default {
         }
     }
     .visitors{
-        flex: .45;
+        flex: .4;
         &>div:nth-child(1){
             margin: 20px 0 25px 0;
         }
@@ -457,10 +456,10 @@ export default {
     font-size: @font-14;
     display: flex;
     .m_l{
-        flex: .4;
+        flex: .45;
     }
     .m_m{
-        flex: .4;
+        flex: .35;
         .top_li{
             height: 120px;
             margin-bottom: 20px;
@@ -483,7 +482,7 @@ export default {
                 }
                 .pro{
                     width: 100px;
-                    background: seagreen;
+                    background: #8dc63f;
                     height: 15px;
                 }
             }
@@ -523,6 +522,8 @@ export default {
                 }
             }
             .day_li::-webkit-scrollbar {display:none}
+            .day_li {scrollbar-width: none;}
+            .day_li {-ms-overflow-style: none;}
         }
     }
     // .column{
@@ -627,6 +628,8 @@ export default {
     overflow-y: scroll;
 }
 /deep/ .el-tab-pane::-webkit-scrollbar {display:none}
+/deep/ .el-tab-pane {scrollbar-width: none;}
+/deep/ .el-tab-pane {-ms-overflow-style: none;}
 /deep/ .el-input__inner{
     border: none;
     font-size: 16px;

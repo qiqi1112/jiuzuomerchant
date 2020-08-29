@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
+import store from './store/store'
 import {
     messages
 } from './components/common/i18n';
@@ -52,6 +53,7 @@ Vue.filter("shopType", function (oldVal) {
 });
 
 
+
 Vue.config.productionTip = false;
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
@@ -65,6 +67,8 @@ const i18n = new VueI18n({
 //使用钩子函数对路由进行权限跳转
 // router.beforeEach((to, from, next) => {
 //     document.title = `${to.meta.title} | 上座`;
+
+    
 //     const role = JSON.parse(localStorage.getItem('userInfo'))|| ''
 //     if (!role && to.path !== '/login') {
 //         next('/login');
@@ -86,5 +90,6 @@ const i18n = new VueI18n({
 new Vue({
     router,
     i18n,
+    store,
     render: h => h(App)
 }).$mount('#app');

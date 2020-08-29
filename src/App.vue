@@ -1,8 +1,27 @@
 <template>
-    <div id="app">
+    <div id="app" @click="close">
         <router-view></router-view>
     </div>
 </template>
+<script>
+export default{
+    data(){
+        return{
+
+        }
+    },
+    created(){
+
+    },
+    methods:{
+        close(){
+            this.$store.commit('change',2)
+        }
+    }
+}
+
+
+</script>
 <style lang='less'>
     @import "./assets/css/main.css";
     @import "./assets/css/color-dark.css";     /* 深色主题*/

@@ -1,7 +1,13 @@
 <template>
     <div id="numeral">
         <div class="container">
-            <div>排号管理</div>
+            <div class="crumbs">
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item>
+                        <i class="el-icon-lx-cascades"></i> 排号管理
+                    </el-breadcrumb-item>
+                </el-breadcrumb>
+            </div>
             <div class="tit_top">
                 <span class="li_text">当前排号总数<span>24</span></span>
                 <span class="li_text">成功排号数<span>24</span></span>
@@ -33,7 +39,7 @@
                                 <div>
                                     <i class="el-icon-s-release"></i>
                                     <span class="info">手机号码</span>
-                                    <span>{{item.tel}}</span>
+                                    <span>{{item.tel | phoneNum}}</span>
                                 </div>
                             </div>
                             <div class="now_r">
@@ -42,9 +48,9 @@
                                 <div>等待时常 <span class="tl"> {{item.wait_time}}</span></div>
                                 <div v-if="index==0">
                                     <span class="stat">处于呼叫中....</span>
-                                    <span class="btn">确定</span>
-                                    <span class="btn">续牌</span>
-                                    <span class="btn">取消</span>
+                                    <span class="btn" @click="ensure(item)">确定</span>
+                                    <span class="btn" @click="nextOne(item)">续牌</span>
+                                    <span class="btn" @click="fail(item)">取消</span>
                                 </div>
                             </div>
                         </li>
@@ -165,7 +171,7 @@ export default {
                     id:1,
                     num:7, 
                     seat_type:1,   
-                    tel:199999999,
+                    tel:'18281910541',
                     take_time:'2020-11-19  23:54:03',
                     wait_time:'01:09:12',
                     seat_num:'A03'
@@ -174,7 +180,7 @@ export default {
                     id:2,
                     num:2, 
                     seat_type:2,   
-                    tel:17777777777,
+                    tel:'18281910541',
                     take_time:'2020-11-19  23:54:03',
                     wait_time:'01:09:12',
                     seat_num:'B03'
@@ -183,7 +189,7 @@ export default {
                     id:3,
                     num:11, 
                     seat_type:1,   
-                    tel:199999999,
+                    tel:'18281910541',
                     take_time:'2020-11-19  23:54:03',
                     wait_time:'01:09:12',
                     seat_num:'C103'
@@ -192,11 +198,11 @@ export default {
         };
     },
     created(){
-        this.time_now = new Date()
-        this.time_now_no = new Date()
+        this.time_now_no = this.time_now = new Date()
     },
     methods:{
-        ensure(){
+        ensure(val){
+            console.log(val)
         },
         nextOne(){
 

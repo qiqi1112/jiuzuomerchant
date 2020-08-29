@@ -187,5 +187,7 @@ export default {
     width: 100%;
     height: 100%;
 }
-
+/deep/.handle-input{
+    width: 150px;
+}
 </style>
