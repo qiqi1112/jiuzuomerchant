@@ -15,7 +15,7 @@
                 <span class="li_text">今日排号总数<span>24</span></span>
             </div>
 
-            <div><el-button type="primary" icon="el-icon-search">呼叫下一位</el-button></div>
+            <div><el-button @click="call()" type="primary" icon="el-icon-search">呼叫下一位</el-button></div>
 
             <div class="numeral_list">
                 <div class="fl_box">
@@ -46,7 +46,7 @@
                                 <div>当前位于第<span class="num"> {{index+1}} </span>位 （{{item.seat_num}}）</div>
                                 <div>取号时间 <span class="tl">{{item.take_time}}</span></div>
                                 <div>等待时常 <span class="tl"> {{item.wait_time}}</span></div>
-                                <div v-if="index==0">
+                                <div v-if="index==0 && callNext">
                                     <span class="stat">处于呼叫中....</span>
                                     <span class="btn" @click="ensure(item)">确定</span>
                                     <span class="btn" @click="nextOne(item)">续牌</span>
@@ -166,6 +166,7 @@ export default {
             time_now:'',
             time_now_no:'',
             focSta:false,
+            callNext:false,
             nowNumList:[
                 {
                     id:1,
@@ -202,14 +203,35 @@ export default {
     },
     methods:{
         ensure(val){
-            console.log(val)
+            this.callNext = false
+            for(let i=0;i<this.nowNumList.length;i++){
+                if(val.id == this.nowNumList[i].id){
+                    this.nowNumList.splice(i,1)
+                }
+            }
         },
-        nextOne(){
-
+        nextOne(val){
+            this.callNext = false
+            this.nowNumList[0] = this.nowNumList.splice(1,1,this.nowNumList[0])[0]
         },
-        fail(){
-
+        fail(val){
+            this.callNext = false
+            for(let i=0;i<this.nowNumList.length;i++){
+                if(val.id == this.nowNumList[i].id){
+                    this.nowNumList.splice(i,1)
+                }
+            }
         },
+        call(){
+            if(this.callNext){
+                this.$message.error({
+                    message: '当前排号订单未处理',
+                    center: true
+                });
+                return
+            }
+            this.callNext = true
+        }
     }
 };
 </script>
@@ -265,6 +287,9 @@ export default {
                     flex: .55;
                     div{
                         margin-bottom: 6px;
+                    }
+                    div:last-child{
+                        margin-bottom: 0;
                     }
                     .num{
                         font-size: 18px;

@@ -66,6 +66,13 @@ export default new Router({
                     }
                 },
                 {
+                    path: '/comments',
+                    component: () => import('../pages/Comments/Comments.vue'),
+                    meta: {
+                        title: '评论管理'
+                    }
+                },
+                {
                     path: '/log',
                     component: () => import('../pages/Log/Log.vue'),
                     meta: {

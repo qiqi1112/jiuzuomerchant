@@ -4,9 +4,14 @@
             <span @click.stop>
                 <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
             </span>
+<<<<<<< HEAD
             
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
             <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>-->
+=======
+            <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
+            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>
+>>>>>>> 764d0c242eccb2df02e6f6ddd58e97bc6717b363
             <div class="city" @click.stop>
                 <el-button type="primary">确定</el-button>
                 <span>{{value}}</span>
@@ -53,7 +58,7 @@ export default {
         };
     },
     props:{
-        mapList:{tyle:Object}
+        mapList:{type:Object}
     },
 
     computed: {
@@ -78,16 +83,28 @@ export default {
     },
     watch: {
         'fristForm.address': {
+<<<<<<< HEAD
             handler: function (val) {
                 this.debounce(this.changeStr, 500);
                 this.aaa();
+=======
+            handler: function(val) {
+                this.debounce(this.changeStr,500);
+                this.childData()
+>>>>>>> 764d0c242eccb2df02e6f6ddd58e97bc6717b363
             },
             deep: true
         }
     },
+<<<<<<< HEAD
     methods: {
         aaa() {
             this.$emit('child-data', this.fristForm);
+=======
+    methods:{
+        childData(){
+            this.$emit('child-data',this.fristForm)
+>>>>>>> 764d0c242eccb2df02e6f6ddd58e97bc6717b363
         },
         showCityFun() {
             this.$store.commit('change', 1);
