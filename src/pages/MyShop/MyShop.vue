@@ -1,12 +1,15 @@
 <template>
     <div class="con-wrap">
         <div class="container">
+            <!-- 左边区域 -->
             <div class="left-wrap">
                 <h4>
                     <span>店铺信息</span>
                     <el-button type="primary" @click="editShopInfo">编辑</el-button>
                     <el-button type="primary" @click="submitShopInfo">保存</el-button>
                 </h4>
+
+                <!-- 店铺基本信息 -->
                 <div class="shop-info clearfix">
                     <div class="left-info">
                         <p>店铺招牌logo</p>
@@ -46,6 +49,8 @@
                         </p>
                     </div>
                 </div>
+
+                <!-- 店铺定位 -->
                 <div class="shop-loca">
                     <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、零嘴”）</p>
                     <div>
@@ -57,6 +62,8 @@
                         >{{item}}</span>
                     </div>
                 </div>
+
+                <!-- 店铺标签 -->
                 <div class="shop-label">
                     <p>店铺标签</p>
                     <div class="change-labels">
@@ -84,8 +91,11 @@
                         </el-button>
                     </div>
                 </div>
+
+                <!-- 店铺营业时间，客服电话，人均消费，类型 -->
                 <div class="shop-div">
                     <div class="shop-div1">
+                        <!-- 店铺营业时间 -->
                         <div class="bussiness-hours">
                             <p>店铺营业时间</p>
                             <div class="time-select">
@@ -112,6 +122,7 @@
                                 ></el-time-select>
                             </div>
                         </div>
+                        <!-- 店铺人均消费 -->
                         <div class="per-con">
                             <p>店铺人均消费</p>
                             <el-input
@@ -123,6 +134,7 @@
                         </div>
                     </div>
                     <div class="shop-div2">
+                        <!-- 客服电话 -->
                         <div class="service-phone">
                             <p>客服电话</p>
                             <el-input
@@ -132,7 +144,7 @@
                                 :readonly="isReadonly"
                             ></el-input>
                         </div>
-
+                        <!-- 店铺类型 -->
                         <div class="shop-type">
                             <p>
                                 店铺类型
@@ -166,6 +178,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 店铺地址 -->
                 <div class="shop-address">
                     <p>店铺地址</p>
                     <p v-if="isReadonly" class="shop-add clearfix">
@@ -173,14 +187,13 @@
                         <span>{{city}}</span>
                         <span>{{district}}</span>
                         <span>{{trustAddress}}</span>
-
                         <!-- <el-input
                             v-model="detailAdd"
                             placeholder="请输入店铺详细地址"
                             :readonly="isReadonly"
                         ></el-input>-->
                     </p>
-                    <mapCom v-else :mapList="mapList"></mapCom>
+                    <mapCom v-else @child-data="childData" :mapList="mapList"></mapCom>
                     <!-- <div>
                                 <el-cascader
                                     :options="addressOptions"
@@ -190,7 +203,9 @@
                     </div>-->
                 </div>
 
+                <!-- 商品文本域部分 -->
                 <div class="shop-desc">
+                    <!-- 商品店面简介 -->
                     <div class="goods-brief">
                         <span>商品店面简介：</span>
                         <el-input
@@ -202,6 +217,7 @@
                             :readonly="isReadonly"
                         ></el-input>
                     </div>
+                    <!-- 订桌注意事项 -->
                     <div class="shop-matter">
                         <span>订桌注意事项：</span>
                         <el-input
@@ -213,6 +229,7 @@
                             :readonly="isReadonly"
                         ></el-input>
                     </div>
+                    <!-- 排号商家提醒 -->
                     <div class="shop-remind">
                         <span>排号商家提醒：</span>
                         <el-input
@@ -226,412 +243,14 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 右边区域 -->
             <div class="right-wrap">
                 <h4>店铺展示图</h4>
-                <div class="shop-info">
-                    <!-- banner展示图 -->
-                    <div class="banner-box">
-                        <p>店铺banner图</p>
-                        <div v-if="isReadonly">
-                            <img v-for="(item,index) in bannerShowBox" :key="index" :src="item" />
-                        </div>
-                        <el-upload
-                            v-else
-                            action="1"
-                            list-type="picture-card"
-                            :http-request="uploadBannerFiles"
-                            :on-preview="bannerPreview"
-                            :on-remove="bannerRemove"
-                            :file-list="bannerImgBox"
-                            :on-error="uploadError"
-                        >
-                            <i class="el-icon-plus"></i>
-                        </el-upload>
-                        <el-dialog :visible.sync="dialogVisible">
-                            <img :src="bannerImageUrl" alt />
-                        </el-dialog>
-                    </div>
-
-                    <!-- 排号横幅图 -->
-                    <div class="rowNum-box">
-                        <div class="top">
-                            <p>排号横幅图</p>
-                            <img v-if="isReadonly" :src="rowNumImageUrl" class="avatar" />
-                            <el-upload
-                                v-else
-                                class="avatar-uploader"
-                                action="1"
-                                :http-request="uploadRowNumFile"
-                                :show-file-list="false"
-                                :on-error="uploadError"
-                            >
-                                <img v-if="rowNumImageUrl" :src="rowNumImageUrl" class="avatar" />
-                                <i class="el-icon-plus avatar-uploader-icon"></i>
-                            </el-upload>
-                        </div>
-                        <div class="botm">
-                            <p>店铺长图（用于展示位置变化）</p>
-                            <img v-if="isReadonly" :src="appShopImageUrl" class="avatar" />
-                            <el-upload
-                                v-else
-                                class="avatar-uploader"
-                                action="1"
-                                :http-request="uploadAppShopFile"
-                                :show-file-list="false"
-                                :on-error="uploadError"
-                            >
-                                <img v-if="appShopImageUrl" :src="appShopImageUrl" class="avatar" />
-                                <i class="el-icon-plus avatar-uploader-icon"></i>
-                            </el-upload>
-                        </div>
-                    </div>
-
-                    <!-- 商家布局图 -->
-                    <div class="overall-box">
-                        <p>商家布局图</p>
-                        <img v-if="isReadonly" :src="overallImageUrl" class="avatar" />
-                        <el-upload
-                            v-else
-                            class="avatar-uploader"
-                            action="1"
-                            :http-request="uploadOverallFile"
-                            :show-file-list="false"
-                            :on-error="uploadError"
-                        >
-                            <img v-if="overallImageUrl" :src="overallImageUrl" class="avatar" />
-                            <i class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                    </div>
-                </div>
-                <h4>店铺卡座</h4>
-                <div v-if="shopLocaIndex == 1" class="shop-seat">
-                    <div class="left-box">
-                        <p class="input-seat">
-                            <label style="margin-right:30px">
-                                座位行数：
-                                <el-input
-                                    :readonly="isReadonly"
-                                    v-model="x"
-                                    @focus="changeSeatAlert"
-                                    min="1"
-                                    placeholder="请输入行数"
-                                    type="number"
-                                    style="width:120px"
-                                ></el-input>
-                            </label>
-                            <label>
-                                座位列数：
-                                <el-input
-                                    :readonly="isReadonly"
-                                    v-model="y"
-                                    min="1"
-                                    placeholder="请输入列数"
-                                    type="number"
-                                    style="width:120px"
-                                ></el-input>
-                            </label>
-                        </p>
-                        <div class="seat-title">
-                            <p>
-                                <span class="not-book"></span>
-                                不可预订
-                            </p>
-                            <p>
-                                <span class="can-book"></span>
-                                可预订
-                            </p>
-                            <p>
-                                <span class="in-book"></span>
-                                预定中
-                            </p>
-                            <p>
-                                <span class="has-book"></span>
-                                已预订
-                            </p>
-                        </div>
-                        <!-- 回显的座位图 -->
-                        <div
-                            v-if="x&&y"
-                            class="seat-box"
-                            ref="seatBox"
-                            :style="{width:32 * y + 30 + 'px'}"
-                            style="overflow:hidden"
-                        >
-                            <div v-for="(itemY,indexY) in Number(y)" :key="indexY">
-                                <div v-for="(itemX,indexX) in Number(x)" :key="indexX">
-                                    <span
-                                        ref="seatSpan"
-                                        :data-indexX="(indexX + 1)"
-                                        :data-indexY="(indexY + 1)"
-                                        class="seat"
-                                        @click="changeStauts($event,seatStyle)"
-                                        @contextmenu.prevent="changeStauts($event,'canBook')"
-                                    ></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="right-box">
-                        <p class="seat-detail">座位详情</p>
-                        <div class="seat-prop">
-                            <span class="seat-detail-span">座位属性：</span>
-                            <div class="prop-box">
-                                <span
-                                    :class="item.style"
-                                    v-for="(item,index) in seatAttOpt"
-                                    :key="index"
-                                    :title="item.title"
-                                    @click="changeStyle(item.style)"
-                                ></span>
-                            </div>
-                        </div>
-                        <div class="seat-num">
-                            <span class="seat-detail-span">座位号：</span>
-                            <el-input
-                                v-model="presentSeatInfo.seatCode"
-                                placeholder="座位号"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>
-                        </div>
-                        <div class="seat-num">
-                            <span class="seat-detail-span">座位类型：</span>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.softHardStatus"
-                                label="1"
-                            >软座</el-radio>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.softHardStatus"
-                                label="2"
-                            >硬座</el-radio>
-                        </div>
-                        <div class="acc-people">
-                            <span class="seat-detail-span">容纳人数：</span>
-                            <el-input
-                                v-model="presentSeatInfo.numberOfPeople"
-                                placeholder="容纳人数"
-                                style="width:50%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>人
-                        </div>
-                        <div class="min-charge">
-                            <span class="seat-detail-span">最低消费：</span>
-                            <el-input
-                                v-model="presentSeatInfo.minConsumption"
-                                placeholder="最低消费"
-                                style="width:34%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>元/人
-                        </div>
-                        <div class="lon-retain">
-                            <span class="seat-detail-span">保留最晚时间：</span>
-                            <el-time-select
-                                style="width:50%"
-                                v-model="presentSeatInfo.seatLatestReservationTime"
-                                :readonly="isReadonly"
-                                :picker-options="{
-                                    start: '00:00',
-                                    step: '00:15',
-                                    end: '23:45'
-                                }"
-                            ></el-time-select>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="shopLocaIndex == 2" class="shop-seat">
-                    <div class="left-box">
-                        <p class="input-seat">
-                            <label style="margin-right:30px">
-                                座位行数：
-                                <el-input
-                                    :readonly="isReadonly"
-                                    v-model="x"
-                                    min="1"
-                                    placeholder="请输入行数"
-                                    type="number"
-                                    style="width:120px"
-                                ></el-input>
-                            </label>
-                            <label>
-                                座位列数：
-                                <el-input
-                                    :readonly="isReadonly"
-                                    v-model="y"
-                                    min="1"
-                                    placeholder="请输入列数"
-                                    type="number"
-                                    style="width:120px"
-                                ></el-input>
-                            </label>
-                        </p>
-                        <div class="seat-title">
-                            <p>
-                                <span class="not-book"></span>
-                                不可预订
-                            </p>
-                            <p>
-                                <span class="can-book"></span>
-                                可预订
-                            </p>
-                            <p>
-                                <span class="in-book"></span>
-                                预定中
-                            </p>
-                            <p>
-                                <span class="has-book"></span>
-                                已预订
-                            </p>
-                        </div>
-                        <!-- 回显的座位图 -->
-                        <div
-                            v-if="x&&y"
-                            class="seat-box"
-                            ref="seatBox"
-                            :style="{width:32 * y + 30 + 'px'}"
-                            style="overflow:hidden"
-                        >
-                            <div v-for="(itemY,indexY) in Number(y)" :key="indexY">
-                                <div v-for="(itemX,indexX) in Number(x)" :key="indexX">
-                                    <span
-                                        ref="seatSpan"
-                                        :data-indexX="(indexX + 1)"
-                                        :data-indexY="(indexY + 1)"
-                                        class="seat"
-                                        @click="changeStauts($event,seatStyle)"
-                                        @contextmenu.prevent="changeStauts($event,'canBook')"
-                                    ></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="right-box">
-                        <p class="seat-detail">座位详情</p>
-                        <div class="seat-prop">
-                            <span class="seat-detail-span">包间属性：</span>
-                            <div class="prop-box">
-                                <span
-                                    :class="item.style"
-                                    v-for="(item,index) in seatAttOpt"
-                                    :key="index"
-                                    :title="item.title"
-                                    @click="changeStyle(item.style)"
-                                ></span>
-                            </div>
-                        </div>
-                        <div class="seat-num">
-                            <span class="seat-detail-span">包间号/名称：</span>
-                            <el-input
-                                v-model="presentSeatInfo.seatCode"
-                                placeholder="座位号"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>
-                        </div>
-                        <div class="acc-people">
-                            <span class="seat-detail-span">容纳人数：</span>
-                            <el-input
-                                v-model="presentSeatInfo.numberOfPeople"
-                                placeholder="容纳人数"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>
-                        </div>
-                        <div class="min-charge">
-                            <span class="seat-detail-span">最低消费：</span>
-                            <el-input
-                                v-model="presentSeatInfo.minConsumption"
-                                placeholder="最低消费"
-                                style="width:34%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>元/人
-                        </div>
-                        <div class="lon-retain">
-                            <span class="seat-detail-span">保留最晚时间：</span>
-                            <el-time-select
-                                style="width:50%"
-                                placeholder="请选择时间"
-                                v-model="presentSeatInfo.seatLatestReservationTime"
-                                :readonly="isReadonly"
-                                :picker-options="{
-                                    start: '00:00',
-                                    step: '00:15',
-                                    end: '23:45'
-                                }"
-                            ></el-time-select>
-                        </div>
-                        <div class="seat-num">
-                            <span class="seat-detail-span">独立卫生间：</span>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.haveToilet"
-                                label="1"
-                            >有</el-radio>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.haveToilet"
-                                label="2"
-                            >无</el-radio>
-                        </div>
-                        <div class="min-charge">
-                            <span class="seat-detail-span">机麻：</span>
-                            <el-input
-                                v-model="presentSeatInfo.mahjong"
-                                placeholder="机麻数量"
-                                style="width:34%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>桌
-                        </div>
-                        <div class="snacks">
-                            <span class="seat-detail-span snacks">零嘴：</span>
-                            <div class="snacks-detail">
-                                <ul>
-                                    <li v-for="(item,index) in presentSeatInfo.snacks" :key="index">
-                                        <span class="snacks-name" :title="item.name">{{item.name}}</span>
-                                        <span class="mult">
-                                            <i class="el-icon-close"></i>
-                                        </span>
-                                        <span>{{item.num}}</span>
-                                        <el-button type="danger">删除</el-button>
-                                    </li>
-                                </ul>
-                                <div class="snacks-form">
-                                    <el-input
-                                        style="width:90px"
-                                        v-model="snackName"
-                                        placeholder="名称"
-                                        :readonly="isReadonly"
-                                    ></el-input>
-                                    <span class="mult">
-                                        <i class="el-icon-close"></i>
-                                    </span>
-                                    <el-input
-                                        style="width:60px;margin-right:10px"
-                                        v-model="snackNum"
-                                        placeholder="数量"
-                                        :readonly="isReadonly"
-                                    ></el-input>
-                                    <el-button type="primary" @click="addSnacks">确定</el-button>
-                                </div>
-                                <!-- <div>
-                                    <span>水果拼盘</span>
-                                    <span class="mult">
-                                        <i class="el-icon-close"></i>
-                                    </span>
-                                    <span>2</span>
-                                </div>
-
-                                <el-input style="width:100px" v-model="snackName" placeholder="名称"></el-input>
-                                <span class="mult">
-                                    <i class="el-icon-close"></i>
-                                </span>
-                                <el-input style="width:100px" v-model="goodNum" placeholder="数量"></el-input>
-                                <el-button type="primary">确定</el-button>-->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <shop-show-img :shopShowImgProp="shopShowImgProp"></shop-show-img>
+                <h4>店铺卡座</h4>nightEnterSeat
+                <night-enter-seat v-if="shopLocaIndex == 1"></night-enter-seat>
+                <ktv-seat v-if="shopLocaIndex == 2"></ktv-seat>
             </div>
         </div>
     </div>
@@ -640,11 +259,18 @@
 <script>
 import { regionData } from 'element-china-area-data'; //引入外部地址选择器
 import mapCom from '../../components/common/map';
+import shopShowImg from './ShopShowImg';
+import nightEnterSeat from './NightEnterSeat';
+import ktvSeat from './KtvSeat';
 
 export default {
     components: {
-        mapCom
+        mapCom,
+        shopShowImg,
+        nightEnterSeat,
+        ktvSeat
     },
+
     data() {
         return {
             mapList: {
@@ -684,14 +310,14 @@ export default {
             shopMatter: '', //订桌注意事项
             shopRemind: '', //排号商家提醒
 
-            dialogVisible: false, //点击放大查看图集时的对话框开关
-            bannerImageUrl: '', //图集放大查看地址
-            bannerUploadUrl: '', //上传banner图集时的url字符串
-            bannerShowBox: [], //要回显的banner图集（可以显示在自定义的地方）
-            bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
-            overallImageUrl: '', //商家布局图
-            rowNumImageUrl: '', //排号横幅图
-            appShopImageUrl: '', //店铺长图
+            // dialogVisible: false, //点击放大查看图集时的对话框开关
+            // bannerImageUrl: '', //图集放大查看地址
+            // bannerUploadUrl: '', //上传banner图集时的url字符串
+            // bannerShowBox: [], //要回显的banner图集（可以显示在自定义的地方）
+            // bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
+            // overallImageUrl: '', //商家布局图
+            // rowNumImageUrl: '', //排号横幅图
+            // appShopImageUrl: '', //店铺长图
 
             x: 20, //座位行数
             y: 20, //座位列数
@@ -768,10 +394,19 @@ export default {
             ],
 
             snackName: '', //零嘴名称
-            snackNum: '' //零嘴数量
+            snackNum: '', //零嘴数量
+
+            shopShowImgProp: {
+                isReadonly: true
+            }
         };
     },
     methods: {
+        //接收地图子组件传过来的参数
+        childData(data) {
+            console.log(data);
+        },
+
         //上传头像-------------------------------------------------------------------
         uploadAvatarFile(file) {
             let formData = new FormData();
@@ -781,58 +416,10 @@ export default {
             });
         },
 
-        //上传banner图-------------------------------------------------------------
-        uploadBannerFiles(file) {
-            let formData = new FormData();
-            formData.append('files', file.file);
-            this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.bannerUploadUrl += res.data[0] + ',';
-                console.log('图集地址', this.bannerUploadUrl);
-            });
-        },
-
-        // 点击查看banner图集
-        bannerPreview(file) {
-            this.dialogVisible = true; //展示图集的对话框开启
-            this.bannerImageUrl = file.url; //将返回的图集地址展示到页面上
-        },
-
-        // 删除banner图集
-        bannerRemove(file, fileList) {
-            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
-            console.log(file, fileList);
-        },
-
-        //上传商家布局图-------------------------------------------------------------------
-        uploadOverallFile(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.overallImageUrl = this.showImgPrefix + res.data;
-            });
-        },
-
-        //上传排号横幅图-------------------------------------------------------------------
-        uploadRowNumFile(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.rowNumImageUrl = this.showImgPrefix + res.data;
-            });
-        },
-
-        //上传店铺长图-------------------------------------------------------------------
-        uploadAppShopFile(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.appShopImageUrl = this.showImgPrefix + res.data;
-            });
-        },
-
         //编辑商铺信息
         editShopInfo() {
             this.isReadonly = false;
+            this.shopShowImgProp.isReadonly = false; //将状态传给店铺展示图子组件
         },
 
         //切换店铺定位
@@ -857,11 +444,7 @@ export default {
                 this.shopTypeOptStr += item + ',';
             } else {
                 e.target.classList.remove('shop-type-span');
-
-                if (this.shopTypeOptStr.indexOf(item) !== -1) {
-                    console.log(this.shopTypeOptStr.indexOf(item));
-                    this.shopTypeOptStr.slice(this.shopTypeOptStr.indexOf(item), 1);
-                }
+                this.shopTypeOptStr = this.shopTypeOptStr.replace(item + ',', '');
             }
             console.log('str', this.shopTypeOptStr);
         },
@@ -907,6 +490,7 @@ export default {
         //提交修改并保存
         submitShopInfo() {
             this.isReadonly = true;
+            this.shopShowImgProp.isReadonly = true; //将状态传给店铺展示图子组件
             if (this.isReadonly == true) {
                 this.$message.success('保存成功');
             }
@@ -934,6 +518,12 @@ export default {
             }
             this.inputVisible = false;
             this.inputValue = '';
+        },
+
+        //地址选择器切换地址
+        handleAddChange(value) {
+            console.log(value);
+            console.log('xxx', this.regionValue);
         },
 
         //查看当前座位信息
@@ -971,11 +561,7 @@ export default {
             this.seatStyle = style;
         },
 
-        //地址选择器切换地址
-        handleAddChange(value) {
-            console.log(value);
-            console.log('xxx', this.regionValue);
-        },
+        
 
         //将返回的字符串转为数组
         strChangeArr(str) {
@@ -1073,10 +659,10 @@ export default {
                     this.district = result.district;
                     this.trustAddress = result.trustAddress;
 
-                    //banner图集模拟数据
-                    let picture =
-                        'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,shangzuo-dev/20200829/d0uqvctvwgzpbwklvrvp.jpg,shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,';
-                    this.showBannerImg(picture); //回显banner图集
+                    // //banner图集模拟数据
+                    // let picture =
+                    //     'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,shangzuo-dev/20200829/d0uqvctvwgzpbwklvrvp.jpg,shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,';
+                    // this.showBannerImg(picture); //回显banner图集
 
                     //门店卡座（模拟数据）--------------------------
                     let cassette = '10x10';
@@ -1652,13 +1238,13 @@ export default {
 
 >>> .rowNum-box .el-upload--text {
     width: 200px;
-    height: 160px;
-    line-height: 160px;
+    height: 120px;
+    line-height: 120px;
 }
 
 >>> .rowNum-box .el-upload--text > img {
     width: 200px;
-    height: 160px;
+    height: 120px;
 }
 
 .right-wrap .shop-info .banner-box > div img {

@@ -870,7 +870,7 @@ export default {
     
 } */
 
-.avatar-uploader .el-upload {
+.goods-info-box .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
     cursor: pointer;
@@ -878,11 +878,11 @@ export default {
     overflow: hidden;
 }
 
-.avatar-uploader .el-upload:hover {
+.goods-info-box .avatar-uploader .el-upload:hover {
     border-color: #409eff;
 }
 
-.avatar-uploader-icon {
+.goods-info-box .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
     width: 140px;
@@ -891,7 +891,7 @@ export default {
     text-align: center;
 }
 
-.avatar {
+.goods-info-box .avatar {
     width: 140px;
     height: 140px;
     display: block;
