@@ -27,6 +27,7 @@
                 :data="tableData"
                 border
                 class="table"
+                 @row-dblclick="lineDb"
                 ref="multipleTable"
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
@@ -37,9 +38,9 @@
                     <template slot-scope="scope">{{scope.row.act_release}}</template>
                 </el-table-column>
                 <el-table-column prop="act_introduce" label="活动开始时间" min-width="220"></el-table-column>
-                <el-table-column label="标签" prop="act_lable" min-width="150" align="center">
+                <el-table-column label="标签" prop="act_lable" min-width="250" align="center">
                     <template slot-scope="scope">
-                        <span  v-for="(item,index) in scope.row.act_lable" :key="index">{{item}} </span>
+                        <span class="lab_span"  v-for="(item,index) in scope.row.act_lable" :key="index">{{item}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="活动缩略图" align="center" min-width="300">
@@ -52,13 +53,19 @@
                         ></el-image>
                     </template>
                 </el-table-column>
-                <el-table-column prop="act_content"  class-name="beyond" min-width="320" :show-overflow-tooltip='true' label="活动内容"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column prop="act_content"  class-name="beyond" min-width="320"  label="活动内容">
+                    <template slot-scope="scope">
+                        <div class="com_del_box">
+                            {{scope.row.act_content}}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180" align="center" fixed="right">
                     <template slot-scope="scope">
                         <el-button
                             type="text"
                             icon="el-icon-edit"
-                            @click="handleEdit(scope.$index, scope.row)"
+                            @click="lineDb(scope.row,scope.$index)"
                         >编辑</el-button>
                         <el-button
                             type="text"
@@ -113,13 +120,9 @@
                                             <i class="el-icon-error" @click.prevent="removeDomain(domain)"></i>
                                         </el-form-item>
                                         <el-form-item>
-                                            <!-- <el-button type="primary" @click="submitForm('dynamicValidateForm')">提交</el-button> -->
                                             <img  src="../../assets/img/jia.png" @click="addDomain" class="addLab">
-                                            <!-- <el-button @click="resetForm('dynamicValidateForm')">重置</el-button> -->
                                         </el-form-item>
                                     </el-form>
-                                    <!-- <input type="text" v-for="(item,index) in addNum"   :key="index"> -->
-                                    <!--  -->
                                 </div>
                             </div>
                         </div>                   
@@ -134,6 +137,7 @@
                                 :http-request="uploadSectionFile"
                                 :on-change="handleChange"
                                 :limit='5'
+                                :file-list="fileList"
                                 :auto-upload="false"
                                 :on-remove="handleRemove">
                                 <i class="el-icon-plus"></i>
@@ -168,6 +172,9 @@ export default {
                 pageIndex: 1,
                 pageSize: 10,
             },
+            fileList: [
+                
+            ],
             tableData: [
                 {
                     id:1,
@@ -218,10 +225,11 @@ export default {
             dynamicValidateForm: {
                 domains: [{
                     value: ''
-                }],
-                dio_name:'',
-                dio_introduce:'',
-                fromdata:[]
+                }],//标签
+                dio_name:'',//名字
+                dio_introduce:'',//简介
+                fromdata:[],//图片
+                editor_text:'',//富文本
             }
         }
     },  
@@ -255,7 +263,7 @@ export default {
         },
         addDomain() {
             this.dynamicValidateForm.domains.push({
-                value: '',
+                
             });
         },
         // 获取 easy-mock 的模拟数据
@@ -294,10 +302,35 @@ export default {
             this.multipleSelection = [];
         },
         // 编辑操作
-        handleEdit(index='', row='') {
+        // handleEdit(index='', row='') {
+        //     this.form = {}
+        //     if(row){
+        //         this.idx = index;
+        //         this.form = row;
+        //     }
+        //     this.editVisible = true;
+        // },
+        lineDb(row, column, event){
+            console.log(row, column, event = '')
+            var file_name = '';
+            for(let i=0;i<row.banner_list.length;i++){
+                file_name =  row.banner_list[i].split('/')
+                this.fileList[i] = {
+                    name:file_name[1],
+                    url:row.banner_list[i]
+                }
+            }
+            let str = '<p>sdf  杀顶发是方式打分杀顶发杀顶f32</p><p>3</p><p>4</p><p>53</p><p>45</p><p><br></p><p>53</p><p>5</p><p>3</p><p>5<span style="color: rgb(230, 0, 0);">23</span></p><p><span style="color: rgb(230, 0, 0);">4</span></p><p><span style="color: rgb(230, 0, 0);">2</span></p><p><span style="color: rgb(230, 0, 0);">42</span></p><p><span style="color: rgb(230, 0, 0);">4</span></p><p><span style="color: rgb(230, 0, 0);">23</span></p><p><span style="color: rgb(230, 0, 0);">4</span></p><p><span style="color: rgb(230, 0, 0);">2阿松大</span></p>'
+            this.dynamicValidateForm.dio_name = row.act_name
+            this.dynamicValidateForm.dio_introduce = row.act_introduce
+            this.dynamicValidateForm.editor_text = str
+            for(let j=0;j<row.act_lable.length;j++){
+                this.dynamicValidateForm.domains[j] = {
+                    value:row.act_lable[j]
+                }
+            }
             this.form = {}
             if(row){
-                this.idx = index;
                 this.form = row;
             }
             this.editVisible = true;
@@ -396,11 +429,22 @@ export default {
 .handle-box {
     margin-bottom: 20px;
 }
-
+.lab_span{
+    border: 1px solid #7a7a7a;
+    border-radius: 4px;
+    margin-right: 10px;
+    padding: 1px 10px;
+}
 .handle-select {
     width: 120px;
 }
-
+.com_del_box{
+    overflow:hidden; 
+    text-overflow:ellipsis;
+    display:-webkit-box; 
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2; 
+}
 .handle-input {
     width: 300px;
     display: inline-block;

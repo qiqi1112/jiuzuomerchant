@@ -138,6 +138,8 @@
             quillEditor
         },
         created(){
+            console.log(this.formData)
+            this.content = this.formData.editor_text
             let Size = Quill.import('attributors/style/size')
             Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '20px', '30px']
             Quill.register(Size, true)
@@ -147,6 +149,7 @@
             Quill.register(Font, true) 
             Quill.register(Video, true)
             Quill.register(Audio, true)
+            // this.content = '<p>ooo</p><p>1</p><p>1</p><p>1</p><p>1</p><p><br></p><p>1</p><p>1</p><p>3s</p><p>df</p><p>2df2</p><p>2ef分</p><p>22</p><p>ddddd交换机端口积分是否杀顶方式打分杀顶发sf</p><p><strong style="color: rgb(240, 102, 102);">啊大大大师的</strong></p>'
         },
         methods: {
             onEditorChange({ editor, html, text }) {

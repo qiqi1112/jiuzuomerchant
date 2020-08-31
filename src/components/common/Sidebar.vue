@@ -92,6 +92,11 @@ export default {
                     title: '广告活动'
                 },
                 {
+                    icon: 'el-icon-lx-text',
+                    index: 'comments',
+                    title: '评论管理'
+                },
+                {
                     icon: 'el-icon-lx-commentfill',
                     index: 'log',
                     title: '操作日志'

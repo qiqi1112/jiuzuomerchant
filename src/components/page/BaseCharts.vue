@@ -15,8 +15,8 @@ export default{
                 latitude:30.65984,//纬度
                 address:'',//默认输入框
                 seacth_city:'成都',//默认城市
-                width:'400px',
-                height:'400px'
+                width:'1200px',
+                height:'600px'
             }
         }
     },

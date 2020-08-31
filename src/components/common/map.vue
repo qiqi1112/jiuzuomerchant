@@ -4,8 +4,8 @@
             <span @click.stop>
                 <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
             </span>
-            <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
-            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input> -->
+            <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
+            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>
             <div class="city" @click.stop>
                 <span>{{value}}</span><span class="changeCity" @click.stop="showCityFun()">切换城市</span>
                 <div class="cityList" v-if="showCity">
@@ -53,7 +53,7 @@ export default {
         };
     },
     props:{
-        mapList:{tyle:Object}
+        mapList:{type:Object}
     },
     computed:{
         showCity(){
@@ -79,13 +79,13 @@ export default {
         'fristForm.address': {
             handler: function(val) {
                 this.debounce(this.changeStr,500);
-                this.aaa()
+                this.childData()
             },
             deep: true
         },
     },
     methods:{
-        aaa(){
+        childData(){
             this.$emit('child-data',this.fristForm)
         },
         showCityFun(){
