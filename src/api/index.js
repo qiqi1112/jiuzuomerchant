@@ -30,7 +30,7 @@ axios.interceptors.response.use(
             router.push("/login");
             return Promise.reject(response.data);
         } else {
-            Message.error(response.data.msg);
+            // Message.error(response.data.msg);
             return Promise.reject(response.data);
         }
     },

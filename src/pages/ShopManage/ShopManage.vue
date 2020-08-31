@@ -24,642 +24,31 @@
                         <!-- 套餐标签页 -->
                         <el-tab-pane label="套餐" name="combo">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <div class="goods-info-box">
-                                <div class="left-box">
-                                    <el-form ref="comboForm" :model="comboForm" label-width="80px">
-                                        <p>
-                                            <span>套餐名称：</span>
-                                            <el-input v-model="comboForm.name" style="width:200px"></el-input>
-                                        </p>
-                                        <p>
-                                            <span>套餐包含：</span>
-                                            <el-input
-                                                type="textarea"
-                                                v-model="comboForm.desc"
-                                                style="width:300px;"
-                                            ></el-input>
-                                        </p>
-                                        <p>
-                                            <span>套餐原单价：</span>
-                                            <el-input
-                                                v-model="comboForm.originPrice"
-                                                style="width:120px;margin-right:20px"
-                                            ></el-input>
-
-                                            <span>套餐现单价：</span>
-                                            <el-input
-                                                v-model="comboForm.nowPrice"
-                                                style="width:120px"
-                                            ></el-input>
-                                        </p>
-                                        <p class="combo-spec">
-                                            <span>套餐规格：</span>
-                                            <i
-                                                v-for="(item,index) in comboForm.spec"
-                                                :key="index"
-                                            >{{item}}</i>
-                                        </p>
-                                    </el-form>
-                                    <p>
-                                        <el-checkbox
-                                            v-model="comboForm.checkedBanner"
-                                            label="放至商店Banner位"
-                                            border
-                                            style="margin-right:20px"
-                                        ></el-checkbox>
-                                    </p>
-                                    <!-- banner图 -->
-                                    <el-upload
-                                        action="/file/admin/system/upload/createBatch"
-                                        list-type="picture-card"
-                                        :data="comboForm.bannerImg"
-                                        :before-upload="beforeComboBannerUpload"
-                                        :on-preview="comboBannerPreview"
-                                        :on-success="uploadComboBannerSuccess"
-                                        :on-remove="comboBannerRemove"
-                                        :file-list="comboForm.bannerImgBox"
-                                        :on-error="uploadError"
-                                    >
-                                        <i class="el-icon-plus"></i>
-                                    </el-upload>
-                                    <el-dialog :visible.sync="comboForm.bannerDialog">
-                                        <img :src="comboForm.bannerImageUrl" alt />
-                                    </el-dialog>
-                                    <span>（*如需商店轮播推荐，请添加Banner图片）</span>
-                                </div>
-                                <div class="right-box">
-                                    <!-- 缩略图 -->
-                                    <p>
-                                        <span>套餐缩略图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            :action="serverUrl"
-                                            :show-file-list="false"
-                                            :data="comboForm.thumImg"
-                                            :on-success="uploadComboThumSuccess"
-                                            :before-upload="beforeComboThumUpload"
-                                            :on-error="uploadError"
-                                        >
-                                            <img
-                                                v-if="comboForm.thumImageUrl"
-                                                :src="comboForm.thumImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                    <!-- 详情图 -->
-                                    <p>
-                                        <span>套餐详情图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            :action="serverUrl"
-                                            :show-file-list="false"
-                                            :data="comboForm.detailImg"
-                                            :on-success="uploadComboDetailSuccess"
-                                            :before-upload="beforeComboDetailUpload"
-                                            :on-error="uploadError"
-                                        >
-                                            <img
-                                                v-if="comboForm.detailImageUrl"
-                                                :src="comboForm.detailImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                </div>
-                            </div>
+                            <combo-tab></combo-tab>
                         </el-tab-pane>
 
                         <!-- 酒水标签页 -->
                         <el-tab-pane label="酒水" name="drinks">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <div class="goods-info-box">
-                                <div class="left-box drinks">
-                                    <el-form
-                                        ref="drinksForm"
-                                        :model="drinksForm"
-                                        label-width="80px"
-                                    >
-                                        <p>
-                                            <span>酒水名称：</span>
-                                            <el-input
-                                                v-model="drinksForm.name"
-                                                style="width:170px;margin-right:20px"
-                                            ></el-input>
-                                            <el-select
-                                                v-model="drinksForm.classify"
-                                                placeholder="酒水分类"
-                                                style="width:110px"
-                                            >
-                                                <el-option
-                                                    v-for="item in drinksForm.classifyOptions"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value"
-                                                ></el-option>
-                                            </el-select>
-                                        </p>
-                                        <p>
-                                            <span>酒水包含：</span>
-                                            <el-input
-                                                type="textarea"
-                                                v-model="drinksForm.desc"
-                                                style="width:300px;"
-                                            ></el-input>
-                                        </p>
-                                        <p>
-                                            <span>酒水原单价：</span>
-                                            <el-input
-                                                v-model="drinksForm.originPrice"
-                                                style="width:120px;margin-right:20px"
-                                            ></el-input>
-
-                                            <span>酒水现单价：</span>
-                                            <el-input
-                                                v-model="drinksForm.nowPrice"
-                                                style="width:120px"
-                                            ></el-input>
-                                        </p>
-                                        <p class="drinks-spec">
-                                            <span>酒水规格：</span>
-                                            <el-form
-                                                :model="dynamicValidateForm"
-                                                ref="dynamicValidateForm"
-                                                label-width="100px"
-                                                class="demo-dynamic"
-                                            >
-                                                <el-form-item
-                                                    v-for="(domain, index) in dynamicValidateForm.domains"
-                                                    :key="index"
-                                                >
-                                                    <el-input
-                                                        v-model="domain.spec"
-                                                        placeholder="规格（如：一打、一箱）"
-                                                        style="width:170px;margin-right:10px"
-                                                    ></el-input>
-                                                    <el-input
-                                                        v-model="domain.price"
-                                                        placeholder="规格单价（如：999.99）"
-                                                        style="width:173px;margin-right:10px"
-                                                    ></el-input>
-                                                    <el-button @click="addDomain">
-                                                        <i class="el-icon-plus"></i>
-                                                    </el-button>
-                                                    <el-button
-                                                        v-show="dynamicValidateForm.domains.length > 1"
-                                                        @click.prevent="removeDomain(domain)"
-                                                    >
-                                                        <i class="el-icon-close"></i>
-                                                    </el-button>
-                                                </el-form-item>
-                                            </el-form>
-                                        </p>
-                                    </el-form>
-                                    <div class="drinks-update-box">
-                                        <div class="banner-box">
-                                            <el-checkbox
-                                                v-model="drinksForm.checkedBanner"
-                                                label="放至商家推荐位"
-                                                border
-                                                style="margin-right:20px"
-                                            ></el-checkbox>
-                                            <el-select
-                                                v-model="drinksForm.weight"
-                                                placeholder="推荐位位权重"
-                                                style="width:140px"
-                                            >
-                                                <el-option
-                                                    v-for="item in drinksForm.options"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value"
-                                                ></el-option>
-                                            </el-select>
-
-                                            <div class="drinks-div">
-                                                <el-upload
-                                                    class="avatar-uploader"
-                                                    action="https://jsonplaceholder.typicode.com/posts/"
-                                                    :show-file-list="false"
-                                                >
-                                                    <img
-                                                        v-if="drinksForm.recoImageUrl"
-                                                        :src="drinksForm.recoImageUrl"
-                                                        class="avatar"
-                                                    />
-                                                    <i
-                                                        v-else
-                                                        class="el-icon-plus avatar-uploader-icon"
-                                                    ></i>
-                                                </el-upload>
-                                                <span>（*如需商家推荐，请添加推荐位图片）</span>
-                                            </div>
-                                        </div>
-                                        <div class="reco-box">
-                                            <el-checkbox
-                                                v-model="drinksForm.checkedReco"
-                                                label="放至商店Banner位"
-                                                border
-                                            ></el-checkbox>
-
-                                            <div class="drinks-div">
-                                                <el-upload
-                                                    class="avatar-uploader"
-                                                    action="https://jsonplaceholder.typicode.com/posts/"
-                                                    :show-file-list="false"
-                                                >
-                                                    <img
-                                                        v-if="drinksForm.bannerImageUrl"
-                                                        :src="drinksForm.bannerImageUrl"
-                                                        class="avatar"
-                                                    />
-                                                    <i
-                                                        v-else
-                                                        class="el-icon-plus avatar-uploader-icon"
-                                                    ></i>
-                                                </el-upload>
-                                                <span>（*如需商店轮播推荐，请添加Banner图片）</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="right-box">
-                                    <!-- 缩略图 -->
-                                    <p>
-                                        <span>酒水缩略图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="drinksForm.thumImageUrl"
-                                                :src="drinksForm.thumImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                    <!-- 详情图 -->
-                                    <p>
-                                        <span>酒水详情图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="drinksForm.detailImageUrl"
-                                                :src="drinksForm.detailImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                </div>
-                            </div>
+                            <drinks-tab></drinks-tab>
                         </el-tab-pane>
 
                         <!-- 小吃标签页 -->
                         <el-tab-pane label="小吃" name="snack">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <div class="goods-info-box">
-                                <div class="left-box">
-                                    <el-form ref="snackForm" :model="snackForm" label-width="80px">
-                                        <p>
-                                            <span>小吃名称：</span>
-                                            <el-input v-model="snackForm.name" style="width:200px"></el-input>
-                                        </p>
-                                        <p>
-                                            <span>小吃包含：</span>
-                                            <el-input
-                                                type="textarea"
-                                                v-model="snackForm.desc"
-                                                style="width:300px;"
-                                            ></el-input>
-                                        </p>
-                                        <p>
-                                            <span>小吃原单价：</span>
-                                            <el-input
-                                                v-model="snackForm.originPrice"
-                                                style="width:120px;margin-right:20px"
-                                            ></el-input>
-
-                                            <span>小吃现单价：</span>
-                                            <el-input
-                                                v-model="snackForm.nowPrice"
-                                                style="width:120px"
-                                            ></el-input>
-                                        </p>
-                                        <p class="combo-spec">
-                                            <span>小吃规格：</span>
-                                            <i
-                                                v-for="(item,index) in snackForm.spec"
-                                                :key="index"
-                                            >{{item}}</i>
-                                        </p>
-                                    </el-form>
-                                    <p>
-                                        <el-checkbox
-                                            v-model="snackForm.checkedBanner"
-                                            label="放至商店Banner位"
-                                            border
-                                            style="margin-right:20px"
-                                        ></el-checkbox>
-                                        <!-- <el-select
-                                            v-model="drinksForm.weight"
-                                            placeholder="Banner位权重"
-                                            style="width:140px"
-                                        >
-                                            <el-option
-                                                v-for="item in snackForm.options"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            ></el-option>
-                                        </el-select> -->
-                                    </p>
-                                    <!-- banner图 -->
-                                    <el-upload
-                                        class="avatar-uploader"
-                                        action="https://jsonplaceholder.typicode.com/posts/"
-                                        :show-file-list="false"
-                                    >
-                                        <img
-                                            v-if="snackForm.bannerImageUrl"
-                                            :src="snackForm.bannerImageUrl"
-                                            class="avatar"
-                                        />
-                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                    </el-upload>
-                                    <span>（*如需商店轮播推荐，请添加Banner图片）</span>
-                                </div>
-                                <div class="right-box">
-                                    <!-- 缩略图 -->
-                                    <p>
-                                        <span>小吃缩略图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="snackForm.thumImageUrl"
-                                                :src="snackForm.thumImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                    <!-- 详情图 -->
-                                    <p>
-                                        <span>小吃详情图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="snackForm.detailImageUrl"
-                                                :src="snackForm.detailImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                </div>
-                            </div>
+                            <snack-tab></snack-tab>
                         </el-tab-pane>
 
                         <!-- 其他标签页 -->
                         <el-tab-pane label="其他" name="other">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <div class="goods-info-box">
-                                <div class="left-box">
-                                    <el-form ref="otherForm" :model="otherForm" label-width="80px">
-                                        <p>
-                                            <span>商品名称：</span>
-                                            <el-input v-model="otherForm.name" style="width:200px"></el-input>
-                                        </p>
-                                        <p>
-                                            <span>商品包含：</span>
-                                            <el-input
-                                                type="textarea"
-                                                v-model="otherForm.desc"
-                                                style="width:300px;"
-                                            ></el-input>
-                                        </p>
-                                        <p>
-                                            <span>商品原单价：</span>
-                                            <el-input
-                                                v-model="otherForm.originPrice"
-                                                style="width:120px;margin-right:20px"
-                                            ></el-input>
-
-                                            <span>商品现单价：</span>
-                                            <el-input
-                                                v-model="otherForm.nowPrice"
-                                                style="width:120px"
-                                            ></el-input>
-                                        </p>
-                                        <p class="combo-spec">
-                                            <span>商品规格：</span>
-                                            <i
-                                                v-for="(item,index) in otherForm.spec"
-                                                :key="index"
-                                            >{{item}}</i>
-                                        </p>
-                                    </el-form>
-                                    <p>
-                                        <el-checkbox
-                                            v-model="otherForm.checkedBanner"
-                                            label="放至商店Banner位"
-                                            border
-                                            style="margin-right:20px"
-                                        ></el-checkbox>
-                                        <!-- <el-select
-                                            v-model="otherForm.weight"
-                                            placeholder="Banner位权重"
-                                            style="width:140px"
-                                        >
-                                            <el-option
-                                                v-for="item in otherForm.options"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            ></el-option>
-                                        </el-select> -->
-                                    </p>
-                                    <!-- banner图 -->
-                                    <el-upload
-                                        class="avatar-uploader"
-                                        action="https://jsonplaceholder.typicode.com/posts/"
-                                        :show-file-list="false"
-                                    >
-                                        <img
-                                            v-if="otherForm.bannerImageUrl"
-                                            :src="otherForm.bannerImageUrl"
-                                            class="avatar"
-                                        />
-                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                    </el-upload>
-                                    <span>（*如需商店轮播推荐，请添加Banner图片）</span>
-                                </div>
-                                <div class="right-box">
-                                    <!-- 缩略图 -->
-                                    <p>
-                                        <span>商品缩略图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="otherForm.thumImageUrl"
-                                                :src="otherForm.thumImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                    <!-- 详情图 -->
-                                    <p>
-                                        <span>商品详情图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="otherForm.detailImageUrl"
-                                                :src="otherForm.detailImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                </div>
-                            </div>
+                            <other-tab></other-tab>
                         </el-tab-pane>
 
                         <!-- 会员卡标签页 -->
                         <el-tab-pane label="会员卡" name="vipCard">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <div class="goods-info-box">
-                                <div class="left-box">
-                                    <el-form
-                                        ref="vipCardForm"
-                                        :model="vipCardForm"
-                                        label-width="80px"
-                                    >
-                                        <p>
-                                            <span>商品名称：</span>
-                                            <el-input
-                                                v-model="vipCardForm.name"
-                                                style="width:200px"
-                                            ></el-input>
-                                        </p>
-                                        <p>
-                                            <span>商品包含：</span>
-                                            <el-input
-                                                type="textarea"
-                                                v-model="vipCardForm.desc"
-                                                style="width:300px;"
-                                            ></el-input>
-                                        </p>
-                                        <p>
-                                            <span>商品积分：</span>
-                                            <el-input
-                                                v-model="vipCardForm.originPrice"
-                                                style="width:120px;margin-right:20px"
-                                            ></el-input>
-
-                                            <span>商品单价：</span>
-                                            <el-input
-                                                v-model="vipCardForm.nowPrice"
-                                                style="width:120px"
-                                            ></el-input>
-                                        </p>
-                                        <p class="combo-spec">
-                                            <span>商品规格：</span>
-                                            <i
-                                                v-for="(item,index) in vipCardForm.spec"
-                                                :key="index"
-                                            >{{item}}</i>
-                                        </p>
-                                    </el-form>
-                                    <p>
-                                        <el-checkbox
-                                            v-model="vipCardForm.checkedBanner"
-                                            label="放至商店Banner位"
-                                            border
-                                            style="margin-right:20px"
-                                        ></el-checkbox>
-                                        <!-- <el-select
-                                            v-model="vipCardForm.weight"
-                                            placeholder="Banner位权重"
-                                            style="width:140px"
-                                        >
-                                            <el-option
-                                                v-for="item in vipCardForm.options"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            ></el-option>
-                                        </el-select> -->
-                                    </p>
-                                    <!-- banner图 -->
-                                    <el-upload
-                                        class="avatar-uploader"
-                                        action="https://jsonplaceholder.typicode.com/posts/"
-                                        :show-file-list="false"
-                                    >
-                                        <img
-                                            v-if="vipCardForm.bannerImg"
-                                            :src="vipCardForm.bannerImg"
-                                            class="avatar"
-                                        />
-                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                    </el-upload>
-                                    <span>（*如需商店轮播推荐，请添加Banner图片）</span>
-                                </div>
-                                <div class="right-box">
-                                    <!-- 缩略图 -->
-                                    <p>
-                                        <span>商品缩略图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="vipCardForm.thumImageUrl"
-                                                :src="vipCardForm.thumImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                    <!-- 详情图 -->
-                                    <p>
-                                        <span>商品详情图：</span>
-                                        <el-upload
-                                            class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
-                                            :show-file-list="false"
-                                        >
-                                            <img
-                                                v-if="vipCardForm.detailImageUrl"
-                                                :src="vipCardForm.detailImageUrl"
-                                                class="avatar"
-                                            />
-                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                        </el-upload>
-                                    </p>
-                                </div>
-                            </div>
+                            <vip-card-tab></vip-card-tab>
                         </el-tab-pane>
                     </el-tabs>
                     <span slot="footer" class="dialog-footer">
@@ -854,7 +243,20 @@
 </template>
 
 <script>
+import comboTab from './ComboTab';
+import drinksTab from './DrinksTab';
+import snackTab from './SnackTab';
+import otherTab from './OtherTab';
+import vipCardTab from './VipCardTab';
+
 export default {
+    components: {
+        comboTab,
+        drinksTab,
+        snackTab,
+        otherTab,
+        vipCardTab
+    },
     data() {
         return {
             serverUrl: '/file/admin/system/upload/create', //上传文件
@@ -870,204 +272,204 @@ export default {
             currentPage: 1, //默认显示的页码所在位置（第一页）
             pagesize: 16, //默认每页要显示多少条数据
 
-            //套餐标签页表单---------------------------------
-            comboForm: {
-                name: '',
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                spec: ['默认'],
-                checkedBanner: false,
+            // //套餐标签页表单---------------------------------
+            // comboForm: {
+            //     name: '',
+            //     desc: '',
+            //     originPrice: '',
+            //     nowPrice: '',
+            //     spec: ['默认'],
+            //     checkedBanner: false,
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
+            //     bannerImageUrl: '', //banner图
+            //     bannerDialog: false, //查看图集时的对话框
+            //     //banner图上传时携带的参数
+            //     bannerImg: {
+            //         img: ''
+            //     },
 
-                thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
+            //     thumImageUrl: '', //缩略图
+            //     //缩略图上传时携带的参数
+            //     thumImg: {
+            //         img: ''
+            //     },
 
-                detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
-                }
-            },
+            //     detailImageUrl: '', //详情图
+            //     //详情图上传时携带的参数
+            //     detailImg: {
+            //         img: ''
+            //     }
+            // },
 
-            //酒水标签页表单-----------------------------------------
-            drinksForm: {
-                name: '',
-                classify: '',
-                classifyOptions: [
-                    {
-                        label: '啤酒',
-                        value: '啤酒'
-                    },
-                    {
-                        label: '香槟',
-                        value: '香槟'
-                    },
-                    {
-                        label: '饮料',
-                        value: '饮料'
-                    },
-                    {
-                        label: '矿泉水',
-                        value: '矿泉水'
-                    }
-                ],
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                checkedBanner: false,
-                checkedReco: false,
-                weight: '',
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
+            // //酒水标签页表单-----------------------------------------
+            // drinksForm: {
+            //     name: '',
+            //     classify: '',
+            //     classifyOptions: [
+            //         {
+            //             label: '啤酒',
+            //             value: '啤酒'
+            //         },
+            //         {
+            //             label: '香槟',
+            //             value: '香槟'
+            //         },
+            //         {
+            //             label: '饮料',
+            //             value: '饮料'
+            //         },
+            //         {
+            //             label: '矿泉水',
+            //             value: '矿泉水'
+            //         }
+            //     ],
+            //     desc: '',
+            //     originPrice: '',
+            //     nowPrice: '',
+            //     checkedBanner: false,
+            //     checkedReco: false,
+            //     weight: '',
+            //     options: [
+            //         {
+            //             label: '0',
+            //             value: '0'
+            //         },
+            //         {
+            //             label: '1',
+            //             value: '1'
+            //         },
+            //         {
+            //             label: '2',
+            //             value: '2'
+            //         },
+            //         {
+            //             label: '3',
+            //             value: '3'
+            //         }
+            //     ],
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
+            //     bannerImageUrl: '', //banner图
+            //     bannerDialog: false, //查看图集时的对话框
+            //     //banner图上传时携带的参数
+            //     bannerImg: {
+            //         img: ''
+            //     },
 
-                recoImageUrl: '', //推荐位图
-                recoDialog: false, //查看图集时的对话框
-                //推荐位图上传时携带的参数
-                RecoImg: {
-                    img: ''
-                },
+            //     recoImageUrl: '', //推荐位图
+            //     recoDialog: false, //查看图集时的对话框
+            //     //推荐位图上传时携带的参数
+            //     RecoImg: {
+            //         img: ''
+            //     },
 
-                thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
+            //     thumImageUrl: '', //缩略图
+            //     //缩略图上传时携带的参数
+            //     thumImg: {
+            //         img: ''
+            //     },
 
-                detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
-                }
-            },
-            //酒水新增规格
-            dynamicValidateForm: {
-                domains: [
-                    {
-                        spec: '', //规格
-                        price: '' //规格价格
-                    }
-                ]
-            },
+            //     detailImageUrl: '', //详情图
+            //     //详情图上传时携带的参数
+            //     detailImg: {
+            //         img: ''
+            //     }
+            // },
+            // //酒水新增规格
+            // dynamicValidateForm: {
+            //     domains: [
+            //         {
+            //             spec: '', //规格
+            //             price: '' //规格价格
+            //         }
+            //     ]
+            // },
 
-            //小吃标签页表单------------------------------------------
-            snackForm: {
-                name: '',
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                spec: ['小份', '中份', '大份'],
-                checkedBanner: false,
+            // //小吃标签页表单------------------------------------------
+            // snackForm: {
+            //     name: '',
+            //     desc: '',
+            //     originPrice: '',
+            //     nowPrice: '',
+            //     spec: ['小份', '中份', '大份'],
+            //     checkedBanner: false,
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
+            //     bannerImageUrl: '', //banner图
+            //     bannerDialog: false, //查看图集时的对话框
+            //     //banner图上传时携带的参数
+            //     bannerImg: {
+            //         img: ''
+            //     },
 
-                thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
+            //     thumImageUrl: '', //缩略图
+            //     //缩略图上传时携带的参数
+            //     thumImg: {
+            //         img: ''
+            //     },
 
-                detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
-                }
-            },
+            //     detailImageUrl: '', //详情图
+            //     //详情图上传时携带的参数
+            //     detailImg: {
+            //         img: ''
+            //     }
+            // },
 
-            //其他标签页表单--------------------------------------------
-            otherForm: {
-                name: '',
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                spec: ['1份', '1盒'],
-                checkedBanner: false,
+            // //其他标签页表单--------------------------------------------
+            // otherForm: {
+            //     name: '',
+            //     desc: '',
+            //     originPrice: '',
+            //     nowPrice: '',
+            //     spec: ['1份', '1盒'],
+            //     checkedBanner: false,
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
+            //     bannerImageUrl: '', //banner图
+            //     bannerDialog: false, //查看图集时的对话框
+            //     //banner图上传时携带的参数
+            //     bannerImg: {
+            //         img: ''
+            //     },
 
-                thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
+            //     thumImageUrl: '', //缩略图
+            //     //缩略图上传时携带的参数
+            //     thumImg: {
+            //         img: ''
+            //     },
 
-                detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
-                }
-            },
+            //     detailImageUrl: '', //详情图
+            //     //详情图上传时携带的参数
+            //     detailImg: {
+            //         img: ''
+            //     }
+            // },
 
-            //会员卡标签页表单--------------------------------------------
-            vipCardForm: {
-                name: '',
-                desc: '',
-                integral: '', //积分
-                nowPrice: '',
-                spec: ['默认'],
-                checkedBanner: false,
+            // //会员卡标签页表单--------------------------------------------
+            // vipCardForm: {
+            //     name: '',
+            //     desc: '',
+            //     integral: '', //积分
+            //     nowPrice: '',
+            //     spec: ['默认'],
+            //     checkedBanner: false,
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
+            //     bannerImageUrl: '', //banner图
+            //     bannerDialog: false, //查看图集时的对话框
+            //     //banner图上传时携带的参数
+            //     bannerImg: {
+            //         img: ''
+            //     },
 
-                thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
+            //     thumImageUrl: '', //缩略图
+            //     //缩略图上传时携带的参数
+            //     thumImg: {
+            //         img: ''
+            //     },
 
-                detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
-                }
-            },
+            //     detailImageUrl: '', //详情图
+            //     //详情图上传时携带的参数
+            //     detailImg: {
+            //         img: ''
+            //     }
+            // },
 
             //商品分类下拉框
             options: [
@@ -1112,21 +514,21 @@ export default {
             this.getGoodsInfo({ pageNo: this.currentPage }); //请求翻页后的数据
         },
 
-        //酒水规格添加按钮
-        addDomain() {
-            this.dynamicValidateForm.domains.push({
-                spec: '',
-                price: ''
-            });
-        },
+        // //酒水规格添加按钮
+        // addDomain() {
+        //     this.dynamicValidateForm.domains.push({
+        //         spec: '',
+        //         price: ''
+        //     });
+        // },
 
-        //酒水规格删除按钮
-        removeDomain(item) {
-            var index = this.dynamicValidateForm.domains.indexOf(item);
-            if (index !== -1) {
-                this.dynamicValidateForm.domains.splice(index, 1);
-            }
-        },
+        // //酒水规格删除按钮
+        // removeDomain(item) {
+        //     var index = this.dynamicValidateForm.domains.indexOf(item);
+        //     if (index !== -1) {
+        //         this.dynamicValidateForm.domains.splice(index, 1);
+        //     }
+        // },
 
         //搜索按钮
         handleSearch() {
@@ -1145,23 +547,6 @@ export default {
             this.dialogVisible = false;
         },
 
-        //添加套餐-------------------------------------------------------
-        setComboInfo() {
-            let data = {
-                type: this.activeNum,
-                name: this.comboForm.name,
-                synopsis: this.comboForm.desc,
-                originalPrice: this.comboForm.originPrice,
-                presentPrice: this.comboForm.nowPrice,
-                recommendAdStatus: 2,
-                recommendStatus: 2,
-                listPicture: 'shangzuo-dev/20200828/edk8f3v5b9j1d6s16y2p.jpg',
-                infoPicture: 'shangzuo-dev/20200828/wa2wu8b47raagzp6cn5f.jpg'
-            };
-            this.$post('/dev/merchant/store/goods/save', data).then((res) => {
-                console.log(res);
-            });
-        },
 
         //上传套餐banner图之前
         beforeComboBannerUpload(file) {
@@ -1250,7 +635,7 @@ export default {
 
         //商品删除
         handleDelete() {
-            let id = "1299275571139633153";
+            let id = '1299275571139633153';
             this.$confirm('确认要删除此商品吗?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',

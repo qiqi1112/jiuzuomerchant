@@ -112,6 +112,17 @@
                                 ></el-time-select>
                             </div>
                         </div>
+                        <div class="per-con">
+                            <p>店铺人均消费</p>
+                            <el-input
+                                v-model="perCon"
+                                placeholder="人均消费"
+                                style="width:44%;margin-right:6px"
+                                :readonly="isReadonly"
+                            ></el-input>元/人
+                        </div>
+                    </div>
+                    <div class="shop-div2">
                         <div class="service-phone">
                             <p>客服电话</p>
                             <el-input
@@ -121,56 +132,64 @@
                                 :readonly="isReadonly"
                             ></el-input>
                         </div>
-                    </div>
-                    <div class="shop-div2">
-                        <div class="shop-address">
-                            <p>店铺地址</p>
-                            <p class="shop-add clearfix">
-                                <span>{{country}}</span>
-                                <span>{{street}}</span>
 
-                                <el-input
-                                    v-model="detailAdd"
-                                    placeholder="请输入店铺详细地址"
-                                    :readonly="isReadonly"
-                                ></el-input>
-                            </p>
-                            <!-- <div>
-                                <el-cascader
-                                    :options="addressOptions"
-                                    v-model="regionValue"
-                                    @change="handleAddChange"
-                                ></el-cascader>
-                            </div>-->
-                        </div>
                         <div class="shop-type">
                             <p>
                                 店铺类型
                                 <span>（用于客户筛选出本店）</span>
                             </p>
                             <div class="type-box">
-                                <span v-if="isReadonly">{{shopType}}</span>
-                                <el-select v-else v-model="shopType" placeholder="请选择">
+                                <div v-if="isReadonly">
+                                    <span
+                                        v-for="(item,index) in shopTypeOptStrArr"
+                                        :key="index"
+                                        class="shop-type-span"
+                                    >{{item}}</span>
+                                </div>
+                                <div v-else>
+                                    <span
+                                        v-for="(item,index) in shopTypeOpt"
+                                        :key="index"
+                                        @click="checkType($event,item)"
+                                    >{{item}}</span>
+                                </div>
+
+                                <!-- <el-select v-else v-model="shopType" placeholder="请选择">
                                     <el-option
                                         v-for="item in shopTypeOpt"
                                         :key="item.value"
                                         :label="item.value"
                                         :value="item.value"
                                     ></el-option>
-                                </el-select>
+                                </el-select>-->
                             </div>
                         </div>
                     </div>
                 </div>
-                <p class="per-con">
-                    店铺人均消费：
-                    <el-input
-                        v-model="perCon"
-                        placeholder="人均消费"
-                        style="width:20%;margin-right:6px"
-                        :readonly="isReadonly"
-                    ></el-input>元/人
-                </p>
+                <div class="shop-address">
+                    <p>店铺地址</p>
+                    <p v-if="isReadonly" class="shop-add clearfix">
+                        <span>{{province}}</span>
+                        <span>{{city}}</span>
+                        <span>{{district}}</span>
+                        <span>{{trustAddress}}</span>
+
+                        <!-- <el-input
+                            v-model="detailAdd"
+                            placeholder="请输入店铺详细地址"
+                            :readonly="isReadonly"
+                        ></el-input>-->
+                    </p>
+                    <mapCom v-else :mapList="mapList"></mapCom>
+                    <!-- <div>
+                                <el-cascader
+                                    :options="addressOptions"
+                                    v-model="regionValue"
+                                    @change="handleAddChange"
+                                ></el-cascader>
+                    </div>-->
+                </div>
+
                 <div class="shop-desc">
                     <div class="goods-brief">
                         <span>商品店面简介：</span>
@@ -233,6 +252,40 @@
                         </el-dialog>
                     </div>
 
+                    <!-- 排号横幅图 -->
+                    <div class="rowNum-box">
+                        <div class="top">
+                            <p>排号横幅图</p>
+                            <img v-if="isReadonly" :src="rowNumImageUrl" class="avatar" />
+                            <el-upload
+                                v-else
+                                class="avatar-uploader"
+                                action="1"
+                                :http-request="uploadRowNumFile"
+                                :show-file-list="false"
+                                :on-error="uploadError"
+                            >
+                                <img v-if="rowNumImageUrl" :src="rowNumImageUrl" class="avatar" />
+                                <i class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                        </div>
+                        <div class="botm">
+                            <p>店铺长图（用于展示位置变化）</p>
+                            <img v-if="isReadonly" :src="appShopImageUrl" class="avatar" />
+                            <el-upload
+                                v-else
+                                class="avatar-uploader"
+                                action="1"
+                                :http-request="uploadAppShopFile"
+                                :show-file-list="false"
+                                :on-error="uploadError"
+                            >
+                                <img v-if="appShopImageUrl" :src="appShopImageUrl" class="avatar" />
+                                <i class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                        </div>
+                    </div>
+
                     <!-- 商家布局图 -->
                     <div class="overall-box">
                         <p>商家布局图</p>
@@ -249,23 +302,6 @@
                             <i class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </div>
-
-                    <!-- 排号banner图 -->
-                    <div class="rowNum-box">
-                        <p>排号banner图</p>
-                        <img v-if="isReadonly" :src="rowNumImageUrl" class="avatar" />
-                        <el-upload
-                            v-else
-                            class="avatar-uploader"
-                            action="1"
-                            :http-request="uploadRowNumFile"
-                            :show-file-list="false"
-                            :on-error="uploadError"
-                        >
-                            <img v-if="rowNumImageUrl" :src="rowNumImageUrl" class="avatar" />
-                            <i class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                    </div>
                 </div>
                 <h4>店铺卡座</h4>
                 <div v-if="shopLocaIndex == 1" class="shop-seat">
@@ -276,6 +312,7 @@
                                 <el-input
                                     :readonly="isReadonly"
                                     v-model="x"
+                                    @focus="changeSeatAlert"
                                     min="1"
                                     placeholder="请输入行数"
                                     type="number"
@@ -314,6 +351,7 @@
                         </div>
                         <!-- 回显的座位图 -->
                         <div
+                            v-if="x&&y"
                             class="seat-box"
                             ref="seatBox"
                             :style="{width:32 * y + 30 + 'px'}"
@@ -400,38 +438,6 @@
                                 }"
                             ></el-time-select>
                         </div>
-                        <!-- <div class="is-toilet">
-                            <span class="seat-detail-span">独立卫生间</span>
-                            <span>
-                                <el-radio v-model="radio" label="1">有</el-radio>
-                                <el-radio v-model="radio" label="0">无</el-radio>
-                            </span>
-                        </div>
-                        <div class="mahjong">
-                            <span class="seat-detail-span">机麻</span>
-                            <span>{{}}</span>桌
-                        </div>
-                        <div class="snacks">
-                            <span class="seat-detail-span">零食</span>
-                            <div class="snacks-detail">
-                                <div>
-                                    <span>水果拼盘</span>
-                                    <span>x2</span>
-                                </div>
-                                <div>
-                                    <span>水果拼盘</span>
-                                    <span>x2</span>
-                                </div>
-                                <div>
-                                    <span>水果拼盘</span>
-                                    <span>x2</span>
-                                </div>
-                                <el-input style="width:100px" v-model="goodName" placeholder="名称"></el-input>
-                                <span class="mult">x</span>
-                                <el-input style="width:100px" v-model="goodNum" placeholder="数量"></el-input>
-                                <el-button type="primary">确定</el-button>
-                            </div>
-                        </div>-->
                     </div>
                 </div>
                 <div v-if="shopLocaIndex == 2" class="shop-seat">
@@ -480,6 +486,7 @@
                         </div>
                         <!-- 回显的座位图 -->
                         <div
+                            v-if="x&&y"
                             class="seat-box"
                             ref="seatBox"
                             :style="{width:32 * y + 30 + 'px'}"
@@ -577,9 +584,37 @@
                             ></el-input>桌
                         </div>
                         <div class="snacks">
-                            <span class="seat-detail-span">零嘴：</span>
+                            <span class="seat-detail-span snacks">零嘴：</span>
                             <div class="snacks-detail">
-                                <div>
+                                <ul>
+                                    <li v-for="(item,index) in presentSeatInfo.snacks" :key="index">
+                                        <span class="snacks-name" :title="item.name">{{item.name}}</span>
+                                        <span class="mult">
+                                            <i class="el-icon-close"></i>
+                                        </span>
+                                        <span>{{item.num}}</span>
+                                        <el-button type="danger">删除</el-button>
+                                    </li>
+                                </ul>
+                                <div class="snacks-form">
+                                    <el-input
+                                        style="width:90px"
+                                        v-model="snackName"
+                                        placeholder="名称"
+                                        :readonly="isReadonly"
+                                    ></el-input>
+                                    <span class="mult">
+                                        <i class="el-icon-close"></i>
+                                    </span>
+                                    <el-input
+                                        style="width:60px;margin-right:10px"
+                                        v-model="snackNum"
+                                        placeholder="数量"
+                                        :readonly="isReadonly"
+                                    ></el-input>
+                                    <el-button type="primary" @click="addSnacks">确定</el-button>
+                                </div>
+                                <!-- <div>
                                     <span>水果拼盘</span>
                                     <span class="mult">
                                         <i class="el-icon-close"></i>
@@ -587,12 +622,12 @@
                                     <span>2</span>
                                 </div>
 
-                                <el-input style="width:100px" v-model="goodName" placeholder="名称"></el-input>
+                                <el-input style="width:100px" v-model="snackName" placeholder="名称"></el-input>
                                 <span class="mult">
                                     <i class="el-icon-close"></i>
                                 </span>
                                 <el-input style="width:100px" v-model="goodNum" placeholder="数量"></el-input>
-                                <el-button type="primary">确定</el-button>
+                                <el-button type="primary">确定</el-button>-->
                             </div>
                         </div>
                     </div>
@@ -604,10 +639,19 @@
 
 <script>
 import { regionData } from 'element-china-area-data'; //引入外部地址选择器
+import mapCom from '../../components/common/map';
 
 export default {
+    components: {
+        mapCom
+    },
     data() {
         return {
+            mapList: {
+                width: '100%',
+                height: '300px'
+            },
+
             fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
             filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
@@ -617,7 +661,7 @@ export default {
             shopName: '', //店铺名称
             shopBrief: '', //店铺简介
             shopLoca: ['夜店/清吧', 'ktv'], //店铺定位数组
-            shopLocaIndex: 2, //默认的店铺定位下标
+            shopLocaIndex: 1, //默认的店铺定位下标
             dynamicTags: [], //店铺标签数组
             inputVisible: false, //添加店铺标签的输入框开关
             inputValue: '', //店铺标签输入框的输入值
@@ -625,41 +669,32 @@ export default {
             endBussTime: '', //结束营业时间
             addressOptions: regionData, //使用外部地址数组
             regionValue: [], //地址选择器选择后的地址编号
-            country: '锦江区', //区县
-            street: '蜀都大道', //街道
+            province: '', //省
+            city: '', //市
+            district: '', //区县
+            trustAddress: '', //详细地址
             detailAdd: '锦江区水碾河路48号', //详细地址
-            servicePhone: '028-0000 0000', //客服电话
+            servicePhone: '', //客服电话
             shopType: '', //选择的店铺类型
-            //所有店铺类型
-            shopTypeOpt: [
-                {
-                    label: '1',
-                    value: '夜店'
-                },
-                {
-                    label: '2',
-                    value: '清吧'
-                },
-                {
-                    label: '3',
-                    value: 'ktv'
-                }
-            ],
-            perCon: 0, //人均消费
+            shopTypeOpt: ['1', '2', '3', '4'], //所有店铺类型（展示）
+            shopTypeOptStrArr: [],
+            shopTypeOptStr: '', //所选的店铺类型（提交时用到的字符串）
+            perCon: '', //人均消费
             goodsBrief: '', //商品店面简介
             shopMatter: '', //订桌注意事项
             shopRemind: '', //排号商家提醒
 
             dialogVisible: false, //点击放大查看图集时的对话框开关
             bannerImageUrl: '', //图集放大查看地址
-            bannerUploadUrl: '', //上传banner图集的url字符串
+            bannerUploadUrl: '', //上传banner图集时的url字符串
             bannerShowBox: [], //要回显的banner图集（可以显示在自定义的地方）
             bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
             overallImageUrl: '', //商家布局图
-            rowNumImageUrl: '', //排号banner图
+            rowNumImageUrl: '', //排号横幅图
+            appShopImageUrl: '', //店铺长图
 
-            x: 0, //座位行数
-            y: 0, //座位列数
+            x: 20, //座位行数
+            y: 20, //座位列数
 
             //座位属性数组
             seatAttOpt: [
@@ -732,8 +767,8 @@ export default {
                 }
             ],
 
-            goodName: '',
-            goodNum: ''
+            snackName: '', //零嘴名称
+            snackNum: '' //零嘴数量
         };
     },
     methods: {
@@ -777,12 +812,21 @@ export default {
             });
         },
 
-        //上传排号banner图-------------------------------------------------------------------
+        //上传排号横幅图-------------------------------------------------------------------
         uploadRowNumFile(file) {
             let formData = new FormData();
             formData.append('file', file.file);
             this.$post(this.fileUploadUrl, formData).then((res) => {
                 this.rowNumImageUrl = this.showImgPrefix + res.data;
+            });
+        },
+
+        //上传店铺长图-------------------------------------------------------------------
+        uploadAppShopFile(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.appShopImageUrl = this.showImgPrefix + res.data;
             });
         },
 
@@ -806,12 +850,65 @@ export default {
             }
         },
 
+        //选择店铺类型
+        checkType(e, item) {
+            if (!e.target.className) {
+                e.target.classList.add('shop-type-span');
+                this.shopTypeOptStr += item + ',';
+            } else {
+                e.target.classList.remove('shop-type-span');
+
+                if (this.shopTypeOptStr.indexOf(item) !== -1) {
+                    console.log(this.shopTypeOptStr.indexOf(item));
+                    this.shopTypeOptStr.slice(this.shopTypeOptStr.indexOf(item), 1);
+                }
+            }
+            console.log('str', this.shopTypeOptStr);
+        },
+
+        //新增店铺
+        submitShop() {
+            let data = {
+                appListBigPicture: this.appShopImageUrl,
+                businessReminder: this.shopRemind,
+                cassette: `${this.x}+${this.y}`,
+                city: '成都市',
+                cityCode: '000000',
+                customerServicePhone: this.servicePhone,
+                district: '锦江区',
+                districtCode: '111111',
+                endTime: this.endBussTime,
+                goodsStoreSynopsis: this.goodsBrief,
+                labels: this.dynamicTags.join(','),
+                layoutPicture: this.overallImageUrl,
+                logo: this.logoImageUrl,
+                lonlat: '111.222,222.2333',
+                name: this.shopName,
+                perCapitaConsumption: this.perCon,
+                picture: this.bannerUploadUrl,
+                province: '四川省',
+                provinceCode: '222222',
+                rowNumberBanner: this.rowNumImageUrl,
+                startTime: this.startBussTime,
+                storeLocation: this.shopLocaIndex,
+                synopsis: this.shopBrief,
+                tableReservationNotes: this.shopMatter,
+                trustAddress: '财富中心c座',
+                type: this.shopTypeOptStr,
+                layoutList: this.nightEnterSeatDetail
+            };
+
+            this.$post('/dev/merchant/store/save', data).then((res) => {
+                console.log(res);
+                this.getStoreInfo();
+            });
+        },
+
         //提交修改并保存
         submitShopInfo() {
             this.isReadonly = true;
             if (this.isReadonly == true) {
                 this.$message.success('保存成功');
-                console.log(this.bannerShowBox);
             }
         },
 
@@ -848,13 +945,10 @@ export default {
             this.nightEnterSeatDetail.forEach((item) => {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
                     this.presentSeatInfo = item;
+
+                    console.log('vvvv', this.presentSeatInfo);
                 }
             });
-        },
-
-        //修改当前座位信息
-        setSeatInfo(e, style) {
-            e.target.className = style;
         },
 
         //座位点击事件
@@ -862,7 +956,14 @@ export default {
             if (!this.isReadonly) {
                 this.setSeatInfo(e, style);
             }
-            this.lookSeatInfo(e);
+
+            this.lookSeatInfo(e); //查看当前座位信息
+            // console.log(this.nightEnterSeatDetail);
+        },
+
+        //修改当前座位属性
+        setSeatInfo(e, style) {
+            e.target.className = style;
         },
 
         //改变座位状态按钮
@@ -949,84 +1050,124 @@ export default {
 
         //回显店铺数据
         getStoreInfo() {
-            this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
-                console.log(res.data);
-                let result = res.data;
-                this.logoImageUrl = 'img/' + result.logo;
-                this.shopName = result.name;
-                this.shopBrief = result.synopsis;
-                this.dynamicTags = this.strChangeArr(result.labels);
-                this.servicePhone = result.customerServicePhone;
-                this.shopType = this.shopTypeChangeWord(result.type);
-                this.perCon = result.perCapitaConsumption;
-                this.goodsBrief = result.goodsStoreSynopsis;
-                this.shopMatter = result.tableReservationNotes;
-                this.shopRemind = result.businessReminder;
-                this.startBussTime = result.startTime;
-                this.endBussTime = result.endTime;
+            this.$get('/dev/merchant/store/getStoreInfo')
+                .then((res) => {
+                    console.log(1111);
 
-                //banner图集模拟数据
-                let picture =
-                    'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,shangzuo-dev/20200829/d0uqvctvwgzpbwklvrvp.jpg,shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,';
-                this.showBannerImg(picture); //回显banner图集
+                    console.log(res.data);
+                    let result = res.data;
+                    this.logoImageUrl = 'img/' + result.logo;
+                    this.shopName = result.name;
+                    this.shopBrief = result.synopsis;
+                    this.dynamicTags = this.strChangeArr(result.labels);
+                    this.servicePhone = result.customerServicePhone;
+                    this.shopType = this.shopTypeChangeWord(result.type);
+                    this.perCon = result.perCapitaConsumption;
+                    this.goodsBrief = result.goodsStoreSynopsis;
+                    this.shopMatter = result.tableReservationNotes;
+                    this.shopRemind = result.businessReminder;
+                    this.startBussTime = result.startTime;
+                    this.endBussTime = result.endTime;
+                    this.province = result.province;
+                    this.city = result.city;
+                    this.district = result.district;
+                    this.trustAddress = result.trustAddress;
 
-                //门店卡座（模拟数据）--------------------------
-                let cassette = '20x20';
-                this.getShopSeat(cassette); //回显店铺卡座数量
+                    //banner图集模拟数据
+                    let picture =
+                        'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,shangzuo-dev/20200829/d0uqvctvwgzpbwklvrvp.jpg,shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,';
+                    this.showBannerImg(picture); //回显banner图集
 
-                //所有座位（模拟数据）--------------------------
-                let layoutList = [
-                    {
-                        haveToilet: 0,
-                        id: 1298186290748964900,
-                        mahjong: '',
-                        minConsumption: '0.00',
-                        numberOfPeople: 2,
-                        seatAttribute: 3,
-                        seatCode: '1',
-                        seatColumn: 1,
-                        seatLatestReservationTime: '20:30',
-                        seatRow: 1,
-                        seatType: 1,
-                        snacks: '',
-                        softHardStatus: 1,
-                        storeId: 1298186290719604700
-                    },
-                    {
-                        haveToilet: 0,
-                        id: 1298186290748964900,
-                        mahjong: '',
-                        minConsumption: '0.00',
-                        numberOfPeople: 2,
-                        seatAttribute: 4,
-                        seatCode: '2',
-                        seatColumn: 2,
-                        seatLatestReservationTime: '21:30',
-                        seatRow: 1,
-                        seatType: 1,
-                        snacks: '',
-                        softHardStatus: 2,
-                        storeId: 1298186290719604700
-                    }
-                ];
+                    //门店卡座（模拟数据）--------------------------
+                    let cassette = '10x10';
+                    this.getShopSeat(cassette); //回显店铺卡座数量
 
-                //转换返回数组中的软硬座类型（将数值型转为字符型）
-                layoutList.forEach((item) => {
-                    if (item.softHardStatus) {
-                        item.softHardStatus = item.softHardStatus.toString();
+                    //门店类型（模拟数据）
+                    let shopTypeStr = '1,2'; //返回的字符串
+                    this.shopTypeOptStrArr = this.strChangeArr(shopTypeStr); //转换为数组并赋值，回显到页面上
+
+                    //所有座位（模拟数据）--------------------------
+                    let layoutList = [
+                        {
+                            haveToilet: 1,
+                            id: 1298186290748964900,
+                            mahjong: '1',
+                            minConsumption: '0.00',
+                            numberOfPeople: 2,
+                            seatAttribute: 3,
+                            seatCode: '1',
+                            seatColumn: 1,
+                            seatLatestReservationTime: '20:30',
+                            seatRow: 1,
+                            seatType: 1,
+                            snacks: '[{"name" : "水果拼盘","num" : 1},{"name" : "臭豆腐","num" :1}]',
+                            softHardStatus: 1,
+                            storeId: 1298186290719604700
+                        },
+                        {
+                            haveToilet: 2,
+                            id: 1298186290748964900,
+                            mahjong: '2',
+                            minConsumption: '0.00',
+                            numberOfPeople: 2,
+                            seatAttribute: 4,
+                            seatCode: '2',
+                            seatColumn: 2,
+                            seatLatestReservationTime: '21:30',
+                            seatRow: 1,
+                            seatType: 1,
+                            snacks: '[{"name" : "鱼豆腐","num" : 2},{"name" : "好巴食","num" :2}]',
+                            softHardStatus: 2,
+                            storeId: 1298186290719604700
+                        }
+                    ];
+
+                    //json字符串转为数组对象形式（零嘴）
+                    layoutList.forEach((item) => {
+                        item.snacks = JSON.parse(item.snacks);
+                    });
+
+                    //将数值型转为字符型（软硬座和有无卫生间）
+                    layoutList.forEach((item) => {
+                        if (item.softHardStatus || item.haveToilet) {
+                            item.softHardStatus = item.softHardStatus.toString();
+                            item.haveToilet = item.haveToilet.toString();
+                        }
+                    });
+
+                    this.nightEnterSeatDetail = layoutList; //赋值返回的座位信息
+
+                    this.showSeatAtt(); //座位属性回显
+
+                    //商家布局图和排号横幅图模拟
+                    // this.overallImageUrl = result.layoutPicture;
+                    // this.rowNumImageUrl = result.rowNumberBanner;
+                    this.overallImageUrl = 'img/img.jpg';
+                    this.rowNumImageUrl = 'img/img.jpg';
+                    this.appShopImageUrl = 'img/img.jpg';
+                })
+                .catch((res) => {
+                    console.log(res);
+                    if (res.code == 600) {
+                        this.$confirm(res.msg, '提示', {
+                            confirmButtonText: '添加门店',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        })
+                            .then(() => {
+                                this.isReadonly = false;
+                                this.createSeatFn();
+                            })
+                            .catch(() => {
+                                this.$router.push('/index');
+                            });
                     }
                 });
+        },
 
-                this.nightEnterSeatDetail = layoutList; //赋值返回的座位信息
-
-                this.showSeatAtt(); //座位属性回显
-
-                //商家布局图和排号banner图模拟
-                // this.overallImageUrl = result.layoutPicture;
-                // this.rowNumImageUrl = result.rowNumberBanner;
-                this.overallImageUrl = 'img/img.jpg';
-                this.rowNumImageUrl = 'img/img.jpg';
-            });
+        //添加零嘴
+        addSnacks() {
+            console.log(this.snackName, this.snackNum);
         },
 
         //座位属性回显
@@ -1069,8 +1210,53 @@ export default {
             }
         },
 
+        //创建座位
+        createSeatFn() {
+            this.nightEnterSeatDetail = [];
+            //根据行数和列数动态的创建座位
+            for (let i = 1; i <= this.y; i++) {
+                for (let j = 1; j <= this.x; j++) {
+                    this.nightEnterSeatDetail.push({
+                        haveToilet: 1,
+                        mahjong: '',
+                        minConsumption: '',
+                        numberOfPeople: 1,
+                        seatAttribute: 2,
+                        seatCode: '',
+                        seatColumn: i,
+                        seatLatestReservationTime: '',
+                        seatRow: j,
+                        snacks: '',
+                        softHardStatus: 1
+                    });
+                }
+            }
+            // console.log('xxx', this.nightEnterSeatDetail);
+        },
+
         //修改店铺数据
-        setStoreInfo() {}
+        setStoreInfo() {},
+
+        //修改座位数量提示
+        changeSeatAlert() {}
+    },
+
+    watch: {
+        //监听x属性的值
+        x(newVal, oldVal) {
+            if (oldVal != newVal) {
+                this.createSeatFn();
+                console.log(newVal, oldVal);
+            }
+        },
+
+        //监听y属性的值
+        y(newVal, oldVal) {
+            if (oldVal != newVal) {
+                this.createSeatFn();
+                console.log(newVal, oldVal);
+            }
+        }
     },
 
     created() {},
@@ -1096,7 +1282,7 @@ export default {
 .container {
     box-sizing: border-box;
     display: flex;
-    padding: 30px;
+    padding: 20px;
 }
 
 .left-wrap {
@@ -1196,13 +1382,17 @@ export default {
     height: 200px;
 }
 
-.shop-info .rowNum-box > p {
+.shop-info .rowNum-box div > p {
     margin-bottom: 10px;
 }
 
-.shop-info .rowNum-box > img {
+.shop-info .rowNum-box div.top {
+    margin-bottom: 30px;
+}
+
+.shop-info .rowNum-box div > img {
     width: 200px;
-    height: 160px;
+    height: 120px;
 }
 
 .left-wrap .shop-info .right-info {
@@ -1348,12 +1538,13 @@ export default {
     margin-bottom: 10px;
 }
 
-.left-wrap .per-con {
-    margin-bottom: 30px;
+.left-wrap .per-con > p {
+    margin-bottom: 10px;
+    /* margin-bottom: 30px; */
 }
 
-.shop-type {
-    margin-bottom: 30px;
+.left-wrap .shop-type {
+    /* margin-bottom: 30px; */
 }
 
 .shop-type > p {
@@ -1366,8 +1557,7 @@ export default {
     clear: both;
 }
 
-.shop-type .type-box > span {
-    background-color: #ecf5ff;
+.shop-type .type-box div > span {
     display: inline-block;
     height: 32px;
     padding: 0 10px;
@@ -1379,6 +1569,11 @@ export default {
     margin: 0 10px 10px 0;
     box-sizing: border-box;
     white-space: nowrap;
+    cursor: pointer;
+}
+
+.shop-type-span {
+    background-color: #ecf5ff;
 }
 
 .shop-label .labels > span {
@@ -1395,6 +1590,9 @@ export default {
 .right-wrap {
     height: 100%;
     width: 100%;
+    /* white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; */
 }
 
 .right-wrap h4 {
@@ -1427,6 +1625,7 @@ export default {
 
 >>> .el-textarea__inner {
     resize: none !important;
+    line-height: 1.9;
 }
 
 >>> .el-upload-list--picture-card .el-upload-list__item {
@@ -1601,6 +1800,10 @@ export default {
     width: 120px;
 }
 
+.shop-seat .right-box > div > span.snacks {
+    width: 48px;
+}
+
 .shop-seat .right-box .seat-detail {
     margin-bottom: 30px;
 }
@@ -1620,8 +1823,27 @@ export default {
     margin-right: 20px;
 }
 
-.snacks .snacks-detail {
-    float: left;
+.snacks .snacks-detail li {
+    /* float: left; */
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.snacks .snacks-detail li .snacks-name {
+    max-width: 132px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.snacks .snacks-form {
+    display: flex;
+    align-items: center;
+}
+
+>>> .snacks .snacks-form .el-input__inner {
+    padding: 0 8px;
 }
 
 .snacks .snacks-detail div span:first-child {
@@ -1675,6 +1897,6 @@ export default {
 }
 
 .mult {
-    margin: 0 10px;
+    margin: 0 3px;
 }
 </style>
