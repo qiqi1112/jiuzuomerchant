@@ -16,11 +16,11 @@
                 <span>{{value}}</span>
                 <span class="changeCity" @click.stop="showCityFun()">切换城市</span>
                 <div class="cityList" v-if="showCity">
-                    <div class="all" v-for="(c,i) in city" :key="i" style="display:flex">
-                        <div class="province" style="flex:.3">
+                    <div class="all" v-for="(c,i) in city" :key="i">
+                        <div class="province">
                             <span>{{c.label}}</span>
                         </div> 
-                        <div class="city" style="flex:.7">
+                        <div class="city">
                             <span @click="changeCity(j)" v-for="(j,index) in c.children" :key="index">{{j.label}}</span>
                         </div>
                     </div>
@@ -133,11 +133,9 @@ export default {
                 this.maiHeight = this.mapList.height ? this.mapList.height : '600px';
                 if(this.mapList.searchAddress){
                     this.fristForm.address = this.mapList.searchAddress
-
                     this.$nextTick(() => {
                         this.changeStr()
                     });
-
                 }
                 if(this.mapList.trustAddress){
                     this.fristForm.dtl_address = this.mapList.trustAddress
@@ -149,7 +147,6 @@ export default {
         },
         showPositionErr(err){
             this.cityTrue = false
-            console.log(2222222)
             this.value = '成都市'
             this.fristForm.longitude = 104.08329
             this.fristForm.latitude = 30.65618
@@ -172,14 +169,14 @@ export default {
         },
         changeStr(data){
             let address = encodeURI(this.fristForm.address)
-            console.log(this.fristForm.address)
             this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`).then(res=>{
-                console.log(res)
                 if(res.status == 0){
                     this.addressLists = res.data
+                }else if(res.status == 330){
+                    this.addressLists = []
                 }else{
                     this.$message({
-                        message: '地图参数错误，请刷新后再试',
+                        message: '遇到一点问题~，请刷新后再试',
                         type: 'warning'
                     });
                 }
@@ -378,6 +375,15 @@ export default {
                     }
                     span:hover{
                         color: red;
+                    }
+                }
+                .all{
+                    display:flex;
+                    .province{
+                        flex: .3;
+                    }
+                    .city{
+                        flex: .7;
                     }
                 }
             }
