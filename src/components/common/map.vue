@@ -1,10 +1,9 @@
 <template>
     <div id="map">
         <div class="seac_address">
-            <span @click.stop>
+            <span @click.stop class="pro_add">
                 <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
                 <!-- <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button> -->
-                <el-input v-if="mapList.status" v-model="fristForm.dtl_address" placeholder="请输入详细地址"></el-input>
             </span>
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
             <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input> -->
@@ -22,7 +21,9 @@
                     </div>
                 </div>
             </div>
-
+            <div class="dtl_add">
+                <el-input v-if="mapList.status" v-model="fristForm.dtl_address" placeholder="请输入详细地址"></el-input>
+            </div>
             <ul class="add_list" v-if="showList">
                 <div v-if="addressLists!=''">
                     <li @click="assignText(item)" v-for="(item,index) in addressLists" :key="index">
