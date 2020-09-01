@@ -237,7 +237,7 @@
                         ></el-input>
                     </div>
                     <!-- 排号商家提醒 -->
-                    <div class="shop-remind">
+                    <!-- <div class="shop-remind">
                         <span>排号商家提醒：</span>
                         <el-input
                             type="textarea"
@@ -247,7 +247,7 @@
                             style="width:76%"
                             :readonly="isReadonly"
                         ></el-input>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
