@@ -3,7 +3,8 @@
         <div class="seac_address">
             <span @click.stop>
                 <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
-                <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button>
+                <!-- <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button> -->
+                <el-input v-if="mapList.status" v-model="fristForm.dtl_address" placeholder="请输入详细地址"></el-input>
             </span>
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
             <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input> -->
@@ -25,13 +26,8 @@
             <ul class="add_list" v-if="showList">
                 <div v-if="addressLists!=''">
                     <li @click="assignText(item)" v-for="(item,index) in addressLists" :key="index">
-<<<<<<< HEAD
                         {{item.title}} 
                         <span>{{item.address}}</span>    
-=======
-                        {{item.name}}
-                        <span>{{item.address}}</span>
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
                     </li>
                 </div>
                 <div v-else class="notAdd">没有相关地址~</div>
@@ -53,9 +49,9 @@ export default {
             fristForm: {
                 longitude: '', //经度
                 latitude: '', //纬度
-                address: '' //输入的地址
+                address: '', //输入的地址
+                dtl_address:'',//详细地址
             },
-<<<<<<< HEAD
             add_info:'',//子组件传值    
             markersArray:[],
             addressLists: [],//下拉菜单数据
@@ -63,14 +59,6 @@ export default {
             value:'',
             searchService:'',
             geocoder:'',
-=======
-            markersArray: [],
-            addressLists: [],
-            city: [],
-            value: '',
-            searchService: '',
-            geocoder: ''
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
         };
     },
     props:{
@@ -89,6 +77,7 @@ export default {
         if (this.mapList) {
             this.mapWidth = this.mapList.width ? this.mapList.width : '1000px';
             this.maiHeight = this.mapList.height ? this.mapList.height : '600px';
+            console.log(this.mapList)
         }
         this.city = city;
     },
@@ -108,15 +97,14 @@ export default {
     },
     methods:{
         // 没有 点击下拉菜单时默认赋值返回数据第一个
-        defGet(){
-            if(this.add_info == ''){
-                this.add_info = this.addressLists[0]
-                this.value = this.addressLists[0].title
-                this.fristForm.longitude = this.addressLists[0].location.lng
-                this.fristForm.latitude = this.addressLists[0].location.lat
-            }
-            console.log(this.add_info)
-        },
+        // defGet(){
+        //     if(this.add_info == ''){
+        //         this.add_info = this.addressLists[0]
+        //         this.fristForm.longitude = this.addressLists[0].location.lng
+        //         this.fristForm.latitude = this.addressLists[0].location.lat
+        //     }
+        //     console.log(this.add_info)
+        // },
         childData(){
             console.log(this.add_info)
             this.$emit('child-data',this.add_info)
@@ -125,7 +113,6 @@ export default {
             this.$store.commit('change', 1);
         },
         showPosition(position) {
-<<<<<<< HEAD
             this.value = position.city
             this.fristForm.longitude = position.lng
             this.fristForm.latitude = position.lat
@@ -134,16 +121,6 @@ export default {
             this.value = '成都市'
             this.fristForm.longitude = 104.08329
             this.fristForm.latitude = 30.65618
-=======
-            this.value = position.province;
-            this.fristForm.longitude = position.lng;
-            this.fristForm.latitude = position.lat;
-        },
-        showPositionErr(err) {
-            this.value = '四川省';
-            this.fristForm.longitude = 104.10194;
-            this.fristForm.latitude = 30.65984;
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
         },
         // 关闭弹窗
         close() {
@@ -161,7 +138,6 @@ export default {
             }
             this.fun = setTimeout(fn, wait);
         },
-<<<<<<< HEAD
         changeStr:function(data){
             let address = encodeURI(this.fristForm.address)
             this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`).then(res=>{
@@ -178,9 +154,6 @@ export default {
                 console.log(err)
             })
             
-=======
-        changeStr: function (data) {
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
             this.searchService.search(this.fristForm.address);
             return
             this.searchService.setLocation(this.value);
@@ -203,7 +176,6 @@ export default {
         },
 
         // 点击搜索结果赋值、
-<<<<<<< HEAD
         assignText(val){
             // 调用接口时
             this.add_info = val
@@ -233,13 +205,6 @@ export default {
             // this.fristForm.longitude = val.latLng.lng
             // this.fristForm.latitude = val.latLng.lat
             // this.fristForm.address = val.name
-=======
-        assignText(val) {
-            this.$store.commit('change', 3);
-            this.fristForm.longitude = val.latLng.lng;
-            this.fristForm.latitude = val.latLng.lat;
-            this.fristForm.address = val.name;
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
         },
         // 切换城市
         changeCity(val) {
@@ -271,13 +236,8 @@ export default {
                     margin: qq.maps.Size(85, 15),
                     map: map
                 });
-<<<<<<< HEAD
                 //绑定单击事件添加参数  点击地图
                 qq.maps.event.addListener(map, 'click', function(event) {
-=======
-                //绑定单击事件添加参数
-                qq.maps.event.addListener(map, 'click', function (event) {
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
                     that.fristForm.longitude = event.latLng.getLng(); // 经度
                     that.fristForm.latitude = event.latLng.getLat(); // 纬度
                     if (that.markersArray) {
@@ -310,21 +270,14 @@ export default {
 
                 // 本地查询 不调用接口
                 this.searchService = new qq.maps.SearchService({
-<<<<<<< HEAD
                     complete : function(results){
                         // that.addressLists = results.detail.pois
                         // console.log(results.detail.pois,22222222222)
                         if(results.type === "CITY_LIST") {
-=======
-                    complete: function (results) {
-                        that.addressLists = results.detail.pois;
-                        if (results.type === 'CITY_LIST') {
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
                             that.searchService.setLocation(results.detail.cities[0].cityName);
                             that.searchService.search(that.fristForm.address);
                             return;
                         }
-<<<<<<< HEAD
                             // var pois = that.addressLists;
                             // console.log(results.detail.pois,1)
                             // console.log(that.addressLists,1)
@@ -336,17 +289,6 @@ export default {
                             //         map:map,
                             //         position: poi.location
                             //     });
-=======
-                        var pois = results.detail.pois;
-                        var latlngBounds = new qq.maps.LatLngBounds();
-                        for (var i = 0, l = pois.length; i < l; i++) {
-                            var poi = pois[i];
-                            latlngBounds.extend(poi.latLng);
-                            var marker = new qq.maps.Marker({
-                                map: map,
-                                position: poi.latLng
-                            });
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
 
                             //     marker.setTitle(poi.title);
                             // }
@@ -440,22 +382,18 @@ export default {
                 box-shadow: 0 2px 5px #5a5a5a;
                 border-radius: 5px;
                 top: 25px;
-<<<<<<< HEAD
                 height: 400px;
                 overflow-y: scroll;
                 span{
-=======
-                span {
->>>>>>> 076f1afa29b1ac4ae862c90ab9eda434ea7c5468
                     margin-right: 10px;
                     margin-bottom: 10px;
-                    cursor: pointer;
                     display: inline-block;
                     // width: 25%;
                 }
                 .city{
                     span{
                         color: #676767;
+                        cursor: pointer;
                     }
                     span:hover{
                         color: red;
