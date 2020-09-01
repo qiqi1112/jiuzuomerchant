@@ -197,7 +197,7 @@
                         <span>{{trustAddress}}</span>
                     </p>
                     <div v-else>
-                        <el-input v-model="trustAddress" placeholder="请输入店铺详细地址"></el-input>
+                        <!-- <el-input v-model="trustAddress" placeholder="请输入店铺详细地址"></el-input> -->
                         <mapCom @child-data="childData" :mapList="mapList"></mapCom>
                     </div>
 
@@ -701,10 +701,13 @@ export default {
 
     data() {
         return {
+            //传给地图子组件的值
             mapList: {
                 width: '100%',
                 height: '300px',
-                status : true
+                status: true,
+                searchAddress: '',
+                trustAddress: ''
             },
 
             fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
@@ -712,6 +715,8 @@ export default {
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
             isReadonly: true, //编辑信息开关（默认只读）
+            isUpdate: true, //判断当前编辑是否为修改操作
+            shopId: '', //门店ID
             logoImageUrl: '', //店铺logo
             shopName: '', //店铺名称
             shopBrief: '', //店铺简介
@@ -726,12 +731,11 @@ export default {
             regionValue: [], //地址选择器选择后的地址编号
 
             province: '', //省
-            // provinceCode: '', //省编码
             city: '', //市
-            // cityCode: '', //市编码
             district: '', //区县
             districtCode: '', //区县编码
-            trustAddress: '', //详细地址
+            searchAddress: '', //地址搜索框里的值
+            trustAddress: '', //输入的详细地址
             longitude: '', //经度
             latitude: '', //纬度
 
@@ -792,59 +796,10 @@ export default {
             presentSeatInfo: {},
 
             //夜店/清吧对应的座位信息
-            nightEnterSeatDetail: [
-                // {
-                //     id: 1, //id
-                //     seatAttribute: 2, //座位属性（1-不可预定 2-可预定 3-预定中 4-已预订）
-                //     seatCode: '1', //座位号
-                //     softHardStatus: '1', //软硬座类型（1-软座 2-硬座）
-                //     numberOfPeople: '1', //容纳人数
-                //     minConsumption: '100', //最低消费
-                //     seatLatestReservationTime: '20:30', //座位保留最晚时间
-                //     seatColumn: 1, //列
-                //     seatRow: 1, //行
-                // },
-                // {
-                //     id: 2, //id
-                //     seatAttribute: 4, //座位属性（1-不可预定 2-可预定 3-预定中 4-已预订）
-                //     seatCode: '2', //座位号
-                //     softHardStatus: '2', //软硬座类型（1-软座 2-硬座）
-                //     numberOfPeople: '2', //容纳人数
-                //     minConsumption: '200', //最低消费
-                //     seatLatestReservationTime: '21:30', //座位保留最晚时间
-                //     seatColumn: 2, //列
-                //     seatRow: 1, //行
-                // }
-            ],
-
-            //ktv对应的座位信息
-            ktvSeatDetail: [
-                {
-                    id: 0, //id
-                    seatAttribute: 2, //包间属性（1-不可预定 2-可预定 3-预定中 4-已预订）
-                    seatCode: '', //包间号/名称
-                    numberOfPeople: '', //容纳人数
-                    minConsumption: '', //最低消费
-                    seatLatestReservationTime: '', //座位保留最晚时间
-                    haveToilet: '1', //是否有独立卫生间（1-有 2-无）
-                    mahjong: '', //机麻
-                    snacks: '', //零嘴
-                    seatColumn: 0, //列
-                    seatRow: 0, //行
-                    seatType: 1 //座位类型（1-普通座位 2-卡座 3-过道）
-                }
-            ],
+            nightEnterSeatDetail: [],
 
             snackName: '', //当前座位的零嘴名称
             snackNum: '' //当前座位的零嘴数量
-            // snacksJson: '' //保存当前座位的零嘴json字符串
-
-            //传给子组件店铺展示图的参数
-            // shopShowImgProp: {
-            //     isReadonly: true,
-            //     picture: '', //请求返回的图集地址
-            //     bannerImgBox: []
-            // },
         };
     },
     methods: {
@@ -899,6 +854,7 @@ export default {
                 this.city = data.ad_info.city;
                 this.district = data.ad_info.district;
                 this.districtCode = data.ad_info.adcode;
+                this.searchAddress = data.title;
                 console.log(data);
             }
         },
@@ -985,18 +941,20 @@ export default {
                 e.target.classList.remove('shop-type-span');
                 this.shopTypeOptStr = this.shopTypeOptStr.replace(item + ',', '');
             }
-
-            // this.shopTypeOptStr = this.shopTypeOptStr.slice(0, this.shopTypeOptStr.length - 1);
-            console.log('str', this.shopTypeOptStr.slice(0, this.shopTypeOptStr.length - 1));
+            // console.log('str', this.shopTypeOptStr.slice(0, this.shopTypeOptStr.length - 1));
         },
 
         //编辑商铺信息
         editShopInfo() {
             this.isReadonly = false;
+
+            //给地图子组件传值
+            this.mapList.searchAddress = this.searchAddress;
+            this.mapList.trustAddress = this.trustAddress;
         },
 
         //新增店铺
-        submitShop() {
+        submitCreatShop() {
             //数组转json形式（零嘴）
             this.nightEnterSeatDetail.forEach((item) => {
                 item.snacks = JSON.stringify(item.snacks);
@@ -1010,15 +968,15 @@ export default {
                 }
             });
 
+            //要传的值
             let data = {
                 appListBigPicture: this.appShopImageUrl,
                 businessReminder: this.shopRemind,
                 cassette: `${this.x}x${this.y}`,
-                city: '成都市',
-                // cityCode: '000000',
+                city: this.city,
                 customerServicePhone: this.servicePhone,
-                district: '锦江区',
-                districtCode: '111111',
+                district: this.district,
+                districtCode: this.districtCode,
                 endTime: this.endBussTime,
                 goodsStoreSynopsis: this.goodsBrief,
                 labels: this.dynamicTags.join(','),
@@ -1028,37 +986,107 @@ export default {
                 name: this.shopName,
                 perCapitaConsumption: this.perCon,
                 picture: this.bannerUploadUrl,
-                province: '四川省',
-                // provinceCode: '222222',
+                province: this.province,
                 rowNumberBanner: this.rowNumImageUrl,
+                searchAddress: this.searchAddress,
                 startTime: this.startBussTime,
                 storeLocation: this.shopLocaIndex,
                 synopsis: this.shopBrief,
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
-                type: this.shopTypeOptStr.slice(0, this.shopTypeOptStr.length - 1),
+                trustAddress: '倪家桥店小二',
+                type: this.shopTypeOptStr,
                 layoutList: this.nightEnterSeatDetail
             };
 
-            console.log('xxx', this.nightEnterSeatDetail);
-
-            // this.$post('/dev/merchant/store/save', data)
-            //     .then((res) => {
-            //         console.log(res);
-            //         this.getStoreInfo();
-            //         this.$message.success('保存成功');
-            //     })
-            //     .catch((err) => {
-            //         console.log(err);
-            //     });
+            this.$post('/dev/merchant/store/save', data)
+                .then((res) => {
+                    console.log(res);
+                    if (res.code == 0) {
+                        this.getStoreInfo();
+                        this.$message.success('添加成功');
+                        this.isReadonly = true;
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.isReadonly = true;
+                });
         },
 
-        //提交修改并保存
+        //修改店铺
+        submitUpdateShop() {
+            //数组转json形式（零嘴）
+            this.nightEnterSeatDetail.forEach((item) => {
+                item.snacks = JSON.stringify(item.snacks);
+            });
+
+            //将数值型转为字符型（软硬座和有无卫生间）
+            this.nightEnterSeatDetail.forEach((item) => {
+                if (item.softHardStatus || item.haveToilet) {
+                    item.softHardStatus = Number(item.softHardStatus);
+                    item.haveToilet = Number(item.haveToilet);
+                }
+            });
+
+            //要传的值
+            let data = {
+                id: this.shopId,
+                appListBigPicture: this.appShopImageUrl,
+                businessReminder: this.shopRemind,
+                cassette: `${this.x}x${this.y}`,
+                city: this.city,
+                customerServicePhone: this.servicePhone,
+                district: this.district,
+                districtCode: this.districtCode,
+                endTime: this.endBussTime,
+                goodsStoreSynopsis: this.goodsBrief,
+                labels: this.dynamicTags.join(','),
+                layoutPicture: this.overallImageUrl,
+                logo: this.logoImageUrl,
+                lonlat: `${this.longitude},${this.latitude}`,
+                name: this.shopName,
+                perCapitaConsumption: this.perCon,
+                picture: this.bannerUploadUrl,
+                province: this.province,
+                rowNumberBanner: this.rowNumImageUrl,
+                searchAddress: this.searchAddress,
+                startTime: this.startBussTime,
+                storeLocation: this.shopLocaIndex,
+                synopsis: this.shopBrief,
+                tableReservationNotes: this.shopMatter,
+                trustAddress: this.trustAddress,
+                trustAddress: '倪家桥店小二',
+                type: this.shopTypeOptStr,
+                layoutList: this.nightEnterSeatDetail
+            };
+
+            this.$put('/dev/merchant/store/update', data)
+                .then((res) => {
+                    if (res.code == 0) {
+                        this.getStoreInfo();
+                        this.$message.success('修改成功');
+                        this.isReadonly = true;
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.isReadonly = true;
+                });
+        },
+
+        //保存按钮
         submitShopInfo() {
-            this.isReadonly = true;
-            if (this.isReadonly == true) {
-                this.submitShop();
-                // this.$message.success('保存成功');
+            if (this.isReadonly == false) {
+                if (this.isUpdate == false) {
+                    this.submitCreatShop(); //新增店铺
+                } else {
+                    this.submitUpdateShop(); //修改店铺
+                }
             }
         },
 
@@ -1086,7 +1114,7 @@ export default {
             this.inputValue = '';
         },
 
-        //查看当前座位信息
+        //查看当前座位信息（修改和添加的情况下）
         lookSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
@@ -1107,6 +1135,20 @@ export default {
             });
 
             console.log(seatType);
+        },
+
+        //查看当前座位信息
+        lookSeatInfo2(e) {
+            let seatRow = Number(e.target.dataset.indexx); //行
+            let seatColumn = Number(e.target.dataset.indexy); //列
+
+            //匹配当前座位信息
+            this.nightEnterSeatDetail.forEach((item) => {
+                if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
+                    this.presentSeatInfo = item;
+                    console.log('当前点击的座位信息', this.presentSeatInfo);
+                }
+            });
         },
 
         //座位点击事件
@@ -1136,7 +1178,7 @@ export default {
                 this.setSeatInfo(e, style);
                 this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息
             } else {
-                this.lookSeatInfo(e); //查看当前座位信息
+                this.lookSeatInfo2(e, seatType, stageCode); //查看当前座位信息
             }
         },
 
@@ -1169,8 +1211,9 @@ export default {
             return newRes;
         },
 
-        //banner图集回显
+        //回显banner图集
         showBannerImg(picStr) {
+            this.bannerImgBox = [];
             this.bannerShowBox = this.imgStrChangeArr(picStr.slice(0, picStr.length - 1)); //回显在自定义的位置
             let pictureArr = this.imgStrChangeArr(picStr.slice(0, picStr.length - 1)); //回显在上传图集的容器中
             pictureArr.forEach((item) => {
@@ -1185,7 +1228,6 @@ export default {
             seat = seat.split('x');
             this.x = seat[0];
             this.y = seat[1];
-            // console.log(this.x,this.y);
         },
 
         //回显经纬度
@@ -1197,17 +1239,17 @@ export default {
 
         //回显店铺数据
         getStoreInfo() {
-            this.$get('/dev/merchant/store/getStoreInfo')
-                .then((res) => {
+            this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
+                if (res.code == 0) {
                     console.log(res.data);
                     let result = res.data;
 
                     //返回的所有属性
+                    this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
                     this.shopRemind = result.businessReminder;
                     let cassette = result.cassette;
                     this.city = result.city;
-                    // this.cityCode = result.cityCode;
                     this.servicePhone = result.customerServicePhone;
                     this.district = result.district;
                     this.districtCode = result.districtCode;
@@ -1220,40 +1262,32 @@ export default {
                     this.shopName = result.name;
                     this.perCon = result.perCapitaConsumption;
                     let picture = result.picture;
+                    this.bannerUploadUrl = result.picture;
                     this.province = result.province;
-                    // this.provinceCode = result.provinceCode;
                     this.rowNumImageUrl = result.rowNumberBanner;
+                    this.searchAddress = result.searchAddress;
                     this.startBussTime = result.startTime;
                     this.shopLocaIndex = result.storeLocation;
                     this.shopBrief = result.synopsis;
                     this.shopMatter = result.tableReservationNotes;
                     this.trustAddress = result.trustAddress;
                     let shopTypeStr = result.type;
+                    this.shopTypeOptStr = result.type;
                     let layoutList = result.layoutList;
 
-                    // 店铺定位（模拟数据）
-                    // this.shopLocaIndex = 1;
-
-                    //banner图集（模拟数据）
-                    // picture = 'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,shangzuo-dev/20200829/d0uqvctvwgzpbwklvrvp.jpg,shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg,';
+                    //回显banner图集
                     this.showBannerImg(picture);
 
-                    //店铺图片（模拟数据）
-                    // this.appShopImageUrl = 'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg';
-                    // this.logoImageUrl = 'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg';
-                    // this.overallImageUrl = 'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg';
-                    // this.rowNumImageUrl = 'shangzuo-dev/20200829/vc1ljtgidmg5xlnn5gq4.jpg';
-
-                    //门店卡座（模拟数据）
-                    // cassette = '20x20';
-                    this.getShopSeat(cassette); //回显店铺卡座数量
+                    //回显店铺卡座数量
+                    this.getShopSeat(cassette);
 
                     //经纬度
                     this.getlonlat(lonlat); //回显经纬度
 
                     //门店类型（模拟数据）
                     // shopTypeStr = '1,2'; //返回的字符串
-                    this.shopTypeOptStrArr = this.strChangeArr(shopTypeStr); //转换为数组并赋值，回显到页面上
+
+                    this.shopTypeOptStrArr = this.strChangeArr(shopTypeStr.slice(0, shopTypeStr.length - 1)); //转换为数组并赋值，回显到页面上
 
                     //所有座位（模拟数据）
                     // layoutList = [
@@ -1307,24 +1341,22 @@ export default {
                     this.showSeatAtt(); //座位属性回显
 
                     this.initShopLocaStyle(); //店铺定位样式初始化
-                })
-                .catch((res) => {
-                    console.log(res);
-                    if (res.code == 600) {
-                        this.$confirm(res.msg, '提示', {
-                            confirmButtonText: '添加门店',
-                            cancelButtonText: '取消',
-                            type: 'warning'
+                } else if (res.code == 600) {
+                    this.isUpdate = false;
+                    this.$confirm(res.msg, '提示', {
+                        confirmButtonText: '添加门店',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    })
+                        .then(() => {
+                            this.isReadonly = false;
+                            this.createSeatFn();
                         })
-                            .then(() => {
-                                this.isReadonly = false;
-                                this.createSeatFn();
-                            })
-                            .catch(() => {
-                                this.$router.push('/index');
-                            });
-                    }
-                });
+                        .catch(() => {
+                            this.$router.push('/index');
+                        });
+                }
+            });
         },
 
         //添加零嘴
@@ -1381,6 +1413,10 @@ export default {
                                 case 4:
                                     item.classList.add('inBook');
                                     break;
+                            }
+
+                            if (item2.seatType == 4) {
+                                item.classList.add('stageBook');
                             }
                         }
                     });
@@ -1690,6 +1726,10 @@ export default {
 
 .left-wrap .bussiness-hours .time-select > span {
     margin: 0 10px;
+}
+
+>>> .left-wrap .shop-address .dtl_add {
+    margin: 10px 0;
 }
 
 .left-wrap .shop-address {
