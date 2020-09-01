@@ -3,20 +3,28 @@
         <div class="seac_address">
             <span @click.stop>
                 <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
+                <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button>
             </span>
-            <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
-            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>
+            <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
+            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input> -->
             <div class="city" @click.stop>
                 <span>{{value}}</span><span class="changeCity" @click.stop="showCityFun()">切换城市</span>
                 <div class="cityList" v-if="showCity">
-                    <span @click="changeCity(c)" v-for="(c,i) in city" :key="i">{{c.label}}</span>
+                    <div class="all" v-for="(c,i) in city" :key="i" style="display:flex">
+                        <div class="province" style="flex:.3">
+                            <span>{{c.label}}</span>
+                        </div> 
+                        <div class="city" style="flex:.7">
+                            <span @click="changeCity(j)" v-for="(j,index) in c.children" :key="index">{{j.label}}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <ul class="add_list" v-if="showList">
                 <div v-if="addressLists!=''">
                     <li @click="assignText(item)" v-for="(item,index) in addressLists" :key="index">
-                        {{item.name}} 
+                        {{item.title}} 
                         <span>{{item.address}}</span>    
                     </li>
                 </div>
@@ -44,8 +52,9 @@ export default {
                 latitude:'',//纬度
                 address:''
             },
+            add_info:'',//子组件传值    
             markersArray:[],
-            addressLists: [],
+            addressLists: [],//下拉菜单数据
             city:[],
             value:'',
             searchService:'',
@@ -85,21 +94,32 @@ export default {
         },
     },
     methods:{
+        // 没有 点击下拉菜单时默认赋值返回数据第一个
+        defGet(){
+            if(this.add_info == ''){
+                this.add_info = this.addressLists[0]
+                this.value = this.addressLists[0].title
+                this.fristForm.longitude = this.addressLists[0].location.lng
+                this.fristForm.latitude = this.addressLists[0].location.lat
+            }
+            console.log(this.add_info)
+        },
         childData(){
-            this.$emit('child-data',this.fristForm)
+            console.log(this.add_info)
+            this.$emit('child-data',this.add_info)
         },
         showCityFun(){
             this.$store.commit('change', 1)
         },
         showPosition(position) {
-            this.value = position.province
+            this.value = position.city
             this.fristForm.longitude = position.lng
             this.fristForm.latitude = position.lat
         },
         showPositionErr(err){
-            this.value = '四川省'
-            this.fristForm.longitude = 104.10194
-            this.fristForm.latitude = 30.65984
+            this.value = '成都市'
+            this.fristForm.longitude = 104.08329
+            this.fristForm.latitude = 30.65618
         },
         // 关闭弹窗
         close(){
@@ -118,15 +138,72 @@ export default {
             this.fun = setTimeout(fn,wait)
         },
         changeStr:function(data){
+            let address = encodeURI(this.fristForm.address)
+            this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`).then(res=>{
+                if(res.status == 0){
+                    this.addressLists = res.data
+                    // this.mapControls(res.data)
+                }else{
+                    this.$message({
+                        message: '地图参数错误，请刷新后再试',
+                        type: 'warning'
+                    });
+                }
+            }).catch(err=>{
+                console.log(err)
+            })
+            
             this.searchService.search(this.fristForm.address);
+            return
             this.searchService.setLocation(this.value);
         },
+        // 地图控件  展示
+        mapControls(data){
+            var pois = data;
+            var latlngBounds = new qq.maps.LatLngBounds();
+            for(var i = 0,l = pois.length;i < l; i++){
+                var poi = pois[i];
+                latlngBounds.extend(poi.latLng);  
+                var marker = new qq.maps.Marker({
+                    map:map,
+                    position: poi.latLng
+                });
+
+                marker.setTitle(poi.name);
+            }
+            map.fitBounds(latlngBounds);
+        },
+
         // 点击搜索结果赋值、
         assignText(val){
+            // 调用接口时
+            this.add_info = val
             this.$store.commit('change', 3)
-            this.fristForm.longitude = val.latLng.lng
-            this.fristForm.latitude = val.latLng.lat
-            this.fristForm.address = val.name
+            this.fristForm.longitude = val.location.lng
+            this.fristForm.latitude = val.location.lat
+            this.fristForm.address = val.title
+
+
+            // var pois = results.detail.pois;
+            // var latlngBounds = new qq.maps.LatLngBounds();
+            // for(var i = 0,l = pois.length;i < l; i++){
+            //     var poi = pois[i];
+            //     latlngBounds.extend(poi.latLng);  
+            //     var marker = new qq.maps.Marker({
+            //         map:map,
+            //         position: poi.latLng
+            //     });
+
+            //     marker.setTitle(poi.name);
+            // }
+            // map.fitBounds(latlngBounds);
+
+
+
+            // 本地搜索时 展示 
+            // this.fristForm.longitude = val.latLng.lng
+            // this.fristForm.latitude = val.latLng.lat
+            // this.fristForm.address = val.name
         },
         // 切换城市
         changeCity(val){
@@ -158,7 +235,7 @@ export default {
                     margin: qq.maps.Size(85, 15),
                     map: map
                 });
-                //绑定单击事件添加参数
+                //绑定单击事件添加参数  点击地图
                 qq.maps.event.addListener(map, 'click', function(event) {
                     that.fristForm.longitude = event.latLng.getLng(); // 经度
                     that.fristForm.latitude = event.latLng.getLat(); // 纬度
@@ -190,27 +267,50 @@ export default {
                     }
                 });
 
+                // 本地查询 不调用接口
                 this.searchService = new qq.maps.SearchService({
                     complete : function(results){
-                        that.addressLists = results.detail.pois
+                        // that.addressLists = results.detail.pois
+                        // console.log(results.detail.pois,22222222222)
                         if(results.type === "CITY_LIST") {
                             that.searchService.setLocation(results.detail.cities[0].cityName);
                             that.searchService.search(that.fristForm.address);
                             return;
                         }
-                        var pois = results.detail.pois;
-                        var latlngBounds = new qq.maps.LatLngBounds();
-                        for(var i = 0,l = pois.length;i < l; i++){
-                            var poi = pois[i];
-                            latlngBounds.extend(poi.latLng);  
-                            var marker = new qq.maps.Marker({
-                                map:map,
-                                position: poi.latLng
-                            });
+                            // var pois = that.addressLists;
+                            // console.log(results.detail.pois,1)
+                            // console.log(that.addressLists,1)
+                            // var latlngBounds = new qq.maps.LatLngBounds();
+                            // for(var i = 0,l = pois.length;i < l; i++){
+                            //     var poi = pois[i];
+                            //     latlngBounds.extend(poi.location);  
+                            //     var marker = new qq.maps.Marker({
+                            //         map:map,
+                            //         position: poi.location
+                            //     });
 
-                            marker.setTitle(poi.name);
-                        }
-                        map.fitBounds(latlngBounds);
+                            //     marker.setTitle(poi.title);
+                            // }
+
+
+                        //  var pois = results.detail.pois;
+                        // var latlngBounds = new qq.maps.LatLngBounds();
+                        // for(var i = 0,l = pois.length;i < l; i++){
+                        //     var poi = pois[i];
+                        //     latlngBounds.extend(poi.latLng);  
+                        //     var marker = new qq.maps.Marker({
+                        //         map:map,
+                        //         position: poi.latLng
+                        //     });
+
+                        //     marker.setTitle(poi.name);
+                        // }
+                        // map.fitBounds(latlngBounds);
+
+
+
+
+                        // map.fitBounds(latlngBounds);
                     }
                 });
             })
@@ -280,14 +380,27 @@ export default {
                 box-shadow: 0 2px 5px #5a5a5a;
                 border-radius: 5px ;
                 top: 25px;
+                height: 400px;
+                overflow-y: scroll;
                 span{
                     margin-right: 10px;
                     margin-bottom: 10px;
                     cursor: pointer;
                     display: inline-block;
-                    width: 25%;
+                    // width: 25%;
+                }
+                .city{
+                    span{
+                        color: #676767;
+                    }
+                    span:hover{
+                        color: red;
+                    }
                 }
             }
+            .cityList::-webkit-scrollbar {display:none}
+            .cityList {scrollbar-width: none;}
+            .cityList {-ms-overflow-style: none;}
         }
         .el-input--small{
             width: 300px;

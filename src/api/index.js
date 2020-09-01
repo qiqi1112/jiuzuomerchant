@@ -19,8 +19,9 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(
     function (response) {
-
-        if (response.data.code == 0) {
+        if(response.status ==200){
+            return response;
+        }else if (response.data.code == 0) {
             return response;
         } else if (response.data.code == 700) {
             //未登录 登录失效
