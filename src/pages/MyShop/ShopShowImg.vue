@@ -105,8 +105,8 @@ export default {
             let formData = new FormData();
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.bannerUploadUrl += res.data[0] + ',';
-                console.log('图集地址', this.bannerUploadUrl);
+                this.bannerUploadUrl += this.showImgPrefix + res.data[0] + ',';
+                console.log(this.bannerUploadUrl);
             });
         },
 
