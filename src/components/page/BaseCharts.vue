@@ -14,7 +14,9 @@ export default{
                
                 width:'1200px',
                 height:'600px',
-                status:true
+                status:true,
+                searchAddress: '光华公园',
+                trustAddress: '132312'
             }
         }
     },
@@ -25,7 +27,7 @@ export default{
     },
     methods:{
         mapData(val){
-            console.log(val)
+            // console.log(val)
         }
     }
 }

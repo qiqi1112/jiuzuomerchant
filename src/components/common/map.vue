@@ -1,8 +1,13 @@
 <template>
     <div id="map">
-        <div class="seac_address">
-            <span @click.stop class="pro_add">
-                <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
+        <div class="seac_address" 
+            v-loading="cityTrue"
+            element-loading-text="拼命加载中"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.8)"
+        >
+            <span @click.stop class="pro_add" >
+                <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)" ></el-input>
                 <!-- <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button> -->
             </span>
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
@@ -39,14 +44,16 @@
 </template>
 
 <script>
-var geocoder, map;
+var geocoder,map;
 import city from '../../utils/city';
 export default {
     data() {
         return {
             fun: null,
+            mapData:'',
             mapWidth: '',
             maiHeight: '',
+            cityTrue:true,
             fristForm: {
                 longitude: '', //经度
                 latitude: '', //纬度
@@ -60,6 +67,8 @@ export default {
             value:'',
             searchService:'',
             geocoder:'',
+            // marker:'',//控件
+            markers:[]
         };
     },
     props:{
@@ -78,20 +87,25 @@ export default {
         if (this.mapList) {
             this.mapWidth = this.mapList.width ? this.mapList.width : '1000px';
             this.maiHeight = this.mapList.height ? this.mapList.height : '600px';
-            console.log(this.mapList)
+            if(this.mapList.searchAddress){
+                this.fristForm.address = this.mapList.searchAddress
+            }
+            if(this.mapList.trustAddress){
+                this.fristForm.dtl_address = this.mapList.trustAddress
+            }
         }
         this.city = city;
     },
     mounted() {
         this.mapTX();
         let geolocation = new qq.maps.Geolocation('ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS', 'dingzuo');
-        geolocation.getLocation(this.showPosition, this.showPositionErr, { timeout: 8000 });
+        geolocation.getLocation(this.showPosition, this.showPositionErr, { timeout: 20000 });
     },
     watch: {
         'fristForm.address': {
             handler: function(val) {
-                this.debounce(this.changeStr,500);
-                this.childData()
+                    this.debounce(this.changeStr,500);
+                // this.childData()
             },
             deep: true
         }
@@ -107,18 +121,35 @@ export default {
         //     console.log(this.add_info)
         // },
         childData(){
-            console.log(this.add_info)
             this.$emit('child-data',this.add_info)
         },
         showCityFun() {
             this.$store.commit('change', 1);
         },
         showPosition(position) {
+            this.cityTrue = false
+            if (this.mapList) {
+                this.mapWidth = this.mapList.width ? this.mapList.width : '1000px';
+                this.maiHeight = this.mapList.height ? this.mapList.height : '600px';
+                if(this.mapList.searchAddress){
+                    this.fristForm.address = this.mapList.searchAddress
+
+                    this.$nextTick(() => {
+                        this.changeStr()
+                    });
+
+                }
+                if(this.mapList.trustAddress){
+                    this.fristForm.dtl_address = this.mapList.trustAddress
+                }
+            }
             this.value = position.city
             this.fristForm.longitude = position.lng
             this.fristForm.latitude = position.lat
         },
         showPositionErr(err){
+            this.cityTrue = false
+            console.log(2222222)
             this.value = '成都市'
             this.fristForm.longitude = 104.08329
             this.fristForm.latitude = 30.65618
@@ -133,18 +164,19 @@ export default {
             this.$store.commit('change', 3);
         },
         // 防抖
-        debounce: function (fn, wait) {
+        debounce(fn, wait) {
             if (this.fun !== null) {
                 clearTimeout(this.fun);
             }
             this.fun = setTimeout(fn, wait);
         },
-        changeStr:function(data){
+        changeStr(data){
             let address = encodeURI(this.fristForm.address)
+            console.log(this.fristForm.address)
             this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`).then(res=>{
+                console.log(res)
                 if(res.status == 0){
                     this.addressLists = res.data
-                    // this.mapControls(res.data)
                 }else{
                     this.$message({
                         message: '地图参数错误，请刷新后再试',
@@ -154,28 +186,13 @@ export default {
             }).catch(err=>{
                 console.log(err)
             })
-            
-            this.searchService.search(this.fristForm.address);
-            return
-            this.searchService.setLocation(this.value);
+            // this.searchService.search(this.fristForm.address);
+            // this.searchService.setLocation(this.value);
         },
         // 地图控件  展示
         mapControls(data){
-            var pois = data;
-            var latlngBounds = new qq.maps.LatLngBounds();
-            for(var i = 0,l = pois.length;i < l; i++){
-                var poi = pois[i];
-                latlngBounds.extend(poi.latLng);  
-                var marker = new qq.maps.Marker({
-                    map:map,
-                    position: poi.latLng
-                });
-
-                marker.setTitle(poi.name);
-            }
-            map.fitBounds(latlngBounds);
+            this.searchService.search(this.fristForm.address);
         },
-
         // 点击搜索结果赋值、
         assignText(val){
             // 调用接口时
@@ -184,24 +201,8 @@ export default {
             this.fristForm.longitude = val.location.lng
             this.fristForm.latitude = val.location.lat
             this.fristForm.address = val.title
-
-
-            // var pois = results.detail.pois;
-            // var latlngBounds = new qq.maps.LatLngBounds();
-            // for(var i = 0,l = pois.length;i < l; i++){
-            //     var poi = pois[i];
-            //     latlngBounds.extend(poi.latLng);  
-            //     var marker = new qq.maps.Marker({
-            //         map:map,
-            //         position: poi.latLng
-            //     });
-
-            //     marker.setTitle(poi.name);
-            // }
-            // map.fitBounds(latlngBounds);
-
-
-
+            this.mapControls(this.add_info)
+            this.childData()
             // 本地搜索时 展示 
             // this.fristForm.longitude = val.latLng.lng
             // this.fristForm.latitude = val.latLng.lat
@@ -227,7 +228,7 @@ export default {
         mapTX() {
             let that = this;
             this.TMap().then((qq) => {
-                var map = new qq.maps.Map(this.$refs.container, {
+                map = new qq.maps.Map(this.$refs.container, {
                     //初始经纬度
                     center: new qq.maps.LatLng(30.611913633860105, 104.08172607421875),
                     zoom: 13
@@ -273,55 +274,34 @@ export default {
                 this.searchService = new qq.maps.SearchService({
                     complete : function(results){
                         // that.addressLists = results.detail.pois
-                        // console.log(results.detail.pois,22222222222)
                         if(results.type === "CITY_LIST") {
                             that.searchService.setLocation(results.detail.cities[0].cityName);
                             that.searchService.search(that.fristForm.address);
                             return;
                         }
-                            // var pois = that.addressLists;
-                            // console.log(results.detail.pois,1)
-                            // console.log(that.addressLists,1)
-                            // var latlngBounds = new qq.maps.LatLngBounds();
-                            // for(var i = 0,l = pois.length;i < l; i++){
-                            //     var poi = pois[i];
-                            //     latlngBounds.extend(poi.location);  
-                            //     var marker = new qq.maps.Marker({
-                            //         map:map,
-                            //         position: poi.location
-                            //     });
-
-                            //     marker.setTitle(poi.title);
-                            // }
-
-
-                        //  var pois = results.detail.pois;
-                        // var latlngBounds = new qq.maps.LatLngBounds();
-                        // for(var i = 0,l = pois.length;i < l; i++){
-                        //     var poi = pois[i];
-                        //     latlngBounds.extend(poi.latLng);  
-                        //     var marker = new qq.maps.Marker({
-                        //         map:map,
-                        //         position: poi.latLng
-                        //     });
-
-                        //     marker.setTitle(poi.name);
-                        // }
-                        // map.fitBounds(latlngBounds);
-
-
-
-
-                        // map.fitBounds(latlngBounds);
+                        that.clearOverlays(that.markers);
+                        var pois = results.detail.pois;
+                        var latlngBounds = new qq.maps.LatLngBounds();
+                        for(var i = 0,l = pois.length;i < l; i++){
+                            var poi = pois[i];
+                            latlngBounds.extend(poi.latLng);  
+                            var marker = new qq.maps.Marker({
+                                map:map,
+                                position: poi.latLng
+                            });
+                            marker.setTitle(poi.name);
+                            that.markers.push(marker)
+                        }
+                        map.fitBounds(latlngBounds);
                     }
                 });
             });
         },
 
-        clearOverlays() {
-            if (this.markersArray) {
-                for (i in this.markersArray) {
-                    this.markersArray[i].setMap(null);
+        clearOverlays(overlays) {
+            if (overlays) {
+                for (let i in overlays) {
+                    overlays[i].setMap(null);
                 }
             }
         }
