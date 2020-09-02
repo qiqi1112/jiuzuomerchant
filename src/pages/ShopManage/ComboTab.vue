@@ -163,7 +163,7 @@ export default {
                 listPicture: 'shangzuo-dev/20200828/edk8f3v5b9j1d6s16y2p.jpg',
                 infoPicture: 'shangzuo-dev/20200828/wa2wu8b47raagzp6cn5f.jpg'
             };
-            this.$post('/dev/merchant/store/goods/save', data).then((res) => {
+            this.$post('/merchant/store/goods/save', data).then((res) => {
                 console.log(res);
             });
         }

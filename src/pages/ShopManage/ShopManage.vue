@@ -642,7 +642,7 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    this.$Delete(`/dev/merchant/store/goods/deleteById/${id}`).then((res) => {
+                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
                         console.log(res);
                         this.$message.success('删除成功');
                     });
@@ -665,7 +665,7 @@ export default {
                 category: '',
                 name: ''
             };
-            this.$post('/dev/merchant/store/goods/goodsLimit', data).then((res) => {
+            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
                 console.log(res);
             });
         }

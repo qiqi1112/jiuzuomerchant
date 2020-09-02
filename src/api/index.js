@@ -3,12 +3,14 @@ import axios from 'axios'
 
 import router from "../router";
 // import IP from "./baseUrl";
+import IP from "./ip";
 import Message from "element-ui/packages/message/index.js";
 
 // axios.defaults.timeout = 10000; //请求超时时间 单位(毫秒)
 
 var token = ''
 // axios.defaults.baseURL = './baseUrl'; //默认地址
+axios.defaults.baseURL = IP;
 axios.interceptors.request.use(config => {
     token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''
     // axios.defaults.headers.common["X-Store-Token"] = token;
