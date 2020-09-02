@@ -73,6 +73,13 @@ export default new Router({
                     }
                 },
                 {
+                    path: '/service',
+                    component: () => import('../pages/Service/Service.vue'),
+                    meta: {
+                        title: '客服管理'
+                    }
+                },
+                {
                     path: '/log',
                     component: () => import('../pages/Log/Log.vue'),
                     meta: {
