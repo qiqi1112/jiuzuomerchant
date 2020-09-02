@@ -1246,7 +1246,7 @@ export default {
 
         //回显店铺数据
         getStoreInfo() {
-            this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
+            this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     console.log(res.data);
                     let result = res.data;

@@ -1,8 +1,12 @@
 module.exports = {
-    baseUrl: './',
+    publicPath: './',
     assetsDir: 'static',
     productionSourceMap: false,
+    outputDir: process.env.DIR_NAME,
     devServer: {
+        host: "0.0.0.0",
+        port: 8080,
+        open: true,
         proxy: {
             '/api': {
                 target: 'http://musicapi.leanapp.cn',
@@ -28,7 +32,9 @@ module.exports = {
             },
 
             '/dev': {
-                target: "http://47.108.204.66:8077",
+                target: "http://192.168.31.94:8077",
+                // ws: true,
+                // secure:true,
                 changeOrigin: true,
                 pathRewrite: {
                     '^/dev': ''
@@ -41,7 +47,7 @@ module.exports = {
                     '^/map': ''
                 }
             },
-            
+
         }
     }
 

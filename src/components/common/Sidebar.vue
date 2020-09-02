@@ -97,6 +97,11 @@ export default {
                     title: '评论管理'
                 },
                 {
+                    icon: 'el-icon-lx-text',
+                    index: 'service',
+                    title: '客服管理'
+                },
+                {
                     icon: 'el-icon-lx-commentfill',
                     index: 'log',
                     title: '操作日志'
