@@ -1,10 +1,5 @@
 module.exports = {
-<<<<<<< HEAD
-    publicPath: process.env.NODE_ENV === "production" ? "./" : "/",
-    baseUrl: './',
-=======
     publicPath: './',
->>>>>>> fb02044817cb34c9ac90ec70428cb4b6bb493208
     assetsDir: 'static',
     productionSourceMap: false,
     outputDir: process.env.DIR_NAME,
