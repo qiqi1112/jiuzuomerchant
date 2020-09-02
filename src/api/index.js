@@ -6,7 +6,7 @@ import router from "../router";
 import Message from "element-ui/packages/message/index.js";
 
 // axios.defaults.timeout = 10000; //请求超时时间 单位(毫秒)
-
+// axios.defaults.baseURL = 'http://47.108.204.66:8077'
 var token = ''
 // axios.defaults.baseURL = './baseUrl'; //默认地址
 axios.interceptors.request.use(config => {
