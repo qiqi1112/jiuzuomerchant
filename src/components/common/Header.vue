@@ -70,7 +70,7 @@ export default {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
-                this.$get('/dev/merchant/store/logout').then(
+                this.$get('/merchant/store/logout').then(
                     (res) => {
                         console.log(res);
                         localStorage.removeItem('userInfo');
