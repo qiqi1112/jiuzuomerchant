@@ -756,7 +756,7 @@ export default {
     align-items: center;
 }
 
-.goods-info-box .good-name-box>div:first-child {
+.goods-info-box .good-name-box > div:first-child {
     margin-right: 20px;
 }
 

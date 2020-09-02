@@ -5,9 +5,25 @@
                 <p>
                     <span>酒水名称：</span>
                     <el-input v-model="drinksForm.name" style="width:170px;margin-right:20px"></el-input>
-                    <el-select v-model="drinksForm.classify" placeholder="酒水分类" style="width:110px">
+                    <el-select
+                        v-model="drinksForm.classify"
+                        placeholder="酒水分类"
+                        style="width:110px;margin-right:20px"
+                    >
                         <el-option
                             v-for="item in drinksForm.classifyOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        ></el-option>
+                    </el-select>
+                    <el-select
+                        v-model="drinksForm.goodWeight"
+                        placeholder="商品排序"
+                        style="width:110px"
+                    >
+                        <el-option
+                            v-for="item in drinksForm.goodOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
@@ -64,6 +80,7 @@
                 </p>
             </el-form>
             <div class="drinks-update-box">
+                <!-- 商家推荐位 -->
                 <div class="banner-box">
                     <el-checkbox
                         v-model="drinksForm.checkedBanner"
@@ -71,20 +88,25 @@
                         border
                         style="margin-right:20px"
                     ></el-checkbox>
-                    <el-select v-model="drinksForm.weight" placeholder="推荐位位权重" style="width:140px">
+                    <el-select
+                        v-model="drinksForm.recoWeight"
+                        placeholder="推荐位位权重"
+                        style="width:140px"
+                    >
                         <el-option
-                            v-for="item in drinksForm.options"
+                            v-for="item in drinksForm.recoOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
                         ></el-option>
                     </el-select>
-
                     <div class="drinks-div">
                         <el-upload
                             class="avatar-uploader"
-                            action="https://jsonplaceholder.typicode.com/posts/"
+                            action="1"
                             :show-file-list="false"
+                            :http-request="uploadRecoFiles"
+                            :on-error="uploadError"
                         >
                             <img
                                 v-if="drinksForm.recoImageUrl"
@@ -96,15 +118,12 @@
                         <span>（*如需商家推荐，请添加推荐位图片）</span>
                     </div>
                 </div>
+
+                <!-- 推荐banner图 -->
                 <div class="reco-box">
                     <el-checkbox v-model="drinksForm.checkedReco" label="放至商店Banner位" border></el-checkbox>
-
                     <div class="drinks-div">
-                        <el-upload
-                            class="avatar-uploader"
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            :show-file-list="false"
-                        >
+                        <el-upload class="avatar-uploader" action="1" :show-file-list="false">
                             <img
                                 v-if="drinksForm.bannerImageUrl"
                                 :src="drinksForm.bannerImageUrl"
@@ -123,8 +142,10 @@
                 <span>酒水缩略图：</span>
                 <el-upload
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="1"
                     :show-file-list="false"
+                    :http-request="uploadThumFiles"
+                    :on-error="uploadError"
                 >
                     <img
                         v-if="drinksForm.thumImageUrl"
@@ -139,8 +160,10 @@
                 <span>酒水详情图：</span>
                 <el-upload
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="1"
                     :show-file-list="false"
+                    :http-request="uploadDetailFiles"
+                    :on-error="uploadError"
                 >
                     <img
                         v-if="drinksForm.detailImageUrl"
@@ -185,8 +208,9 @@ export default {
                 nowPrice: '',
                 checkedBanner: false,
                 checkedReco: false,
-                weight: '',
-                options: [
+
+                goodWeight: '',
+                goodOptions: [
                     {
                         label: '0',
                         value: '0'
@@ -205,32 +229,33 @@ export default {
                     }
                 ],
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
+                recoWeight: '',
+                recoOptions: [
+                    {
+                        label: '0',
+                        value: '0'
+                    },
+                    {
+                        label: '1',
+                        value: '1'
+                    },
+                    {
+                        label: '2',
+                        value: '2'
+                    },
+                    {
+                        label: '3',
+                        value: '3'
+                    }
+                ],
 
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
                 recoImageUrl: '', //推荐位图
-                recoDialog: false, //查看图集时的对话框
-                //推荐位图上传时携带的参数
-                RecoImg: {
-                    img: ''
-                },
-
                 thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
-
-                detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
-                }
+                detailImageUrl: '' //详情图
             },
+
             //酒水新增规格
             dynamicValidateForm: {
                 domains: [
@@ -258,6 +283,71 @@ export default {
             if (index !== -1) {
                 this.dynamicValidateForm.domains.splice(index, 1);
             }
+        },
+
+        //发送当前子组件的表单信息给父组件
+        sendChildForm() {
+            this.$emit('drinksFormChild', this.drinksForm);
+        },
+
+        //上传banner图集
+        uploadBannerFiles(file) {
+            let formData = new FormData();
+            formData.append('files', file.file);
+            this.$post(this.filesUploadUrl, formData).then((res) => {
+                this.drinksForm.bannerUploadUrl += res.data[0] + ',';
+                console.log('图集地址', this.drinksForm.bannerUploadUrl);
+            });
+        },
+
+        //移除套餐banner图时
+        comboBannerRemove(file, fileList) {
+            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
+            console.log(file, fileList);
+
+            // let urlArr = this.bannerUploadUrl.split(',');
+            // urlArr.forEach((item, i) => {
+            //     if (this.showImgPrefix + item == file.url) {
+            //         urlArr.splice(i, 1);
+            //         this.bannerShowBox.splice(i, 1);
+            //     }
+            // });
+
+            // this.bannerUploadUrl = urlArr.join(',');
+
+            // console.log(this.bannerUploadUrl);
+        },
+
+        //上传推荐位图
+        uploadRecoFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.drinksForm.recoImageUrl = res.data;
+            });
+        },
+
+        //上传缩略图
+        uploadThumFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.drinksForm.thumImageUrl = res.data;
+            });
+        },
+
+        //上传详情图
+        uploadDetailFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.drinksForm.detailImageUrl = res.data;
+            });
+        },
+
+        //图片上传失败时
+        uploadError() {
+            this.$message.error('插入失败');
         }
     }
 };

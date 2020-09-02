@@ -8,12 +8,11 @@
                         <el-input v-model="comboForm.name" style="width:160px"></el-input>
                     </div>
                     <div>
-                        <span>商品排序：</span>
-                        <!-- <el-input v-model="comboForm.weight" style="width:100px"></el-input> -->
+                        <!-- <span>商品排序：</span> -->
                         <el-select
                             v-model="comboForm.weight"
-                            placeholder="推荐位位权重"
-                            style="width:140px"
+                            placeholder="商品排序"
+                            style="width:110px"
                         >
                             <el-option
                                 v-for="item in comboForm.options"
@@ -151,6 +150,7 @@ export default {
     },
 
     watch: {
+        //监听表单信息变化
         comboForm: {
             handler() {
                 this.sendChildForm();
@@ -160,6 +160,7 @@ export default {
     },
 
     methods: {
+        //发送当前子组件的表单信息给父组件
         sendChildForm() {
             this.$emit('comboFormChild', this.comboForm);
         },

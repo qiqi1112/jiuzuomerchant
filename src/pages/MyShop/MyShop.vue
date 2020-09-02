@@ -1068,7 +1068,7 @@ export default {
 
             console.log('xxx', data);
 
-            this.$put('/dev/merchant/store/update', data)
+            this.$put('/merchant/store/update', data)
                 .then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
