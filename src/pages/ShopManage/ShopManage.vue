@@ -24,7 +24,10 @@
                         <!-- 套餐标签页 -->
                         <el-tab-pane label="套餐" name="combo">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <combo-tab></combo-tab>
+                            <combo-tab
+                                :comboFormParent="comboForm"
+                                @comboFormChild="getChildComboForm"
+                            ></combo-tab>
                         </el-tab-pane>
 
                         <!-- 酒水标签页 -->
@@ -259,7 +262,6 @@ export default {
     },
     data() {
         return {
-            serverUrl: '/file/admin/system/upload/create', //上传文件
             searchName: '', //商品名称输入框
             value: '', //商品酒水分类下拉框
 
@@ -272,204 +274,128 @@ export default {
             currentPage: 1, //默认显示的页码所在位置（第一页）
             pagesize: 16, //默认每页要显示多少条数据
 
-            // //套餐标签页表单---------------------------------
-            // comboForm: {
-            //     name: '',
-            //     desc: '',
-            //     originPrice: '',
-            //     nowPrice: '',
-            //     spec: ['默认'],
-            //     checkedBanner: false,
+            //套餐标签页表单---------------------------------
+            comboForm: {
+                name: '',
+                desc: '',
+                originPrice: '',
+                nowPrice: '',
+                spec: ['默认'],
+                checkedBanner: false,
 
-            //     bannerImageUrl: '', //banner图
-            //     bannerDialog: false, //查看图集时的对话框
-            //     //banner图上传时携带的参数
-            //     bannerImg: {
-            //         img: ''
-            //     },
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '' //详情图
+            },
 
-            //     thumImageUrl: '', //缩略图
-            //     //缩略图上传时携带的参数
-            //     thumImg: {
-            //         img: ''
-            //     },
+            //酒水标签页表单-----------------------------------------
+            drinksForm: {
+                name: '',
+                classify: '',
+                classifyOptions: [
+                    {
+                        label: '啤酒',
+                        value: '啤酒'
+                    },
+                    {
+                        label: '香槟',
+                        value: '香槟'
+                    },
+                    {
+                        label: '饮料',
+                        value: '饮料'
+                    },
+                    {
+                        label: '矿泉水',
+                        value: '矿泉水'
+                    }
+                ],
+                desc: '',
+                originPrice: '',
+                nowPrice: '',
+                checkedBanner: false,
+                checkedReco: false,
+                weight: '',
+                options: [
+                    {
+                        label: '0',
+                        value: '0'
+                    },
+                    {
+                        label: '1',
+                        value: '1'
+                    },
+                    {
+                        label: '2',
+                        value: '2'
+                    },
+                    {
+                        label: '3',
+                        value: '3'
+                    }
+                ],
 
-            //     detailImageUrl: '', //详情图
-            //     //详情图上传时携带的参数
-            //     detailImg: {
-            //         img: ''
-            //     }
-            // },
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '' //详情图
+            },
+            //酒水新增规格
+            dynamicValidateForm: {
+                domains: [
+                    {
+                        spec: '', //规格
+                        price: '' //规格价格
+                    }
+                ]
+            },
 
-            // //酒水标签页表单-----------------------------------------
-            // drinksForm: {
-            //     name: '',
-            //     classify: '',
-            //     classifyOptions: [
-            //         {
-            //             label: '啤酒',
-            //             value: '啤酒'
-            //         },
-            //         {
-            //             label: '香槟',
-            //             value: '香槟'
-            //         },
-            //         {
-            //             label: '饮料',
-            //             value: '饮料'
-            //         },
-            //         {
-            //             label: '矿泉水',
-            //             value: '矿泉水'
-            //         }
-            //     ],
-            //     desc: '',
-            //     originPrice: '',
-            //     nowPrice: '',
-            //     checkedBanner: false,
-            //     checkedReco: false,
-            //     weight: '',
-            //     options: [
-            //         {
-            //             label: '0',
-            //             value: '0'
-            //         },
-            //         {
-            //             label: '1',
-            //             value: '1'
-            //         },
-            //         {
-            //             label: '2',
-            //             value: '2'
-            //         },
-            //         {
-            //             label: '3',
-            //             value: '3'
-            //         }
-            //     ],
+            //小吃标签页表单------------------------------------------
+            snackForm: {
+                name: '',
+                weight: 0,
+                desc: '',
+                originPrice: '',
+                nowPrice: '',
+                spec: ['小份', '中份', '大份'],
+                checkedBanner: false,
 
-            //     bannerImageUrl: '', //banner图
-            //     bannerDialog: false, //查看图集时的对话框
-            //     //banner图上传时携带的参数
-            //     bannerImg: {
-            //         img: ''
-            //     },
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '' //详情图
+            },
 
-            //     recoImageUrl: '', //推荐位图
-            //     recoDialog: false, //查看图集时的对话框
-            //     //推荐位图上传时携带的参数
-            //     RecoImg: {
-            //         img: ''
-            //     },
+            //其他标签页表单--------------------------------------------
+            otherForm: {
+                name: '',
+                desc: '',
+                originPrice: '',
+                nowPrice: '',
+                spec: ['1份', '1盒'],
+                checkedBanner: false,
 
-            //     thumImageUrl: '', //缩略图
-            //     //缩略图上传时携带的参数
-            //     thumImg: {
-            //         img: ''
-            //     },
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '' //详情图
+            },
 
-            //     detailImageUrl: '', //详情图
-            //     //详情图上传时携带的参数
-            //     detailImg: {
-            //         img: ''
-            //     }
-            // },
-            // //酒水新增规格
-            // dynamicValidateForm: {
-            //     domains: [
-            //         {
-            //             spec: '', //规格
-            //             price: '' //规格价格
-            //         }
-            //     ]
-            // },
+            //会员卡标签页表单--------------------------------------------
+            vipCardForm: {
+                name: '',
+                desc: '',
+                integral: '', //积分
+                nowPrice: '',
+                spec: ['默认'],
+                checkedBanner: false,
 
-            // //小吃标签页表单------------------------------------------
-            // snackForm: {
-            //     name: '',
-            //     desc: '',
-            //     originPrice: '',
-            //     nowPrice: '',
-            //     spec: ['小份', '中份', '大份'],
-            //     checkedBanner: false,
-
-            //     bannerImageUrl: '', //banner图
-            //     bannerDialog: false, //查看图集时的对话框
-            //     //banner图上传时携带的参数
-            //     bannerImg: {
-            //         img: ''
-            //     },
-
-            //     thumImageUrl: '', //缩略图
-            //     //缩略图上传时携带的参数
-            //     thumImg: {
-            //         img: ''
-            //     },
-
-            //     detailImageUrl: '', //详情图
-            //     //详情图上传时携带的参数
-            //     detailImg: {
-            //         img: ''
-            //     }
-            // },
-
-            // //其他标签页表单--------------------------------------------
-            // otherForm: {
-            //     name: '',
-            //     desc: '',
-            //     originPrice: '',
-            //     nowPrice: '',
-            //     spec: ['1份', '1盒'],
-            //     checkedBanner: false,
-
-            //     bannerImageUrl: '', //banner图
-            //     bannerDialog: false, //查看图集时的对话框
-            //     //banner图上传时携带的参数
-            //     bannerImg: {
-            //         img: ''
-            //     },
-
-            //     thumImageUrl: '', //缩略图
-            //     //缩略图上传时携带的参数
-            //     thumImg: {
-            //         img: ''
-            //     },
-
-            //     detailImageUrl: '', //详情图
-            //     //详情图上传时携带的参数
-            //     detailImg: {
-            //         img: ''
-            //     }
-            // },
-
-            // //会员卡标签页表单--------------------------------------------
-            // vipCardForm: {
-            //     name: '',
-            //     desc: '',
-            //     integral: '', //积分
-            //     nowPrice: '',
-            //     spec: ['默认'],
-            //     checkedBanner: false,
-
-            //     bannerImageUrl: '', //banner图
-            //     bannerDialog: false, //查看图集时的对话框
-            //     //banner图上传时携带的参数
-            //     bannerImg: {
-            //         img: ''
-            //     },
-
-            //     thumImageUrl: '', //缩略图
-            //     //缩略图上传时携带的参数
-            //     thumImg: {
-            //         img: ''
-            //     },
-
-            //     detailImageUrl: '', //详情图
-            //     //详情图上传时携带的参数
-            //     detailImg: {
-            //         img: ''
-            //     }
-            // },
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '' //详情图
+            },
 
             //商品分类下拉框
             options: [
@@ -501,13 +427,27 @@ export default {
                     label: '饮料',
                     value: '7'
                 }
-            ],
-
-            showImgPrefix: '/file/admin/system/upload/down?keyName=' //回显图片的前缀
+            ]
         };
     },
 
     methods: {
+        //获取子组件传过来的表单值
+        getChildComboForm(data) {
+            console.log(data);
+            this.comboForm.name = data.name;
+            this.comboForm.weight = data.weight;
+            this.comboForm.desc = data.desc;
+            this.comboForm.originPrice = data.originPrice;
+            this.comboForm.nowPrice = data.nowPrice;
+            this.comboForm.checkedBanner =
+                data.checkedBanner == true ? (this.comboForm.checkedBanner = 1) : (this.comboForm.checkedBanner = 2);
+            this.comboForm.bannerImgBox = data.bannerImgBox;
+            this.comboForm.bannerUploadUrl = data.bannerUploadUrl;
+            this.comboForm.thumImageUrl = data.thumImageUrl;
+            this.comboForm.detailImageUrl = data.detailImageUrl;
+        },
+
         //翻页
         handleCurrentChange(val) {
             this.currentPage = val; //将当前跳转的页码赋给显在页面上的页码
@@ -547,45 +487,25 @@ export default {
             this.dialogVisible = false;
         },
 
-
-        //上传套餐banner图之前
-        beforeComboBannerUpload(file) {
-            this.comboForm.bannerImg.img = file;
-        },
-        //上传套餐banner图成功之后
-        uploadComboBannerSuccess(res, file) {
-            this.comboForm.bannerImageUrl += this.showImgPrefix + res.data + ',';
-            console.log(this.comboForm.bannerImageUrl, '图集上传完成之后返回的地址');
-        },
-        //点击查看套餐banner图时
-        comboBannerPreview(file) {
-            this.comboForm.bannerDialog = true; //展示图集的对话框开启
-            this.comboForm.bannerImageUrl = file.url; //将返回的图集地址展示到页面上
-        },
-        //移除套餐banner图时
-        comboBannerRemove(file, fileList) {
-            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
-            console.log(file, fileList);
-        },
-
-        //上传套餐缩略图之前
-        beforeComboThumUpload(file) {
-            this.comboForm.thumImg.img = file;
-        },
-        //上传套餐缩略图成功之后
-        uploadComboThumSuccess(res, file) {
-            this.comboForm.thumImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
-            console.log(this.comboForm.thumImageUrl);
-        },
-
-        //上传套餐详情图之前
-        beforeComboDetailUpload(file) {
-            this.comboForm.detailImg.img = file;
-        },
-        //上传套餐详情图成功之后
-        uploadComboDetailSuccess(res, file) {
-            this.comboForm.detailImageUrl = this.showImgPrefix + res.data; //这就是图片的完整地址，这样后续就可以进行相关操作了
-            console.log(this.comboForm.detailImageUrl);
+        //添加套餐-------------------------------------------------------
+        setComboInfo() {
+            let data = {
+                type: this.activeNum,
+                name: this.comboForm.name,
+                goodsSort: this.comboForm.weight,
+                goodsSort: 0,
+                synopsis: this.comboForm.desc,
+                originalPrice: this.comboForm.originPrice,
+                presentPrice: this.comboForm.nowPrice,
+                recommendAdStatus: this.comboForm.checkedBanner,
+                recommendStatus: 2,
+                recommendAdPicture: this.comboForm.bannerUploadUrl,
+                listPicture: this.comboForm.thumImageUrl,
+                infoPicture: this.comboForm.detailImageUrl
+            };
+            this.$post('/dev/merchant/store/goods/save', data).then((res) => {
+                console.log(res);
+            });
         },
 
         //添加酒水----------------------------------
@@ -602,7 +522,6 @@ export default {
 
         //添加商品对话框里的确定按钮
         handleSure() {
-            this.dialogVisible = false;
             switch (this.activeName) {
                 case 'combo':
                     this.setComboInfo();
@@ -618,6 +537,7 @@ export default {
                 case 'vipCard':
                     this.setVipCardInfo();
             }
+            this.dialogVisible = false;
         },
 
         //标签页切换事件
@@ -678,6 +598,11 @@ export default {
 </script>
 
 <style>
+.goods-info-box .el-textarea__inner {
+    resize: none !important;
+    height: 84px;
+}
+
 .clearfix::after {
     content: '';
     display: block;
@@ -818,10 +743,21 @@ export default {
     width: 70%;
     /* border: 1px solid black; */
 }
+
 .goods-info-box p {
     margin-bottom: 30px;
     display: flex;
     align-items: center;
+}
+
+.goods-info-box .good-name-box {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.goods-info-box .good-name-box>div:first-child {
+    margin-right: 20px;
 }
 
 .goods-info-box p > span {
@@ -853,10 +789,6 @@ export default {
     /* display: flex;
     align-items: center; */
     margin-bottom: 0px;
-}
-
-.el-textarea__inner {
-    line-height: 3;
 }
 
 .drinks-update {

@@ -173,15 +173,6 @@
                                         @click="checkType($event,item)"
                                     >{{item}}</span>
                                 </div>
-
-                                <!-- <el-select v-else v-model="shopType" placeholder="请选择">
-                                    <el-option
-                                        v-for="item in shopTypeOpt"
-                                        :key="item.value"
-                                        :label="item.value"
-                                        :value="item.value"
-                                    ></el-option>
-                                </el-select>-->
                             </div>
                         </div>
                     </div>
@@ -197,17 +188,8 @@
                         <span>{{trustAddress}}</span>
                     </p>
                     <div v-else>
-                        <!-- <el-input v-model="trustAddress" placeholder="请输入店铺详细地址"></el-input> -->
                         <mapCom @child-data="childData" :mapList="mapList"></mapCom>
                     </div>
-
-                    <!-- <div>
-                                <el-cascader
-                                    :options="addressOptions"
-                                    v-model="regionValue"
-                                    @change="handleAddChange"
-                                ></el-cascader>
-                    </div>-->
                 </div>
 
                 <!-- 商品文本域部分 -->
@@ -247,7 +229,7 @@
                             style="width:76%"
                             :readonly="isReadonly"
                         ></el-input>
-                    </div> -->
+                    </div>-->
                 </div>
             </div>
 
@@ -361,27 +343,25 @@
                         <p class="input-seat">
                             <label style="margin-right:30px">
                                 座位行数：
-                                <el-input
-                                    :readonly="isReadonly"
+                                <el-input-number
+                                    :disabled="isReadonly"
                                     v-model="x"
-                                    @focus="changeSeatAlert"
-                                    min="1"
-                                    placeholder="请输入行数"
-                                    type="number"
+                                    :min="1"
                                     style="width:120px"
-                                ></el-input>
+                                    label="行数"
+                                ></el-input-number>
                             </label>
-                            <label>
+                            <label style="margin-right:30px">
                                 座位列数：
-                                <el-input
-                                    :readonly="isReadonly"
+                                <el-input-number
+                                    :disabled="isReadonly"
                                     v-model="y"
-                                    min="1"
-                                    placeholder="请输入列数"
-                                    type="number"
+                                    :min="1"
                                     style="width:120px"
-                                ></el-input>
+                                    label="列数"
+                                ></el-input-number>
                             </label>
+                            <!-- <el-button type="primary" @click="sureChangeSeatNum">确定</el-button> -->
                         </p>
                         <div class="seat-title">
                             <p>
@@ -502,26 +482,25 @@
                         <p class="input-seat">
                             <label style="margin-right:30px">
                                 座位行数：
-                                <el-input
-                                    :readonly="isReadonly"
+                                <el-input-number
+                                    :disabled="isReadonly"
                                     v-model="x"
-                                    min="1"
-                                    placeholder="请输入行数"
-                                    type="number"
+                                    :min="1"
                                     style="width:120px"
-                                ></el-input>
+                                    label="行数"
+                                ></el-input-number>
                             </label>
-                            <label>
+                            <label style="margin-right:30px">
                                 座位列数：
-                                <el-input
-                                    :readonly="isReadonly"
+                                <el-input-number
+                                    :disabled="isReadonly"
                                     v-model="y"
-                                    min="1"
-                                    placeholder="请输入列数"
-                                    type="number"
+                                    :min="1"
                                     style="width:120px"
-                                ></el-input>
+                                    label="列数"
+                                ></el-input-number>
                             </label>
+                            <!-- <el-button type="primary" @click="sureChangeSeatNum">确定</el-button> -->
                         </p>
                         <div class="seat-title">
                             <p>
@@ -654,7 +633,11 @@
                                             <i class="el-icon-close"></i>
                                         </span>
                                         <span>{{item.num}}</span>
-                                        <el-button type="danger">删除</el-button>
+                                        <el-button
+                                            :disabled="isReadonly"
+                                            @click="deleteSnacks(item)"
+                                            type="danger"
+                                        >删除</el-button>
                                     </li>
                                 </ul>
                                 <div class="snacks-form">
@@ -673,7 +656,11 @@
                                         placeholder="数量"
                                         :readonly="isReadonly"
                                     ></el-input>
-                                    <el-button type="primary" @click="addSnacks">确定</el-button>
+                                    <el-button
+                                        :disabled="isReadonly"
+                                        type="primary"
+                                        @click="addSnacks"
+                                    >确定</el-button>
                                 </div>
                             </div>
                         </div>
@@ -687,16 +674,16 @@
 <script>
 import { regionData } from 'element-china-area-data'; //引入外部地址选择器
 import mapCom from '../../components/common/map';
-import shopShowImg from './ShopShowImg';
-import nightEnterSeat from './NightEnterSeat';
-import ktvSeat from './KtvSeat';
+// import shopShowImg from './ShopShowImg';
+// import nightEnterSeat from './NightEnterSeat';
+// import ktvSeat from './KtvSeat';
 
 export default {
     components: {
-        mapCom,
-        shopShowImg,
-        nightEnterSeat,
-        ktvSeat
+        mapCom
+        // shopShowImg,
+        // nightEnterSeat,
+        // ktvSeat
     },
 
     data() {
@@ -855,7 +842,8 @@ export default {
                 this.district = data.ad_info.district;
                 this.districtCode = data.ad_info.adcode;
                 this.searchAddress = data.title;
-                console.log(data);
+                this.trustAddress = data.trustAddress;
+                console.log('1111', data);
             }
         },
 
@@ -874,7 +862,7 @@ export default {
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
                 this.bannerUploadUrl += res.data[0] + ',';
-                console.log(this.bannerUploadUrl);
+                // console.log(this.bannerUploadUrl);
             });
         },
 
@@ -888,6 +876,18 @@ export default {
         bannerRemove(file, fileList) {
             //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
             console.log(file, fileList);
+
+            let urlArr = this.bannerUploadUrl.split(',');
+            urlArr.forEach((item, i) => {
+                if (this.showImgPrefix + item == file.url) {
+                    urlArr.splice(i, 1);
+                    this.bannerShowBox.splice(i, 1);
+                }
+            });
+
+            this.bannerUploadUrl = urlArr.join(',');
+
+            console.log(this.bannerUploadUrl);
         },
 
         //上传商家布局图
@@ -956,7 +956,8 @@ export default {
         //新增店铺
         submitCreatShop() {
             //数组转json形式（零嘴）
-            this.nightEnterSeatDetail.forEach((item) => {
+            let seatArr = JSON.parse(JSON.stringify(this.nightEnterSeatDetail));
+            seatArr.forEach((item) => {
                 item.snacks = JSON.stringify(item.snacks);
             });
 
@@ -971,7 +972,7 @@ export default {
             //要传的值
             let data = {
                 appListBigPicture: this.appShopImageUrl,
-                businessReminder: this.shopRemind,
+                businessReminder: '商家排号提醒',
                 cassette: `${this.x}x${this.y}`,
                 city: this.city,
                 customerServicePhone: this.servicePhone,
@@ -994,10 +995,11 @@ export default {
                 synopsis: this.shopBrief,
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
-                trustAddress: '倪家桥店小二',
                 type: this.shopTypeOptStr,
-                layoutList: this.nightEnterSeatDetail
+                layoutList: seatArr
             };
+
+            console.log('xxx', data);
 
             this.$post('/dev/merchant/store/save', data)
                 .then((res) => {
@@ -1006,6 +1008,7 @@ export default {
                         this.getStoreInfo();
                         this.$message.success('添加成功');
                         this.isReadonly = true;
+                        this.isUpdate = true;
                     } else {
                         this.$message.error(res.msg);
                     }
@@ -1019,7 +1022,8 @@ export default {
         //修改店铺
         submitUpdateShop() {
             //数组转json形式（零嘴）
-            this.nightEnterSeatDetail.forEach((item) => {
+            let seatArr = JSON.parse(JSON.stringify(this.nightEnterSeatDetail));
+            seatArr.forEach((item) => {
                 item.snacks = JSON.stringify(item.snacks);
             });
 
@@ -1035,7 +1039,7 @@ export default {
             let data = {
                 id: this.shopId,
                 appListBigPicture: this.appShopImageUrl,
-                businessReminder: this.shopRemind,
+                businessReminder: '商家排号提醒',
                 cassette: `${this.x}x${this.y}`,
                 city: this.city,
                 customerServicePhone: this.servicePhone,
@@ -1058,10 +1062,11 @@ export default {
                 synopsis: this.shopBrief,
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
-                trustAddress: '倪家桥店小二',
                 type: this.shopTypeOptStr,
-                layoutList: this.nightEnterSeatDetail
+                layoutList: seatArr
             };
+
+            console.log('xxx', data);
 
             this.$put('/dev/merchant/store/update', data)
                 .then((res) => {
@@ -1202,7 +1207,7 @@ export default {
             this.$message.error('插入失败');
         },
 
-        //将字符串分割为数组（图片视频专用）
+        //将字符串分割为数组（banner图片视频专用）
         imgStrChangeArr(str) {
             let res = str.split(',');
             let newRes = res.map((item) => {
@@ -1221,6 +1226,8 @@ export default {
                 obj.url = item;
                 this.bannerImgBox.push(obj);
             });
+
+            console.log(this.bannerShowBox);
         },
 
         //回显店铺卡座数量（行和列数量）
@@ -1281,47 +1288,11 @@ export default {
                     //回显店铺卡座数量
                     this.getShopSeat(cassette);
 
-                    //经纬度
-                    this.getlonlat(lonlat); //回显经纬度
+                    //回显经纬度
+                    this.getlonlat(lonlat);
 
                     //门店类型（模拟数据）
-                    // shopTypeStr = '1,2'; //返回的字符串
-
                     this.shopTypeOptStrArr = this.strChangeArr(shopTypeStr.slice(0, shopTypeStr.length - 1)); //转换为数组并赋值，回显到页面上
-
-                    //所有座位（模拟数据）
-                    // layoutList = [
-                    //     {
-                    //         haveToilet: 1,
-                    //         id: 1298186290748964900,
-                    //         mahjong: '1',
-                    //         minConsumption: '0.00',
-                    //         numberOfPeople: 2,
-                    //         seatAttribute: 3,
-                    //         seatCode: '1',
-                    //         seatColumn: 1,
-                    //         seatLatestReservationTime: '20:30',
-                    //         seatRow: 1,
-                    //         seatType: 1,
-                    //         snacks: '[{"name" : "水果拼盘","num" : 1},{"name" : "臭豆腐","num" :1}]',
-                    //         softHardStatus: 1
-                    //     },
-                    //     {
-                    //         haveToilet: 2,
-                    //         id: 1298186290748964900,
-                    //         mahjong: '2',
-                    //         minConsumption: '0.00',
-                    //         numberOfPeople: 2,
-                    //         seatAttribute: 4,
-                    //         seatCode: '2',
-                    //         seatColumn: 2,
-                    //         seatLatestReservationTime: '21:30',
-                    //         seatRow: 1,
-                    //         seatType: 1,
-                    //         snacks: '[{"name" : "鱼豆腐","num" : 2},{"name" : "好巴食","num" :2}]',
-                    //         softHardStatus: 2
-                    //     }
-                    // ];
 
                     //json字符串转为数组对象形式（零嘴）
                     layoutList.forEach((item) => {
@@ -1361,13 +1332,6 @@ export default {
 
         //添加零嘴
         addSnacks() {
-            // console.log(this.snackName, this.snackNum);
-            // this.snacksArr = JSON.parse(this.snacksArr);
-
-            // this.presentSeatInfo.snacks.forEach((item) => {
-            //     this.snacksArr.push(item);
-            // });
-
             let snacksObj = {};
             snacksObj.name = this.snackName;
             snacksObj.num = this.snackNum;
@@ -1379,14 +1343,17 @@ export default {
                 this.presentSeatInfo.snacks.push(item);
             });
 
-            //转JSON
-            // this.snacksJson = JSON.stringify(this.snacksArr);
-            // this.presentSeatInfo.snacks = this.snacksJson;
-
-            console.log(this.presentSeatInfo);
-
             this.snackName = '';
             this.snackNum = '';
+        },
+
+        //删除零嘴
+        deleteSnacks(item) {
+            this.presentSeatInfo.snacks.forEach((ele, i) => {
+                if (ele.name == item.name && ele.num == item.num) {
+                    this.presentSeatInfo.snacks.splice(i, 1);
+                }
+            });
         },
 
         //座位属性回显
@@ -1445,7 +1412,7 @@ export default {
                         minConsumption: '',
                         numberOfPeople: 1,
                         seatAttribute: 2,
-                        seatCode: '',
+                        seatCode: j + '-' + i,
                         seatColumn: i,
                         seatLatestReservationTime: '',
                         seatRow: j,
@@ -1455,30 +1422,33 @@ export default {
                     });
                 }
             }
-        },
 
-        //修改店铺数据
-        setStoreInfo() {},
-
-        //修改座位数量提示
-        changeSeatAlert() {}
+            //重新创建座位就要将之前的样式全部清除
+            this.$refs.seatSpan.forEach((item) => {
+                item.className = 'seat';
+            });
+        }
     },
 
     watch: {
-        // //监听x属性的值
-        // x(newVal, oldVal) {
-        //     if (oldVal != newVal) {
-        //         this.createSeatFn();
-        //         console.log(newVal, oldVal);
-        //     }
-        // },
-        // //监听y属性的值
-        // y(newVal, oldVal) {
-        //     if (oldVal != newVal) {
-        //         this.createSeatFn();
-        //         console.log(newVal, oldVal);
-        //     }
-        // }
+        //监听x属性的值
+        x(newVal, oldVal) {
+            if (this.isReadonly == false) {
+                if (oldVal != newVal) {
+                    this.createSeatFn();
+                    console.log(oldVal, newVal);
+                }
+            }
+        },
+        //监听y属性的值
+        y(newVal, oldVal) {
+            if (this.isReadonly == false) {
+                if (oldVal != newVal) {
+                    this.createSeatFn();
+                    console.log(oldVal, newVal);
+                }
+            }
+        }
     },
 
     created() {},
@@ -1969,7 +1939,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     cursor: pointer;
-    border: 1px solid #ddd !important;
+    border: 1px solid #ddd;
 }
 
 .notBook {
@@ -1978,6 +1948,7 @@ export default {
     height: 20px;
     border-radius: 4px;
     margin-bottom: 10px;
+    margin-right: 10px;
     border: 1px solid transparent !important;
     background-color: #ddd !important;
     cursor: pointer;
@@ -1989,6 +1960,7 @@ export default {
     height: 20px;
     border-radius: 4px;
     margin-bottom: 10px;
+    margin-right: 10px;
     border: 1px solid #ddd !important;
     background-color: #fff !important;
     cursor: pointer;
@@ -2000,6 +1972,7 @@ export default {
     height: 20px;
     border-radius: 4px;
     margin-bottom: 10px;
+    margin-right: 10px;
     border: 1px solid transparent !important;
     background-color: #409eff !important;
     cursor: pointer;
@@ -2011,6 +1984,7 @@ export default {
     height: 20px;
     border-radius: 4px;
     margin-bottom: 10px;
+    margin-right: 10px;
     border: 1px solid transparent !important;
     background-color: #f56c6c !important;
     cursor: pointer;
@@ -2022,6 +1996,7 @@ export default {
     height: 20px;
     border-radius: 4px;
     margin-bottom: 10px;
+    margin-right: 10px;
     border: 1px solid transparent !important;
     background-color: #008000 !important;
     cursor: pointer;

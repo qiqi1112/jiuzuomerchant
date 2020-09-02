@@ -1,17 +1,18 @@
 <template>
     <div id="map">
-        <div class="seac_address" 
+        <div
+            class="seac_address"
             v-loading="cityTrue"
             element-loading-text="拼命加载中"
             element-loading-spinner="el-icon-loading"
             element-loading-background="rgba(0, 0, 0, 0.8)"
         >
-            <span @click.stop class="pro_add" >
-                <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)" ></el-input>
+            <span @click.stop class="pro_add">
+                <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
                 <!-- <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button> -->
             </span>
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
-            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input> -->
+            <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>-->
             <div class="city" @click.stop>
                 <span>{{value}}</span>
                 <span class="changeCity" @click.stop="showCityFun()">切换城市</span>
@@ -19,21 +20,25 @@
                     <div class="all" v-for="(c,i) in city" :key="i">
                         <div class="province">
                             <span>{{c.label}}</span>
-                        </div> 
+                        </div>
                         <div class="city">
-                            <span @click="changeCity(j)" v-for="(j,index) in c.children" :key="index">{{j.label}}</span>
+                            <span
+                                @click="changeCity(j)"
+                                v-for="(j,index) in c.children"
+                                :key="index"
+                            >{{j.label}}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="dtl_add">
-                <el-input v-if="mapList.status" v-model="fristForm.dtl_address" placeholder="请输入详细地址"></el-input>
+                <el-input v-model="fristForm.dtl_address" @blur="trustAddress" placeholder="请输入详细地址"></el-input>
             </div>
             <ul class="add_list" v-if="showList">
                 <div v-if="addressLists!=''">
                     <li @click="assignText(item)" v-for="(item,index) in addressLists" :key="index">
-                        {{item.title}} 
-                        <span>{{item.address}}</span>    
+                        {{item.title}}
+                        <span>{{item.address}}</span>
                     </li>
                 </div>
                 <div v-else class="notAdd">没有相关地址~</div>
@@ -44,35 +49,35 @@
 </template>
 
 <script>
-var geocoder,map;
+var geocoder, map;
 import city from '../../utils/city';
 export default {
     data() {
         return {
             fun: null,
-            mapData:'',
+            mapData: '',
             mapWidth: '',
             maiHeight: '',
-            cityTrue:true,
+            cityTrue: true,
             fristForm: {
                 longitude: '', //经度
                 latitude: '', //纬度
                 address: '', //输入的地址
-                dtl_address:'',//详细地址
+                dtl_address: '' //详细地址
             },
-            add_info:'',//子组件传值    
-            markersArray:[],
-            addressLists: [],//下拉菜单数据
-            city:[],
-            value:'',
-            searchService:'',
-            geocoder:'',
+            add_info: '', //子组件传值
+            markersArray: [],
+            addressLists: [], //下拉菜单数据
+            city: [],
+            value: '',
+            searchService: '',
+            geocoder: '',
             // marker:'',//控件
-            markers:[]
+            markers: []
         };
     },
-    props:{
-        mapList:{type:Object}
+    props: {
+        mapList: { type: Object }
     },
 
     computed: {
@@ -87,14 +92,16 @@ export default {
         if (this.mapList) {
             this.mapWidth = this.mapList.width ? this.mapList.width : '1000px';
             this.maiHeight = this.mapList.height ? this.mapList.height : '600px';
-            if(this.mapList.searchAddress){
-                this.fristForm.address = this.mapList.searchAddress
+            if (this.mapList.searchAddress) {
+                this.fristForm.address = this.mapList.searchAddress;
             }
-            if(this.mapList.trustAddress){
-                this.fristForm.dtl_address = this.mapList.trustAddress
+            if (this.mapList.trustAddress) {
+                this.fristForm.dtl_address = this.mapList.trustAddress;
             }
         }
         this.city = city;
+
+        // console.log("zzz",this.mapList);
     },
     mounted() {
         this.mapTX();
@@ -103,14 +110,21 @@ export default {
     },
     watch: {
         'fristForm.address': {
-            handler: function(val) {
-                    this.debounce(this.changeStr,500);
+            handler: function (val) {
+                this.debounce(this.changeStr, 500);
                 // this.childData()
             },
             deep: true
-        }
+        },
+
+        // 'fristForm.dtl_address': {
+        //     handler: function (newVal, oldVal) {
+        //         this.trustAddress();
+        //     },
+        //     deep: true
+        // }
     },
-    methods:{
+    methods: {
         // 没有 点击下拉菜单时默认赋值返回数据第一个
         // defGet(){
         //     if(this.add_info == ''){
@@ -120,36 +134,43 @@ export default {
         //     }
         //     console.log(this.add_info)
         // },
-        childData(){
-            this.$emit('child-data',this.add_info)
+        trustAddress() {
+            this.childData();
+        },
+        
+
+        childData() {
+            console.log(this.fristForm.dtl_address);
+            this.add_info['trustAddress'] = this.fristForm.dtl_address;
+            this.$emit('child-data', this.add_info);
         },
         showCityFun() {
             this.$store.commit('change', 1);
         },
         showPosition(position) {
-            this.cityTrue = false
+            this.cityTrue = false;
             if (this.mapList) {
                 this.mapWidth = this.mapList.width ? this.mapList.width : '1000px';
                 this.maiHeight = this.mapList.height ? this.mapList.height : '600px';
-                if(this.mapList.searchAddress){
-                    this.fristForm.address = this.mapList.searchAddress
+                if (this.mapList.searchAddress) {
+                    this.fristForm.address = this.mapList.searchAddress;
                     this.$nextTick(() => {
-                        this.changeStr()
+                        this.changeStr();
                     });
                 }
-                if(this.mapList.trustAddress){
-                    this.fristForm.dtl_address = this.mapList.trustAddress
+                if (this.mapList.trustAddress) {
+                    this.fristForm.dtl_address = this.mapList.trustAddress;
                 }
             }
-            this.value = position.city
-            this.fristForm.longitude = position.lng
-            this.fristForm.latitude = position.lat
+            this.value = position.city;
+            this.fristForm.longitude = position.lng;
+            this.fristForm.latitude = position.lat;
         },
-        showPositionErr(err){
-            this.cityTrue = false
-            this.value = '成都市'
-            this.fristForm.longitude = 104.08329
-            this.fristForm.latitude = 30.65618
+        showPositionErr(err) {
+            this.cityTrue = false;
+            this.value = '成都市';
+            this.fristForm.longitude = 104.08329;
+            this.fristForm.latitude = 30.65618;
         },
         // 关闭弹窗
         close() {
@@ -167,40 +188,45 @@ export default {
             }
             this.fun = setTimeout(fn, wait);
         },
-        changeStr(data){
-            let address = encodeURI(this.fristForm.address)
-            this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`).then(res=>{
-                if(res.status == 0){
-                    this.addressLists = res.data
-                }else if(res.status == 330){
-                    this.addressLists = []
-                }else{
-                    this.$message({
-                        message: '遇到一点问题~，请刷新后再试',
-                        type: 'warning'
-                    });
-                }
-            }).catch(err=>{
-                console.log(err)
-            })
+        changeStr(data) {
+            let address = encodeURI(this.fristForm.address);
+            this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`)
+                .then((res) => {
+                    if (res.status == 0) {
+                        this.addressLists = res.data;
+                        this.add_info = res.data[0]
+
+                        // console.log(res.data);
+                    } else if (res.status == 330) {
+                        this.addressLists = [];
+                    } else {
+                        this.$message({
+                            message: '遇到一点问题~，请刷新后再试',
+                            type: 'warning'
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
             // this.searchService.search(this.fristForm.address);
             // this.searchService.setLocation(this.value);
         },
         // 地图控件  展示
-        mapControls(data){
+        mapControls(data) {
             this.searchService.search(this.fristForm.address);
         },
         // 点击搜索结果赋值、
-        assignText(val){
+        assignText(val) {
             // 调用接口时
-            this.add_info = val
-            this.$store.commit('change', 3)
-            this.fristForm.longitude = val.location.lng
-            this.fristForm.latitude = val.location.lat
-            this.fristForm.address = val.title
-            this.mapControls(this.add_info)
-            this.childData()
-            // 本地搜索时 展示 
+            this.add_info = val;
+            this.$store.commit('change', 3);
+            this.fristForm.longitude = val.location.lng;
+            this.fristForm.latitude = val.location.lat;
+            this.fristForm.address = val.title;
+            this.mapControls(this.add_info);
+            this.childData();
+            // 本地搜索时 展示
             // this.fristForm.longitude = val.latLng.lng
             // this.fristForm.latitude = val.latLng.lat
             // this.fristForm.address = val.name
@@ -236,7 +262,7 @@ export default {
                     map: map
                 });
                 //绑定单击事件添加参数  点击地图
-                qq.maps.event.addListener(map, 'click', function(event) {
+                qq.maps.event.addListener(map, 'click', function (event) {
                     that.fristForm.longitude = event.latLng.getLng(); // 经度
                     that.fristForm.latitude = event.latLng.getLat(); // 纬度
                     if (that.markersArray) {
@@ -269,9 +295,9 @@ export default {
 
                 // 本地查询 不调用接口
                 this.searchService = new qq.maps.SearchService({
-                    complete : function(results){
+                    complete: function (results) {
                         // that.addressLists = results.detail.pois
-                        if(results.type === "CITY_LIST") {
+                        if (results.type === 'CITY_LIST') {
                             that.searchService.setLocation(results.detail.cities[0].cityName);
                             that.searchService.search(that.fristForm.address);
                             return;
@@ -279,15 +305,15 @@ export default {
                         that.clearOverlays(that.markers);
                         var pois = results.detail.pois;
                         var latlngBounds = new qq.maps.LatLngBounds();
-                        for(var i = 0,l = pois.length;i < l; i++){
+                        for (var i = 0, l = pois.length; i < l; i++) {
                             var poi = pois[i];
-                            latlngBounds.extend(poi.latLng);  
+                            latlngBounds.extend(poi.latLng);
                             var marker = new qq.maps.Marker({
-                                map:map,
+                                map: map,
                                 position: poi.latLng
                             });
                             marker.setTitle(poi.name);
-                            that.markers.push(marker)
+                            that.markers.push(marker);
                         }
                         map.fitBounds(latlngBounds);
                     }
@@ -362,34 +388,40 @@ export default {
                 top: 25px;
                 height: 400px;
                 overflow-y: scroll;
-                span{
+                span {
                     margin-right: 10px;
                     margin-bottom: 10px;
                     display: inline-block;
                     // width: 25%;
                 }
-                .city{
-                    span{
+                .city {
+                    span {
                         color: #676767;
                         cursor: pointer;
                     }
-                    span:hover{
+                    span:hover {
                         color: red;
                     }
                 }
-                .all{
-                    display:flex;
-                    .province{
-                        flex: .3;
+                .all {
+                    display: flex;
+                    .province {
+                        flex: 0.3;
                     }
-                    .city{
-                        flex: .7;
+                    .city {
+                        flex: 0.7;
                     }
                 }
             }
-            .cityList::-webkit-scrollbar {display:none}
-            .cityList {scrollbar-width: none;}
-            .cityList {-ms-overflow-style: none;}
+            .cityList::-webkit-scrollbar {
+                display: none;
+            }
+            .cityList {
+                scrollbar-width: none;
+            }
+            .cityList {
+                -ms-overflow-style: none;
+            }
         }
         .el-input--small {
             width: 300px;

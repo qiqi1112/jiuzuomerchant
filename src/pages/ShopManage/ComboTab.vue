@@ -2,10 +2,28 @@
     <div class="goods-info-box">
         <div class="left-box">
             <el-form ref="comboForm" :model="comboForm" label-width="80px">
-                <p>
-                    <span>套餐名称：</span>
-                    <el-input v-model="comboForm.name" style="width:200px"></el-input>
-                </p>
+                <div class="good-name-box">
+                    <div>
+                        <span>套餐名称：</span>
+                        <el-input v-model="comboForm.name" style="width:160px"></el-input>
+                    </div>
+                    <div>
+                        <span>商品排序：</span>
+                        <!-- <el-input v-model="comboForm.weight" style="width:100px"></el-input> -->
+                        <el-select
+                            v-model="comboForm.weight"
+                            placeholder="推荐位位权重"
+                            style="width:140px"
+                        >
+                            <el-option
+                                v-for="item in comboForm.options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            ></el-option>
+                        </el-select>
+                    </div>
+                </div>
                 <p>
                     <span>套餐包含：</span>
                     <el-input type="textarea" v-model="comboForm.desc" style="width:300px;"></el-input>
@@ -36,14 +54,11 @@
                 list-type="picture-card"
                 :http-request="uploadBannerFiles"
                 :on-remove="comboBannerRemove"
-                :file-list="bannerImgBox"
+                :file-list="comboForm.bannerImgBox"
                 :on-error="uploadError"
             >
                 <i class="el-icon-plus"></i>
             </el-upload>
-            <!-- <el-dialog :visible.sync="bannerDialog">
-                <img :src="bannerImageUrl" alt />
-            </el-dialog>-->
             <span>（*如需商店轮播推荐，请添加Banner图片）</span>
         </div>
         <div class="right-box">
@@ -57,7 +72,11 @@
                     :show-file-list="false"
                     :on-error="uploadError"
                 >
-                    <img v-if="thumImageUrl" :src="thumImageUrl" class="avatar" />
+                    <img
+                        v-if="comboForm.thumImageUrl"
+                        :src="showImgPrefix + comboForm.thumImageUrl"
+                        class="avatar"
+                    />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -71,7 +90,11 @@
                     :show-file-list="false"
                     :on-error="uploadError"
                 >
-                    <img v-if="detailImageUrl" :src="detailImageUrl" class="avatar" />
+                    <img
+                        v-if="comboForm.detailImageUrl"
+                        :src="showImgPrefix + comboForm.detailImageUrl"
+                        class="avatar"
+                    />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -81,6 +104,8 @@
 
 <script>
 export default {
+    props: ['comboFormParent'], //父组件传过来的值
+
     data() {
         return {
             fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
@@ -90,82 +115,104 @@ export default {
             //表单属性
             comboForm: {
                 name: '',
+                weight: '',
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
                 spec: ['默认'],
-                checkedBanner: false
-            },
+                checkedBanner: false,
+                options: [
+                    {
+                        label: '0',
+                        value: '0'
+                    },
+                    {
+                        label: '1',
+                        value: '1'
+                    },
+                    {
+                        label: '2',
+                        value: '2'
+                    },
+                    {
+                        label: '3',
+                        value: '3'
+                    }
+                ],
 
-            // bannerDialog: false, //查看图集时的对话框
-            // bannerImageUrl: '', //图集放大查看地址
-            bannerImgBox: [], //回显在图集容器中的所有图片
-            bannerUploadUrl: '', //上传banner图集时的url字符串
-
-            thumImageUrl: '', //缩略图
-            detailImageUrl: '' //详情图
+                // bannerDialog: false, //查看图集时的对话框
+                // bannerImageUrl: '', //图集放大查看地址
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '' //详情图
+            }
         };
     },
 
+    watch: {
+        comboForm: {
+            handler() {
+                this.sendChildForm();
+            },
+            deep: true
+        }
+    },
+
     methods: {
+        sendChildForm() {
+            this.$emit('comboFormChild', this.comboForm);
+        },
+
+        //上传banner图集
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.bannerUploadUrl += res.data[0] + ',';
-                console.log('图集地址', this.bannerUploadUrl);
+                this.comboForm.bannerUploadUrl += res.data[0] + ',';
+                console.log('图集地址', this.comboForm.bannerUploadUrl);
             });
         },
-
-        uploadThumFiles(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.thumImageUrl = this.showImgPrefix + res.data;
-            });
-        },
-
-        uploadDetailFiles(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.detailImageUrl = this.showImgPrefix + res.data;
-            });
-        },
-
-        //点击查看套餐banner图时
-        // comboBannerPreview(file) {
-        //     this.bannerDialog = true; //展示图集的对话框开启
-        //     this.bannerImageUrl = file.url; //将返回的图集地址展示到页面上
-        // },
 
         //移除套餐banner图时
         comboBannerRemove(file, fileList) {
             //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
             console.log(file, fileList);
+
+            // let urlArr = this.bannerUploadUrl.split(',');
+            // urlArr.forEach((item, i) => {
+            //     if (this.showImgPrefix + item == file.url) {
+            //         urlArr.splice(i, 1);
+            //         this.bannerShowBox.splice(i, 1);
+            //     }
+            // });
+
+            // this.bannerUploadUrl = urlArr.join(',');
+
+            // console.log(this.bannerUploadUrl);
+        },
+
+        //上传缩略图
+        uploadThumFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.comboForm.thumImageUrl = res.data;
+            });
+        },
+
+        //上传详情图
+        uploadDetailFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.comboForm.detailImageUrl = res.data;
+            });
         },
 
         //图片上传失败时
         uploadError() {
             this.$message.error('插入失败');
-        },
-
-        //添加套餐-------------------------------------------------------
-        setComboInfo() {
-            let data = {
-                type: this.activeNum,
-                name: this.comboForm.name,
-                synopsis: this.comboForm.desc,
-                originalPrice: this.comboForm.originPrice,
-                presentPrice: this.comboForm.nowPrice,
-                recommendAdStatus: 2,
-                recommendStatus: 2,
-                listPicture: 'shangzuo-dev/20200828/edk8f3v5b9j1d6s16y2p.jpg',
-                infoPicture: 'shangzuo-dev/20200828/wa2wu8b47raagzp6cn5f.jpg'
-            };
-            this.$post('/dev/merchant/store/goods/save', data).then((res) => {
-                console.log(res);
-            });
         }
     }
 };
