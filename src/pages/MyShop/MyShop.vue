@@ -862,7 +862,7 @@ export default {
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
                 this.bannerUploadUrl += res.data[0] + ',';
-                // console.log(this.bannerUploadUrl);
+                console.log(this.bannerUploadUrl);
             });
         },
 
@@ -986,7 +986,7 @@ export default {
                 lonlat: `${this.longitude},${this.latitude}`,
                 name: this.shopName,
                 perCapitaConsumption: this.perCon,
-                picture: this.bannerUploadUrl,
+                picture: (this.bannerUploadUrl = this.bannerUploadUrl.slice(0, this.bannerUploadUrl.length - 1)),
                 province: this.province,
                 rowNumberBanner: this.rowNumImageUrl,
                 searchAddress: this.searchAddress,
@@ -1053,7 +1053,7 @@ export default {
                 lonlat: `${this.longitude},${this.latitude}`,
                 name: this.shopName,
                 perCapitaConsumption: this.perCon,
-                picture: this.bannerUploadUrl,
+                picture: (this.bannerUploadUrl = this.bannerUploadUrl.slice(0, this.bannerUploadUrl.length - 1)),
                 province: this.province,
                 rowNumberBanner: this.rowNumImageUrl,
                 searchAddress: this.searchAddress,
@@ -1068,7 +1068,7 @@ export default {
 
             console.log('xxx', data);
 
-            this.$put('/merchant/store/update', data)
+            this.$put('/dev/merchant/store/update', data)
                 .then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
@@ -1219,8 +1219,8 @@ export default {
         //回显banner图集
         showBannerImg(picStr) {
             this.bannerImgBox = [];
-            this.bannerShowBox = this.imgStrChangeArr(picStr.slice(0, picStr.length - 1)); //回显在自定义的位置
-            let pictureArr = this.imgStrChangeArr(picStr.slice(0, picStr.length - 1)); //回显在上传图集的容器中
+            this.bannerShowBox = this.imgStrChangeArr(picStr); //回显在自定义的位置
+            let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
             pictureArr.forEach((item) => {
                 let obj = {};
                 obj.url = item;
@@ -1246,7 +1246,7 @@ export default {
 
         //回显店铺数据
         getStoreInfo() {
-            this.$get('/merchant/store/getStoreInfo').then((res) => {
+            this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     console.log(res.data);
                     let result = res.data;
@@ -1269,7 +1269,7 @@ export default {
                     this.shopName = result.name;
                     this.perCon = result.perCapitaConsumption;
                     let picture = result.picture;
-                    this.bannerUploadUrl = result.picture;
+                    this.bannerUploadUrl = result.picture + ',';
                     this.province = result.province;
                     this.rowNumImageUrl = result.rowNumberBanner;
                     this.searchAddress = result.searchAddress;

@@ -67,7 +67,7 @@ export default {
                 loginNameOrPhone: this.param.username,
                 loginPassword: this.param.password
             };
-            this.$post('/merchant/store/login', data).then(
+            this.$post('/dev/merchant/store/login', data).then(
                 (res) => {
                     console.log(res);
                     if (res.code == 0) {

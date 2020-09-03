@@ -2,10 +2,21 @@
     <div class="goods-info-box">
         <div class="left-box">
             <el-form ref="otherForm" :model="otherForm" label-width="80px">
-                <p>
+                <!-- <p>
                     <span>商品名称：</span>
                     <el-input v-model="otherForm.name" style="width:200px"></el-input>
-                </p>
+                </p>-->
+                <div class="good-name-box">
+                    <div>
+                        <span>商品名称：</span>
+                        <el-input v-model="otherForm.name" style="width:160px"></el-input>
+                    </div>
+                    <div>
+                        <span>商品排序（可选）：</span>
+                        <!-- <el-input type="number" min="0" v-model="drinksForm.goodWeight" style="width:200px" placeholder="请输入商品排序（如：0）"></el-input> -->
+                        <el-input-number v-model="otherForm.weight" :min="0" label="商品排序"></el-input-number>
+                    </div>
+                </div>
                 <p>
                     <span>商品包含：</span>
                     <el-input type="textarea" v-model="otherForm.desc" style="width:300px;"></el-input>
@@ -19,7 +30,42 @@
                 </p>
                 <p class="combo-spec">
                     <span>商品规格：</span>
-                    <i v-for="(item,index) in otherForm.spec" :key="index">{{item}}</i>
+                    <el-form
+                        :model="otherForm.dynamicValidateForm"
+                        ref="otherForm.dynamicValidateForm"
+                        label-width="100px"
+                        class="demo-dynamic"
+                    >
+                        <el-form-item
+                            v-for="(domain, index) in otherForm.dynamicValidateForm.domains"
+                            :key="index"
+                        >
+                            <el-input
+                                v-model="domain.specName"
+                                placeholder="规格（如：一箱）"
+                                style="width:132px;margin-right:10px"
+                            ></el-input>
+                            <el-input
+                                v-model="domain.originalPrice"
+                                placeholder="原价（如：9.99）"
+                                style="width:130px;margin-right:10px"
+                            ></el-input>
+                            <el-input
+                                v-model="domain.presentPrice"
+                                placeholder="现价（如：9.99）"
+                                style="width:130px;margin-right:10px"
+                            ></el-input>
+                            <el-button @click="addDomain">
+                                <i class="el-icon-plus"></i>
+                            </el-button>
+                            <el-button
+                                v-show="otherForm.dynamicValidateForm.domains.length > 1"
+                                @click.prevent="removeDomain(domain)"
+                            >
+                                <i class="el-icon-close"></i>
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
                 </p>
             </el-form>
             <p>
@@ -29,27 +75,19 @@
                     border
                     style="margin-right:20px"
                 ></el-checkbox>
-                <!-- <el-select
-                                            v-model="otherForm.weight"
-                                            placeholder="Banner位权重"
-                                            style="width:140px"
-                                        >
-                                            <el-option
-                                                v-for="item in otherForm.options"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            ></el-option>
-                </el-select>-->
             </p>
             <!-- banner图 -->
             <el-upload
+                v-if="otherForm.checkedBanner"
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :show-file-list="false"
+                action="1"
+                list-type="picture-card"
+                :http-request="uploadBannerFiles"
+                :on-remove="bannerRemove"
+                :file-list="otherForm.bannerImgBox"
+                :on-error="uploadError"
             >
-                <img v-if="otherForm.bannerImageUrl" :src="otherForm.bannerImageUrl" class="avatar" />
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                <i class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <span>（*如需商店轮播推荐，请添加Banner图片）</span>
         </div>
@@ -59,10 +97,16 @@
                 <span>商品缩略图：</span>
                 <el-upload
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="1"
                     :show-file-list="false"
+                    :http-request="uploadThumFiles"
+                    :on-error="uploadError"
                 >
-                    <img v-if="otherForm.thumImageUrl" :src="otherForm.thumImageUrl" class="avatar" />
+                    <img
+                        v-if="otherForm.thumImageUrl"
+                        :src="showImgPrefix + otherForm.thumImageUrl"
+                        class="avatar"
+                    />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -71,12 +115,14 @@
                 <span>商品详情图：</span>
                 <el-upload
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="1"
                     :show-file-list="false"
+                    :http-request="uploadDetailFiles"
+                    :on-error="uploadError"
                 >
                     <img
                         v-if="otherForm.detailImageUrl"
-                        :src="otherForm.detailImageUrl"
+                        :src="showImgPrefix + otherForm.detailImageUrl"
                         class="avatar"
                     />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -88,37 +134,167 @@
 
 <script>
 export default {
+    props: ['otherFormParent'], //父组件传过来的值
+
     data() {
         return {
+            fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
+            filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
+            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
+
             //其他标签页表单--------------------------------------------
             otherForm: {
                 name: '',
+                weight: 0,
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
-                spec: ['1份', '1盒'],
                 checkedBanner: false,
 
-                bannerImageUrl: '', //banner图
-                bannerDialog: false, //查看图集时的对话框
-                //banner图上传时携带的参数
-                bannerImg: {
-                    img: ''
-                },
-
+                bannerImgBox: [], //回显在图集容器中的所有图片
+                bannerUploadUrl: '', //上传banner图集时的url字符串
                 thumImageUrl: '', //缩略图
-                //缩略图上传时携带的参数
-                thumImg: {
-                    img: ''
-                },
-
                 detailImageUrl: '', //详情图
-                //详情图上传时携带的参数
-                detailImg: {
-                    img: ''
+
+                //酒水新增规格
+                dynamicValidateForm: {
+                    domains: [
+                        {
+                            specName: '', //规格
+                            originalPrice: '', //规格原价
+                            presentPrice: '' //规格现价
+                        }
+                    ]
                 }
             }
         };
+    },
+
+    watch: {
+        //监听表单信息变化
+        otherForm: {
+            handler() {
+                this.sendChildForm();
+            },
+            deep: true
+        }
+    },
+
+    mounted() {
+        this.assignParentToChild(); //回显商品信息
+    },
+
+    methods: {
+        //回显父组件传过来的值（编辑商品）
+        assignParentToChild() {
+            this.otherForm.name = this.otherFormParent.name;
+            this.otherForm.weight = this.otherFormParent.weight;
+            this.otherForm.desc = this.otherFormParent.desc;
+            this.otherForm.originPrice = this.otherFormParent.originPrice;
+            this.otherForm.nowPrice = this.otherFormParent.nowPrice;
+            this.otherForm.checkedBanner = this.otherFormParent.checkedBanner;
+            this.otherForm.bannerUploadUrl = this.otherFormParent.bannerUploadUrl + ',';
+            let picture = this.otherFormParent.bannerUploadUrl;
+            this.otherForm.thumImageUrl = this.otherFormParent.thumImageUrl;
+            this.otherForm.detailImageUrl = this.otherFormParent.detailImageUrl;
+            this.otherForm.dynamicValidateForm.domains = this.otherFormParent.dynamicValidateForm.domains;
+
+            this.showBannerImg(picture);
+        },
+
+        //将字符串分割为数组（banner图片专用）
+        imgStrChangeArr(str) {
+            let res = str.split(',');
+            let newRes = res.map((item) => {
+                return (item = this.showImgPrefix + item);
+            });
+            return newRes;
+        },
+
+        //回显banner图集
+        showBannerImg(picStr) {
+            this.otherForm.bannerImgBox = [];
+            let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
+            pictureArr.forEach((item) => {
+                let obj = {};
+                obj.url = item;
+                this.otherForm.bannerImgBox.push(obj);
+            });
+        },
+
+        // 删除banner图集
+        bannerRemove(file) {
+            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
+            console.log(file);
+
+            // console.log("zzz",this.otherForm.bannerUploadUrl);
+
+            let urlArr = this.otherForm.bannerUploadUrl.split(',');
+            urlArr.forEach((item, i) => {
+                if (this.showImgPrefix + item == file.url) {
+                    urlArr.splice(i, 1);
+                }
+            });
+
+            this.otherForm.bannerUploadUrl = urlArr.join(',');
+
+            console.log(this.otherForm.bannerUploadUrl);
+        },
+
+        //发送当前子组件的表单信息给父组件
+        sendChildForm() {
+            this.$emit('otherFormChild', this.otherForm);
+        },
+
+        //规格添加按钮
+        addDomain() {
+            this.otherForm.dynamicValidateForm.domains.push({
+                specName: '', //规格
+                originalPrice: '', //规格原价
+                presentPrice: '' //规格现价
+            });
+        },
+
+        //规格删除按钮
+        removeDomain(item) {
+            var index = this.otherForm.dynamicValidateForm.domains.indexOf(item);
+            if (index !== -1) {
+                this.otherForm.dynamicValidateForm.domains.splice(index, 1);
+            }
+        },
+
+        //上传banner图集
+        uploadBannerFiles(file) {
+            let formData = new FormData();
+            formData.append('files', file.file);
+            this.$post(this.filesUploadUrl, formData).then((res) => {
+                this.otherForm.bannerUploadUrl += res.data[0] + ',';
+                console.log('图集地址', this.otherForm.bannerUploadUrl);
+            });
+        },
+
+        //上传缩略图
+        uploadThumFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.otherForm.thumImageUrl = res.data;
+            });
+        },
+
+        //上传详情图
+        uploadDetailFiles(file) {
+            let formData = new FormData();
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.otherForm.detailImageUrl = res.data;
+            });
+        },
+
+        //图片上传失败时
+        uploadError() {
+            this.$message.error('插入失败');
+        }
     }
 };
 </script>

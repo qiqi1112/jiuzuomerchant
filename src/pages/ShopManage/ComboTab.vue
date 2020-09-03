@@ -8,19 +8,9 @@
                         <el-input v-model="comboForm.name" style="width:160px"></el-input>
                     </div>
                     <div>
-                        <!-- <span>商品排序：</span> -->
-                        <el-select
-                            v-model="comboForm.weight"
-                            placeholder="商品排序"
-                            style="width:110px"
-                        >
-                            <el-option
-                                v-for="item in comboForm.options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                            ></el-option>
-                        </el-select>
+                        <span>商品排序（可选）：</span>
+                        <!-- <el-input type="number" min="0" v-model="drinksForm.goodWeight" style="width:200px" placeholder="请输入商品排序（如：0）"></el-input> -->
+                        <el-input-number v-model="comboForm.weight" :min="0" label="商品排序"></el-input-number>
                     </div>
                 </div>
                 <p>
@@ -49,10 +39,12 @@
             </p>
             <!-- banner图 -->
             <el-upload
+                v-if="comboForm.checkedBanner"
+                class="avatar-uploader"
                 action="1"
                 list-type="picture-card"
                 :http-request="uploadBannerFiles"
-                :on-remove="comboBannerRemove"
+                :on-remove="bannerRemove"
                 :file-list="comboForm.bannerImgBox"
                 :on-error="uploadError"
             >
@@ -67,8 +59,8 @@
                 <el-upload
                     class="avatar-uploader"
                     action="1"
-                    :http-request="uploadThumFiles"
                     :show-file-list="false"
+                    :http-request="uploadThumFiles"
                     :on-error="uploadError"
                 >
                     <img
@@ -85,8 +77,8 @@
                 <el-upload
                     class="avatar-uploader"
                     action="1"
-                    :http-request="uploadDetailFiles"
                     :show-file-list="false"
+                    :http-request="uploadDetailFiles"
                     :on-error="uploadError"
                 >
                     <img
@@ -114,33 +106,13 @@ export default {
             //表单属性
             comboForm: {
                 name: '',
-                weight: '',
+                weight: 0,
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
                 spec: ['默认'],
                 checkedBanner: false,
-                options: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
 
-                // bannerDialog: false, //查看图集时的对话框
-                // bannerImageUrl: '', //图集放大查看地址
                 bannerImgBox: [], //回显在图集容器中的所有图片
                 bannerUploadUrl: '', //上传banner图集时的url字符串
                 thumImageUrl: '', //缩略图
@@ -159,7 +131,66 @@ export default {
         }
     },
 
+    mounted() {
+        this.assignParentToChild(); //回显商品信息
+    },
+
     methods: {
+        //回显父组件传过来的值（编辑商品）
+        assignParentToChild() {
+            this.comboForm.name = this.comboFormParent.name;
+            this.comboForm.weight = this.comboFormParent.weight;
+            this.comboForm.desc = this.comboFormParent.desc;
+            this.comboForm.originPrice = this.comboFormParent.originPrice;
+            this.comboForm.nowPrice = this.comboFormParent.nowPrice;
+            this.comboForm.checkedBanner = this.comboFormParent.checkedBanner;
+            this.comboForm.bannerUploadUrl = this.comboFormParent.bannerUploadUrl + ',';
+            let picture = this.comboFormParent.bannerUploadUrl;
+            this.comboForm.thumImageUrl = this.comboFormParent.thumImageUrl;
+            this.comboForm.detailImageUrl = this.comboFormParent.detailImageUrl;
+
+            this.showBannerImg(picture);
+        },
+
+        //将字符串分割为数组（banner图片专用）
+        imgStrChangeArr(str) {
+            let res = str.split(',');
+            let newRes = res.map((item) => {
+                return (item = this.showImgPrefix + item);
+            });
+            return newRes;
+        },
+
+        //回显banner图集
+        showBannerImg(picStr) {
+            this.comboForm.bannerImgBox = [];
+            let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
+            pictureArr.forEach((item) => {
+                let obj = {};
+                obj.url = item;
+                this.comboForm.bannerImgBox.push(obj);
+            });
+        },
+
+        // 删除banner图集
+        bannerRemove(file) {
+            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
+            console.log(file);
+
+            // console.log("zzz",this.comboForm.bannerUploadUrl);
+
+            let urlArr = this.comboForm.bannerUploadUrl.split(',');
+            urlArr.forEach((item, i) => {
+                if (this.showImgPrefix + item == file.url) {
+                    urlArr.splice(i, 1);
+                }
+            });
+
+            this.comboForm.bannerUploadUrl = urlArr.join(',');
+
+            console.log(this.comboForm.bannerUploadUrl);
+        },
+
         //发送当前子组件的表单信息给父组件
         sendChildForm() {
             this.$emit('comboFormChild', this.comboForm);
@@ -171,26 +202,12 @@ export default {
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
                 this.comboForm.bannerUploadUrl += res.data[0] + ',';
+
+                // this.comboForm.bannerUploadUrl = this.comboForm.bannerUploadUrl.slice(0, this.comboForm.bannerUploadUr.length - 1);
+
+                // this.comboForm.bannerUploadUrl = this.comboForm.bannerUploadUrl.slice(0, this.comboForm.bannerUploadUrl.length - 1)
                 console.log('图集地址', this.comboForm.bannerUploadUrl);
             });
-        },
-
-        //移除套餐banner图时
-        comboBannerRemove(file, fileList) {
-            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
-            console.log(file, fileList);
-
-            // let urlArr = this.bannerUploadUrl.split(',');
-            // urlArr.forEach((item, i) => {
-            //     if (this.showImgPrefix + item == file.url) {
-            //         urlArr.splice(i, 1);
-            //         this.bannerShowBox.splice(i, 1);
-            //     }
-            // });
-
-            // this.bannerUploadUrl = urlArr.join(',');
-
-            // console.log(this.bannerUploadUrl);
         },
 
         //上传缩略图

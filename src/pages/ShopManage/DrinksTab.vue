@@ -5,10 +5,11 @@
                 <p>
                     <span>酒水名称：</span>
                     <el-input v-model="drinksForm.name" style="width:170px;margin-right:20px"></el-input>
+                    <!-- 酒水分类 -->
                     <el-select
                         v-model="drinksForm.classify"
-                        placeholder="酒水分类"
-                        style="width:110px;margin-right:20px"
+                        placeholder="酒水分类（可选）"
+                        style="width:150px;margin-right:20px"
                     >
                         <el-option
                             v-for="item in drinksForm.classifyOptions"
@@ -17,18 +18,11 @@
                             :value="item.value"
                         ></el-option>
                     </el-select>
-                    <el-select
-                        v-model="drinksForm.goodWeight"
-                        placeholder="商品排序"
-                        style="width:110px"
-                    >
-                        <el-option
-                            v-for="item in drinksForm.goodOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        ></el-option>
-                    </el-select>
+                </p>
+                <p>
+                    <span>商品排序（可选）：</span>
+                    <!-- <el-input type="number" min="0" v-model="drinksForm.goodWeight" style="width:200px" placeholder="请输入商品排序（如：0）"></el-input> -->
+                    <el-input-number v-model="drinksForm.goodWeight" :min="0" label="商品排序"></el-input-number>
                 </p>
                 <p>
                     <span>酒水包含：</span>
@@ -47,30 +41,35 @@
                 <p class="drinks-spec">
                     <span>酒水规格：</span>
                     <el-form
-                        :model="dynamicValidateForm"
-                        ref="dynamicValidateForm"
+                        :model="drinksForm.dynamicValidateForm"
+                        ref="drinksForm.dynamicValidateForm"
                         label-width="100px"
                         class="demo-dynamic"
                     >
                         <el-form-item
-                            v-for="(domain, index) in dynamicValidateForm.domains"
+                            v-for="(domain, index) in drinksForm.dynamicValidateForm.domains"
                             :key="index"
                         >
                             <el-input
-                                v-model="domain.spec"
-                                placeholder="规格（如：一打、一箱）"
-                                style="width:170px;margin-right:10px"
+                                v-model="domain.specName"
+                                placeholder="规格（如：一箱）"
+                                style="width:132px;margin-right:10px"
                             ></el-input>
                             <el-input
-                                v-model="domain.price"
-                                placeholder="规格单价（如：999.99）"
-                                style="width:173px;margin-right:10px"
+                                v-model="domain.originalPrice"
+                                placeholder="原价（如：9.99）"
+                                style="width:130px;margin-right:10px"
+                            ></el-input>
+                            <el-input
+                                v-model="domain.presentPrice"
+                                placeholder="现价（如：9.99）"
+                                style="width:130px;margin-right:10px"
                             ></el-input>
                             <el-button @click="addDomain">
                                 <i class="el-icon-plus"></i>
                             </el-button>
                             <el-button
-                                v-show="dynamicValidateForm.domains.length > 1"
+                                v-show="drinksForm.dynamicValidateForm.domains.length > 1"
                                 @click.prevent="removeDomain(domain)"
                             >
                                 <i class="el-icon-close"></i>
@@ -80,28 +79,49 @@
                 </p>
             </el-form>
             <div class="drinks-update-box">
-                <!-- 商家推荐位 -->
+                <!-- 推荐banner图 -->
                 <div class="banner-box">
                     <el-checkbox
                         v-model="drinksForm.checkedBanner"
-                        label="放至商家推荐位"
+                        label="放至商店Banner位"
                         border
                         style="margin-right:20px"
                     ></el-checkbox>
-                    <el-select
-                        v-model="drinksForm.recoWeight"
-                        placeholder="推荐位位权重"
-                        style="width:140px"
-                    >
-                        <el-option
-                            v-for="item in drinksForm.recoOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        ></el-option>
-                    </el-select>
                     <div class="drinks-div">
                         <el-upload
+                            v-if="drinksForm.checkedBanner"
+                            class="avatar-uploader"
+                            action="1"
+                            list-type="picture-card"
+                            :http-request="uploadBannerFiles"
+                            :on-remove="bannerRemove"
+                            :file-list="drinksForm.bannerImgBox"
+                            :on-error="uploadError"
+                        >
+                            <i class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                        <span>（*如需商店轮播推荐，请添加Banner图片）</span>
+                    </div>
+                </div>
+
+                <!-- 商家推荐位 -->
+                <div class="reco-box">
+                    <el-checkbox
+                        v-model="drinksForm.checkedReco"
+                        label="放至商家推荐位"
+                        border
+                        style="width:88%;margin-bottom: 20px;"
+                    ></el-checkbox>
+                    <!-- <span>推荐位排序（可选）：</span>
+                    <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>-->
+                    <div v-if="drinksForm.checkedReco">
+                        <span>推荐位排序：</span>
+                        <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>
+                    </div>
+
+                    <div class="drinks-div">
+                        <el-upload
+                            v-if="drinksForm.checkedReco"
                             class="avatar-uploader"
                             action="1"
                             :show-file-list="false"
@@ -110,28 +130,12 @@
                         >
                             <img
                                 v-if="drinksForm.recoImageUrl"
-                                :src="drinksForm.recoImageUrl"
+                                :src="showImgPrefix + drinksForm.recoImageUrl"
                                 class="avatar"
                             />
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                         <span>（*如需商家推荐，请添加推荐位图片）</span>
-                    </div>
-                </div>
-
-                <!-- 推荐banner图 -->
-                <div class="reco-box">
-                    <el-checkbox v-model="drinksForm.checkedReco" label="放至商店Banner位" border></el-checkbox>
-                    <div class="drinks-div">
-                        <el-upload class="avatar-uploader" action="1" :show-file-list="false">
-                            <img
-                                v-if="drinksForm.bannerImageUrl"
-                                :src="drinksForm.bannerImageUrl"
-                                class="avatar"
-                            />
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                        <span>（*如需商店轮播推荐，请添加Banner图片）</span>
                     </div>
                 </div>
             </div>
@@ -149,7 +153,7 @@
                 >
                     <img
                         v-if="drinksForm.thumImageUrl"
-                        :src="drinksForm.thumImageUrl"
+                        :src="showImgPrefix + drinksForm.thumImageUrl"
                         class="avatar"
                     />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -167,7 +171,7 @@
                 >
                     <img
                         v-if="drinksForm.detailImageUrl"
-                        :src="drinksForm.detailImageUrl"
+                        :src="showImgPrefix + drinksForm.detailImageUrl"
                         class="avatar"
                     />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -179,115 +183,112 @@
 
 <script>
 export default {
+    props: ['drinksFormParent'], //父组件传过来的值
+
     data() {
         return {
+            fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
+            filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
+            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
+
             //酒水标签页表单-----------------------------------------
             drinksForm: {
                 name: '',
-                classify: '',
-                classifyOptions: [
-                    {
-                        label: '啤酒',
-                        value: '啤酒'
-                    },
-                    {
-                        label: '香槟',
-                        value: '香槟'
-                    },
-                    {
-                        label: '饮料',
-                        value: '饮料'
-                    },
-                    {
-                        label: '矿泉水',
-                        value: '矿泉水'
-                    }
-                ],
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
                 checkedBanner: false,
                 checkedReco: false,
 
-                goodWeight: '',
-                goodOptions: [
+                //酒水分类
+                classify: '',
+                classifyOptions: [
                     {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
+                        label: '红酒',
                         value: '1'
                     },
                     {
-                        label: '2',
+                        label: '白酒',
                         value: '2'
                     },
                     {
-                        label: '3',
+                        label: '啤酒',
                         value: '3'
+                    },
+                    {
+                        label: '香槟',
+                        value: '4'
+                    },
+                    {
+                        label: '洋酒',
+                        value: '5'
+                    },
+                    {
+                        label: '调制酒',
+                        value: '6'
+                    },
+                    {
+                        label: '饮料',
+                        value: '7'
                     }
                 ],
 
-                recoWeight: '',
-                recoOptions: [
-                    {
-                        label: '0',
-                        value: '0'
-                    },
-                    {
-                        label: '1',
-                        value: '1'
-                    },
-                    {
-                        label: '2',
-                        value: '2'
-                    },
-                    {
-                        label: '3',
-                        value: '3'
-                    }
-                ],
+                //商品排序
+                goodWeight: 0,
+
+                //商家推荐位排序
+                recoWeight: 0,
 
                 bannerImgBox: [], //回显在图集容器中的所有图片
                 bannerUploadUrl: '', //上传banner图集时的url字符串
                 recoImageUrl: '', //推荐位图
                 thumImageUrl: '', //缩略图
-                detailImageUrl: '' //详情图
-            },
+                detailImageUrl: '', //详情图
 
-            //酒水新增规格
-            dynamicValidateForm: {
-                domains: [
-                    {
-                        spec: '', //规格
-                        price: '' //规格价格
-                    }
-                ]
+                //酒水新增规格
+                dynamicValidateForm: {
+                    domains: [
+                        {
+                            specName: '', //规格
+                            originalPrice: '', //规格原价
+                            presentPrice: '' //规格现价
+                        }
+                    ]
+                }
             }
         };
     },
 
+    watch: {
+        drinksForm: {
+            handler(val) {
+                this.sendChildForm();
+            },
+            deep: true
+        }
+    },
+
     methods: {
+        //发送当前子组件的表单信息给父组件
+        sendChildForm() {
+            this.$emit('drinksFormChild', this.drinksForm);
+        },
+
         //酒水规格添加按钮
         addDomain() {
-            this.dynamicValidateForm.domains.push({
-                spec: '',
-                price: ''
+            this.drinksForm.dynamicValidateForm.domains.push({
+                specName: '', //规格
+                originalPrice: '', //规格原价
+                presentPrice: '' //规格现价
             });
         },
 
         //酒水规格删除按钮
         removeDomain(item) {
-            var index = this.dynamicValidateForm.domains.indexOf(item);
+            var index = this.drinksForm.dynamicValidateForm.domains.indexOf(item);
             if (index !== -1) {
-                this.dynamicValidateForm.domains.splice(index, 1);
+                this.drinksForm.dynamicValidateForm.domains.splice(index, 1);
             }
-        },
-
-        //发送当前子组件的表单信息给父组件
-        sendChildForm() {
-            this.$emit('drinksFormChild', this.drinksForm);
         },
 
         //上传banner图集
@@ -301,7 +302,7 @@ export default {
         },
 
         //移除套餐banner图时
-        comboBannerRemove(file, fileList) {
+        bannerRemove(file, fileList) {
             //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
             console.log(file, fileList);
 
