@@ -4,6 +4,7 @@ import router from './router';
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import store from './store/store'
+import VueSocketIO from 'vue-socket.io'
 import {
     messages
 } from './components/common/i18n';
@@ -27,6 +28,28 @@ Vue.prototype.$post = post;
 Vue.prototype.$get = get;
 Vue.prototype.$Delete = Delete;
 Vue.prototype.$put = put;
+
+
+Vue.use(new VueSocketIO({
+    debug: true,
+    connection: 'http://192.168.31.94:9210',
+    vuex: {
+        store,
+        actionPrefix: 'SOCKET_',
+        mutationPrefix: 'SOCKET_'
+    },
+    options: { path: "/socket.io",query: {
+        token: JSON.parse(localStorage.getItem('userInfo')).token,
+        signature:'123456'
+    }}
+}))
+
+// Vue.use(VueSocketio, SocketIO('http://192.168.31.94:9210'),{
+//     query: {
+//         token: JSON.parse(localStorage.getItem('userInfo')).token,
+//         signature:'123456'
+//     }
+// });
 
 
 //手机号过滤器

@@ -3,28 +3,28 @@
         <div class="box">
             <div class="people_list">
                 <ul>
-                    <li :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">{{item.loginName}}</li>
+                    <li :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">{{item.msg.msg.loginName}}</li>
                 </ul>
             </div>
             <div class="chat" v-if="now_user">
                 <div class="record">
-                    <div class="username">{{now_user.loginName}}</div>
+                    <div class="username">{{now_user.msg.msg.loginName}}</div>
                     <div class="chat_list">
                         <div class="cli">
                             <div class="cmsg" v-for="(item,i) in roomChatText" :key="i">
-                                <div class="msg_list" v-if="item.from == now_user.id">
+                                <div class="msg_list" v-if="item.from == now_user.msg.msg.id">
                                     <div class="headImg">
                                         <img  src="img/4.jpg" alt="">
                                     </div>
                                     <div class="msg">
-                                        <span>{{item.msg.msg}}</span>
+                                        <div>{{item.msg.msg}}</div>
                                     </div>
                                 </div>
                                 <div class="msg_list self" v-else>
-                                    <div class="msg">
-                                        <span>{{item.msg.msg}}</span>
+                                    <div class="msg self_msg">
+                                        <div>{{item.msg.msg}}</div>
                                     </div>
-                                    <div class="headImg">
+                                    <div class="headImg self_img">
                                         <img  src="img/3.jpg" alt="">
                                     </div>
                                 </div>
@@ -65,76 +65,36 @@
 
             </div>
         </div> 
-
-
-        <!-- 
-```
-> 经纬度消息
-```
-    {
-        "target_type": "users", //目标类型：用户users，群chatgroups，聊天室chatrooms
-        "target": ["user2"],//目标数组，userId,groupId,roomId
-        "msg": {
-            "type": "loc", // 消息类型 文本txt 图片img 位置loc 语音audio 视频video 文件file
-            "lat": "39.966",
-            "lng":"116.322",
-            "addr":"中国北京市海淀区中关村"
-            },
-        "from": "user1"
-    }
-```
-> 文件消息
-```
-    {
-        "target_type": "users", //目标类型：用户users，群chatgroups，聊天室chatrooms
-        "target": ["user2"],//目标数组，userId,groupId,roomId
-        "msg": {
-            "type": "img", // 消息类型 文本txt 图片img 位置loc 语音audio 视频video 文件file
-            "url": "http://oss.cdhqht.com/test.png"
-            },
-        "from": "user1"
-    }
- -->
-    
     </div>
 </template>
 
 <script>
+// import SocketIO from "socket.io-client";
     export default {
         data() {
             return {
                 activeName: 'first',
                 now_user:'',
+                mySelf:'',
                 // active:null,//默认需要点击
-                active:0,
+                active:null,
                 sendText:'',
                 userList:[
-                    {
-                        "id":"1297081179142270977",
-                        "loginName":"文雪峰",
-                        "phone":"18200329369",
-                        "loginPassword":"e10adc3949ba59abbe56e057f20f883e",
-                        "token":null,
-                        "roomIds":[],
-                        "online":true,
-                        "socketId":"1300745849701273600",
-                        "serverId":"200000"
-                    },
-                    {
-                        "id":"1297081179142277777",
-                        "loginName":"小猫",
-                        "phone":"18200329222",
-                        "loginPassword":"e10adc3949ba59abbe56e057f20f883e",
-                        "token":null,
-                        "roomIds":[],
-                        "online":true,
-                        "socketId":"1300745849701273600",
-                        "serverId":"200000"
-                    },
                     // {
-                    //     "id":"1297081179142278888",
-                    //     "loginName":"小狗",
-                    //     "phone":"18200329111",
+                    //     "id":"1297081179142270977",
+                    //     "loginName":"文雪峰",
+                    //     "phone":"18200329369",
+                    //     "loginPassword":"e10adc3949ba59abbe56e057f20f883e",
+                    //     "token":null,
+                    //     "roomIds":[],
+                    //     "online":true,
+                    //     "socketId":"1300745849701273600",
+                    //     "serverId":"200000"
+                    // },
+                    // {
+                    //     "id":"1297081179142277777",
+                    //     "loginName":"小猫",
+                    //     "phone":"18200329222",
                     //     "loginPassword":"e10adc3949ba59abbe56e057f20f883e",
                     //     "token":null,
                     //     "roomIds":[],
@@ -144,42 +104,42 @@
                     // },
                 ],
                 roomChatText:[
-                    {
-                        "target_type": "users", //目标类型：用户users，群chatgroups，聊天室chatrooms
-                        "target": ["user2"],//目标数组，userId,groupId,roomId
-                        "msg": {
-                            "type": "txt", // 消息类型 文本txt 图片img 位置loc 语音audio 视频video 文件file
-                            "msg": "你好"
-                        },
-                        "from": "1297081179142270977"
-                    },
-                    {
-                        "target_type": "users",
-                        "target": ["user2"],
-                        "msg": {
-                            "type": "txt", 
-                            "msg": "这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西"
-                        },
-                        "from": "1297081179142270977"
-                    },
-                    {
-                        "target_type": "users", 
-                        "target": ["user2"],
-                        "msg": {
-                            "type": "txt", 
-                            "msg": "这是个吃的"
-                        },
-                        "from": "user2"
-                    },
-                    {
-                        "target_type": "users",
-                        "target": ["user2"],
-                        "msg": {
-                            "type": "txt", 
-                            "msg": "哦哦，知道了"
-                        },
-                        "from": "1297081179142270977"
-                    },
+                    // {
+                    //     "target_type": "users", //目标类型：用户users，群chatgroups，聊天室chatrooms
+                    //     "target": ["user2"],//目标数组，userId,groupId,roomId
+                    //     "msg": {
+                    //         "type": "txt", // 消息类型 文本txt 图片img 位置loc 语音audio 视频video 文件file
+                    //         "msg": "你好"
+                    //     },
+                    //     "from": "1297081179142270977"
+                    // },
+                    // {
+                    //     "target_type": "users",
+                    //     "target": ["user2"],
+                    //     "msg": {
+                    //         "type": "txt", 
+                    //         "msg": "这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西"
+                    //     },
+                    //     "from": "1297081179142270977"
+                    // },
+                    // {
+                    //     "target_type": "users", 
+                    //     "target": ["user2"],
+                    //     "msg": {
+                    //         "type": "txt", 
+                    //         "msg": "这是个吃的"
+                    //     },
+                    //     "from": "user2"
+                    // },
+                    // {
+                    //     "target_type": "users",
+                    //     "target": ["user2"],
+                    //     "msg": {
+                    //         "type": "txt", 
+                    //         "msg": "哦哦，知道了"
+                    //     },
+                    //     "from": "1297081179142270977"
+                    // },
                 ],
                 oneList:[
                     'asdasdasdasd','阿发发士大夫胜多负少','手动阀手动阀手动阀'
@@ -187,100 +147,82 @@
             }
         },
         created(){
-            this.now_user = this.userList[0]
+            
+            // this.now_user = this.userList[0]
+            // this.socketInit()
+        },
+        sockets: {
+            connect(data) {
+                console.log('连接成功')
+                // setInterval(()=>{
+                //     this.$socket.emit("heart_interval");
+                // },1000);
+            },
+            error(data){
+                console.log(data,'错误')
+            },
+            new_user_result(data){
+                console.log(data,'收到用户信息')
+                this.userList.push(data)
+
+            },
+            reconnect(data){
+                console.log(data,'重新连接')
+            },
+            disconnect(data){
+                console.log('断开连接',data)
+                // this.$socket.emit('connect', 1)
+            },
+            hall_join(data){
+
+            },
+            pong(data){
+                // console.log(data,'pong')
+                // this.$socket.emit("h_ping",1);
+            },
+            login_result(data){
+                this.mySelf = data
+                console.log(data)
+            },
+            hall_join_push(data){
+                console.log(data,'新用户加入')
+            },
+            hall_broadcast_push(data) {
+                console.log(data,'收到消息')
+                this.roomChatText.push(data)
+            }
+        },
+        mounted(){
+           
         },
         methods: {
             getChat(val,i){
                 this.now_user = val
                 this.active = i
-                console.log(this.now_user.id)
-                if(i==1){
-                    this.roomChatText = 
-                    [
-                        {
-                            "target_type": "users", 
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "哎呀，不会了"
-                            },
-                            "from": "1297081179142277777"
-                        },
-                        {
-                            "target_type": "users",
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "你可以这样，你可以这样，你可以这样，你可以这样，你可以这样，你可以这样，你可以这样，你可以这样，你可以这样，"
-                            },
-                            "from": "uesr2"
-                        },
-                        {
-                            "target_type": "users", 
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "噢噢噢噢噢噢噢噢噢噢噢噢噢"
-                            },
-                            "from": "user2"
-                        },
-                        {
-                            "target_type": "users",
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "8888888"
-                            },
-                            "from": "1297081179142277777"
-                        }
-                    ]
-                }else if(i == 0){
-                    this.roomChatText =  [
-                        {
-                            "target_type": "users", //目标类型：用户users，群chatgroups，聊天室chatrooms
-                            "target": ["user2"],//目标数组，userId,groupId,roomId
-                            "msg": {
-                                "type": "txt", // 消息类型 文本txt 图片img 位置loc 语音audio 视频video 文件file
-                                "msg": "你好"
-                            },
-                            "from": "1297081179142270977"
-                        },
-                        {
-                            "target_type": "users",
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西这是个什么东西这是个什么东西个什么东西这是个什么东西"
-                            },
-                            "from": "1297081179142270977"
-                        },
-                        {
-                            "target_type": "users", 
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "这是个吃的"
-                            },
-                            "from": "user2"
-                        },
-                        {
-                            "target_type": "users",
-                            "target": ["user2"],
-                            "msg": {
-                                "type": "txt", 
-                                "msg": "哦哦，知道了"
-                            },
-                            "from": "1297081179142270977"
-                        },
-                    ]
-                }
+                console.log(this.mySelf.id,val.target[0])
+                this.$socket.emit('join', {userId:3,roomId:val.target[0]})
+              
             },
             send(){
                 if(this.sendText ==''){
                     this.$message('发送消息不能为空')
                     return
                 }
-                alert(this.sendText)
+                let data = {
+                    "target_type": "users", //目标类型：用户users，群chatgroups，聊天室chatrooms
+                    "target": ["user2"],//目标数组，userId,groupId,roomId
+                    "msg": {
+                        "type": "txt", // 消息类型 文本txt 图片img 位置loc 语音audio 视频video 文件file
+                        "msg": this.sendText
+                    },
+                    "from": "user2"
+                }
+
+                this.$socket.emit('hall_broadcast', {msg:this.sendText,roomId:this.now_user.target[0]});
+                // hall_join 加入房间
+                // this.roomChatText.push(data)
+                this.sendText = ''
+                
             },
             handleClick(tab, event) {
                 // console.log(tab, event);
@@ -288,7 +230,7 @@
             // 点击快捷回复
             quickRrep(val){
                 this.sendText = val
-            }
+            },
         },
         computed: {
             
@@ -391,13 +333,34 @@
                         .headImg{
                             flex: .08;
                             img{
-                                height: 30px;
-                                width: 30px;
+                                height: 35px;
+                                width: 35px;
+                                border-radius: 4px;
                             }
                         }
                         .msg{
                             flex: .92;
+                            width: 200px;
+                            div{
+                                padding: 10px;
+                                border-radius: 10px;
+                                color: #f3f3f3;
+                                max-width: 400px;
+                                display: inline-block;
+                                background: #f37b1d;
+                            }
                         }
+                        .self_img{
+                            text-align: right;
+                        }
+                        .self_msg{
+                            div{
+                                margin: auto;
+                                margin-right: 0;
+                                text-align: left;
+                                background: #39b54a;
+                            }
+                        }        
                     }
                 }
             }

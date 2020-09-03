@@ -32,7 +32,8 @@ module.exports = {
             },
 
             '/dev': {
-                target: "http://192.168.31.94:8077",
+                // target: "http://192.168.31.94:8077",
+                target: "http://47.108.204.66:8077",
                 // ws: true,
                 // secure:true,
                 changeOrigin: true,
