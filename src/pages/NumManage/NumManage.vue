@@ -8,6 +8,7 @@
                     </el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
+
             <div class="tit_top">
                 <span class="li_text">当前排号总数<span>24</span></span>
                 <span class="li_text">成功排号数<span>24</span></span>
@@ -18,6 +19,7 @@
             <div><el-button @click="call()" type="primary" icon="el-icon-search">呼叫下一位</el-button></div>
 
             <div class="numeral_list">
+                
                 <div class="fl_box">
                     <div class="column">
                         <span class="line lw2"></span>
@@ -57,20 +59,23 @@
                     </ul>
                 </div>
                 <div class="fl_box">
-                    <div class="column">
+                    <div class="column" >
                         <span class="line lw2"></span>
                         <span>成功排号记录</span>
-                        <el-date-picker
-                            v-model="time_now"
-                            :clearable="false"
-                            type="date"
-                            @focus="focSta=true"
-                            :editable="false"
-                            @blur="focSta=false"
-                            :time-arrow-control='true'
-                            placeholder="请选择时间">
-                        </el-date-picker>
-                        <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
+
+                        <div class="time-ch">
+                            <el-date-picker
+                                v-model="time_now"
+                                :clearable="false"
+                                type="date"
+                                @focus="focSta=true"
+                                :editable="false"
+                                @blur="focSta=false"
+                                :time-arrow-control='true'
+                                placeholder="请选择时间">
+                            </el-date-picker>
+                            <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
+                        </div>
                     </div>
                     <ul>
                         <li class='li_n suc_num'>
@@ -109,17 +114,19 @@
                     <div class="column">
                         <span class="line lw2"></span>
                         <span>取消排号记录</span>
-                        <el-date-picker
-                            v-model="time_now_no"
-                            :clearable="false"
-                            type="date"
-                            @focus="focSta=true"
-                            :editable="false"
-                            @blur="focSta=false"
-                            :time-arrow-control='true'
-                            placeholder="请选择时间">
-                        </el-date-picker>
-                        <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
+                        <div class="time-ch">
+                            <el-date-picker
+                                v-model="time_now_no"
+                                :clearable="false"
+                                type="date"
+                                @focus="focSta=true"
+                                :editable="false"
+                                @blur="focSta=false"
+                                :time-arrow-control='true'
+                                placeholder="请选择时间">
+                            </el-date-picker>
+                            <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
+                        </div>
                     </div>
                     <ul>
                         <li class='li_n fail_num'>
@@ -237,6 +244,9 @@ export default {
 </script>
 
 <style scoped lang='less'>
+@media screen and (max-width: 1300px) {
+    @font-size:12px;
+}
 @font-size:14px;
 @bor-color:rgb(97, 97, 97);
 #numeral{
@@ -251,7 +261,7 @@ export default {
         .li_text{
             margin-right: 32px;
             span{
-                font-size: 18px;
+                font-size: 1.2rem;
                 margin-left: 10px;
                 color: rgb(255, 102, 0);
             }
@@ -262,12 +272,17 @@ export default {
         display: flex;
         .fl_box{
             flex: 1;
+            
             .li_n{
                 border: 1px solid @bor-color;
                 border-radius: 5px;
                 margin-bottom: 15px;
                 padding: 10px;
                 width: 90%;
+            }
+            .time-ch{
+                margin: auto;
+                margin-right: 7%;
             }
             .now_num{
                 display: flex;
@@ -320,10 +335,10 @@ export default {
                         margin-right: 15px;
                     }
                     .tel_lab{
-                        margin-right: 30px;
+                        margin-right: 7%;
                     }
                     .tel{
-                         margin-right: 50px;
+                        margin-right: 11%;
                     }
                     .tex{
                         margin-right: 10px;
@@ -336,7 +351,7 @@ export default {
                          margin-right: 10px;
                     }
                     .get_tim{
-                         margin-right: 50px;
+                         margin-right: 11%;
                     }
                     .fai_lab{
                          margin-right: 10px;
@@ -409,7 +424,6 @@ ul,li{
 }
 /deep/ .el-date-editor{
     width: 114px;
-    margin-left: 52%;
 }
 /deep/ .el-input__prefix{
     display: none;
