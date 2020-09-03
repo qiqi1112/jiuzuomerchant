@@ -381,12 +381,14 @@ export default {
 </script>
 
 <style scoped lang='less'>
-@font-14:14px;
-@font-15:15px;
+@font-size:14px;
+    @media screen and (max-width: 1300px) {
+        @font-size:12px;
+    }
 @def-color:#000;
 @line-bg-color:rgb(138, 143, 134);
 .top_box{
-    font-size: @font-14;
+    font-size: @font-size;
     height: 120px;
     border-bottom: 1px solid #000;
     display: flex;
@@ -453,7 +455,7 @@ export default {
 }
 
 .main_box{
-    font-size: @font-14;
+    font-size: @font-size;
     display: flex;
     .m_l{
         flex: .45;
@@ -526,31 +528,12 @@ export default {
             .day_li {-ms-overflow-style: none;}
         }
     }
-    // .column{
-    //     display: flex;
-    //     margin: 20px 0;
-    // }
 }
-// 公用
-// .line{
-//     width: 5px;
-//     background: @line-bg-color;
-//     margin-right: 10px;
-//     display: inline-block;
-// }
-// .lw1{
-//     height: 30px;
 
-// }
-// .lw2{
-//     height: 20px;
-    
-// }
 .xtc{
     color: rgb(255, 102, 0);
     font-weight: 600;
-    font-size: 18px;
-
+    font-size: 1.2rem;
 }
 .xj{
     color: rgb(55, 55, 177);
@@ -562,7 +545,6 @@ export default {
     font-size: 16px;
     width:125px;
     height:30px;
-    // top: 210px;
     top: 340px;
 }
 .choose::before{
@@ -593,7 +575,8 @@ export default {
     top: -7px;
     /deep/.el-rate__icon{
         color: red!important;
-        font-size: 27px;
+        // font-size: 27px;
+        font-size: 1.7rem;
     }
     /deep/ .el-rate__decimal{
         color: red!important;
@@ -602,7 +585,8 @@ export default {
         position: absolute;
         left: -48px;
         top: -2px;
-        font-size: 30px;
+        // font-size: 30px;
+        font-size: 1.8rem;
         font-weight: bold;
         color: #000!important;
         
