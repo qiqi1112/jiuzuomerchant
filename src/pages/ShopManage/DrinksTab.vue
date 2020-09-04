@@ -8,7 +8,7 @@
                     <!-- 酒水分类 -->
                     <el-select
                         v-model="drinksForm.classify"
-                        placeholder="酒水分类（可选）"
+                        placeholder="酒水分类"
                         style="width:150px;margin-right:20px"
                     >
                         <el-option
@@ -20,8 +20,7 @@
                     </el-select>
                 </p>
                 <p>
-                    <span>商品排序（可选）：</span>
-                    <!-- <el-input type="number" min="0" v-model="drinksForm.goodWeight" style="width:200px" placeholder="请输入商品排序（如：0）"></el-input> -->
+                    <span>商品排序：</span>
                     <el-input-number v-model="drinksForm.goodWeight" :min="0" label="商品排序"></el-input-number>
                 </p>
                 <p>
@@ -89,7 +88,7 @@
                     ></el-checkbox>
                     <div class="drinks-div">
                         <el-upload
-                            v-if="drinksForm.checkedBanner"
+                            v-if="drinksForm.checkedBanner&&drinksForm.checkedBanner !== 2"
                             class="avatar-uploader"
                             action="1"
                             list-type="picture-card"
@@ -114,14 +113,14 @@
                     ></el-checkbox>
                     <!-- <span>推荐位排序（可选）：</span>
                     <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>-->
-                    <div v-if="drinksForm.checkedReco">
+                    <div v-if="drinksForm.checkedReco&&drinksForm.checkedReco !==2">
                         <span>推荐位排序：</span>
                         <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>
                     </div>
 
                     <div class="drinks-div">
                         <el-upload
-                            v-if="drinksForm.checkedReco"
+                            v-if="drinksForm.checkedReco&&drinksForm.checkedReco !== 2"
                             class="avatar-uploader"
                             action="1"
                             :show-file-list="false"
@@ -201,35 +200,35 @@ export default {
                 checkedReco: false,
 
                 //酒水分类
-                classify: '',
+                classify: 1,
                 classifyOptions: [
                     {
                         label: '红酒',
-                        value: '1'
+                        value: 1
                     },
                     {
                         label: '白酒',
-                        value: '2'
+                        value: 2
                     },
                     {
                         label: '啤酒',
-                        value: '3'
+                        value: 3
                     },
                     {
                         label: '香槟',
-                        value: '4'
+                        value: 4
                     },
                     {
                         label: '洋酒',
-                        value: '5'
+                        value: 5
                     },
                     {
                         label: '调制酒',
-                        value: '6'
+                        value: 6
                     },
                     {
                         label: '饮料',
-                        value: '7'
+                        value: 7
                     }
                 ],
 
@@ -240,7 +239,7 @@ export default {
                 recoWeight: 0,
 
                 bannerImgBox: [], //回显在图集容器中的所有图片
-                bannerUploadUrl: '', //上传banner图集时的url字符串
+                bannerUploadUrl: [], //上传banner图集时的url数组
                 recoImageUrl: '', //推荐位图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
@@ -268,10 +267,60 @@ export default {
         }
     },
 
+    mounted() {
+        this.assignParentToChild(); //回显商品信息
+        console.log('酒水组件');
+    },
+
     methods: {
         //发送当前子组件的表单信息给父组件
         sendChildForm() {
             this.$emit('drinksFormChild', this.drinksForm);
+        },
+
+        //回显父组件传过来的值（编辑商品）
+        assignParentToChild() {
+            this.drinksForm.name = this.drinksFormParent.name;
+            this.drinksForm.goodWeight = this.drinksFormParent.goodWeight;
+            this.drinksForm.desc = this.drinksFormParent.desc;
+            this.drinksForm.originPrice = this.drinksFormParent.originPrice;
+            this.drinksForm.nowPrice = this.drinksFormParent.nowPrice;
+            this.drinksForm.checkedBanner = this.drinksFormParent.checkedBanner;
+            this.drinksForm.checkedReco = this.drinksFormParent.checkedReco;
+            this.drinksForm.classify = this.drinksFormParent.classify;
+            this.drinksForm.recoWeight = this.drinksFormParent.recoWeight;
+            this.drinksForm.bannerUploadUrl = this.drinksFormParent.bannerUploadUrl;
+            this.drinksForm.recoImageUrl = this.drinksFormParent.recoImageUrl;
+            this.drinksForm.thumImageUrl = this.drinksFormParent.thumImageUrl;
+            this.drinksForm.detailImageUrl = this.drinksFormParent.detailImageUrl;
+            this.drinksForm.dynamicValidateForm.domains = this.drinksFormParent.dynamicValidateForm.domains;
+
+            //如果回显的图集长度大于1，才回显图片（空字符也算一个值）
+            if (this.drinksForm.bannerUploadUrl.length > 0) {
+                this.showBannerImg(); //回显banner图片
+            }
+        },
+
+        //回显banner图集
+        showBannerImg() {
+            let pictureArr = this.drinksForm.bannerUploadUrl;
+            this.drinksForm.bannerImgBox = [];
+            pictureArr.forEach((item) => {
+                let obj = {};
+                obj.url = this.showImgPrefix + item;
+                this.drinksForm.bannerImgBox.push(obj);
+            });
+        },
+
+        // 删除banner图集
+        bannerRemove(file) {
+            this.drinksForm.bannerUploadUrl.forEach((item, i) => {
+                if (file.url == this.showImgPrefix + item) {
+                    this.drinksForm.bannerUploadUrl.splice(i, 1);
+                }
+            });
+
+            console.log("删除banner后的地址",this.drinksForm.bannerUploadUrl);
         },
 
         //酒水规格添加按钮
@@ -296,27 +345,9 @@ export default {
             let formData = new FormData();
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.drinksForm.bannerUploadUrl += res.data[0] + ',';
+                this.drinksForm.bannerUploadUrl.push(res.data[0]);
                 console.log('图集地址', this.drinksForm.bannerUploadUrl);
             });
-        },
-
-        //移除套餐banner图时
-        bannerRemove(file, fileList) {
-            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
-            console.log(file, fileList);
-
-            // let urlArr = this.bannerUploadUrl.split(',');
-            // urlArr.forEach((item, i) => {
-            //     if (this.showImgPrefix + item == file.url) {
-            //         urlArr.splice(i, 1);
-            //         this.bannerShowBox.splice(i, 1);
-            //     }
-            // });
-
-            // this.bannerUploadUrl = urlArr.join(',');
-
-            // console.log(this.bannerUploadUrl);
         },
 
         //上传推荐位图

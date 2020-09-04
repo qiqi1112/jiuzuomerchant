@@ -13,8 +13,7 @@
                         <el-input v-model="snackForm.name" style="width:160px"></el-input>
                     </div>
                     <div>
-                        <span>商品排序（可选）：</span>
-                        <!-- <el-input type="number" min="0" v-model="drinksForm.goodWeight" style="width:200px" placeholder="请输入商品排序（如：0）"></el-input> -->
+                        <span>商品排序：</span>
                         <el-input-number v-model="snackForm.weight" :min="0" label="商品排序"></el-input-number>
                     </div>
                 </div>
@@ -79,7 +78,7 @@
             </p>
             <!-- banner图 -->
             <el-upload
-                v-if="snackForm.checkedBanner"
+                v-if="snackForm.checkedBanner&&snackForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
                 list-type="picture-card"
@@ -153,7 +152,7 @@ export default {
                 checkedBanner: false,
 
                 bannerImgBox: [], //回显在图集容器中的所有图片
-                bannerUploadUrl: '', //上传banner图集时的url字符串
+                bannerUploadUrl: [], //上传banner图集时的url数组
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
 
@@ -183,6 +182,7 @@ export default {
 
     mounted() {
         this.assignParentToChild(); //回显商品信息
+        console.log('小吃组件');
     },
 
     methods: {
@@ -194,52 +194,36 @@ export default {
             this.snackForm.originPrice = this.snackFormParent.originPrice;
             this.snackForm.nowPrice = this.snackFormParent.nowPrice;
             this.snackForm.checkedBanner = this.snackFormParent.checkedBanner;
-            this.snackForm.bannerUploadUrl = this.snackFormParent.bannerUploadUrl + ',';
-            let picture = this.snackFormParent.bannerUploadUrl;
+            this.snackForm.bannerUploadUrl = this.snackFormParent.bannerUploadUrl;
+            // let picture = this.snackFormParent.bannerUploadUrl;
             this.snackForm.thumImageUrl = this.snackFormParent.thumImageUrl;
             this.snackForm.detailImageUrl = this.snackFormParent.detailImageUrl;
             this.snackForm.dynamicValidateForm.domains = this.snackFormParent.dynamicValidateForm.domains;
 
-            this.showBannerImg(picture);
-        },
-
-        //将字符串分割为数组（banner图片专用）
-        imgStrChangeArr(str) {
-            let res = str.split(',');
-            let newRes = res.map((item) => {
-                return (item = this.showImgPrefix + item);
-            });
-            return newRes;
+            //如果回显的图集长度大于1，才回显图片（空字符也算一个值）
+            if (this.snackForm.bannerUploadUrl.length > 0) {
+                this.showBannerImg(); //回显banner图片
+            }
         },
 
         //回显banner图集
-        showBannerImg(picStr) {
+        showBannerImg() {
+            let pictureArr = this.snackForm.bannerUploadUrl;
             this.snackForm.bannerImgBox = [];
-            let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
             pictureArr.forEach((item) => {
                 let obj = {};
-                obj.url = item;
+                obj.url = this.showImgPrefix + item;
                 this.snackForm.bannerImgBox.push(obj);
             });
         },
 
         // 删除banner图集
         bannerRemove(file) {
-            //第一个参数为当前删除的图集信息，第二个参数为剩余的图集信息数组
-            console.log(file);
-
-            // console.log("zzz",this.snackForm.bannerUploadUrl);
-
-            let urlArr = this.snackForm.bannerUploadUrl.split(',');
-            urlArr.forEach((item, i) => {
-                if (this.showImgPrefix + item == file.url) {
-                    urlArr.splice(i, 1);
+            this.snackForm.bannerUploadUrl.forEach((item, i) => {
+                if (file.url == this.showImgPrefix + item) {
+                    this.snackForm.bannerUploadUrl.splice(i, 1);
                 }
             });
-
-            this.snackForm.bannerUploadUrl = urlArr.join(',');
-
-            console.log(this.snackForm.bannerUploadUrl);
         },
 
         //发送当前子组件的表单信息给父组件
@@ -269,7 +253,7 @@ export default {
             let formData = new FormData();
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.snackForm.bannerUploadUrl += res.data[0] + ',';
+                this.snackForm.bannerUploadUrl.push(res.data[0]);
                 console.log('图集地址', this.snackForm.bannerUploadUrl);
             });
         },

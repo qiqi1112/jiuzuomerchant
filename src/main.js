@@ -30,19 +30,19 @@ Vue.prototype.$Delete = Delete;
 Vue.prototype.$put = put;
 
 
-Vue.use(new VueSocketIO({
-    debug: true,
-    connection: 'http://192.168.31.94:9210',
-    vuex: {
-        store,
-        actionPrefix: 'SOCKET_',
-        mutationPrefix: 'SOCKET_'
-    },
-    options: { path: "/socket.io",query: {
-        token: JSON.parse(localStorage.getItem('userInfo')).token,
-        signature:'123456'
-    }}
-}))
+// Vue.use(new VueSocketIO({
+//     debug: true,
+//     connection: 'http://192.168.31.94:9210',
+//     vuex: {
+//         store,
+//         actionPrefix: 'SOCKET_',
+//         mutationPrefix: 'SOCKET_'
+//     },
+//     options: { path: "/socket.io",query: {
+//         token: JSON.parse(localStorage.getItem('userInfo')).token,
+//         signature:'123456'
+//     }}
+// }))
 
 // Vue.use(VueSocketio, SocketIO('http://192.168.31.94:9210'),{
 //     query: {
