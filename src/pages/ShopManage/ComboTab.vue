@@ -224,7 +224,7 @@ export default {
                     goodsIdList: this.comboForm.goodsIdList,
                     name: this.comboForm.goodName
                 };
-                this.$post('/dev/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
+                this.$post('/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
                     if (res.code == 0) {
                         this.comboForm.options = res.data;
                         this.antiStatus = true;

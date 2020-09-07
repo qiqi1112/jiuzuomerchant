@@ -1001,7 +1001,7 @@ export default {
 
             console.log('xxx', data);
 
-            this.$post('/dev/merchant/store/save', data)
+            this.$post('/merchant/store/save', data)
                 .then((res) => {
                     console.log(res);
                     if (res.code == 0) {
@@ -1068,7 +1068,7 @@ export default {
 
             console.log('xxx', data);
 
-            this.$put('/dev/merchant/store/update', data)
+            this.$put('/merchant/store/update', data)
                 .then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
@@ -1246,7 +1246,7 @@ export default {
 
         //回显店铺数据
         getStoreInfo() {
-            this.$get('/dev/merchant/store/getStoreInfo').then((res) => {
+            this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     console.log(res.data);
                     let result = res.data;
