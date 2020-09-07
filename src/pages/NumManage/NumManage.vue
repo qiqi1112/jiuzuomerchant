@@ -152,6 +152,7 @@
                                 <span class="tex">等待时常</span>
                                 <span class="tim">00:01:10</span>
                             </div>
+                          
                             <div class="su_l">
                                 <span class="get_lab">取号时间</span>
                                 <span class="get_tim">2020-11-19  23:54:03</span>

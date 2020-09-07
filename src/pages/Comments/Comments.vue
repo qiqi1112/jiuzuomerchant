@@ -157,7 +157,15 @@ export default {
     },
     methods: {
         getData() {
-            
+            let data = {
+                orderAppraiseLimitQueryDTO:{
+                    pageNo:1,
+                    pageSize:10,
+                }
+            }
+            this.$post('/merchant/store/appraise/appraiseListByStoreId',data).then(res=>{
+                console.log(res)
+            })
         },
         // 触发搜索按钮
         handleSearch() {

@@ -10,7 +10,7 @@ import Message from "element-ui/packages/message/index.js";
 // axios.defaults.baseURL = 'http://47.108.204.66:8077'
 var token = ''
 // axios.defaults.baseURL = './baseUrl'; //默认地址
-// axios.defaults.baseURL = IP;
+axios.defaults.baseURL = IP;
 axios.interceptors.request.use(config => {
     token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''
     // axios.defaults.headers.common["X-Store-Token"] = token;
