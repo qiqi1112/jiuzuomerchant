@@ -137,8 +137,20 @@
 
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
-                    <el-input v-model="searchName" @keydown.13="handleSearch" placeholder="商品名称" class="handle-input mr10"></el-input>
-                    <el-select v-model="value" placeholder="选择分类" class="mr10" style="width:100px" clearable >
+                    <el-input
+                        v-model="searchName"
+                        @keydown.13.native="handleSearch"
+                        placeholder="商品名称"
+                        class="handle-input mr10"
+                        clearable
+                    ></el-input>
+                    <el-select
+                        v-model="value"
+                        placeholder="选择分类"
+                        class="mr10"
+                        style="width:100px"
+                        clearable
+                    >
                         <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -552,7 +564,7 @@ export default {
 
         //添加商品请求
         addGoodsAjaxPost(data) {
-            this.$post('/merchant/store/goods/save', data).then((res) => {
+            this.$post('/api/merchant/store/goods/save', data).then((res) => {
                 if (res.code == 0) {
                     this.getGoodsInfo();
                     this.$message.success('添加成功');
@@ -566,7 +578,7 @@ export default {
 
         //修改商品请求
         updateGoodsAjaxPost(data) {
-            this.$put('/merchant/store/goods/update', data).then((res) => {
+            this.$put('/api/merchant/store/goods/update', data).then((res) => {
                 if (res.code == 0) {
                     this.getGoodsInfo();
                     this.$message.success('修改成功');
@@ -581,7 +593,7 @@ export default {
 
         //商品编辑
         handleEdit(id) {
-            this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
+            this.$get(`/api/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
                 if (res.code == 0) {
                     this.isUpdate = true;
                     this.goodId = id;
@@ -736,7 +748,7 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
+                    this.$Delete(`/api/merchant/store/goods/deleteById/${id}`).then((res) => {
                         if (res.code == 0) {
                             this.getGoodsInfo();
                             this.$message.success('删除成功');
@@ -758,9 +770,8 @@ export default {
                 type: this.value,
                 name: this.searchName
             };
-            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
+            this.$post('/api/merchant/store/goods/goodsLimit', data).then((res) => {
                 this.goodsData = res.data.list;
-
                 console.log(this.goodsData);
             });
         },
