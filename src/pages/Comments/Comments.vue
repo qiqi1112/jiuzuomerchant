@@ -158,10 +158,10 @@ export default {
     methods: {
         getData() {
             let data = {
-                    pageNo:1,
-                    pageSize:10,
+                pageNo:1,
+                pageSize:10,
             }
-            this.$post('/merchant/store/appraise/appraiseListByStoreId',data).then(res=>{
+            this.$post('/api/merchant/store/appraise/appraiseListByStoreId',data).then(res=>{
                 console.log(res)
             })
         },

@@ -9,7 +9,8 @@ module.exports = {
         open: true,
         proxy: {
             '/api': {
-                target: 'http://musicapi.leanapp.cn',
+                target: 'http://47.108.204.66:8077',
+                // target: "http://192.168.31.94:8077",
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''
