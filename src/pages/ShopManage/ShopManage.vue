@@ -137,8 +137,8 @@
 
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
-                    <el-input v-model="searchName" placeholder="商品名称" class="handle-input mr10"></el-input>
-                    <el-select v-model="value" placeholder="选择分类" class="mr10" style="width:100px">
+                    <el-input v-model="searchName" @keydown.13="handleSearch" placeholder="商品名称" class="handle-input mr10"></el-input>
+                    <el-select v-model="value" placeholder="选择分类" class="mr10" style="width:100px" clearable >
                         <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -552,7 +552,7 @@ export default {
 
         //添加商品请求
         addGoodsAjaxPost(data) {
-            this.$post('/dev/merchant/store/goods/save', data).then((res) => {
+            this.$post('/merchant/store/goods/save', data).then((res) => {
                 if (res.code == 0) {
                     this.getGoodsInfo();
                     this.$message.success('添加成功');
@@ -566,7 +566,7 @@ export default {
 
         //修改商品请求
         updateGoodsAjaxPost(data) {
-            this.$put('/dev/merchant/store/goods/update', data).then((res) => {
+            this.$put('/merchant/store/goods/update', data).then((res) => {
                 if (res.code == 0) {
                     this.getGoodsInfo();
                     this.$message.success('修改成功');
@@ -581,7 +581,7 @@ export default {
 
         //商品编辑
         handleEdit(id) {
-            this.$get(`/dev/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
+            this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
                 if (res.code == 0) {
                     this.isUpdate = true;
                     this.goodId = id;
@@ -736,7 +736,7 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    this.$Delete(`/dev/merchant/store/goods/deleteById/${id}`).then((res) => {
+                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
                         if (res.code == 0) {
                             this.getGoodsInfo();
                             this.$message.success('删除成功');
@@ -758,7 +758,7 @@ export default {
                 type: this.value,
                 name: this.searchName
             };
-            this.$post('dev/merchant/store/goods/goodsLimit', data).then((res) => {
+            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
                 this.goodsData = res.data.list;
 
                 console.log(this.goodsData);
