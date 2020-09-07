@@ -71,25 +71,28 @@
             <p>
                 <el-checkbox
                     v-model="snackForm.checkedBanner"
-                    label="放至商店Banner位"
+                    label="放至商店广告位"
                     border
                     style="margin-right:20px"
                 ></el-checkbox>
             </p>
-            <!-- banner图 -->
+            <!-- 广告图 -->
             <el-upload
                 v-if="snackForm.checkedBanner&&snackForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
-                list-type="picture-card"
+                :show-file-list="false"
                 :http-request="uploadBannerFiles"
-                :on-remove="bannerRemove"
-                :file-list="snackForm.bannerImgBox"
                 :on-error="uploadError"
             >
-                <i class="el-icon-plus avatar-uploader-icon"></i>
+                <img
+                    v-if="snackForm.bannerImageUrl"
+                    :src="showImgPrefix + snackForm.bannerImageUrl"
+                    class="avatar"
+                />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
-            <span>（*如需商店轮播推荐，请添加Banner图片）</span>
+            <span>（*如需商店轮播推荐，请添加广告图片）</span>
         </div>
         <div class="right-box">
             <!-- 缩略图 -->
@@ -151,8 +154,7 @@ export default {
                 nowPrice: '',
                 checkedBanner: false,
 
-                bannerImgBox: [], //回显在图集容器中的所有图片
-                bannerUploadUrl: [], //上传banner图集时的url数组
+                bannerImageUrl: '', //广告图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
 
@@ -162,10 +164,12 @@ export default {
                         {
                             specName: '', //规格
                             originalPrice: '', //规格原价
-                            presentPrice: '' //规格现价
+                            presentPrice: '', //规格现价
+                            skuCode: '' //sku码
                         }
                     ]
-                }
+                },
+                skuCodeArr: [] //sku码数组
             }
         };
     },
@@ -194,36 +198,11 @@ export default {
             this.snackForm.originPrice = this.snackFormParent.originPrice;
             this.snackForm.nowPrice = this.snackFormParent.nowPrice;
             this.snackForm.checkedBanner = this.snackFormParent.checkedBanner;
-            this.snackForm.bannerUploadUrl = this.snackFormParent.bannerUploadUrl;
-            // let picture = this.snackFormParent.bannerUploadUrl;
+            this.snackForm.bannerImageUrl = this.snackFormParent.bannerImageUrl;
             this.snackForm.thumImageUrl = this.snackFormParent.thumImageUrl;
             this.snackForm.detailImageUrl = this.snackFormParent.detailImageUrl;
             this.snackForm.dynamicValidateForm.domains = this.snackFormParent.dynamicValidateForm.domains;
-
-            //如果回显的图集长度大于1，才回显图片（空字符也算一个值）
-            if (this.snackForm.bannerUploadUrl.length > 0) {
-                this.showBannerImg(); //回显banner图片
-            }
-        },
-
-        //回显banner图集
-        showBannerImg() {
-            let pictureArr = this.snackForm.bannerUploadUrl;
-            this.snackForm.bannerImgBox = [];
-            pictureArr.forEach((item) => {
-                let obj = {};
-                obj.url = this.showImgPrefix + item;
-                this.snackForm.bannerImgBox.push(obj);
-            });
-        },
-
-        // 删除banner图集
-        bannerRemove(file) {
-            this.snackForm.bannerUploadUrl.forEach((item, i) => {
-                if (file.url == this.showImgPrefix + item) {
-                    this.snackForm.bannerUploadUrl.splice(i, 1);
-                }
-            });
+            this.snackForm.skuCodeArr = this.snackFormParent.skuCodeArr;
         },
 
         //发送当前子组件的表单信息给父组件
@@ -236,7 +215,8 @@ export default {
             this.snackForm.dynamicValidateForm.domains.push({
                 specName: '', //规格
                 originalPrice: '', //规格原价
-                presentPrice: '' //规格现价
+                presentPrice: '', //规格现价
+                skuCode: '' //sku码
             });
         },
 
@@ -246,15 +226,20 @@ export default {
             if (index !== -1) {
                 this.snackForm.dynamicValidateForm.domains.splice(index, 1);
             }
+
+            //删除一个规格就添加到这个删除规格数组里
+            if (item.skuCode !== '') {
+                this.snackForm.skuCodeArr.push(item.skuCode);
+                console.log('规格', this.snackForm.skuCodeArr);
+            }
         },
 
-        //上传banner图集
+        //上传广告图
         uploadBannerFiles(file) {
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.snackForm.bannerUploadUrl.push(res.data[0]);
-                console.log('图集地址', this.snackForm.bannerUploadUrl);
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.snackForm.bannerImageUrl = res.data;
             });
         },
 

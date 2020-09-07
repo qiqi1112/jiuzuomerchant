@@ -17,6 +17,53 @@
                     <el-input type="textarea" v-model="comboForm.desc" style="width:300px;"></el-input>
                 </p>
                 <p>
+                    <span>选择商品：</span>
+                    <el-select
+                        v-model="comboForm.goodName"
+                        filterable
+                        remote
+                        placeholder="请选择"
+                        @change="selectGoodInfo"
+                        @focus="selectGoodsList"
+                    >
+                        <el-option
+                            v-for="(item,index) in comboForm.options"
+                            :key="index"
+                            :label="item.name"
+                            :value="item.id + '+' + item.listPicture + '+' + item.name + '+' + item.originalPrice + '+' + item.presentPrice"
+                        ></el-option>
+                    </el-select>
+                </p>
+                <p style="width:82%" v-if="comboForm.tableData.length > 0">
+                    <el-table :data="comboForm.tableData" border>
+                        <el-table-column prop="goodsName" label="商品名称" width="150"></el-table-column>
+                        <el-table-column label="商品图片" width="130">
+                            <template slot-scope="scope">
+                                <img
+                                    style="width:100px;height:60px"
+                                    :src="showImgPrefix + scope.row.listPicture"
+                                />
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="originalPrice" label="原价" width="100"></el-table-column>
+                        <el-table-column prop="presentPrice" label="现价" width="100"></el-table-column>
+                        <el-table-column prop="presentPrice" label="数量" width="160">
+                            <template slot-scope="scope">
+                                <el-input-number v-model="scope.row.number" :min="1" label="商品数量"></el-input-number>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                    size="mini"
+                                    type="danger"
+                                    @click="handleDelete(scope.$index, scope.row)"
+                                >移除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </p>
+                <p>
                     <span>套餐原单价：</span>
                     <el-input v-model="comboForm.originPrice" style="width:120px;margin-right:20px"></el-input>
 
@@ -31,25 +78,28 @@
             <p>
                 <el-checkbox
                     v-model="comboForm.checkedBanner"
-                    label="放至商店Banner位"
+                    label="放至商店广告位"
                     border
                     style="margin-right:20px"
                 ></el-checkbox>
             </p>
-            <!-- banner图 -->
+            <!-- 广告图 -->
             <el-upload
                 v-if="comboForm.checkedBanner&&comboForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
-                list-type="picture-card"
+                :show-file-list="false"
                 :http-request="uploadBannerFiles"
-                :on-remove="bannerRemove"
-                :file-list="comboForm.bannerImgBox"
                 :on-error="uploadError"
             >
-                <i class="el-icon-plus"></i>
+                <img
+                    v-if="comboForm.bannerImageUrl"
+                    :src="showImgPrefix + comboForm.bannerImageUrl"
+                    class="avatar"
+                />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
-            <span>（*如需商店轮播推荐，请添加Banner图片）</span>
+            <span>（*如需商店轮播推荐，请添加广告图片）</span>
         </div>
         <div class="right-box">
             <!-- 缩略图 -->
@@ -70,6 +120,7 @@
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
+
             <!-- 详情图 -->
             <p>
                 <span>套餐详情图：</span>
@@ -111,12 +162,16 @@ export default {
                 nowPrice: '',
                 spec: ['默认'],
                 checkedBanner: false,
-
-                bannerImgBox: [], //回显在图集容器中的所有图片
-                bannerUploadUrl: [], //上传banner图集时的url数组
+                bannerImageUrl: '', //广告图
                 thumImageUrl: '', //缩略图
-                detailImageUrl: '' //详情图
-            }
+                detailImageUrl: '', //详情图
+                options: [], //输入框请求到的商品信息数组
+                goodName: '', //选中的商品对应的信息
+                tableData: [], //渲染表格时的所有商品数据
+                goodsIdList: [] //所有已选择的商品对应的id
+            },
+
+            antiStatus: true //防抖状态值
         };
     },
 
@@ -125,7 +180,6 @@ export default {
         comboForm: {
             handler() {
                 this.sendChildForm();
-                console.log(222);
             },
             deep: true
         }
@@ -137,6 +191,69 @@ export default {
     },
 
     methods: {
+        //处理当前选中的商品信息
+        selectGoodInfo() {
+            let goodInfoArr = this.comboForm.goodName.split('+'); //将字符串拆分成数组
+
+            //将商品相关信息存入对象
+            let obj = {
+                goodsId: goodInfoArr[0],
+                listPicture: goodInfoArr[1],
+                goodsName: goodInfoArr[2],
+                originalPrice: goodInfoArr[3],
+                presentPrice: goodInfoArr[4],
+                number: 1
+            };
+
+            this.comboForm.goodsIdList.push(goodInfoArr[0]); //存入当前选择的商品id
+
+            this.comboForm.tableData.push(obj); //存入当前选择的商品所有信息，用于表格回显
+
+            this.comboForm.goodName = ''; //清空选择的选项
+
+            this.selectGoodsList(); //重新请求商品列表
+
+            console.log(this.comboForm.tableData);
+        },
+
+        //请求商品列表
+        selectGoodsList() {
+            if (this.antiStatus == true) {
+                this.antiStatus = false;
+                let data = {
+                    goodsIdList: this.comboForm.goodsIdList,
+                    name: this.comboForm.goodName
+                };
+                this.$post('/dev/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
+                    if (res.code == 0) {
+                        this.comboForm.options = res.data;
+                        this.antiStatus = true;
+                        console.log(this.comboForm.options);
+                    } else {
+                        this.antiStatus = true;
+                        this.$message.error(res.msg);
+                    }
+                });
+            }
+        },
+
+        //移除商品列表里的商品
+        handleDelete(index, row) {
+            //在表格中移除当前商品
+            this.comboForm.tableData.forEach((item, i) => {
+                if (row.goodsId == item.goodsId) {
+                    this.comboForm.tableData.splice(i, 1);
+
+                    //在所已选择的商品id中移除当前商品的id
+                    this.comboForm.goodsIdList.forEach((item, i) => {
+                        if (row.goodsId == item) {
+                            this.comboForm.goodsIdList.splice(i, 1);
+                        }
+                    });
+                }
+            });
+        },
+
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
             this.comboForm.name = this.comboFormParent.name;
@@ -145,34 +262,11 @@ export default {
             this.comboForm.originPrice = this.comboFormParent.originPrice;
             this.comboForm.nowPrice = this.comboFormParent.nowPrice;
             this.comboForm.checkedBanner = this.comboFormParent.checkedBanner;
-            this.comboForm.bannerUploadUrl = this.comboFormParent.bannerUploadUrl;
-            // let picture = this.comboFormParent.bannerUploadUrl;
+            this.comboForm.bannerImageUrl = this.comboFormParent.bannerImageUrl;
             this.comboForm.thumImageUrl = this.comboFormParent.thumImageUrl;
             this.comboForm.detailImageUrl = this.comboFormParent.detailImageUrl;
-
-            if (this.comboForm.bannerUploadUrl.length != 0) {
-                this.showBannerImg(); //回显banner图片
-            }
-        },
-
-        //回显banner图集
-        showBannerImg() {
-            let pictureArr = this. comboForm.bannerUploadUrl;
-            this. comboForm.bannerImgBox = [];
-            pictureArr.forEach((item) => {
-                let obj = {};
-                obj.url = this.showImgPrefix + item;
-                this. comboForm.bannerImgBox.push(obj);
-            });
-        },
-
-        // 删除banner图集
-        bannerRemove(file) {
-            this. comboForm.bannerUploadUrl.forEach((item, i) => {
-                if (file.url == this.showImgPrefix + item) {
-                    this. comboForm.bannerUploadUrl.splice(i, 1);
-                }
-            });
+            this.comboForm.tableData = this.comboFormParent.tableData;
+            this.comboForm.goodsIdList = this.comboFormParent.goodsIdList;
         },
 
         //发送当前子组件的表单信息给父组件
@@ -180,13 +274,12 @@ export default {
             this.$emit('comboFormChild', this.comboForm);
         },
 
-        //上传banner图集
+        //上传广告图
         uploadBannerFiles(file) {
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.comboForm.bannerUploadUrl.push(res.data[0]);
-                console.log('图集地址', this.comboForm.bannerUploadUrl);
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.comboForm.bannerImageUrl = res.data;
             });
         },
 
@@ -217,4 +310,7 @@ export default {
 </script>
 
 <style scoped>
+/* >>>.el-table td,.el-table th {
+    text-align: center !important;
+} */
 </style>

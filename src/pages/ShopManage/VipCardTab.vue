@@ -35,25 +35,28 @@
             <p>
                 <el-checkbox
                     v-model="vipCardForm.checkedBanner"
-                    label="放至商店Banner位"
+                    label="放至商店广告位"
                     border
                     style="margin-right:20px"
                 ></el-checkbox>
             </p>
-            <!-- banner图 -->
+            <!-- 广告图 -->
             <el-upload
                 v-if="vipCardForm.checkedBanner&&vipCardForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
-                list-type="picture-card"
+                :show-file-list="false"
                 :http-request="uploadBannerFiles"
-                :on-remove="bannerRemove"
-                :file-list="vipCardForm.bannerImgBox"
                 :on-error="uploadError"
             >
-                <i class="el-icon-plus avatar-uploader-icon"></i>
+                <img
+                    v-if="vipCardForm.bannerImageUrl"
+                    :src="showImgPrefix + vipCardForm.bannerImageUrl"
+                    class="avatar"
+                />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
-            <span>（*如需商店轮播推荐，请添加Banner图片）</span>
+            <span>（*如需商店轮播推荐，请添加广告图片）</span>
         </div>
         <div class="right-box">
             <!-- 缩略图 -->
@@ -115,9 +118,7 @@ export default {
                 nowPrice: '',
                 spec: ['默认'],
                 checkedBanner: false,
-
-                bannerImgBox: [], //回显在图集容器中的所有图片
-                bannerUploadUrl: [], //上传banner图集时的url数组
+                bannerImageUrl: '', //广告图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '' //详情图
             }
@@ -148,35 +149,9 @@ export default {
             this.vipCardForm.integral = this.vipCardFormParent.integral;
             this.vipCardForm.nowPrice = this.vipCardFormParent.nowPrice;
             this.vipCardForm.checkedBanner = this.vipCardFormParent.checkedBanner;
-            this.vipCardForm.bannerUploadUrl = this.vipCardFormParent.bannerUploadUrl;
-            // let picture = this.vipCardFormParent.bannerUploadUrl;
+            this.vipCardForm.bannerImageUrl = this.vipCardFormParent.bannerImageUrl;
             this.vipCardForm.thumImageUrl = this.vipCardFormParent.thumImageUrl;
             this.vipCardForm.detailImageUrl = this.vipCardFormParent.detailImageUrl;
-
-            //如果回显的图集长度大于1，才回显图片（空字符也算一个值）
-            if (this.vipCardForm.bannerUploadUrl.length > 0) {
-                this.showBannerImg(); //回显banner图片
-            }
-        },
-
-        //回显banner图集
-        showBannerImg() {
-            let pictureArr = this.vipCardForm.bannerUploadUrl;
-            this.vipCardForm.bannerImgBox = [];
-            pictureArr.forEach((item) => {
-                let obj = {};
-                obj.url = this.showImgPrefix + item;
-                this.vipCardForm.bannerImgBox.push(obj);
-            });
-        },
-
-        // 删除banner图集
-        bannerRemove(file) {
-            this.vipCardForm.bannerUploadUrl.forEach((item, i) => {
-                if (file.url == this.showImgPrefix + item) {
-                    this.vipCardForm.bannerUploadUrl.splice(i, 1);
-                }
-            });
         },
 
         //发送当前子组件的表单信息给父组件
@@ -184,13 +159,12 @@ export default {
             this.$emit('vipCardFormChild', this.vipCardForm);
         },
 
-        //上传banner图集
+        //上传广告图
         uploadBannerFiles(file) {
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.vipCardForm.bannerUploadUrl.push(res.data[0]);
-                console.log('图集地址', this.vipCardForm.bannerUploadUrl);
+            formData.append('file', file.file);
+            this.$post(this.fileUploadUrl, formData).then((res) => {
+                this.vipCardForm.bannerImageUrl = res.data;
             });
         },
 
