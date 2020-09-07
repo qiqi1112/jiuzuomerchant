@@ -337,7 +337,6 @@
                     </div>
                 </div>
                 <h4>店铺卡座</h4>
-                <!-- <night-enter-seat></night-enter-seat> -->
                 <div v-if="shopLocaIndex == 1" class="shop-seat">
                     <div class="left-box">
                         <p class="input-seat">
@@ -361,7 +360,6 @@
                                     label="列数"
                                 ></el-input-number>
                             </label>
-                            <!-- <el-button type="primary" @click="sureChangeSeatNum">确定</el-button> -->
                         </p>
                         <div class="seat-title">
                             <p>
@@ -476,7 +474,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <ktv-seat v-if="shopLocaIndex == 2"></ktv-seat> -->
                 <div v-if="shopLocaIndex == 2" class="shop-seat">
                     <div class="left-box">
                         <p class="input-seat">
@@ -500,7 +497,143 @@
                                     label="列数"
                                 ></el-input-number>
                             </label>
-                            <!-- <el-button type="primary" @click="sureChangeSeatNum">确定</el-button> -->
+                        </p>
+                        <div class="seat-title">
+                            <p>
+                                <span class="not-book"></span>
+                                不可预订
+                            </p>
+                            <p>
+                                <span class="can-book"></span>
+                                可预订
+                            </p>
+                            <p>
+                                <span class="in-book"></span>
+                                预定中
+                            </p>
+                            <p>
+                                <span class="has-book"></span>
+                                已预订
+                            </p>
+                            <p>
+                                <span class="stage-book"></span>
+                                舞台
+                            </p>
+                        </div>
+                        <!-- 回显的座位图 -->
+                        <div
+                            v-if="x&&y"
+                            class="seat-box"
+                            ref="seatBox"
+                            :style="{width:32 * y + 30 + 'px'}"
+                            style="overflow:hidden"
+                        >
+                            <div v-for="(itemY,indexY) in Number(y)" :key="indexY">
+                                <div v-for="(itemX,indexX) in Number(x)" :key="indexX">
+                                    <span
+                                        ref="seatSpan"
+                                        :data-indexX="(indexX + 1)"
+                                        :data-indexY="(indexY + 1)"
+                                        class="seat"
+                                        @click="changeStauts($event,seatStyle)"
+                                        @contextmenu.prevent="changeStauts($event,'canBook')"
+                                    ></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-box">
+                        <p class="seat-detail">座位详情</p>
+                        <div class="seat-prop">
+                            <span class="seat-detail-span">座位属性：</span>
+                            <div class="prop-box">
+                                <span
+                                    :class="item.style"
+                                    v-for="(item,index) in seatAttOpt"
+                                    :key="index"
+                                    :title="item.title"
+                                    @click="changeStyle(item.style)"
+                                ></span>
+                            </div>
+                        </div>
+                        <div class="seat-num">
+                            <span class="seat-detail-span">座位号：</span>
+                            <el-input
+                                v-model="presentSeatInfo.seatCode"
+                                placeholder="座位号"
+                                style="width:50%"
+                                :readonly="isReadonly"
+                            ></el-input>
+                        </div>
+                        <div class="seat-num">
+                            <span class="seat-detail-span">座位类型：</span>
+                            <el-radio
+                                :disabled="isReadonly"
+                                v-model="presentSeatInfo.softHardStatus"
+                                label="1"
+                            >软座</el-radio>
+                            <el-radio
+                                :disabled="isReadonly"
+                                v-model="presentSeatInfo.softHardStatus"
+                                label="2"
+                            >硬座</el-radio>
+                        </div>
+                        <div class="acc-people">
+                            <span class="seat-detail-span">容纳人数：</span>
+                            <el-input
+                                v-model="presentSeatInfo.numberOfPeople"
+                                placeholder="容纳人数"
+                                style="width:50%;margin-right:6px"
+                                :readonly="isReadonly"
+                            ></el-input>人
+                        </div>
+                        <div class="min-charge">
+                            <span class="seat-detail-span">最低消费：</span>
+                            <el-input
+                                v-model="presentSeatInfo.minConsumption"
+                                placeholder="最低消费"
+                                style="width:34%;margin-right:6px"
+                                :readonly="isReadonly"
+                            ></el-input>元/人
+                        </div>
+                        <div class="lon-retain">
+                            <span class="seat-detail-span">保留最晚时间：</span>
+                            <el-time-select
+                                style="width:50%"
+                                v-model="presentSeatInfo.seatLatestReservationTime"
+                                :readonly="isReadonly"
+                                :picker-options="{
+                                    start: '00:00',
+                                    step: '00:15',
+                                    end: '23:45'
+                                }"
+                            ></el-time-select>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="shopLocaIndex == 3" class="shop-seat">
+                    <div class="left-box">
+                        <p class="input-seat">
+                            <label style="margin-right:30px">
+                                座位行数：
+                                <el-input-number
+                                    :disabled="isReadonly"
+                                    v-model="x"
+                                    :min="1"
+                                    style="width:120px"
+                                    label="行数"
+                                ></el-input-number>
+                            </label>
+                            <label style="margin-right:30px">
+                                座位列数：
+                                <el-input-number
+                                    :disabled="isReadonly"
+                                    v-model="y"
+                                    :min="1"
+                                    style="width:120px"
+                                    label="列数"
+                                ></el-input-number>
+                            </label>
                         </p>
                         <div class="seat-title">
                             <p>
@@ -707,7 +840,7 @@ export default {
             logoImageUrl: '', //店铺logo
             shopName: '', //店铺名称
             shopBrief: '', //店铺简介
-            shopLoca: ['夜店/清吧', 'ktv'], //店铺定位数组
+            shopLoca: ['夜店', '清吧', 'ktv'], //店铺定位数组
             shopLocaIndex: 1, //默认的店铺定位下标
             dynamicTags: [], //店铺标签数组
             inputVisible: false, //添加店铺标签的输入框开关
@@ -924,10 +1057,12 @@ export default {
                     item.classList.remove('shop-loca-span');
                 });
                 e.target.classList.add('shop-loca-span');
-                if (e.target.innerHTML == '夜店/清吧') {
+                if (e.target.innerHTML == '夜店') {
                     this.shopLocaIndex = 1;
-                } else if (e.target.innerHTML == 'ktv') {
+                } else if (e.target.innerHTML == '清吧') {
                     this.shopLocaIndex = 2;
+                } else if (e.target.innerHTML == 'ktv') {
+                    this.shopLocaIndex = 3;
                 }
             }
         },
@@ -1397,6 +1532,8 @@ export default {
                 this.$refs.shopLoca[0].classList.add('shop-loca-span');
             } else if (this.shopLocaIndex == 2) {
                 this.$refs.shopLoca[1].classList.add('shop-loca-span');
+            } else if (this.shopLocaIndex == 3) {
+                this.$refs.shopLoca[2].classList.add('shop-loca-span');
             }
         },
 

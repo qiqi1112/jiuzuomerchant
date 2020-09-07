@@ -11,8 +11,20 @@
         <div class="container">
             <!-- 头部模块 -->
             <div class="handle-box">
-                <el-input v-model="searchName" placeholder="用户昵称" class="handle-input mr10"></el-input>
-                <el-select v-model="collectVal" placeholder="收藏本店" style="width:100px" class="mr10">
+                <el-input
+                    clearable
+                    @keydown.13.native="handleSearch"
+                    v-model="searchName"
+                    placeholder="用户昵称"
+                    class="handle-input mr10"
+                ></el-input>
+                <el-select
+                    clearable
+                    v-model="collectVal"
+                    placeholder="收藏本店"
+                    style="width:100px"
+                    class="mr10"
+                >
                     <el-option
                         v-for="item in collectValOpt"
                         :key="item.value"
@@ -20,7 +32,13 @@
                         :value="item.value"
                     ></el-option>
                 </el-select>
-                <el-select v-model="isVipVal" placeholder="本店会员" style="width:100px" class="mr10">
+                <el-select
+                    clearable
+                    v-model="isVipVal"
+                    placeholder="本店会员"
+                    style="width:100px"
+                    class="mr10"
+                >
                     <el-option
                         v-for="item in isVipOpt"
                         :key="item.value"
@@ -38,25 +56,33 @@
                 tooltip-effect="dark"
                 style="width: 100%"
             >
-                <el-table-column label="ID" type="index" fixed></el-table-column>
-                <el-table-column prop="name" label="用户昵称"></el-table-column>
+                <el-table-column prop="id" label="ID" fixed type="index"></el-table-column>
+                <el-table-column prop="petName" label="用户昵称"></el-table-column>
                 <el-table-column label="用户手机" min-width="100">
                     <template slot-scope="scope">
-                        <span>{{scope.row.number | phoneNum}}</span>
+                        <span>{{scope.row.phone}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="isVip" label="本店会员" min-width="80"></el-table-column>
-                <el-table-column prop="AANum" label="AA拼单次数" min-width="90"></el-table-column>
-                <el-table-column prop="reserveNum" label="预定桌消费次数" min-width="110"></el-table-column>
-                <el-table-column prop="rowNum" label="排号次数"></el-table-column>
-                <el-table-column prop="vaildNum" label="生效排号次数" min-width="100"></el-table-column>
-                <el-table-column prop="cancelNum" label="取消排号次数" min-width="100"></el-table-column>
-                <el-table-column prop="collect" label="是否收藏本店" min-width="100"></el-table-column>
-                <el-table-column prop="evalNum" label="评价次数"></el-table-column>
-                <el-table-column prop="visitNum" label="访问店铺次数" min-width="100"></el-table-column>
-                <el-table-column prop="conDate" label="最近一次消费时间" min-width="135"></el-table-column>
-                <el-table-column prop="visitDate" label="最近一次访问时间" min-width="135"></el-table-column>
-                <el-table-column prop="conMoney" label="本店累计消费金额" min-width="135"></el-table-column>
+                <el-table-column label="本店会员" min-width="80">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.vip | yesOrNo}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="aaMakeUpATableTimes" label="AA拼单次数" min-width="90"></el-table-column>
+                <el-table-column prop="reserveConsumptionTimes" label="预定桌消费次数" min-width="110"></el-table-column>
+                <el-table-column prop="numberOfTimes" label="排号次数"></el-table-column>
+                <el-table-column prop="takeEffectNumberOfTimes" label="生效排号次数" min-width="100"></el-table-column>
+                <el-table-column prop="cancelEffectNumberOfTimes" label="取消排号次数" min-width="100"></el-table-column>
+                <el-table-column label="收藏本店" min-width="100">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.collectionMerchantStatus | yesOrNo}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="numberOfComments" label="评价次数"></el-table-column>
+                <el-table-column prop="visitMerchantTimes" label="访问店铺次数" min-width="100"></el-table-column>
+                <el-table-column prop="lastConsumptionTime" label="最近一次消费时间" min-width="135"></el-table-column>
+                <el-table-column prop="lastVisitMerchantTime" label="最近一次访问时间" min-width="135"></el-table-column>
+                <el-table-column prop="totalConsumptionAmount" label="本店累计消费金额" min-width="135"></el-table-column>
                 <el-table-column label="操作" fixed="right" min-width="80">
                     <template slot-scope="scope">
                         <el-button
@@ -75,25 +101,25 @@
                     <div>
                         <p>
                             <span>昵称：</span>
-                            <span>{{userInfo.name}}</span>
+                            <span>{{userInfo.petName}}</span>
                         </p>
                         <p>
                             <span>手机：</span>
-                            <span>{{userInfo.number}}</span>
+                            <span>{{userInfo.phone}}</span>
                         </p>
                     </div>
                     <div>
                         <p>
                             <span>本店会员：</span>
-                            <span>{{userInfo.isVip}}</span>
+                            <span>{{userInfo.vip}}</span>
                         </p>
                         <p>
                             <span>收藏本店：</span>
-                            <span>{{userInfo.collect}}</span>
+                            <span>{{userInfo.collectionMerchantStatus}}</span>
                         </p>
                         <p>
                             <span>累计消费：</span>
-                            <span>{{userInfo.conMoney}}</span>
+                            <span>{{userInfo.totalConsumptionAmount}}</span>
                         </p>
                     </div>
                 </div>
@@ -106,227 +132,23 @@
                     @tab-click="handleClick"
                 >
                     <el-tab-pane label="排号记录" name="rowRecord">
-                        <ul class="tabs-box">
-                            <li>
-                                <p>
-                                    <span>排号预计人数：</span>
-                                    <span>5人</span>
-                                </p>
-                                <p>
-                                    <span>座位选择：</span>
-                                    <span>无要求</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>排号预计人数：</span>
-                                    <span>5人</span>
-                                </p>
-                                <p>
-                                    <span>座位选择：</span>
-                                    <span>无要求</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>排号预计人数：</span>
-                                    <span>5人</span>
-                                </p>
-                                <p>
-                                    <span>座位选择：</span>
-                                    <span>无要求</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>排号预计人数：</span>
-                                    <span>5人</span>
-                                </p>
-                                <p>
-                                    <span>座位选择：</span>
-                                    <span>无要求</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                        </ul>
+                        <row-record-tab :userID="userInfo.userID" v-if="activeName=='rowRecord'"></row-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="评价记录" name="evalRecord">
-                        <ul class="tabs-box">
-                            <li>
-                                <p>
-                                    <span>消费类型：</span>
-                                    <span>AA拼桌</span>
-                                </p>
-                                <p>
-                                    <span>打分：</span>
-                                    <span>5.0</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>消费类型：</span>
-                                    <span>AA拼桌</span>
-                                </p>
-                                <p>
-                                    <span>打分：</span>
-                                    <span>5.0</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>消费类型：</span>
-                                    <span>AA拼桌</span>
-                                </p>
-                                <p>
-                                    <span>打分：</span>
-                                    <span>5.0</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>消费类型：</span>
-                                    <span>AA拼桌</span>
-                                </p>
-                                <p>
-                                    <span>打分：</span>
-                                    <span>5.0</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                        </ul>
+                        <eval-record-tab :userID="userInfo.userID" v-if="activeName=='evalRecord'"></eval-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="访问记录" name="visitRecord">
-                        <ul class="visit-tab tabs-box">
-                            <li>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                        </ul>
+                        <visit-record-tab
+                            :userID="userInfo.userID"
+                            v-if="activeName=='visitRecord'"
+                        ></visit-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="消费记录" name="conRecord">
-                        <ul class="tabs-box">
-                            <li>
-                                <p>
-                                    <span>支付方式：</span>
-                                    <span>支付宝</span>
-                                </p>
-                                <p>
-                                    <span>金额：</span>
-                                    <span>264.00</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>支付方式：</span>
-                                    <span>会员积分</span>
-                                </p>
-                                <p>
-                                    <span>金额：</span>
-                                    <span>264.00</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>支付方式：</span>
-                                    <span>支付宝</span>
-                                </p>
-                                <p>
-                                    <span>金额：</span>
-                                    <span>264.00</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span>支付方式：</span>
-                                    <span>会员积分</span>
-                                </p>
-                                <p>
-                                    <span>金额：</span>
-                                    <span>264.00</span>
-                                </p>
-                                <p>
-                                    <span>2020-09-29 23:46:41</span>
-                                    <span>星期五</span>
-                                </p>
-                            </li>
-                        </ul>
+                        <con-record-tab :userID="userInfo.userID" v-if="activeName=='conRecord'"></con-record-tab>
                     </el-tab-pane>
-
-                    <!-- 对话框里的标签页数据分页 -->
-                    <el-pagination
-                        background
-                        layout="prev, pager, next"
-                        @current-change="handleCurrentChange2"
-                        :total="dataListCount2"
-                        :current-page="currentPage2"
-                        :page-size="pagesize2"
-                        class="page"
-                    ></el-pagination>
                 </el-tabs>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="handleSure">确 定</el-button>
+                    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
                 </div>
             </el-dialog>
 
@@ -345,329 +167,116 @@
 </template>
 
 <script>
+import rowRecordTab from './RowRecordTab';
+import evalRecordTab from './EvalRecordTab';
+import visitRecordTab from './VisitRecordTab';
+import conRecordTab from './ConRecordTab';
+
 export default {
+    components: {
+        rowRecordTab,
+        evalRecordTab,
+        visitRecordTab,
+        conRecordTab
+    },
+
     data() {
         return {
-            // 头部模块----------------------------------------------
-            searchName: '', //用户昵称输入框
-            collectVal: '', //收藏本店下拉框选择值
-            //收藏本店下拉框数组
+            searchName: '', //用户昵称
+            collectVal: '', //收藏本店
+            //是否收藏本店
             collectValOpt: [
                 {
-                    value: '不限',
-                    label: '不限'
-                },
-                {
-                    value: '是',
+                    value: 1,
                     label: '是'
                 },
                 {
-                    value: '否',
+                    value: 0,
                     label: '否'
                 }
             ],
-            isVipVal: '', //本店会员下拉框选择值
-            //本店下拉框数组
+            isVipVal: '', //本店会员
+            //是否收藏本店
             isVipOpt: [
                 {
-                    value: '不限',
-                    label: '不限'
-                },
-                {
-                    value: '是',
+                    value: 1,
                     label: '是'
                 },
                 {
-                    value: '否',
+                    value: 0,
                     label: '否'
                 }
             ],
+            tableData: [], //表格数据
 
-            // 表格相关属性--------------------------------------------
-            tableData: [
-                {
-                    name: '张三1',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三2',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三3',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三4',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '否',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三5',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '否',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三6',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '否',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三7',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三8',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '否',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三9',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三10',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三11',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '是',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                },
-                {
-                    name: '张三12',
-                    number: '14781828227',
-                    AANum: '289',
-                    isVip: '否',
-                    reserveNum: '282',
-                    rowNum: '322',
-                    vaildNum: '229',
-                    cancelNum: '322',
-                    collect: '是',
-                    evalNum: '283',
-                    visitNum: '384',
-                    conDate: '2018-04-12 20:46',
-                    visitDate: '2018-04-12 20:46',
-                    conMoney: '2899.99'
-                }
-            ],
-            // 表格数据分页相关属性
             dataListCount: 0, //默认当前要显示的数据条数
             currentPage: 1, //默认显示的页码所在位置（第一页）
             pagesize: 10, //默认每页要显示多少条数据
 
-            // 对话框里的相关属性---------------------------------------
             dialogFormVisible: false, //对话框的开启与隐藏
             activeName: 'rowRecord', //默认显示的标签页
+
             //用户相关属性
             userInfo: {
-                name: '',
-                number: '',
-                isVip: '',
-                collect: '',
-                conMoney: ''
-            },
-            //标签页数据分页相关属性
-            dataListCount2: 0, //默认当前要显示的数据条数
-            currentPage2: 1, //默认显示的页码所在位置（第一页）
-            pagesize2: 10 //默认每页要显示多少条数据
+                petName: '',
+                phone: '',
+                vip: '',
+                collectionMerchantStatus: '',
+                totalConsumptionAmount: '',
+                userID: ''
+            }
         };
     },
 
     methods: {
         //表格数据页码发生变化后
         handleCurrentChange(val) {
-            //将当前跳转的页码赋给显在页面上的页码
             this.currentPage = val;
-
-            if (this.isSearchObj == false) {
-                //请求相关数据，实现页面数据变化
-                this.ajax1(this.currentPage);
-            } else {
-                //根据页码的改变，要显示的数据也跟着改变
-                this.tableData = this.searchData.slice((this.currentPage - 1) * this.pagesize, this.currentPage * this.pagesize);
-            }
+            this.getClientInfo(); //请求翻页后的数据
         },
-
-        //标签页数据发生变化后
-        handleCurrentChange2() {},
 
         //查看按钮
         lookInfo(index, row) {
             this.dialogFormVisible = true;
-            this.userInfo.name = row.name;
-            this.userInfo.number = row.number;
-            this.userInfo.isVip = row.isVip;
-            this.userInfo.collect = row.collect;
-            this.userInfo.conMoney = row.conMoney;
-        },
-
-        //搜索按钮
-        handleSearch() {
-            let searchName = this.searchName;
-            if (searchName) {
-                // this.tableData.filter(item => {
-                //     if(item.name == searchName) {
-                //         this.tableData = item;
-                //     }
-                //     return item
-                // });
-
-                let fragArr = [];
-                this.tableData.forEach((item, i) => {
-                    if (item.name.indexOf(searchName) !== -1) {
-                        console.log('xxx', item);
-                        // this.tableData.slice(0,3);
-
-                        fragArr.push(item);
-                        // this.tableData.push(item);
-                    }
-                });
-                this.tableData = [];
-                this.tableData = fragArr;
-
-                console.log(this.tableData);
-            }
-
-            this.searchName = ''; //清空输入框
-        },
-
-        //对话框里的确认按钮
-        handleSure() {
-            this.dialogFormVisible = false;
+            this.userInfo.petName = row.petName;
+            this.userInfo.phone = row.phone;
+            this.userInfo.vip = row.vip;
+            this.userInfo.collectionMerchantStatus = row.collectionMerchantStatus;
+            this.userInfo.totalConsumptionAmount = row.totalConsumptionAmount;
+            this.userInfo.userID = row.userId;
         },
 
         //标签页切换操作
         handleClick(tab, event) {
             console.log(this.activeName);
+        },
+
+        //搜索操作
+        handleSearch() {
+            this.getClientInfo();
+        },
+
+        //获取客户信息
+        getClientInfo() {
+            let data = {
+                pageNo: this.currentPage,
+                pageSize: this.pagesize,
+                petName: this.searchName,
+                collectionMerchantStatus: this.collectVal,
+                vip: this.isVipVal
+            };
+
+            this.$post('/api/merchant/store/customer/customerLimit', data).then((res) => {
+                if (res.code == 0) {
+                    // console.log(res.data.list);
+                    this.tableData = res.data.list;
+                }
+            });
         }
+    },
+
+    created() {
+        this.getClientInfo();
     }
 };
 </script>

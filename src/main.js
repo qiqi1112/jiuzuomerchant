@@ -22,6 +22,8 @@ import {
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
 import less from 'less'
+import filter from './utils/filter'
+
 Vue.use(less)
 Vue.prototype.$regular = regular
 Vue.prototype.$post = post;
@@ -52,31 +54,6 @@ Vue.prototype.$put = put;
 // });
 
 
-//手机号过滤器
-Vue.filter("phoneNum", function (oldVal) {
-    let newVal = oldVal.replace(oldVal.slice(3, 7), "****");
-    return newVal;
-});
-
-//店铺类型过滤器
-Vue.filter("shopType", function (oldVal) {
-    let newVal = "";
-    switch (oldVal) {
-        case 1:
-            newVal = "夜店";
-            break;
-        case 2:
-            newVal = "清吧";
-            break;
-        case 3:
-            newVal = "ktv";
-            break;
-    }
-    return newVal;
-});
-
-
-
 Vue.config.productionTip = false;
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
@@ -91,7 +68,7 @@ const i18n = new VueI18n({
 // router.beforeEach((to, from, next) => {
 //     document.title = `${to.meta.title} | 上座`;
 
-    
+
 //     const role = JSON.parse(localStorage.getItem('userInfo'))|| ''
 //     if (!role && to.path !== '/login') {
 //         next('/login');

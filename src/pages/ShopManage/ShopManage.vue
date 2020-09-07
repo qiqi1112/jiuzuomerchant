@@ -14,7 +14,9 @@
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd">添加商品</el-button>
-                    <el-button type="danger" icon="el-icon-delete " @click="handleDelAll">批量删除</el-button>
+                    <el-button type="danger" icon="el-icon-delete" @click="handleDelAll">批量删除</el-button>
+                    <el-button v-if="isSelect" type="warning" @click="sureDelAll">确定</el-button>
+                    <el-button v-if="isSelect" @click="isSelect=false">取消</el-button>
                 </el-row>
 
                 <!-- 添加商户的对话框 -->
@@ -164,7 +166,13 @@
 
             <!-- 商品列表 -->
             <div class="goodsList">
-                <div class="goods-box" v-for="(item,index) in goodsData" :key="index">
+                <div
+                    class="goods-box"
+                    v-for="(item,index) in goodsData"
+                    :key="index"
+                    @click="selectGoods"
+                >
+                    <el-checkbox v-if="isSelect" :data-id="item.id"></el-checkbox>
                     <img :src="showImgPrefix + item.listPicture" alt />
                     <div class="goods-detail">
                         <h4 title="商品名称">{{item.name}}</h4>
@@ -224,7 +232,7 @@ export default {
             activeNum: '', //标签页对应的下标
 
             // 表格数据分页相关属性
-            dataListCount: 100, //默认当前要显示的数据条数
+            dataListCount: 0, //默认当前要显示的数据条数
             currentPage: 1, //默认页码
             pagesize: 16, //默认每页要显示多少条数据
 
@@ -367,20 +375,78 @@ export default {
             ],
 
             isUpdate: false, //是否为修改操作
-            goodId: '' //当前编辑的商品id
+            goodId: '', //当前编辑的商品id
+            isSelect: false, //是否要批量删除
+            deleteSelect: [], //批量删除的数组
+            requestStatus: true //请求时的防抖标杆
         };
     },
 
     methods: {
-        //翻页
+        //翻页操作
         handleCurrentChange(val) {
             this.currentPage = val; //将当前跳转的页码赋给显在页面上的页码
-            // this.getGoodsInfo({ pageNo: this.currentPage }); //请求翻页后的数据
-            this.getGoodsInfo(); //请求翻页后的数据
+
+            //防抖请求
+            if (this.requestStatus) {
+                this.requestStatus = false;
+                this.getGoodsInfo(); //请求翻页后的数据
+            }
         },
 
-        //批量删除商品
-        handleDelAll() {},
+        //批量删除选中操作
+        selectGoods(e) {
+            if (e.target.nodeName == 'INPUT') {
+                //将当前选中的商品的id加入到数组中
+                let id = e.target.parentNode.parentNode.dataset.id;
+                if (e.target.checked) {
+                    this.deleteSelect.push(id);
+                } else {
+                    //从数组中删除当前商品id
+                    let delId = this.deleteSelect.indexOf(id);
+                    this.deleteSelect.splice(delId, 1);
+                }
+            }
+        },
+
+        //批量删除按钮
+        handleDelAll() {
+            this.isSelect = true;
+        },
+
+        //确认删除选择的商品
+        sureDelAll() {
+            if (this.deleteSelect.length > 0) {
+                this.$confirm('确认要删除所选商品吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                })
+                    .then(() => {
+                        let goodsIdList = this.deleteSelect; //要传的参数（要删除的id数组）
+
+                        this.$post('/api/merchant/store/goods/batchDeleteGoods', goodsIdList).then((res) => {
+                            if (res.code == 0) {
+                                this.getGoodsInfo();
+                                this.deleteSelect = [];
+                                this.isSelect = false;
+                                this.$message.success('删除成功');
+                            } else {
+                                this.deleteSelect = [];
+                                this.isSelect = false;
+                                this.$message.error(res.msg);
+                            }
+                        });
+                    })
+                    .catch(() => {
+                        this.deleteSelect = [];
+                        this.isSelect = false;
+                        this.$message.info('已取消删除');
+                    });
+            } else {
+                this.$message.error('请选择要删除的商品');
+            }
+        },
 
         //搜索按钮
         handleSearch() {
@@ -750,7 +816,7 @@ export default {
                 .then(() => {
                     this.$Delete(`/api/merchant/store/goods/deleteById/${id}`).then((res) => {
                         if (res.code == 0) {
-                            this.getGoodsInfo();
+                            this.getGoodsInfo(); //重新请求数据
                             this.$message.success('删除成功');
                         } else {
                             this.$message.error(res.msg);
@@ -771,8 +837,12 @@ export default {
                 name: this.searchName
             };
             this.$post('/api/merchant/store/goods/goodsLimit', data).then((res) => {
-                this.goodsData = res.data.list;
-                console.log(this.goodsData);
+                if (res.code == 0) {
+                    this.dataListCount = res.data.total; //总数据条数
+                    this.goodsData = res.data.list; //所有数据
+                    this.requestStatus = true;
+                    console.log('cvcvcv', this.goodsData);
+                }
             });
         },
 
@@ -1066,6 +1136,16 @@ export default {
     width: 90%;
     height: 180px;
 }
+
+/* .goods-box {
+    position: relative;
+} */
+
+/* .goods-box > input[type='checkbox'] {
+    position: absolute;
+    right: 0;
+    top: 0;
+} */
 
 .goods-box .goods-detail .goods-handle {
     display: flex;
