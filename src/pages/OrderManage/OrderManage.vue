@@ -9,7 +9,7 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                 <el-button
+                <el-button
                     type="primary"
                     icon="el-icon-delete"
                     class="handle-del mr10"
@@ -22,6 +22,12 @@
                 <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-input v-model="query.tel" placeholder="手机号" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                 <el-button
+                    type="primary"
+                    icon="el-icon-download"
+                    class="handle-del mr10"
+                    @click="handleEdit()"
+                >Excel导出</el-button>
             </div>
             <el-table 
                 :data="tableData" border class="table" 

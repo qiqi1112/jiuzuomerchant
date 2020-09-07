@@ -86,6 +86,13 @@ export default new Router({
                         title: '操作日志'
                     }
                 },
+                {
+                    path: '/coupons',
+                    component: () => import('../pages/Coupons/Coupons.vue'),
+                    meta: {
+                        title: '优惠券'
+                    }
+                },
                 // {
                 //     path: '/Advertising',
                 //     component: () => import('../pages/AdverActivity/Advertising.vue'),

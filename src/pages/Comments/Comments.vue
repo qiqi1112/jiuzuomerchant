@@ -12,6 +12,7 @@
                 <el-input v-model="query.text" placeholder="关键字" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
+
             <el-table 
                 :data="tableData" border class="table" 
                 ref="multipleTable" 
@@ -19,27 +20,33 @@
                 @row-dblclick="lineDb"
             >
                 <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="user_name" min-width="100" label="评论用户"></el-table-column>
-                <el-table-column prop="com_detail" min-width="280" label="评论详情">
+                <el-table-column prop="userNickname" min-width="100" label="评论用户"></el-table-column>
+                <el-table-column prop="content" min-width="280" label="评论详情">
                     <template slot-scope="scope">
                         <div class="com_del_box">
-                            {{scope.row.com_detail}}
+                            {{scope.row.content}}
                         </div>
                     </template>
                 </el-table-column>
 
                 <el-table-column label="评论缩略图" align="center" min-width="220">
-                    <template slot-scope="scope">
+                    <!-- <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
-                            v-for="(item,index) in scope.row.com_img_list" :key="index"
+                            v-for="(item,index) in scope.row.appraisePicture" :key="index"
                             :src="item"
-                            :preview-src-list="scope.row.com_img_list"
+                            :preview-src-list="scope.row.appraisePicture"
                         ></el-image>
+                    </template> -->
+                </el-table-column>
+                <el-table-column align="center" prop="appraiseLevel" min-width="80" label="打分"></el-table-column>  
+                <el-table-column prop="com_label" min-width="200" label="标签">
+                    <template slot-scope="scope">
+                        <div class="com_del_box">
+                            <span class="lab_span" v-for="(item,index) in scope.row.labels" :key="index">{{item}}</span>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" prop="star" min-width="80" label="打分"></el-table-column>  
-                <el-table-column prop="com_label" min-width="200" label="标签"></el-table-column>
                 <el-table-column prop="com_time" align="center" min-width="150" label="评论日期"></el-table-column>
                 <el-table-column label="操作" width="100" align="center" fixed="right">
                     <template slot-scope="scope">
@@ -75,24 +82,24 @@
                     <div class="activity">
                         <div class="in_act">
                             <el-form-item label="评论用户" >
-                                <div>{{form.user_name}}</div>
+                                <div>{{form.userNickname}}</div>
                             </el-form-item>
                             <el-form-item label="打分">
-                                <div>{{form.star}}</div>
+                                <div>{{form.appraiseLevel}}</div>
                             </el-form-item>
                             <el-form-item label="评论时间">
-                                <div>{{form.com_time}}</div>
+                                <!-- <div>{{form.com_time}}</div> -->
                             </el-form-item>
                             <el-form-item label="标签">
                                 <div class="lab_list">
-                                    <span v-for="(lab,index) in form.com_label" :key="index">{{lab}}</span>
+                                    <span v-for="(lab,index) in form.labels" :key="index">{{lab}}</span>
                                 </div>
                             </el-form-item>
                             <el-form-item label="评论内容">
-                                <div class="com_del">{{form.com_detail}}</div>
+                                <div class="com_del">{{form.content}}</div>
                             </el-form-item>
                             <el-form-item label="评论配图">
-                                <div class="img_list">
+                                <!-- <div class="img_list">
                                     <el-image
                                         style="width: 150px; height: 150px;margin-right:20px"
                                         class="table-td-thumb"
@@ -100,7 +107,7 @@
                                         :src="img"
                                         :preview-src-list="form.com_img_list"
                                     ></el-image>
-                                </div>
+                                </div> -->
                             </el-form-item>
                         </div>                   
                     </div>
@@ -129,31 +136,12 @@ export default {
             form: {},
             pageTotal:null,
             editVisible:false,
-            tableData: [
-                {
-                    id:1,
-                    user_name:'张三',
-                    com_detail:'艾萨拉桑德兰三菱电机阿拉斯萨拉桑德兰三菱电机阿拉斯萨拉桑德兰三菱电机阿拉斯萨拉桑德兰三菱电机阿拉斯加动力技术的窘境1解耦i距离尽量加快了交流空间离开家了j',
-                    com_img_list:['img/2.jpg','img/3.jpg','img/4.jpg'],
-                    star:'5.0',
-                    com_label:['氛围好','环境好','实惠'],
-                    com_time:'2020-11-11',
-                },
-                {
-                    id:2,
-                    user_name:'李四',
-                    com_detail:'快速的疯狂数独克里夫丝毫覅你噢然后和互惠互利海澜423卡将康佳4可及4看来3加可健康将开4',
-                    com_img_list:['img/timg.jpg','img/5.jpg'],
-                    star:'4.7',
-                    com_label:['氛围好','实惠'],
-                    com_time:['2020-11-11'],
-                },
-            ],
+            tableData: [],
         };
     },
     created() {
         this.getData();
-        this.pageTotal = this.tableData.length
+        
     },
     methods: {
         getData() {
@@ -162,7 +150,17 @@ export default {
                 pageSize:10,
             }
             this.$post('/api/merchant/store/appraise/appraiseListByStoreId',data).then(res=>{
-                console.log(res)
+                if(res.code == 0){
+                    let lab = ''
+                    res.data.forEach(i=>{
+                        lab = i.labels.split(',')
+                        this.$set(i,'labels',lab)
+                    })
+                    this.tableData = res.data
+                    this.pageTotal = this.tableData.length
+                }else{
+                    this.$message({message: res.mesg,type: 'warning'});
+                }
             })
         },
         // 触发搜索按钮
@@ -221,7 +219,22 @@ export default {
         -webkit-box-orient:vertical;
         -webkit-line-clamp:2; 
     }
-
+    .lab_span{
+        border: 1px solid #7a7a7a;
+        border-radius: 4px;
+        margin-right: 10px;
+        padding: 1px 10px;
+    }
+    .handle-box {
+        margin-bottom: 20px;
+    }
+    .mr10 {
+        margin-right: 10px;
+    }
+    .handle-input {
+        width: 200px;
+        display: inline-block;
+    }
 }
 
 /deep/.table-td-thumb {

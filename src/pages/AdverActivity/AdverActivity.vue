@@ -10,7 +10,7 @@
 
         <div class="container">
             <div class="handle-box">
-                 <el-button
+                <el-button
                     type="primary"
                     icon="el-icon-delete"
                     class="handle-del mr10"
