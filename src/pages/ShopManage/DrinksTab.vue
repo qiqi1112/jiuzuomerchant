@@ -22,6 +22,7 @@
                 <p>
                     <span>商品排序：</span>
                     <el-input-number v-model="drinksForm.goodWeight" :min="0" label="商品排序"></el-input-number>
+                    <span>（*数值越小排序越靠前）</span>
                 </p>
                 <p>
                     <span>酒水包含：</span>
@@ -201,7 +202,7 @@ export default {
                 checkedReco: false,
 
                 //酒水分类
-                classify: 1,
+                classify: '',
                 classifyOptions: [
                     {
                         label: '红酒',

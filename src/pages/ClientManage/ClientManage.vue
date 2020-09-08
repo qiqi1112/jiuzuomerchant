@@ -154,6 +154,7 @@
 
             <!-- 表格数据分页 -->
             <el-pagination
+                v-if="tableData.length > 0"
                 background
                 layout="prev, pager, next"
                 @current-change="handleCurrentChange"
@@ -253,7 +254,9 @@ export default {
 
         //搜索操作
         handleSearch() {
-            this.getClientInfo();
+            if (this.searchName) {
+                this.getClientInfo();
+            }
         },
 
         //获取客户信息

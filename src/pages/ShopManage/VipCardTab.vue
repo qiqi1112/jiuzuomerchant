@@ -2,10 +2,6 @@
     <div class="goods-info-box">
         <div class="left-box">
             <el-form ref="vipCardForm" :model="vipCardForm" label-width="80px">
-                <!-- <p>
-                    <span>商品名称：</span>
-                    <el-input v-model="vipCardForm.name" style="width:200px"></el-input>
-                </p>-->
                 <div class="good-name-box">
                     <div>
                         <span>商品名称：</span>
@@ -14,6 +10,7 @@
                     <div>
                         <span>商品排序：</span>
                         <el-input-number v-model="vipCardForm.weight" :min="0" label="商品排序"></el-input-number>
+                        <span>（*数值越小排序越靠前）</span>
                     </div>
                 </div>
                 <p>

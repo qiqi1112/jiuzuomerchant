@@ -15,6 +15,7 @@
                     <div>
                         <span>商品排序：</span>
                         <el-input-number v-model="snackForm.weight" :min="0" label="商品排序"></el-input-number>
+                        <span>（*数值越小排序越靠前）</span>
                     </div>
                 </div>
                 <p>

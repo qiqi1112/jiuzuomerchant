@@ -192,6 +192,7 @@
             <!-- 翻页区域 -->
             <div>
                 <el-pagination
+                    v-if="goodsData.length > 0"
                     background
                     layout="prev, pager, next"
                     @current-change="handleCurrentChange"
@@ -263,7 +264,7 @@ export default {
                 checkedReco: false,
                 goodWeight: 0, //商品排序
                 recoWeight: 0, //商家推荐位排序
-                classify: 1, //酒水分类
+                classify: '', //酒水分类
 
                 bannerImageUrl: '', //广告图
                 recoImageUrl: '', //推荐位图
@@ -757,8 +758,6 @@ export default {
             this.drinksForm.detailImageUrl = data.infoPicture;
             this.drinksForm.dynamicValidateForm.domains = data.skuList;
             this.dialogVisible = true;
-
-            console.log('2', this.drinksForm.bannerImageUrl);
         },
 
         //传值给小吃子组件
@@ -1137,16 +1136,6 @@ export default {
     height: 180px;
 }
 
-/* .goods-box {
-    position: relative;
-} */
-
-/* .goods-box > input[type='checkbox'] {
-    position: absolute;
-    right: 0;
-    top: 0;
-} */
-
 .goods-box .goods-detail .goods-handle {
     display: flex;
     justify-content: space-around;
@@ -1183,21 +1172,15 @@ export default {
 }
 
 .goods-info-box {
-    /* border: 1px solid black; */
     display: flex;
-    /* justify-content: space-between; */
 }
 
 .goods-info-box .left-box {
-    /* margin-right: 100px; */
     width: 70%;
-    /* border: 1px solid black; */
 }
 
 .goods-info-box .left-box.drinks {
-    /* margin-right: 100px; */
     width: 70%;
-    /* border: 1px solid black; */
 }
 
 .goods-info-box p {
@@ -1218,8 +1201,6 @@ export default {
 
 .goods-info-box p > span {
     margin-right: 10px;
-    /* float: left; */
-    /* color: #f00; */
 }
 
 .goods-info-box p > i {
@@ -1251,12 +1232,6 @@ export default {
     display: flex;
     justify-content: space-between;
 }
-
-/* .drinks-check {
-    display: flex;
-    flex-direction: column;
-    
-} */
 
 .goods-info-box .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;

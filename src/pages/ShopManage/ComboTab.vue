@@ -10,6 +10,7 @@
                     <div>
                         <span>商品排序：</span>
                         <el-input-number v-model="comboForm.weight" :min="0" label="商品排序"></el-input-number>
+                        <span>（*数值越小排序越靠前）</span>
                     </div>
                 </div>
                 <p>
@@ -37,7 +38,7 @@
                 <p style="width:82%" v-if="comboForm.tableData.length > 0">
                     <el-table :data="comboForm.tableData" border>
                         <el-table-column prop="goodsName" label="商品名称" width="150"></el-table-column>
-                        <el-table-column label="商品图片" width="130">
+                        <el-table-column label="商品图片" width="126">
                             <template slot-scope="scope">
                                 <img
                                     style="width:100px;height:60px"
