@@ -15,8 +15,11 @@
                 <span class="li_text">今日取消排号数<span>24</span></span>
                 <span class="li_text">今日排号总数<span>24</span></span>
             </div>
-
-            <div><el-button @click="call()" type="primary" icon="el-icon-search">呼叫下一位</el-button></div>
+            
+            <div>
+                <el-button @click="call()" type="primary" icon="el-icon-dish">呼叫下一位</el-button>
+                <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button>
+            </div>
 
             <div class="numeral_list">
                 

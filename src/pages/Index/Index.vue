@@ -28,10 +28,10 @@
                 </div>
                 <div class="visitors">
                     <div class="comp">
-                    <span class="line lw2"></span> <span>今日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
+                    <span class="line lw2"></span> <span>昨日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
                     </div>
                     <div class="comp">
-                        <span class="line lw2"></span><span class="jg">今日新增访客 <i class="xtc">19</i> 人，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
+                        <span class="line lw2"></span><span class="jg">昨日新增访客 <i class="xtc">19</i> 人，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
                         <span class="line lw2"></span><span>店铺曝光量 <i class="xtc">234234 P</i></span>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                                             </div>
                                             <div class="tr">
                                                 <p class="tit">{{item.title}}</p>
-                                                <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 今日已售{{item.sold}}瓶</p>
+                                                <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p>
                                                 <div class="pro" :style="{width:item.sold/10+'px'}"></div>
                                             </div>
                                         </li>
@@ -118,9 +118,45 @@
                             </ul>
                         </div>
                     </div>
+
+
+                    <div class="excel">
+                        <el-button type="primary" icon="el-icon-download" class="handle-del" @click="dialogVisible = true">一件生成Excel</el-button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- 弹窗 -->
+        <el-dialog :visible.sync="dialogVisible" width="30%" >
+            <el-form ref="form" :model='form'  label-width="70px" label-position="left">
+                <div class="column">
+                    <span class="line lw2"></span>
+                    <span>导出Excel</span>
+                </div>
+                <el-form-item label="类型" >
+                    <el-radio v-model="form.radio_type" label="1">营业额数据</el-radio>
+                    <el-radio v-model="form.radio_type" label="2">商品销量数据</el-radio>
+                </el-form-item>
+                <el-form-item label="时间">
+                    <div class="block">
+                        <el-date-picker
+                        v-model="form.excel_time"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        >
+                        </el-date-picker>
+                    </div>
+                </el-form-item>
+            </el-form>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="downEx()">导出</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -132,8 +168,11 @@ export default {
             day_mon:1,
             focSta:false,
             value: 2.6,
-            // brokenline:'',
-            // columnarLine:'',
+            dialogVisible: false,
+            form:{
+                radio_type:'1',
+                excel_time:'',        
+            },
             activeName: 'first',
             value2: '',
             time_now:'',
@@ -180,8 +219,6 @@ export default {
                 }
             }
         })
-
-        
     },
     watch: {
         time_now(val) {
@@ -190,7 +227,6 @@ export default {
         }
     },
     mounted(){
-        // console.log(this.$refs.day[this.active].innerText)
         this.brokenChart()
         this.columnarChart()
         this.breadChart()
@@ -221,6 +257,14 @@ export default {
             let trr = time.split('-')
             let day = new Date(trr[0],trr[1],0).getDate()
             return day
+        },
+        // 导出
+        downEx(){
+            if(!this.form.excel_time){
+                this.$message({message: '请选择时间',type: 'warning'});
+                return
+            }
+            this.dialogVisible = false
         },
         // 折现图
         brokenChart(){
@@ -493,6 +537,11 @@ export default {
     .m_r{
         flex: .2;
         position: relative;
+        .excel{
+            text-align: center;
+            margin-top: 80px;
+            
+        }
         .timeData{
             width: 125px;
             margin:0 auto ;
@@ -614,16 +663,18 @@ export default {
 /deep/ .el-tab-pane::-webkit-scrollbar {display:none}
 /deep/ .el-tab-pane {scrollbar-width: none;}
 /deep/ .el-tab-pane {-ms-overflow-style: none;}
-/deep/ .el-input__inner{
-    border: none;
-    font-size: 16px;
-    color: #000;
-    height: 30px;
-    line-height: 30px;
-}
-/deep/ .el-date-editor{
-    width: 120px;
-    
+
+.m_r{
+    /deep/ .el-input__inner{
+        border: none;
+        font-size: 16px;
+        color: #000;
+        height: 30px;
+        line-height: 30px;
+    }
+    /deep/ .el-date-editor{
+        width: 120px;
+    }
 }
 /deep/ .el-input__prefix{
     display: none;

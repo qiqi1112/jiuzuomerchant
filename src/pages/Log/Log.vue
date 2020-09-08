@@ -9,13 +9,10 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <!-- <el-select v-model="query.address" placeholder="订单类型" class="handle-select mr10">
-                    <el-option key="1" label="预定" value="预定"></el-option>
-                    <el-option key="2" label="AA拼单" value="AA拼单"></el-option>
-                </el-select> -->
                 <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-input v-model="query.tel" placeholder="手机号" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button>
             </div>
             <el-table 
                 :data="tableData" border class="table" 
@@ -28,9 +25,9 @@
                 <el-table-column prop="user_name" min-width="200" label="访问标题"></el-table-column>
                 <el-table-column prop="order_type" min-width="300" label="访问地址"></el-table-column>  
                 <el-table-column prop="tel" min-width="200" label="备注说明"></el-table-column>
-                <el-table-column prop="order_state" min-width="50" label="访问次数"></el-table-column>
+                <el-table-column prop="order_state" min-width="100" label="访问次数"></el-table-column>
                 <el-table-column prop="creat_time" min-width="200" label="最近访问IP"></el-table-column>
-                <el-table-column prop="remark" min-width="200" label="最近访问时间"></el-table-column>
+                <el-table-column prop="remark" min-width="200" label="最近访问时间"></el-table-column>  
             </el-table>
             <div class="pagination">
                 <el-pagination

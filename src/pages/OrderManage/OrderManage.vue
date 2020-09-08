@@ -38,37 +38,38 @@
             >
             <!-- phoneNum -->
                 <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="order_id" min-width="200" label="预定用户"></el-table-column>
-                <el-table-column prop="tel" min-width="200" label="预定手机">
+                <el-table-column prop="order_id" min-width="120" label="订单发起人"></el-table-column>
+                <el-table-column prop="order_id" min-width="120" label="预定用户"></el-table-column>
+                <el-table-column prop="tel" min-width="120" label="预定手机">
                     <template slot-scope="scope">
                         <span>{{scope.row.tel | phoneNum}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="order_type" min-width="200" label="订单类型"></el-table-column>  
-                <el-table-column prop="user_name" min-width="200" label="订单号"></el-table-column>
-                <el-table-column prop="creat_time" min-width="200" label="支付状态"></el-table-column>
-                <el-table-column prop="order_state" min-width="200" label="支付类型"></el-table-column>
+                <el-table-column prop="order_type" min-width="100" label="订单类型"></el-table-column>  
+                <el-table-column prop="user_name" min-width="180" label="订单号"></el-table-column>
+                <el-table-column prop="creat_time" min-width="150" label="支付状态"></el-table-column>
+                <el-table-column prop="order_state" min-width="100" label="支付类型"></el-table-column>
+                <el-table-column prop="order_state" min-width="200" label="总订单号"></el-table-column>
                 <el-table-column prop="remark" min-width="200" label="实付金额"></el-table-column>
                 <el-table-column prop="pay_type" min-width="200" label="优惠卷"></el-table-column>
                 <el-table-column prop="pay_time" min-width="200" label="备注信息"></el-table-column>
-                <el-table-column prop="total" min-width="200" label="订单发起时间"></el-table-column>
-                <el-table-column prop="order_detail" min-width="200" label="订单支付时间"></el-table-column>
+                <el-table-column prop="total" min-width="150" label="订单发起时间"></el-table-column>
+                <el-table-column prop="order_detail" min-width="150" label="订单支付时间"></el-table-column>
                 <el-table-column prop="is_coupons" min-width="200" label="订单信息"></el-table-column>
-                <!-- <el-table-column prop="coupons_total" min-width="200" label="优惠券金额"></el-table-column> -->
-                <!-- <el-table-column label="活动发布" min-width="100">
-                    <template slot-scope="scope">{{scope.row.act_release}}</template>
-                </el-table-column>
-                <el-table-column prop="act_introduce" label="活动简介" min-width="220"></el-table-column>
-                <el-table-column label="活动标签" prop="act_lable" min-width="150" align="center">
-                    <template slot-scope="scope">
-                        <span  v-for="(item,index) in scope.row.act_lable" :key="index">{{item}} </span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="act_content"  class-name="beyond" min-width="320" :show-overflow-tooltip='true' label="活动内容"></el-table-column> -->
                 <el-table-column label="操作" width="180" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" >查看</el-button>
-                        <!-- <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" >删除</el-button> -->
+                        <el-button
+                        size="mini"
+                        :disabled='scope.row.stateUsing==3'
+                        :type="scope.row.stateUsing==1?'success':(scope.row.stateUsing==2?'danger':'info')"
+                        @click="stateEdit(scope.$index, scope.row)">
+                        {{scope.row.stateUsing==1?'已到店':(scope.row.stateUsing==2?'使用中':'已离开')}}
+                        </el-button>
+                        <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleEdit(scope.$index, scope.row)">查看</el-button>
+
                     </template>
                 </el-table-column>
             </el-table>
@@ -216,6 +217,7 @@ export default {
                     total:'1000',
                     is_coupons:1,
                     coupons_total:'50',
+                    stateUsing:1,
                     remark:'快点快点快点快点快点快点',
                     order_detail:'202卡座'
                 },
@@ -232,6 +234,7 @@ export default {
                     total:'1000',
                     is_coupons:1,
                     coupons_total:'50',
+                    stateUsing:1,
                     remark:'快点快点快点快点快点快点',
                     order_detail:'202卡座'
                 },
@@ -243,6 +246,7 @@ export default {
                     tel:'18825255252',
                     creat_time:'2020-08-12 22:00',
                     order_state:'1',
+                    stateUsing:1,
                     pay_type:'微信支付',
                     pay_time:'2020-08-12 22:10',
                     total:'1000',
@@ -365,12 +369,20 @@ export default {
                 this.form = row;
             }
             this.editVisible = true;
+            console.log(row)
         },
-        // 保存编辑
-        saveEdit() {
-            this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            this.$set(this.tableData, this.idx, this.form);
+        // 修改当前状态 已到店/使用中/已离开
+        stateEdit(idx,row) {
+            this.$confirm('确定要修改当前订单状态吗？', '温馨提示', {
+                type: 'warning'
+            }).then(() => {
+                this.$message.success('订单状态修改成功');
+                row.stateUsing ++
+                if(row.stateUsing > 3){
+                    row.stateUsing = 1
+                }
+            }).catch(() => {});
+         
         },
         // 分页导航
         handlePageChange(val) {

@@ -9,8 +9,8 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="addTicket()">添加</el-button>
-                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="dtlCoupon('',this.primary_dtl_cou)">删除</el-button>
+                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="handleEdit()">添加</el-button>
+                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="dtlCoupon('',primary_dtl_cou)">删除</el-button>
                 <el-input v-model="query.text" placeholder="关键字" class="handle-input mr10"></el-input>
                  <el-select v-model="query.coupons" placeholder="优惠券类型" class="handle-select mr10">
                     <el-option key="0" label="全部" value=""></el-option>
@@ -44,8 +44,8 @@
                 <el-table-column align="center" prop="overTime" min-width="100" label="结束时间"></el-table-column>
                 <el-table-column label="操作" width="300" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" >查看</el-button>
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" >编辑</el-button>
+                        <el-button type="text" icon="el-icon-view" @click="handleEdit(scope.$index, scope.row,1)" >查看</el-button>
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row,2)" >编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="dtlCoupon(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -63,7 +63,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog :title="doing" :visible.sync="editVisible" width="32%">
+        <el-dialog :title="doing" :visible.sync="editVisible" width="32%" >
             <el-form ref="form" :model='form'  label-width="120px" label-position="left">
                 <div class="column">
                     <span class="line lw2"></span>
@@ -74,7 +74,7 @@
                     <div class="activity">
                         <div class="in_act">
                             <el-form-item label="优惠券类型">
-                                <el-select v-model="form.region" placeholder="请选择类型">
+                                <el-select v-model="form.region" placeholder="请选择类型" @change='selChange' :disabled='readOnly || editRead'>
                                 <el-option label="满减券" value="2"></el-option>
                                 <el-option label="抵扣券" value="1"></el-option>
                                 <el-option label="消费礼券" value="3"></el-option>
@@ -82,7 +82,7 @@
                             </el-form-item>
                             <el-form-item label="优惠券详情" v-if='form.region'>
                                 <div class="add_con">
-                                    <el-form :model="dynamicValidateForm" ref="dynamicValidateForm"  class="demo-dynamic">
+                                    <el-form :model="dynamicValidateForm" ref="dynamicValidateForm"  class="demo-dynamic" >
                                         <el-form-item
                                             v-for="(domain, index) in dynamicValidateForm.domains"
                                             :key="domain.key"
@@ -90,52 +90,52 @@
                                         >
                                             <div v-if="form.region == 2">
                                                 <span class="tt">满</span>
-                                                <el-input v-model="domain.full" class="num">
+                                                <el-input v-model="domain.full" class="num" :disabled='readOnly'>
                                                     <template slot="append">￥</template>
                                                 </el-input>
                                                 <span class="tt">减</span>
-                                                <el-input v-model="domain.minus" class="num">
+                                                <el-input v-model="domain.minus" class="num" :disabled='readOnly'> 
                                                     <template slot="append">￥</template>
                                                 </el-input>
                                                 <span class="tt">送</span>
-                                                <el-input v-model="domain.give" class="num">
+                                                <el-input v-model="domain.give" class="num" :disabled='readOnly'>
                                                     <template slot="append">张</template>
                                                 </el-input>
-                                                <i class="el-icon-error" @click.prevent="removeDomain(domain)"></i>
+                                                <i class="el-icon-error" @click.prevent="removeDomain(domain)" v-if="!readOnly && !editRead"></i>
                                             </div>
 
                                             <div v-if="form.region == 1">
                                                 <span class="tt">直接抵扣</span>
-                                                <el-input v-model="domain.minus" class="num">
+                                                <el-input v-model="domain.minus" class="num" :disabled='readOnly'>
                                                     <template slot="append">￥</template>
                                                 </el-input>
                                                 <span class="tt">送</span>
-                                                <el-input v-model="domain.give" class="num">
+                                                <el-input v-model="domain.give" class="num" :disabled='readOnly'>
                                                     <template slot="append">张</template>
                                                 </el-input>
-                                                <i class="el-icon-error" @click.prevent="removeDomain(domain)"></i>
+                                                <i class="el-icon-error" @click.prevent="removeDomain(domain)" v-if="!readOnly && !editRead"></i>
                                             </div>
 
                                             <div v-if="form.region == 3">
                                                 <span class="tt">满</span>
-                                                <el-input v-model="domain.full" class="num">
+                                                <el-input v-model="domain.full" class="num" :disabled='readOnly'>
                                                     <template slot="append">￥</template>
                                                 </el-input>
                                                 <span class="tt">赠</span>
-                                                <el-input v-model="domain.minus" class="num">
-                                                    <template slot="append">￥</template>
+                                                <el-input v-model="domain.minus" class="num" :disabled='readOnly'>
                                                 </el-input>
                                                 <span class="tt">送</span>
-                                                <el-input v-model="domain.give" class="num">
+                                                <el-input v-model="domain.give" class="num" :disabled='readOnly'>
                                                     <template slot="append">张</template>
                                                 </el-input>
-                                                <i class="el-icon-error" @click.prevent="removeDomain(domain)"></i>
+                                                <i class="el-icon-error" @click.prevent="removeDomain(domain)" v-if="!readOnly && !editRead"></i>
                                             </div>
 
                                             <div class="block">
                                                 <el-date-picker
                                                 v-model="domain.start_end"
                                                 type="daterange"
+                                                :disabled='readOnly'
                                                 range-separator="至"
                                                 start-placeholder="开始日期"
                                                 end-placeholder="结束日期">
@@ -144,7 +144,7 @@
                                         </el-form-item>
                                     </el-form>
                                 </div>
-                                <img class="addCou" src="../../assets/img/jia.png" @click="addCou" alt="">
+                                <img class="addCou" src="../../assets/img/jia.png" @click="addCou" alt="" v-if="!readOnly && !editRead">
                             </el-form-item>
                         </div>                   
                     </div>
@@ -152,7 +152,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="editVisible=false">返回</el-button>
-                <el-button type="primary" @click="save">确定</el-button>
+                <el-button type="primary" @click="saveBefore" v-if="!readOnly">确定</el-button>
             </span>
         </el-dialog>
      
@@ -167,7 +167,7 @@ export default {
             query: {
                 text: '',
                 pageIndex: 1,
-                pageSize: 10,
+                pageSize: 20,
                 coupons:'',
             },
             doing:'',
@@ -184,25 +184,13 @@ export default {
                 }],//标签
             },
             primary_dtl_cou:'',//多选中的数组
+            readOnly:false,//查看优惠券时禁点
+            editRead:false,//编辑时禁点
+            couId:'',//查看编辑时id
         };
     },
     created() {
         this.getData();
-    },
-    watch:{
-        'form.region': {
-            handler: function (val) {
-                this.dynamicValidateForm = {
-                    domains: [{
-                        full: '',
-                        minus:'',
-                        give:'',
-                        start_end:'',
-                    }]
-                }
-            },
-            deep: true
-        },
     },
     methods: {
         getData() {
@@ -225,14 +213,49 @@ export default {
         handleSearch() {
             this.getData();
         },
-         // 编辑操作
-        handleEdit(index='', row='') {
-            this.form = {}
-            console.log(row)
-            if(row){
-                this.idx = index;
-                this.form = row;
+        // 下拉框改变时
+        selChange(){
+            this.dynamicValidateForm = {
+                domains: [{
+                    full: '',
+                    minus:'',
+                    give:'',
+                    start_end:'',
+                }]
             }
+        },
+         // 查看/编辑操作
+        handleEdit(index='', row='',type) {
+            this.form = {}
+            if(row){
+                this.couId = row.id
+                if(type==1){
+                    this.readOnly = true
+                    this.editRead = false
+                }else{
+                    this.readOnly = false
+                    this.editRead = true
+                }
+                this.form.region = row.category
+                this.dynamicValidateForm={
+                    domains: [{
+                        full: row.contentMoney,
+                        minus:row.discountMoney,
+                        give:row.remainder,
+                        start_end:[
+                            row.beginTime,row.overTime
+                        ],
+                    }],
+                }
+            }else{
+                this.readOnly = false
+                this.editRead = false
+                this.couId=''
+            }
+            // if(row){
+            //     this.idx = index;
+            //     this.form = row;
+            // }
             this.editVisible = true;
         },
         // 双击某一行
@@ -255,25 +278,26 @@ export default {
         // 批量增加优惠券
         addCou() {
             this.dynamicValidateForm.domains.push({
-                
             });
         },
         // 删除 新增时的优惠券
         removeDomain(item) {
             var index = this.dynamicValidateForm.domains.indexOf(item)
             if (index !== -1) {
-            this.dynamicValidateForm.domains.splice(index, 1)
+                this.dynamicValidateForm.domains.splice(index, 1)
             }
         },
         // 多选
         handleSelectionChange(val){
             this.primary_dtl_cou = val
+            console.log()
         },
         //删除已有优惠券
         dtlCoupon(index,val){
+            // this.tableData.splice(1, 1);
+            // return
             let str = val.map(v=>{return v.id});
-            let data = str.join(",");
-            this.$Delete(`/api/merchant/store/coupon/deleteById/${data}`).then(res=>{
+            this.$post(`/api/merchant/store/coupon/batchDeleteCoupon`,str).then(res=>{
                 if(res.code == 0){
                     this.$message({message: '删除成功',type: 'success'});
                 }else{
@@ -281,10 +305,21 @@ export default {
                 }
             })
         },
-        // 新增保存
+        // 新增/修改  保存
         save(){
             let from = this.dynamicValidateForm.domains
-            let arr = []
+            let url='',id='',urlType='';
+            if(!this.editRead){
+                var arr = []
+                // 新增
+                url='/api/merchant/store/coupon/save'
+                id=''
+            }else{
+                // 编辑修改
+                url='/api/merchant/store/coupon/update'
+                id=this.couId
+                var arr='';
+            }
             from.forEach(i=>{
                 let str = ''
                 if(this.form.region == 1){
@@ -300,22 +335,81 @@ export default {
                     contentMoney: Number(i.full),
                     details: str, 
                     discountMoney: Number(i.minus),
-                    id: "",
+                    id: id,
                     overTime: this.$regular.timeData(i.start_end[1],1),
                     remainder: Number(i.give),
                     source: 0,
                     sum: Number(i.give)
                 }
-                arr.push(data)
+                if(!this.editRead){
+                    // 新增 
+                    arr.push(data)
+                    urlType = this.$post
+                }else{
+                    // 编辑修改
+                    arr = data
+                    urlType = this.$put
+                }
             })
-            this.$post('/api/merchant/store/coupon/save',arr).then(res=>{
+            urlType(url,arr).then(res=>{
                 if(res.code == 0){
-                    this.$message({message: '新增成功',type: 'success'});
+                    if(id){
+                        this.$message({message: '修改成功',type: 'success'});
+                    }else{
+                        this.$message({message: '新增成功',type: 'success'});
+                    }
                     this.editVisible = false
                 }else{
                     this.$message({message: res.mesg,type: 'warning'});
                 }
             })
+        },
+
+        // 保存之前的 非空判断
+        saveBefore(){
+            if(!this.form.region){
+                this.$message({message: '请选择优惠券类型',type: 'warning'});
+                return
+            }
+            let arr = this.dynamicValidateForm.domains
+            for(let i in arr){
+                console.log(arr[i].start_end)
+                return
+                if(this.form.region == 1){
+                    if(!arr[i].minus){
+                        this.$message({message: '请输入抵扣金额',type: 'warning'});
+                        break
+                    }
+                    if(!arr[i].give){
+                        this.$message({message: '请输入优惠券张数',type: 'warning'});
+                        break
+                    }
+                }else{
+                    if(!arr[i].full){
+                        this.$message({message: '请输入满减金额',type: 'warning'});
+                        break
+                    }
+                    if(!arr[i].minus){
+                        this.$message({message: '请输入抵扣金额',type: 'warning'});
+                        break
+                    }
+                    if(!arr[i].give){
+                        this.$message({message: '请输入优惠券张数',type: 'warning'});
+                        break
+                    }
+                }
+                if(!arr[i].start_end){
+                    this.$message({message: '请选择时间',type: 'warning'});
+                    break
+                }
+            }
+            if(!this.editRead){
+                // 新增
+                
+            }else{
+                // 编辑修改
+
+            }
         },
     }
 };
@@ -375,9 +469,6 @@ export default {
             .num{
                 height: 32px;
                 margin-right: 30px;
-            }
-       
-            .el-input-group{
                 width: 100px;
             }
             /deep/ .el-input-group__append{
