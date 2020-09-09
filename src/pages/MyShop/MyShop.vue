@@ -883,18 +883,20 @@ export default {
 
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
-            const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
+            const isMP4 = file.type === 'video/mp4';
+            // const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
 
-            if (!isJPG && !isPNG) {
-                this.$message.error('上传图片只能是 JPG 或 PNG 格式');
+            //限制上传文件格式
+            if (!isJPG && !isPNG && !isMP4) {
+                this.$message.error('上传图片只能是 JPG / PNG / MP4 格式');
             }
 
-            if (!isLt2M) {
-                this.$message.error('上传文件大小不能超过 2MB!');
-            }
+            //显示上传文件大小
+            // if (!isLt2M) {
+            //     this.$message.error('上传文件大小不能超过 2MB!');
+            // }
 
-            // console.log(isJPG, isPNG, isLt2M);
-            return isJPG || (isPNG && isLt2M);
+            return isJPG || isPNG || isMP4;
         },
 
         //上传banner图
