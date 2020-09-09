@@ -31,6 +31,7 @@
             </el-form>
             <p>
                 <el-checkbox
+                    @change="removeBanner"
                     v-model="vipCardForm.checkedBanner"
                     label="放至商店广告位"
                     border
@@ -138,6 +139,13 @@ export default {
     },
 
     methods: {
+        //关闭广告位操作
+        removeBanner() {
+            if (!this.vipCardForm.checkedBanner) {
+                this.vipCardForm.bannerImageUrl = '';
+            }
+        },
+
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
             this.vipCardForm.name = this.vipCardFormParent.name;
@@ -145,10 +153,12 @@ export default {
             this.vipCardForm.desc = this.vipCardFormParent.desc;
             this.vipCardForm.integral = this.vipCardFormParent.integral;
             this.vipCardForm.nowPrice = this.vipCardFormParent.nowPrice;
-            this.vipCardForm.checkedBanner = this.vipCardFormParent.checkedBanner;
+            this.vipCardForm.checkedBanner = this.vipCardFormParent.checkedBanner == 1 ? true : false;
             this.vipCardForm.bannerImageUrl = this.vipCardFormParent.bannerImageUrl;
             this.vipCardForm.thumImageUrl = this.vipCardFormParent.thumImageUrl;
             this.vipCardForm.detailImageUrl = this.vipCardFormParent.detailImageUrl;
+
+            console.log(this.vipCardForm.bannerImageUrl);
         },
 
         //发送当前子组件的表单信息给父组件

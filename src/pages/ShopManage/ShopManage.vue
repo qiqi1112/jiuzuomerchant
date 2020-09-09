@@ -15,8 +15,12 @@
                 <el-row class="left-handle">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd">添加商品</el-button>
                     <el-button type="danger" icon="el-icon-delete" @click="handleDelAll">批量删除</el-button>
-                    <el-button v-if="isSelect" type="warning" @click="sureDelAll">确定</el-button>
-                    <el-button v-if="isSelect" @click="isSelect=false">取消</el-button>
+                    <el-button
+                        v-if="isSelect && goodsData.length > 0"
+                        type="warning"
+                        @click="sureDelAll"
+                    >确定</el-button>
+                    <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
 
                 <!-- 添加商户的对话框 -->
@@ -141,7 +145,7 @@
                 <div class="right-handle">
                     <el-input
                         v-model="searchName"
-                        @keydown.13.native="handleSearch"
+                        @keydown.13.native="getGoodsInfo"
                         placeholder="商品名称"
                         class="handle-input mr10"
                         clearable
@@ -160,7 +164,7 @@
                             :value="item.value"
                         ></el-option>
                     </el-select>
-                    <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                    <el-button type="primary" icon="el-icon-search" @click="getGoodsInfo">搜索</el-button>
                 </div>
             </div>
 
@@ -429,19 +433,16 @@ export default {
                         this.$post('/api/merchant/store/goods/batchDeleteGoods', goodsIdList).then((res) => {
                             if (res.code == 0) {
                                 this.getGoodsInfo();
-                                this.deleteSelect = [];
-                                this.isSelect = false;
+                                this.cancelDelete();
                                 this.$message.success('删除成功');
                             } else {
-                                this.deleteSelect = [];
-                                this.isSelect = false;
+                                this.cancelDelete();
                                 this.$message.error(res.msg);
                             }
                         });
                     })
                     .catch(() => {
-                        this.deleteSelect = [];
-                        this.isSelect = false;
+                        this.cancelDelete();
                         this.$message.info('已取消删除');
                     });
             } else {
@@ -449,11 +450,10 @@ export default {
             }
         },
 
-        //搜索按钮
-        handleSearch() {
-            this.getGoodsInfo();
-            // this.searchName = '';
-            // this.value = '';
+        //初始化操作（删除商品相关操作）
+        cancelDelete() {
+            this.deleteSelect = [];
+            this.isSelect = false;
         },
 
         //添加商品
@@ -470,11 +470,20 @@ export default {
             this.activeName = '';
             this.activeNum = '';
             this.isUpdate = false;
+            this.cancelDelete(); //初始化删除商品相关的操作
             this.clearAllForm(); //清空所有表单
         },
 
         //添加/修改套餐
         setComboInfo() {
+            //验证是否上传广告位图
+            if (this.comboForm.checkedBanner == 1) {
+                if (!this.comboForm.bannerImageUrl) {
+                    this.$message.error('请上传广告图片');
+                    return;
+                }
+            }
+
             let data = {
                 type: this.activeNum,
                 name: this.comboForm.name,
@@ -502,6 +511,22 @@ export default {
 
         //添加/修改酒水
         setDrinksInfo() {
+            //验证是否上传广告位图
+            if (this.drinksForm.checkedBanner == 1) {
+                if (!this.drinksForm.bannerImageUrl) {
+                    this.$message.error('请上传广告图片');
+                    return;
+                }
+            }
+
+            //验证是否上传推荐位图
+            if (this.drinksForm.checkedReco == 1) {
+                if (!this.drinksForm.recoImageUrl) {
+                    this.$message.error('请上传推荐图片');
+                    return;
+                }
+            }
+
             let data = {
                 infoPicture: this.drinksForm.detailImageUrl,
                 listPicture: this.drinksForm.thumImageUrl,
@@ -533,6 +558,14 @@ export default {
 
         //添加/修改小吃
         setSnackInfo() {
+            //验证是否上传广告位图
+            if (this.snackForm.checkedBanner == 1) {
+                if (!this.snackForm.bannerImageUrl) {
+                    this.$message.error('请上传广告图片');
+                    return;
+                }
+            }
+
             let data = {
                 type: this.activeNum,
                 name: this.snackForm.name,
@@ -561,6 +594,14 @@ export default {
 
         //添加/修改其他
         setOtherInfo() {
+            //验证是否上传广告位图
+            if (this.otherForm.checkedBanner == 1) {
+                if (!this.otherForm.bannerImageUrl) {
+                    this.$message.error('请上传广告图片');
+                    return;
+                }
+            }
+
             let data = {
                 type: this.activeNum,
                 name: this.otherForm.name,
@@ -589,6 +630,14 @@ export default {
 
         //添加/修改会员卡
         setVipCardInfo() {
+            //验证是否上传广告位图
+            if (this.vipCardForm.checkedBanner == 1) {
+                if (!this.vipCardForm.bannerImageUrl) {
+                    this.$message.error('请上传广告图片');
+                    return;
+                }
+            }
+
             let data = {
                 type: this.activeNum,
                 name: this.vipCardForm.name,
@@ -952,12 +1001,11 @@ export default {
         //接收套餐传值
         getChildComboForm(data) {
             this.comboForm.name = data.name;
-            this.comboForm.weight = Number(data.weight);
+            this.comboForm.weight = data.weight;
             this.comboForm.desc = data.desc;
             this.comboForm.originPrice = data.originPrice;
             this.comboForm.nowPrice = data.nowPrice;
-            this.comboForm.checkedBanner =
-                data.checkedBanner == true ? (this.comboForm.checkedBanner = 1) : (this.comboForm.checkedBanner = 2);
+            this.comboForm.checkedBanner = data.checkedBanner == true ? 1 : 2;
             this.comboForm.bannerImageUrl = data.bannerImageUrl;
             this.comboForm.thumImageUrl = data.thumImageUrl;
             this.comboForm.detailImageUrl = data.detailImageUrl;
@@ -968,66 +1016,86 @@ export default {
         getChildDrinksForm(data) {
             this.drinksForm.name = data.name;
             this.drinksForm.desc = data.desc;
-            this.drinksForm.originPrice = data.originPrice;
-            this.drinksForm.nowPrice = data.nowPrice;
-            this.drinksForm.checkedBanner =
-                data.checkedBanner == true ? (this.comboForm.checkedBanner = 1) : (this.comboForm.checkedBanner = 2);
-            this.drinksForm.checkedReco = data.checkedReco == true ? (this.comboForm.checkedReco = 1) : (this.comboForm.checkedReco = 2);
+            this.drinksForm.checkedBanner = data.checkedBanner == true ? 1 : 2;
+            this.drinksForm.checkedReco = data.checkedReco == true ? 1 : 2;
             this.drinksForm.classify = data.classify;
-            this.drinksForm.goodWeight = Number(data.goodWeight);
-            this.drinksForm.recoWeight = Number(data.recoWeight);
+
+            this.drinksForm.goodWeight = data.goodWeight;
+            this.drinksForm.recoWeight = data.recoWeight;
+
             this.drinksForm.bannerImageUrl = data.bannerImageUrl;
             this.drinksForm.recoImageUrl = data.recoImageUrl;
             this.drinksForm.thumImageUrl = data.thumImageUrl;
             this.drinksForm.detailImageUrl = data.detailImageUrl;
             this.drinksForm.dynamicValidateForm = data.dynamicValidateForm;
             this.drinksForm.skuCodeArr = data.skuCodeArr;
+
+            let minOriginPrice = this.getMinVal(data, 'originalPrice'); //获取规格中的最低原价
+            let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
+            this.drinksForm.originPrice = minOriginPrice;
+            this.drinksForm.nowPrice = minNowPrice;
+
+            console.log('最低', this.drinksForm.originPrice, this.drinksForm.nowPrice);
         },
 
         //接收小吃传值
         getChildSnackForm(data) {
             this.snackForm.name = data.name;
-            this.snackForm.weight = Number(data.weight);
+            this.snackForm.weight = data.weight;
             this.snackForm.desc = data.desc;
-            this.snackForm.originPrice = data.originPrice;
-            this.snackForm.nowPrice = data.nowPrice;
-            this.snackForm.checkedBanner =
-                data.checkedBanner == true ? (this.snackForm.checkedBanner = 1) : (this.snackForm.checkedBanner = 2);
+            this.snackForm.checkedBanner = data.checkedBanner == true ? 1 : 2;
             this.snackForm.bannerImageUrl = data.bannerImageUrl;
             this.snackForm.thumImageUrl = data.thumImageUrl;
             this.snackForm.detailImageUrl = data.detailImageUrl;
             this.snackForm.dynamicValidateForm = data.dynamicValidateForm;
             this.snackForm.skuCodeArr = data.skuCodeArr;
+
+            let minOriginPrice = this.getMinVal(data, 'originalPrice'); //获取规格中的最低原价
+            let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
+            this.snackForm.originPrice = minOriginPrice;
+            this.snackForm.nowPrice = minNowPrice;
+
+            console.log('bbb', this.snackForm.checkedBanner);
         },
 
         //接收其他传值
         getChildOtherForm(data) {
             this.otherForm.name = data.name;
-            this.otherForm.weight = Number(data.weight);
+            this.otherForm.weight = data.weight;
             this.otherForm.desc = data.desc;
-            this.otherForm.originPrice = data.originPrice;
-            this.otherForm.nowPrice = data.nowPrice;
-            this.otherForm.checkedBanner =
-                data.checkedBanner == true ? (this.otherForm.checkedBanner = 1) : (this.otherForm.checkedBanner = 2);
+            this.otherForm.checkedBanner = data.checkedBanner == true ? 1 : 2;
             this.otherForm.bannerImageUrl = data.bannerImageUrl;
             this.otherForm.thumImageUrl = data.thumImageUrl;
             this.otherForm.detailImageUrl = data.detailImageUrl;
             this.otherForm.dynamicValidateForm = data.dynamicValidateForm;
             this.otherForm.skuCodeArr = data.skuCodeArr;
+
+            let minOriginPrice = this.getMinVal(data, 'originalPrice'); //获取规格中的最低原价
+            let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
+            this.otherForm.originPrice = minOriginPrice;
+            this.otherForm.nowPrice = minNowPrice;
         },
 
         //接收会员卡传值
         getChildVipCardForm(data) {
             this.vipCardForm.name = data.name;
-            this.vipCardForm.weight = Number(data.weight);
+            this.vipCardForm.weight = data.weight;
             this.vipCardForm.desc = data.desc;
             this.vipCardForm.integral = data.integral;
             this.vipCardForm.nowPrice = data.nowPrice;
-            this.vipCardForm.checkedBanner =
-                data.checkedBanner == true ? (this.vipCardForm.checkedBanner = 1) : (this.vipCardForm.checkedBanner = 2);
+            this.vipCardForm.checkedBanner = data.checkedBanner == true ? 1 : 2;
             this.vipCardForm.bannerImageUrl = data.bannerImageUrl;
             this.vipCardForm.thumImageUrl = data.thumImageUrl;
             this.vipCardForm.detailImageUrl = data.detailImageUrl;
+        },
+
+        //获取规格中的原价和现价最小值
+        getMinVal(data, key) {
+            let newArr = data.dynamicValidateForm.domains.map((item) => {
+                return item[key];
+            });
+
+            return Math.min(...newArr); //返回最小值
         }
     },
 

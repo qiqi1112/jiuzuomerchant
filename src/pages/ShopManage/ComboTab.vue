@@ -78,6 +78,7 @@
             </el-form>
             <p>
                 <el-checkbox
+                    @change="removeBanner"
                     v-model="comboForm.checkedBanner"
                     label="放至商店广告位"
                     border
@@ -192,6 +193,13 @@ export default {
     },
 
     methods: {
+        //关闭广告位操作
+        removeBanner() {
+            if (!this.comboForm.checkedBanner) {
+                this.comboForm.bannerImageUrl = '';
+            }
+        },
+
         //处理当前选中的商品信息
         selectGoodInfo() {
             let goodInfoArr = this.comboForm.goodName.split('+'); //将字符串拆分成数组
@@ -262,7 +270,7 @@ export default {
             this.comboForm.desc = this.comboFormParent.desc;
             this.comboForm.originPrice = this.comboFormParent.originPrice;
             this.comboForm.nowPrice = this.comboFormParent.nowPrice;
-            this.comboForm.checkedBanner = this.comboFormParent.checkedBanner;
+            this.comboForm.checkedBanner = this.comboFormParent.checkedBanner == 1 ? true : false;
             this.comboForm.bannerImageUrl = this.comboFormParent.bannerImageUrl;
             this.comboForm.thumImageUrl = this.comboFormParent.thumImageUrl;
             this.comboForm.detailImageUrl = this.comboFormParent.detailImageUrl;

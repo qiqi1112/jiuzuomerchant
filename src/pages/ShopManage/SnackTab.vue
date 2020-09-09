@@ -22,13 +22,6 @@
                     <span>小吃包含：</span>
                     <el-input type="textarea" v-model="snackForm.desc" style="width:300px;"></el-input>
                 </p>
-                <p>
-                    <span>小吃原单价：</span>
-                    <el-input v-model="snackForm.originPrice" style="width:120px;margin-right:20px"></el-input>
-
-                    <span>小吃现单价：</span>
-                    <el-input v-model="snackForm.nowPrice" style="width:120px"></el-input>
-                </p>
                 <p class="combo-spec">
                     <span>小吃规格：</span>
                     <el-form
@@ -71,6 +64,7 @@
             </el-form>
             <p>
                 <el-checkbox
+                    @change="removeBanner"
                     v-model="snackForm.checkedBanner"
                     label="放至商店广告位"
                     border
@@ -191,6 +185,13 @@ export default {
     },
 
     methods: {
+        //关闭广告位操作
+        removeBanner() {
+            if (!this.snackForm.checkedBanner) {
+                this.snackForm.bannerImageUrl = '';
+            }
+        },
+
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
             this.snackForm.name = this.snackFormParent.name;
@@ -198,12 +199,14 @@ export default {
             this.snackForm.desc = this.snackFormParent.desc;
             this.snackForm.originPrice = this.snackFormParent.originPrice;
             this.snackForm.nowPrice = this.snackFormParent.nowPrice;
-            this.snackForm.checkedBanner = this.snackFormParent.checkedBanner;
+            this.snackForm.checkedBanner = this.snackFormParent.checkedBanner == 1 ? true : false;
             this.snackForm.bannerImageUrl = this.snackFormParent.bannerImageUrl;
             this.snackForm.thumImageUrl = this.snackFormParent.thumImageUrl;
             this.snackForm.detailImageUrl = this.snackFormParent.detailImageUrl;
             this.snackForm.dynamicValidateForm.domains = this.snackFormParent.dynamicValidateForm.domains;
             this.snackForm.skuCodeArr = this.snackFormParent.skuCodeArr;
+
+            console.log('xxx', this.snackForm.checkedBanner);
         },
 
         //发送当前子组件的表单信息给父组件

@@ -28,16 +28,6 @@
                     <span>酒水包含：</span>
                     <el-input type="textarea" v-model="drinksForm.desc" style="width:300px;"></el-input>
                 </p>
-                <p>
-                    <span>酒水原单价：</span>
-                    <el-input
-                        v-model="drinksForm.originPrice"
-                        style="width:120px;margin-right:20px"
-                    ></el-input>
-
-                    <span>酒水现单价：</span>
-                    <el-input v-model="drinksForm.nowPrice" style="width:120px"></el-input>
-                </p>
                 <p class="drinks-spec">
                     <span>酒水规格：</span>
                     <el-form
@@ -82,6 +72,7 @@
                 <!-- 广告图 -->
                 <div class="banner-box">
                     <el-checkbox
+                        @change="removeBanner"
                         v-model="drinksForm.checkedBanner"
                         label="放至商店广告位"
                         border
@@ -111,6 +102,7 @@
                 <!-- 商家推荐位 -->
                 <div class="reco-box">
                     <el-checkbox
+                        @change="removeReco"
                         v-model="drinksForm.checkedReco"
                         label="放至商家推荐位"
                         border
@@ -276,6 +268,21 @@ export default {
     },
 
     methods: {
+        //关闭广告位操作
+        removeBanner() {
+            if (!this.drinksForm.checkedBanner) {
+                this.drinksForm.bannerImageUrl = '';
+            }
+        },
+
+        //关闭商家推荐位操作
+        removeReco() {
+            if (!this.drinksForm.checkedReco) {
+                this.drinksForm.recoImageUrl = '';
+                this.drinksForm.recoWeight = 0;
+            }
+        },
+
         //发送当前子组件的表单信息给父组件
         sendChildForm() {
             this.$emit('drinksFormChild', this.drinksForm);
@@ -288,8 +295,8 @@ export default {
             this.drinksForm.desc = this.drinksFormParent.desc;
             this.drinksForm.originPrice = this.drinksFormParent.originPrice;
             this.drinksForm.nowPrice = this.drinksFormParent.nowPrice;
-            this.drinksForm.checkedBanner = this.drinksFormParent.checkedBanner;
-            this.drinksForm.checkedReco = this.drinksFormParent.checkedReco;
+            this.drinksForm.checkedBanner = this.drinksFormParent.checkedBanner == 1 ? true : false;
+            this.drinksForm.checkedReco = this.drinksFormParent.checkedReco == 1 ? true : false;
             this.drinksForm.classify = this.drinksFormParent.classify;
             this.drinksForm.recoWeight = this.drinksFormParent.recoWeight;
             this.drinksForm.bannerImageUrl = this.drinksFormParent.bannerImageUrl;

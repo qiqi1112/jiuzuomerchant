@@ -17,13 +17,6 @@
                     <span>商品包含：</span>
                     <el-input type="textarea" v-model="otherForm.desc" style="width:300px;"></el-input>
                 </p>
-                <p>
-                    <span>商品原单价：</span>
-                    <el-input v-model="otherForm.originPrice" style="width:120px;margin-right:20px"></el-input>
-
-                    <span>商品现单价：</span>
-                    <el-input v-model="otherForm.nowPrice" style="width:120px"></el-input>
-                </p>
                 <p class="combo-spec">
                     <span>商品规格：</span>
                     <el-form
@@ -66,6 +59,7 @@
             </el-form>
             <p>
                 <el-checkbox
+                    @change="removeBanner"
                     v-model="otherForm.checkedBanner"
                     label="放至商店广告位"
                     border
@@ -186,6 +180,13 @@ export default {
     },
 
     methods: {
+        //关闭广告位操作
+        removeBanner() {
+            if (!this.otherForm.checkedBanner) {
+                this.otherForm.bannerImageUrl = '';
+            }
+        },
+
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
             this.otherForm.name = this.otherFormParent.name;
@@ -193,7 +194,7 @@ export default {
             this.otherForm.desc = this.otherFormParent.desc;
             this.otherForm.originPrice = this.otherFormParent.originPrice;
             this.otherForm.nowPrice = this.otherFormParent.nowPrice;
-            this.otherForm.checkedBanner = this.otherFormParent.checkedBanner;
+            this.otherForm.checkedBanner = this.otherFormParent.checkedBanner == 1 ? true : false;
             this.otherForm.bannerImageUrl = this.otherFormParent.bannerImageUrl;
             this.otherForm.thumImageUrl = this.otherFormParent.thumImageUrl;
             this.otherForm.detailImageUrl = this.otherFormParent.detailImageUrl;

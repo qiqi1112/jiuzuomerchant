@@ -6,7 +6,8 @@
                 <h4>
                     <span>店铺信息</span>
                     <el-button type="primary" @click="editShopInfo">编辑</el-button>
-                    <el-button type="primary" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
+                    <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
+                    <el-button type="info" @click="cancelSubmit" v-if="!isReadonly">取消</el-button>
                 </h4>
 
                 <!-- 店铺基本信息 -->
@@ -242,12 +243,17 @@
                     <div class="banner-box">
                         <p>店铺banner图</p>
                         <div v-if="isReadonly">
-                            <img v-for="(item,index) in bannerShowBox" :key="index" :src="item" />
+                            <img
+                                v-for="(item,index) in bannerShowBox"
+                                :key="index"
+                                :src="showImgPrefix + item"
+                            />
                         </div>
                         <el-upload
                             v-else
                             action="1"
                             list-type="picture-card"
+                            :before-upload="beforeBannerUpload"
                             :http-request="uploadBannerFiles"
                             :on-remove="bannerRemove"
                             :file-list="bannerImgBox"
@@ -468,13 +474,72 @@
                             ></el-time-select>
                         </div>
                         <div class="min-charge">
-                            <span class="seat-detail-span">最低消费：</span>
-                            <el-input
-                                v-model="presentSeatInfo.minConsumption"
-                                placeholder="最低消费"
-                                style="width:34%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>元/人
+                            <span class="seat-detail-span min-con">最低消费：</span>
+                            <div class="day-mincom">
+                                <p>
+                                    <span>星期一</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[0].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                                <p>
+                                    <span>星期二</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[1].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                                <p>
+                                    <span>星期三</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[2].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                                <p>
+                                    <span>星期四</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[3].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                                <p>
+                                    <span>星期五</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[4].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                                <p>
+                                    <span>星期六</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[5].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                                <p>
+                                    <span>星期七</span>
+                                    <el-input
+                                        v-model="presentSeatInfo.weekPriceList[6].price"
+                                        placeholder="最低消费"
+                                        style="width:47%;;margin-right:6px"
+                                        :readonly="isReadonly"
+                                    ></el-input>元/人
+                                </p>
+                            </div>
                         </div>
                     </div>
                     <!-- 当选择ktv时展示的座位属性 -->
@@ -551,19 +616,38 @@
                             <div class="snacks-detail">
                                 <ul>
                                     <li v-for="(item,index) in presentSeatInfo.snacks" :key="index">
-                                        <span class="snacks-name" :title="item.name">{{item.name}}</span>
+                                        <!-- <span class="snacks-name" :title="item.name">{{item.name}}</span>
                                         <span class="mult">
                                             <i class="el-icon-close"></i>
                                         </span>
-                                        <span>{{item.num}}</span>
+                                        <span>{{item.num}}</span>-->
+                                        <el-input
+                                            style="width:90px"
+                                            v-model="item.name"
+                                            placeholder="名称"
+                                            :readonly="isReadonly"
+                                        ></el-input>
+                                        <span class="mult">
+                                            <i class="el-icon-close"></i>
+                                        </span>
+                                        <el-input
+                                            style="width:60px;margin-right:10px"
+                                            v-model="item.num"
+                                            placeholder="数量"
+                                            :readonly="isReadonly"
+                                        ></el-input>
                                         <el-button
-                                            :disabled="isReadonly"
+                                            v-if="!isReadonly"
                                             @click="deleteSnacks(item)"
                                             type="danger"
                                         >删除</el-button>
                                     </li>
                                 </ul>
-                                <div class="snacks-form">
+                                <span
+                                    v-if="presentSeatInfo.snacks.length == 0 && isReadonly"
+                                    style="margin-left:74px"
+                                >无</span>
+                                <div class="snacks-form" v-if="!isReadonly">
                                     <el-input
                                         style="width:90px"
                                         v-model="snackName"
@@ -593,7 +677,7 @@
                                 <p>
                                     <span>星期一</span>
                                     <el-input
-                                        v-model="presentSeatInfo.weekPriceList"
+                                        v-model="presentSeatInfo.weekPriceList[0].price"
                                         placeholder="最低消费"
                                         style="width:47%;margin-right:6px"
                                         :readonly="isReadonly"
@@ -602,7 +686,7 @@
                                 <p>
                                     <span>星期二</span>
                                     <el-input
-                                        v-model="presentSeatInfo.minConsumption"
+                                        v-model="presentSeatInfo.weekPriceList[1].price"
                                         placeholder="最低消费"
                                         style="width:47%;;margin-right:6px"
                                         :readonly="isReadonly"
@@ -611,7 +695,7 @@
                                 <p>
                                     <span>星期三</span>
                                     <el-input
-                                        v-model="presentSeatInfo.minConsumption"
+                                        v-model="presentSeatInfo.weekPriceList[2].price"
                                         placeholder="最低消费"
                                         style="width:47%;;margin-right:6px"
                                         :readonly="isReadonly"
@@ -620,7 +704,7 @@
                                 <p>
                                     <span>星期四</span>
                                     <el-input
-                                        v-model="presentSeatInfo.minConsumption"
+                                        v-model="presentSeatInfo.weekPriceList[3].price"
                                         placeholder="最低消费"
                                         style="width:47%;;margin-right:6px"
                                         :readonly="isReadonly"
@@ -629,7 +713,7 @@
                                 <p>
                                     <span>星期五</span>
                                     <el-input
-                                        v-model="presentSeatInfo.minConsumption"
+                                        v-model="presentSeatInfo.weekPriceList[4].price"
                                         placeholder="最低消费"
                                         style="width:47%;;margin-right:6px"
                                         :readonly="isReadonly"
@@ -638,7 +722,7 @@
                                 <p>
                                     <span>星期六</span>
                                     <el-input
-                                        v-model="presentSeatInfo.minConsumption"
+                                        v-model="presentSeatInfo.weekPriceList[5].price"
                                         placeholder="最低消费"
                                         style="width:47%;;margin-right:6px"
                                         :readonly="isReadonly"
@@ -647,7 +731,7 @@
                                 <p>
                                     <span>星期七</span>
                                     <el-input
-                                        v-model="presentSeatInfo.minConsumption"
+                                        v-model="presentSeatInfo.weekPriceList[6].price"
                                         placeholder="最低消费"
                                         style="width:47%;;margin-right:6px"
                                         :readonly="isReadonly"
@@ -721,9 +805,9 @@ export default {
             shopMatter: '', //订桌注意事项
             shopRemind: '', //排号商家提醒
 
-            bannerUploadUrl: '', //上传banner图集时的url字符串
-            bannerShowBox: [], //要回显的banner图集（可以显示在自定义的地方）
+            bannerShowBox: [], //要上传的banner图集和回显的banner图集（回显在自定义的位置）
             bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
+
             overallImageUrl: '', //商家布局图
             rowNumImageUrl: '', //排号横幅图
             appShopImageUrl: '', //店铺长图
@@ -793,13 +877,33 @@ export default {
             });
         },
 
+        //上传banner图之前的验证
+        beforeBannerUpload(file) {
+            console.log('上传之前', file);
+
+            const isJPG = file.type === 'image/jpeg';
+            const isPNG = file.type === 'image/png';
+            const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
+
+            if (!isJPG && !isPNG) {
+                this.$message.error('上传图片只能是 JPG 或 PNG 格式');
+            }
+
+            if (!isLt2M) {
+                this.$message.error('上传文件大小不能超过 2MB!');
+            }
+
+            // console.log(isJPG, isPNG, isLt2M);
+            return isJPG || (isPNG && isLt2M);
+        },
+
         //上传banner图
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.bannerUploadUrl += res.data[0] + ',';
-                console.log('图集', this.bannerUploadUrl);
+                this.bannerShowBox.push(res.data[0]);
+                console.log('图集', this.bannerShowBox);
             });
         },
 
@@ -815,7 +919,6 @@ export default {
         //回显banner图集
         showBannerImg(picStr) {
             this.bannerImgBox = [];
-            this.bannerShowBox = this.imgStrChangeArr(picStr); //回显在自定义的位置
             let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
             pictureArr.forEach((item) => {
                 let obj = {};
@@ -826,17 +929,12 @@ export default {
 
         // 删除banner图集
         bannerRemove(file, fileList) {
-            let urlArr = this.bannerUploadUrl.split(',');
-            urlArr.forEach((item, i) => {
+            this.bannerShowBox.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
-                    urlArr.splice(i, 1);
                     this.bannerShowBox.splice(i, 1);
                 }
             });
-
-            this.bannerUploadUrl = urlArr.join(',');
-
-            console.log('剩余的图集数组', this.bannerUploadUrl);
+            console.log('剩余的图集数组', this.bannerShowBox);
         },
 
         //上传商家布局图
@@ -943,7 +1041,7 @@ export default {
                 lonlat: `${this.longitude},${this.latitude}`,
                 name: this.shopName,
                 perCapitaConsumption: this.perCon,
-                picture: (this.bannerUploadUrl = this.bannerUploadUrl.slice(0, this.bannerUploadUrl.length - 1)),
+                picture: this.bannerShowBox.join(','),
                 province: this.province,
                 rowNumberBanner: this.rowNumImageUrl,
                 searchAddress: this.searchAddress,
@@ -978,8 +1076,12 @@ export default {
         //修改店铺
         submitUpdateShop() {
             //数组转json形式（零嘴）
-            let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
-            seatArr.forEach((item) => {
+            // let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
+            // seatArr.forEach((item) => {
+            //     item.snacks = JSON.stringify(item.snacks);
+            // });
+
+            this.allSeatDetailInfo.forEach((item) => {
                 item.snacks = JSON.stringify(item.snacks);
             });
 
@@ -1009,7 +1111,7 @@ export default {
                 lonlat: `${this.longitude},${this.latitude}`,
                 name: this.shopName,
                 perCapitaConsumption: this.perCon,
-                picture: (this.bannerUploadUrl = this.bannerUploadUrl.slice(0, this.bannerUploadUrl.length - 1)),
+                picture: this.bannerShowBox.join(','),
                 province: this.province,
                 rowNumberBanner: this.rowNumImageUrl,
                 searchAddress: this.searchAddress,
@@ -1019,7 +1121,7 @@ export default {
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
                 type: this.shopTypeOptStr,
-                layoutList: seatArr
+                layoutList: this.allSeatDetailInfo
             };
 
             console.log('修改时传的值', data);
@@ -1048,7 +1150,14 @@ export default {
                 } else {
                     this.submitUpdateShop(); //修改店铺
                 }
+                this.isClickSeat = false; //展示当前点击的座位的详细信息
             }
+        },
+
+        //取消保存按钮
+        cancelSubmit() {
+            this.isReadonly = true;
+            this.isClickSeat = false; //展示当前点击的座位的详细信息
         },
 
         //删除当前标签
@@ -1182,15 +1291,19 @@ export default {
             snacksObj.name = this.snackName;
             snacksObj.num = this.snackNum;
 
-            let snacksArr = [];
-            snacksArr.push(snacksObj);
+            // let snacksArr = [];
+            // snacksArr.push(snacksObj);
 
-            snacksArr.forEach((item) => {
-                this.presentSeatInfo.snacks.push(item);
-            });
+            // snacksArr.forEach((item) => {
+            //     this.presentSeatInfo.snacks.push(item);
+            // });
+
+            this.presentSeatInfo.snacks.push(snacksObj);
 
             this.snackName = '';
             this.snackNum = '';
+
+            console.log('添加零嘴', this.presentSeatInfo.snacks);
         },
 
         //删除零嘴
@@ -1200,6 +1313,8 @@ export default {
                     this.presentSeatInfo.snacks.splice(i, 1);
                 }
             });
+
+            console.log('删除零嘴', this.presentSeatInfo.snacks);
         },
 
         //座位属性回显
@@ -1273,7 +1388,49 @@ export default {
                                 price: 0,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 0
+                                weekIndex: 1
+                            },
+                            {
+                                id: '',
+                                price: 0,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 2
+                            },
+                            {
+                                id: '',
+                                price: 0,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 3
+                            },
+                            {
+                                id: '',
+                                price: 0,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 4
+                            },
+                            {
+                                id: '',
+                                price: 0,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 5
+                            },
+                            {
+                                id: '',
+                                price: 0,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 6
+                            },
+                            {
+                                id: '',
+                                price: 0,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 7
                             }
                         ]
                     });
@@ -1290,7 +1447,6 @@ export default {
         getStoreInfo() {
             this.$get('/api/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
-                    console.log('当前店铺数据', res.data);
                     let result = res.data;
 
                     //返回的所有属性
@@ -1311,7 +1467,7 @@ export default {
                     this.shopName = result.name;
                     this.perCon = result.perCapitaConsumption;
                     let picture = result.picture;
-                    this.bannerUploadUrl = result.picture + ',';
+                    this.bannerShowBox = result.picture.split(',');
                     this.province = result.province;
                     this.rowNumImageUrl = result.rowNumberBanner;
                     this.searchAddress = result.searchAddress;
@@ -1354,6 +1510,8 @@ export default {
                     this.showSeatAtt(); //座位属性回显
 
                     this.initShopLocaStyle(); //店铺定位样式初始化
+
+                    console.log('当前店铺数据', res.data);
                 } else if (res.code == 600) {
                     this.$confirm(res.msg, '提示', {
                         confirmButtonText: '添加门店',
@@ -1704,11 +1862,15 @@ export default {
     border: 1px solid #dcdfe6;
     border-radius: 4px;
     padding: 16px 20px;
+    width: 80%;
 }
 
 .shop-seat .right-box .min-charge .day-mincom > p {
     margin-bottom: 16px;
     font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .shop-seat .right-box .min-charge .day-mincom > p:last-child {
@@ -1989,6 +2151,10 @@ export default {
     align-items: center;
 }
 
+.shop-seat .right-box > div.snacks {
+    align-items: flex-start;
+}
+
 .shop-seat .right-box > div > span {
     margin-right: 0;
     width: 120px;
@@ -2015,13 +2181,14 @@ export default {
 .seat-detail-span.min-con {
     float: left;
     margin-right: 0px;
-    width: 132px !important;
+    /* width: 132px !important; */
 }
 
 .snacks .snacks-detail li {
     /* float: left; */
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
 }
 
