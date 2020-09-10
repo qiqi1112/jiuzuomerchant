@@ -113,8 +113,8 @@
                                     :readonly="isReadonly"
                                     :picker-options="{
                                     start: '00:00',
-                                    step: '00:15',
-                                    end: '23:45'
+                                    step: '00:10',
+                                    end: '23:50'
                                 }"
                                     placeholder="开始"
                                 ></el-time-select>
@@ -124,8 +124,8 @@
                                     :readonly="isReadonly"
                                     :picker-options="{
                                     start: '00:00',
-                                  step: '00:15',
-                                  end: '23:45'
+                                  step: '00:10',
+                                  end: '23:50'
                                 }"
                                     placeholder="结束"
                                 ></el-time-select>
@@ -243,13 +243,17 @@
                     <div class="banner-box">
                         <p>店铺banner图</p>
                         <div v-if="isReadonly">
-                            <img
-                                v-for="(item,index) in bannerShowBox"
-                                :key="index"
-                                :src="showImgPrefix + item"
-                            />
+                            <div v-for="(item,index) in bannerShowBox" :key="index">
+                                <!-- 如果匹配到mp4的视频就不回显到图片标签里 -->
+                                <img :src="showImgPrefix + item" v-if="item.search(/.mp4/i) == -1" />
+                            </div>
+                            <!-- 回显视频 -->
+                            <video controls v-for="item in bannerVideo" :key="item">
+                                <source :src="showImgPrefix + item" />您的浏览器版本太低，请升级。
+                            </video>
                         </div>
                         <el-upload
+                            class="banner-show-box"
                             v-else
                             action="1"
                             list-type="picture-card"
@@ -466,10 +470,14 @@
                                 style="width:50%"
                                 v-model="presentSeatInfo.seatLatestReservationTime"
                                 :readonly="isReadonly"
-                                :picker-options="{
-                                    start: '00:00',
-                                    step: '00:15',
-                                    end: '23:45'
+                                :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
+                                    start: startBussTime,
+                                    step: '00:10',
+                                    end: '23:50'
+                                } : {
+                                    start: startBussTime,
+                                    step: '00:10',
+                                    end: endBussTime
                                 }"
                             ></el-time-select>
                         </div>
@@ -807,6 +815,7 @@ export default {
 
             bannerShowBox: [], //要上传的banner图集和回显的banner图集（回显在自定义的位置）
             bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
+            bannerVideo: [],
 
             overallImageUrl: '', //商家布局图
             rowNumImageUrl: '', //排号横幅图
@@ -843,7 +852,7 @@ export default {
                     style: 'stageBook'
                 }
             ],
-            seatStyle: 'hasBook', //默认的选座样式
+            seatStyle: 'canBook', //默认的选座样式
 
             allSeatDetailInfo: [], //所有座位详细信息
             presentSeatInfo: {}, //当前座位对应的详细信息
@@ -873,7 +882,10 @@ export default {
             let formData = new FormData();
             formData.append('file', file.file);
             this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.logoImageUrl = res.data;
+                if (res.code == 0) {
+                    this.logoImageUrl = res.data;
+                    this.$message.success('上传成功');
+                }
             });
         },
 
@@ -888,7 +900,7 @@ export default {
 
             //限制上传文件格式
             if (!isJPG && !isPNG && !isMP4) {
-                this.$message.error('上传图片只能是 JPG / PNG / MP4 格式');
+                this.$message.error('上传文件只能是 JPG / PNG / MP4 格式');
             }
 
             //显示上传文件大小
@@ -904,12 +916,15 @@ export default {
             let formData = new FormData();
             formData.append('files', file.file);
             this.$post(this.filesUploadUrl, formData).then((res) => {
-                this.bannerShowBox.push(res.data[0]);
+                if (res.code == 0) {
+                    this.bannerShowBox.push(res.data[0]);
+                    this.$message.success('上传成功');
+                }
                 console.log('图集', this.bannerShowBox);
             });
         },
 
-        //将字符串分割为数组（banner图片视频专用）
+        //将banner图集字符串分割为数组
         imgStrChangeArr(str) {
             let res = str.split(',');
             let newRes = res.map((item) => {
@@ -918,7 +933,7 @@ export default {
             return newRes;
         },
 
-        //回显banner图集
+        //回显banner图集（回显在上传图集的容器中）
         showBannerImg(picStr) {
             this.bannerImgBox = [];
             let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
@@ -931,6 +946,8 @@ export default {
 
         // 删除banner图集
         bannerRemove(file, fileList) {
+            console.log('mmm', file);
+
             this.bannerShowBox.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
                     this.bannerShowBox.splice(i, 1);
@@ -944,7 +961,10 @@ export default {
             let formData = new FormData();
             formData.append('file', file.file);
             this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.overallImageUrl = res.data;
+                if (res.code == 0) {
+                    this.overallImageUrl = res.data;
+                    this.$message.success('上传成功');
+                }
             });
         },
 
@@ -953,7 +973,10 @@ export default {
             let formData = new FormData();
             formData.append('file', file.file);
             this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.rowNumImageUrl = res.data;
+                if (res.code == 0) {
+                    this.rowNumImageUrl = res.data;
+                    this.$message.success('上传成功');
+                }
             });
         },
 
@@ -962,13 +985,16 @@ export default {
             let formData = new FormData();
             formData.append('file', file.file);
             this.$post(this.fileUploadUrl, formData).then((res) => {
-                this.appShopImageUrl = res.data;
+                if (res.code == 0) {
+                    this.appShopImageUrl = res.data;
+                    this.$message.success('上传成功');
+                }
             });
         },
 
         //图片上传失败时
         uploadError() {
-            this.$message.error('插入失败');
+            this.$message.error('上传失败');
         },
 
         //切换店铺定位
@@ -1001,9 +1027,30 @@ export default {
             }
         },
 
+        //点击编辑时，回显banner图集里的视频
+        showBannerVideo() {
+            this.$nextTick(() => {
+                let showImgList = document.querySelectorAll('.banner-show-box ul li img'); //获取所有回显的img节点
+                showImgList.forEach((item) => {
+                    //匹配所有链接是mp4格式的
+                    if (item.src.search(/.mp4/i) !== -1) {
+                        //重新创建一个video节点，并添加上相关属性
+                        let newEle = document.createElement('video');
+                        newEle.controls = 'controls';
+                        newEle.style = `width:100%;height:100%`;
+                        newEle.innerHTML = `<source :src="${this.showImgPrefix}${item.src}" />您的浏览器版本太低，请升级。`;
+
+                        item.parentNode.replaceChild(newEle, item); //在该节点的父节点上替换掉之前的img节点，换成video
+                    }
+                });
+            });
+        },
+
         //编辑商铺信息
         editShopInfo() {
             this.isReadonly = false;
+
+            this.showBannerVideo(); //回显banner图集里的视频
 
             //给地图子组件传值（回显地址信息）
             this.mapList.searchAddress = this.searchAddress;
@@ -1013,10 +1060,15 @@ export default {
         //新增店铺
         submitCreatShop() {
             //数组转json形式（零嘴）
-            let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
-            seatArr.forEach((item) => {
+            this.allSeatDetailInfo.forEach((item) => {
                 item.snacks = JSON.stringify(item.snacks);
             });
+
+            //数组转json形式（零嘴）
+            // let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
+            // seatArr.forEach((item) => {
+            //     item.snacks = JSON.stringify(item.snacks);
+            // });
 
             //将数值型转为字符型（软硬座和有无卫生间）
             // this.allSeatDetailInfo.forEach((item) => {
@@ -1053,7 +1105,7 @@ export default {
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
                 type: this.shopTypeOptStr,
-                layoutList: seatArr
+                layoutList: this.allSeatDetailInfo
             };
 
             console.log('新增时传的值', data);
@@ -1078,14 +1130,14 @@ export default {
         //修改店铺
         submitUpdateShop() {
             //数组转json形式（零嘴）
+            this.allSeatDetailInfo.forEach((item) => {
+                item.snacks = JSON.stringify(item.snacks);
+            });
+
             // let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
             // seatArr.forEach((item) => {
             //     item.snacks = JSON.stringify(item.snacks);
             // });
-
-            this.allSeatDetailInfo.forEach((item) => {
-                item.snacks = JSON.stringify(item.snacks);
-            });
 
             //将数值型转为字符型（软硬座和有无卫生间）
             // this.allSeatDetailInfo.forEach((item) => {
@@ -1197,7 +1249,7 @@ export default {
                     this.presentSeatInfo = item;
 
                     //修改当前座位的属性值
-                    this.presentSeatInfo.seatAttribute = seatType == 'stageBook' ? this.presentSeatInfo.seatAttribute : seatType;
+                    this.presentSeatInfo.seatAttribute = seatType == 'stageBook' ? 1 : seatType;
 
                     //修改当前座位为舞台
                     this.presentSeatInfo.seatType = stageCode;
@@ -1223,10 +1275,6 @@ export default {
 
         //座位点击事件
         changeStauts(e, style) {
-            //只有在编辑商铺时，点击座位才会显示对话框
-            if (!this.isReadonly) {
-                this.dialogFormVisible = true;
-            }
             this.isClickSeat = true; //展示当前点击的座位的详细信息
 
             let seatType = style;
@@ -1261,6 +1309,28 @@ export default {
         //修改当前座位属性
         setSeatInfo(e, style) {
             e.target.className = style;
+
+            //修改四周的位置
+            // let row = Number(e.target.dataset.indexx); //行
+            // let col = Number(e.target.dataset.indexy); //列
+
+            // let allSeatSpan = document.querySelectorAll('.seat-box div div span');
+            // allSeatSpan.forEach((item) => {
+            //     let indexX = item.dataset.indexx;
+            //     let indexY = item.dataset.indexy;
+
+            //     if (row + 1 == indexX && col == indexY) {
+            //         item.className = style;
+            //     }
+
+            //     if (row == indexX && col + 1 == indexY) {
+            //         item.className = style;
+            //     }
+
+            //     if (row + 1 == indexX && col + 1 == indexY) {
+            //         item.className = style;
+            //     }
+            // });
         },
 
         //改变座位状态按钮（改变点击的座位颜色）
@@ -1293,19 +1363,12 @@ export default {
             snacksObj.name = this.snackName;
             snacksObj.num = this.snackNum;
 
-            // let snacksArr = [];
-            // snacksArr.push(snacksObj);
-
-            // snacksArr.forEach((item) => {
-            //     this.presentSeatInfo.snacks.push(item);
-            // });
-
             this.presentSeatInfo.snacks.push(snacksObj);
 
             this.snackName = '';
             this.snackNum = '';
 
-            console.log('添加零嘴', this.presentSeatInfo.snacks);
+            // console.log('添加零嘴', this.presentSeatInfo.snacks);
         },
 
         //删除零嘴
@@ -1316,7 +1379,7 @@ export default {
                 }
             });
 
-            console.log('删除零嘴', this.presentSeatInfo.snacks);
+            // console.log('删除零嘴', this.presentSeatInfo.snacks);
         },
 
         //座位属性回显
@@ -1484,6 +1547,14 @@ export default {
 
                     //回显banner图集
                     this.showBannerImg(picture);
+
+                    //回显视频banner
+                    this.bannerVideo = [];
+                    this.bannerShowBox.forEach((item, i) => {
+                        if (item.search(/.mp4/i) !== -1) {
+                            this.bannerVideo.push(item);
+                        }
+                    });
 
                     //回显店铺卡座数量
                     this.getShopSeat(cassette);
@@ -1998,6 +2069,16 @@ export default {
 }
 
 .right-wrap .shop-info .banner-box > div img {
+    width: 170px;
+    height: 100px;
+    margin: 0 10px 10px 0;
+}
+
+.right-wrap .shop-info .banner-box > div div {
+    display: inline-block;
+}
+
+.right-wrap .shop-info .banner-box > div video {
     width: 170px;
     height: 100px;
     margin: 0 10px 10px 0;

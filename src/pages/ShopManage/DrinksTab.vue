@@ -37,21 +37,21 @@
                         class="demo-dynamic"
                     >
                         <el-form-item
-                            v-for="(domain, index) in drinksForm.dynamicValidateForm.domains"
+                            v-for="(item, index) in drinksForm.dynamicValidateForm.domains"
                             :key="index"
                         >
                             <el-input
-                                v-model="domain.specName"
+                                v-model="item.specName"
                                 placeholder="规格（如：一箱）"
                                 style="width:132px;margin-right:10px"
                             ></el-input>
                             <el-input
-                                v-model="domain.originalPrice"
+                                v-model="item.originalPrice"
                                 placeholder="原价（如：9.99）"
                                 style="width:130px;margin-right:10px"
                             ></el-input>
                             <el-input
-                                v-model="domain.presentPrice"
+                                v-model="item.presentPrice"
                                 placeholder="现价（如：9.99）"
                                 style="width:130px;margin-right:10px"
                             ></el-input>
@@ -60,7 +60,7 @@
                             </el-button>
                             <el-button
                                 v-show="drinksForm.dynamicValidateForm.domains.length > 1"
-                                @click.prevent="removeDomain(domain)"
+                                @click.prevent="removeDomain(item)"
                             >
                                 <i class="el-icon-close"></i>
                             </el-button>

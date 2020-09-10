@@ -30,52 +30,57 @@
                     @close="handleCancel"
                 >
                     <!-- 编辑当前商品时 -->
-                    <el-tabs v-if="isUpdate" v-model="activeName">
+                    <el-tabs v-if="isUpdate" v-model="editActiveName">
                         <!-- 套餐标签页 -->
-                        <el-tab-pane v-if="activeName=='combo'" label="套餐" name="combo">
+                        <el-tab-pane v-if="editActiveName=='editCombo'" label="套餐" name="editCombo">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <combo-tab
-                                v-if="activeName=='combo'"
                                 :comboFormParent="comboForm"
                                 @comboFormChild="getChildComboForm"
                             ></combo-tab>
                         </el-tab-pane>
 
                         <!-- 酒水标签页 -->
-                        <el-tab-pane v-if="activeName=='drinks'" label="酒水" name="drinks">
+                        <el-tab-pane
+                            v-if="editActiveName=='editDrinks'"
+                            label="酒水"
+                            name="editDrinks"
+                        >
                             <span class="add-classify-title goods-info">商品信息</span>
                             <drinks-tab
-                                v-if="activeName=='drinks'"
                                 :drinksFormParent="drinksForm"
                                 @drinksFormChild="getChildDrinksForm"
                             ></drinks-tab>
                         </el-tab-pane>
 
                         <!-- 小吃标签页 -->
-                        <el-tab-pane v-if="activeName=='snack'" label="小吃" name="snack">
+                        <el-tab-pane v-if="editActiveName=='editSnack'" label="小吃" name="editSnack">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <snack-tab
-                                v-if="activeName=='snack'"
                                 :snackFormParent="snackForm"
                                 @snackFormChild="getChildSnackForm"
                             ></snack-tab>
                         </el-tab-pane>
 
                         <!-- 其他标签页 -->
-                        <el-tab-pane v-if="activeName=='other'" label="其他" name="other">
+                        <el-tab-pane v-if="editActiveName=='editOther'" label="其他" name="editOther">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <other-tab
-                                v-if="activeName=='other'"
-                                :otherFormParent="otherForm"
-                                @otherFormChild="getChildOtherForm"
-                            ></other-tab>
+                            <div>
+                                <other-tab
+                                    :otherFormParent="otherForm"
+                                    @otherFormChild="getChildOtherForm"
+                                ></other-tab>
+                            </div>
                         </el-tab-pane>
 
                         <!-- 会员卡标签页 -->
-                        <el-tab-pane v-if="activeName=='vipCard'" label="会员卡" name="vipCard">
+                        <el-tab-pane
+                            v-if="editActiveName=='editVipCard'"
+                            label="会员卡"
+                            name="editVipCard"
+                        >
                             <span class="add-classify-title goods-info">商品信息</span>
                             <vip-card-tab
-                                v-if="activeName=='vipCard'"
                                 :vipCardFormParent="vipCardForm"
                                 @vipCardFormChild="getChildVipCardForm"
                             ></vip-card-tab>
@@ -235,6 +240,7 @@ export default {
             dialogVisible: false, //添加商品的对话框
             activeName: '', //默认展示的标签页
             activeNum: '', //标签页对应的下标
+            editActiveName: '', //编辑时展示的标签页
 
             // 表格数据分页相关属性
             dataListCount: 0, //默认当前要显示的数据条数
@@ -469,6 +475,7 @@ export default {
             this.dialogVisible = false;
             this.activeName = '';
             this.activeNum = '';
+            this.editActiveName = '';
             this.isUpdate = false;
             this.cancelDelete(); //初始化删除商品相关的操作
             this.clearAllForm(); //清空所有表单
@@ -667,6 +674,7 @@ export default {
             this.goodId = '';
             this.activeName = '';
             this.activeNum = '';
+            this.editActiveName = '';
             this.dialogVisible = false;
             this.isUpdate = false;
         },
@@ -717,23 +725,23 @@ export default {
 
                     switch (res.data.type) {
                         case 1:
-                            this.activeName = 'combo';
+                            this.editActiveName = 'editCombo';
                             this.sendComoboForm(res.data);
                             break;
                         case 2:
-                            this.activeName = 'drinks';
+                            this.editActiveName = 'editDrinks';
                             this.sendDrinksForm(res.data);
                             break;
                         case 3:
-                            this.activeName = 'snack';
+                            this.editActiveName = 'editSnack';
                             this.sendSnacksForm(res.data);
                             break;
                         case 4:
-                            this.activeName = 'other';
+                            this.editActiveName = 'editOther';
                             this.sendOtherForm(res.data);
                             break;
                         case 5:
-                            this.activeName = 'vipCard';
+                            this.editActiveName = 'editVipCard';
                             this.sendVipCardForm(res.data);
                             break;
                     }
@@ -743,22 +751,46 @@ export default {
 
         //对话框里的确定按钮
         handleSure() {
-            switch (this.activeName) {
-                case 'combo':
-                    this.setComboInfo();
-                    break;
-                case 'drinks':
-                    this.setDrinksInfo();
-                    break;
-                case 'snack':
-                    this.setSnackInfo();
-                    break;
-                case 'other':
-                    this.setOtherInfo();
-                    break;
-                case 'vipCard':
-                    this.setVipCardInfo();
-                    break;
+            //如果当前是添加商品
+            if (this.activeName) {
+                switch (this.activeName) {
+                    case 'combo':
+                        this.setComboInfo();
+                        break;
+                    case 'drinks':
+                        this.setDrinksInfo();
+                        break;
+                    case 'snack':
+                        this.setSnackInfo();
+                        break;
+                    case 'other':
+                        this.setOtherInfo();
+                        break;
+                    case 'vipCard':
+                        this.setVipCardInfo();
+                        break;
+                }
+            }
+
+            //如果当前是修改商品
+            if (this.editActiveName) {
+                switch (this.editActiveName) {
+                    case 'editCombo':
+                        this.setComboInfo();
+                        break;
+                    case 'editDrinks':
+                        this.setDrinksInfo();
+                        break;
+                    case 'editSnack':
+                        this.setSnackInfo();
+                        break;
+                    case 'editOther':
+                        this.setOtherInfo();
+                        break;
+                    case 'editVipCard':
+                        this.setVipCardInfo();
+                        break;
+                }
             }
         },
 

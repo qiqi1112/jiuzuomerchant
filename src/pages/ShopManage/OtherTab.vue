@@ -26,8 +26,8 @@
                         class="demo-dynamic"
                     >
                         <el-form-item
-                            v-for="item in otherForm.dynamicValidateForm.domains"
-                            :key="item.goodsId"
+                            v-for="(item,index) in otherForm.dynamicValidateForm.domains"
+                            :key="index"
                         >
                             <el-input
                                 v-model="item.specName"
