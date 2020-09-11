@@ -372,25 +372,13 @@
                         </p>
                         <!-- 座位属性标题 -->
                         <div class="seat-title">
-                            <p @click="changeStyle('notBook')">
-                                <span class="not-book"></span>
-                                不可预订
-                            </p>
-                            <p @click="changeStyle('canBook')">
-                                <span class="can-book"></span>
-                                可预订
-                            </p>
-                            <p @click="changeStyle('hasBook')">
-                                <span class="in-book"></span>
-                                预定中
-                            </p>
-                            <p @click="changeStyle('inBook')">
-                                <span class="has-book"></span>
-                                已预订
-                            </p>
-                            <p @click="changeStyle('stageBook')">
-                                <span class="stage-book"></span>
-                                舞台
+                            <p
+                                v-for="(item,index) in seatAttOpt"
+                                :key="index"
+                                @click="changeStyle(item.style)"
+                            >
+                                <span :class="item.class"></span>
+                                {{item.name}}
                             </p>
                         </div>
                         <!-- 回显的座位图 -->
@@ -422,19 +410,19 @@
                     >
                         <p class="seat-detail">座位详情</p>
                         <div class="seat-prop">
-                            <span class="seat-detail-span">座位属性：</span>
+                            <span>座位属性：</span>
                             <div class="prop-box">
                                 <span
                                     :class="item.style"
                                     v-for="(item,index) in seatAttOpt"
                                     :key="index"
-                                    :title="item.title"
+                                    :title="item.name"
                                     @click="changeStyle(item.style)"
                                 ></span>
                             </div>
                         </div>
                         <div class="seat-num">
-                            <span class="seat-detail-span">座位号：</span>
+                            <span>座位号：</span>
                             <el-input
                                 v-model="presentSeatInfo.seatCode"
                                 placeholder="座位号"
@@ -443,7 +431,7 @@
                             ></el-input>
                         </div>
                         <div class="seat-num">
-                            <span class="seat-detail-span">座位类型：</span>
+                            <span>座位类型：</span>
                             <el-radio
                                 :disabled="isReadonly"
                                 v-model="presentSeatInfo.softHardStatus"
@@ -456,7 +444,7 @@
                             >硬座</el-radio>
                         </div>
                         <div class="acc-people">
-                            <span class="seat-detail-span">容纳人数：</span>
+                            <span>容纳人数：</span>
                             <el-input
                                 v-model="presentSeatInfo.numberOfPeople"
                                 placeholder="容纳人数"
@@ -465,7 +453,7 @@
                             ></el-input>人
                         </div>
                         <div class="lon-retain">
-                            <span class="seat-detail-span">保留最晚时间：</span>
+                            <span>保留最晚时间：</span>
                             <el-time-select
                                 style="width:50%"
                                 v-model="presentSeatInfo.seatLatestReservationTime"
@@ -482,7 +470,7 @@
                             ></el-time-select>
                         </div>
                         <div class="min-charge">
-                            <span class="seat-detail-span min-con">最低消费：</span>
+                            <span class="min-con">最低消费：</span>
                             <div class="day-mincom">
                                 <p>
                                     <span>星期一</span>
@@ -554,19 +542,19 @@
                     <div v-if="isClickSeat && shopLocaIndex == 3" class="right-box">
                         <p class="seat-detail">座位详情</p>
                         <div class="seat-prop">
-                            <span class="seat-detail-span">包间属性：</span>
+                            <span>包间属性：</span>
                             <div class="prop-box">
                                 <span
                                     :class="item.style"
                                     v-for="(item,index) in seatAttOpt"
                                     :key="index"
-                                    :title="item.title"
+                                    :title="item.name"
                                     @click="changeStyle(item.style)"
                                 ></span>
                             </div>
                         </div>
                         <div class="seat-num">
-                            <span class="seat-detail-span">包间号/名称：</span>
+                            <span>包间号/名称：</span>
                             <el-input
                                 v-model="presentSeatInfo.seatCode"
                                 placeholder="座位号"
@@ -575,7 +563,7 @@
                             ></el-input>
                         </div>
                         <div class="acc-people">
-                            <span class="seat-detail-span">容纳人数：</span>
+                            <span>容纳人数：</span>
                             <el-input
                                 v-model="presentSeatInfo.numberOfPeople"
                                 placeholder="容纳人数"
@@ -584,7 +572,7 @@
                             ></el-input>
                         </div>
                         <div class="lon-retain">
-                            <span class="seat-detail-span">保留最晚时间：</span>
+                            <span>保留最晚时间：</span>
                             <el-time-select
                                 style="width:50%"
                                 placeholder="请选择时间"
@@ -598,7 +586,7 @@
                             ></el-time-select>
                         </div>
                         <div class="seat-num">
-                            <span class="seat-detail-span">独立卫生间：</span>
+                            <span>独立卫生间：</span>
                             <el-radio
                                 :disabled="isReadonly"
                                 v-model="presentSeatInfo.haveToilet"
@@ -611,7 +599,7 @@
                             >无</el-radio>
                         </div>
                         <div class="min-charge">
-                            <span class="seat-detail-span">机麻：</span>
+                            <span>机麻：</span>
                             <el-input
                                 v-model="presentSeatInfo.mahjong"
                                 placeholder="机麻数量"
@@ -620,15 +608,10 @@
                             ></el-input>桌
                         </div>
                         <div class="snacks">
-                            <span class="seat-detail-span snacks">零嘴：</span>
+                            <span class="snacks">零嘴：</span>
                             <div class="snacks-detail">
                                 <ul>
                                     <li v-for="(item,index) in presentSeatInfo.snacks" :key="index">
-                                        <!-- <span class="snacks-name" :title="item.name">{{item.name}}</span>
-                                        <span class="mult">
-                                            <i class="el-icon-close"></i>
-                                        </span>
-                                        <span>{{item.num}}</span>-->
                                         <el-input
                                             style="width:90px"
                                             v-model="item.name"
@@ -680,7 +663,7 @@
                             </div>
                         </div>
                         <div class="min-charge">
-                            <span class="seat-detail-span min-con">最低消费：</span>
+                            <span class="min-con">最低消费：</span>
                             <div class="day-mincom">
                                 <p>
                                     <span>星期一</span>
@@ -827,29 +810,19 @@ export default {
             //座位属性数组
             seatAttOpt: [
                 {
-                    title: '不可预订',
                     name: '不可预订',
-                    style: 'notBook'
+                    style: 'notBook',
+                    class: 'not-book'
                 },
                 {
-                    title: '可预订',
                     name: '可预订',
-                    style: 'canBook'
+                    style: 'canBook',
+                    class: 'can-book'
                 },
                 {
-                    title: '预定中',
-                    name: '预定中',
-                    style: 'hasBook'
-                },
-                {
-                    title: '已预订',
-                    name: '已预订',
-                    style: 'inBook'
-                },
-                {
-                    title: '舞台',
                     name: '舞台',
-                    style: 'stageBook'
+                    style: 'stageBook',
+                    class: 'stage-book'
                 }
             ],
             seatStyle: 'canBook', //默认的选座样式
@@ -1304,6 +1277,12 @@ export default {
             } else {
                 this.lookSeatInfo2(e, seatType, stageCode); //查看当前座位信息
             }
+
+            this.$refs.seatSpan.forEach((item) => {
+                item.classList.remove('border');
+            });
+
+            e.target.classList.add('border');
         },
 
         //修改当前座位属性
@@ -1629,26 +1608,7 @@ export default {
 };
 </script>
 
-<style scoped>
-.add-classify-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.add-classify-title::before {
-    display: inline-block;
-    content: '';
-    width: 4px;
-    height: 20px;
-    margin-right: 10px;
-    background-color: #999;
-}
-
->>> .el-dialog__header {
-    padding: 0;
-}
-
+<style lang="less" scoped>
 .clearfix::after {
     display: block;
     content: '';
@@ -1669,144 +1629,581 @@ export default {
     width: 35%;
     height: 100%;
     margin-right: 50px;
+
+    h4 {
+        font-weight: normal;
+        display: flex;
+        align-items: center;
+        height: 26px;
+        margin-bottom: 30px;
+        box-sizing: border-box;
+
+        > span {
+            margin-right: 30px;
+        }
+    }
+
+    h4::before {
+        display: inline-block;
+        content: '';
+        width: 4px;
+        height: 26px;
+        margin-right: 10px;
+        background-color: #000;
+    }
+
+    .shop-info {
+        height: 160px;
+        margin-bottom: 30px;
+
+        .left-info {
+            width: 30%;
+            float: left;
+
+            > p {
+                margin-bottom: 10px;
+            }
+
+            /deep/ .avatar-uploader .el-upload {
+                border: 1px dashed #d9d9d9;
+                border-radius: 6px;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /deep/ .avatar-uploader .el-upload:hover {
+                border-color: #409eff;
+            }
+
+            /deep/.avatar-uploader-icon {
+                font-size: 28px;
+                color: #8c939d;
+                width: 120px;
+                height: 120px;
+                line-height: 120px;
+                text-align: center;
+            }
+
+            /deep/.avatar {
+                width: 120px;
+                height: 120px;
+                border-radius: 6px;
+                display: block;
+            }
+
+            /deep/.el-upload.el-upload--text {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        .right-info {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .shop-name {
+                float: left;
+                margin-bottom: 40px;
+
+                > span {
+                    margin-right: 30px;
+                }
+            }
+
+            .shop-brief {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+
+    .shop-desc > div {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .shop-loca {
+        margin-bottom: 30px;
+
+        > p {
+            margin-bottom: 10px;
+        }
+
+        > div span {
+            display: inline-block;
+            height: 32px;
+            padding: 0 10px;
+            line-height: 30px;
+            font-size: 12px;
+            color: #409eff;
+            border: 1px solid #d9ecff;
+            border-radius: 4px;
+            margin: 0 10px 10px 0;
+            box-sizing: border-box;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+    }
+
+    .shop-div {
+        display: flex;
+        margin-bottom: 30px;
+
+        .shop-div1 {
+            width: 42%;
+            margin-right: 30px;
+
+            .bussiness-hours {
+                margin-bottom: 30px;
+
+                > p {
+                    margin-bottom: 10px;
+                }
+
+                .time-select {
+                    display: flex;
+                    align-items: center;
+
+                    > span {
+                        margin: 0 10px;
+                    }
+                }
+            }
+
+            .per-con > p {
+                margin-bottom: 10px;
+            }
+        }
+
+        .shop-div2 {
+            .service-phone {
+                margin-bottom: 30px;
+
+                > p {
+                    margin-bottom: 10px;
+                }
+            }
+
+            .shop-type {
+                > p {
+                    margin-bottom: 10px;
+                }
+
+                .type-box::after {
+                    display: block;
+                    content: '';
+                    clear: both;
+                }
+
+                .type-box div > span {
+                    display: inline-block;
+                    height: 32px;
+                    padding: 0 10px;
+                    line-height: 30px;
+                    font-size: 12px;
+                    color: #409eff;
+                    border: 1px solid #d9ecff;
+                    border-radius: 4px;
+                    margin: 0 10px 10px 0;
+                    box-sizing: border-box;
+                    white-space: nowrap;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    .shop-label {
+        margin-bottom: 30px;
+
+        > p {
+            margin-bottom: 10px;
+        }
+
+        .labels > span {
+            display: block;
+            border: 1px solid #409eff;
+            color: #409eff;
+            border-radius: 6px;
+            padding: 6px 20px;
+            float: left;
+            margin: 0 10px 10px 0;
+            background-color: #ecf5ff;
+        }
+
+        /deep/ .input-new-tag {
+            width: 90px;
+            margin-left: 10px;
+            vertical-align: bottom;
+            vertical-align: middle !important;
+        }
+
+        .button-new-tag {
+            margin-left: 10px;
+            height: 32px;
+            line-height: 32px;
+            padding-top: 0;
+            padding-bottom: 0;
+            box-sizing: border-box;
+            font-weight: bolder;
+        }
+    }
+
+    .shop-address {
+        margin-bottom: 30px;
+
+        /deep/ .dtl_add {
+            margin: 10px 0;
+        }
+
+        > p {
+            margin-bottom: 10px;
+        }
+
+        .shop-add span {
+            background-color: #ecf5ff;
+            display: inline-block;
+            height: 32px;
+            padding: 0 10px;
+            line-height: 30px;
+            font-size: 12px;
+            color: #409eff;
+            border: 1px solid #d9ecff;
+            border-radius: 4px;
+            margin: 0 10px 10px 0;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+    }
+
+    /deep/ .el-textarea__inner {
+        resize: none !important;
+        line-height: 1.9;
+    }
 }
 
-.left-wrap h4 {
-    font-weight: normal;
-    display: flex;
-    align-items: center;
-    height: 26px;
-    margin-bottom: 30px;
-    box-sizing: border-box;
-}
+.right-wrap {
+    height: 100%;
+    width: 100%;
 
-.left-wrap h4::before {
-    display: inline-block;
-    content: '';
-    width: 4px;
-    height: 26px;
-    margin-right: 10px;
-    background-color: #000;
-}
+    h4 {
+        font-weight: normal;
+        display: flex;
+        align-items: center;
+        height: 26px;
+        margin-bottom: 30px;
+        box-sizing: border-box;
+    }
 
-.left-wrap h4 > span {
-    margin-right: 30px;
-}
+    h4::before {
+        display: inline-block;
+        content: '';
+        width: 4px;
+        height: 26px;
+        margin-right: 10px;
+        background-color: #000;
+    }
 
-.left-wrap .shop-info {
-    height: 160px;
-    margin-bottom: 30px;
-}
+    .shop-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
 
-.right-wrap .shop-info img {
-    border-radius: 6px !important;
-}
+        img {
+            border-radius: 6px !important;
+        }
 
-.shop-brief {
-    display: flex;
-    align-items: center;
-}
+        video {
+            border-radius: 6px !important;
+        }
 
-.left-wrap .shop-info .left-info {
-    width: 30%;
-    float: left;
-}
+        .banner-box {
+            width: 38%;
 
-.left-wrap .shop-info .left-info > p {
-    margin-bottom: 10px;
-}
+            > div {
+                img {
+                    width: 170px;
+                    height: 100px;
+                    margin: 0 10px 10px 0;
+                }
 
->>> .left-info .el-upload.el-upload--text {
-    width: 120px;
-    height: 120px;
-}
+                video {
+                    width: 170px;
+                    height: 100px;
+                    margin: 0 10px 10px 0;
+                }
 
->>> .left-wrap .shop-info .left-info .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
+                div {
+                    display: inline-block;
+                }
+            }
 
->>> .left-wrap .shop-info .left-info .avatar-uploader .el-upload:hover {
-    border-color: #409eff;
-}
+            > p {
+                margin-bottom: 10px;
+            }
+        }
 
->>> .left-wrap .shop-info .left-info .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 120px;
-    height: 120px;
-    line-height: 120px;
-    text-align: center;
-}
+        .overall-box {
+            > p {
+                margin-bottom: 10px;
+            }
 
->>> .left-wrap .shop-info .left-info .avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 6px;
-    display: block;
-}
+            > img {
+                width: 160px;
+                height: 200px;
+            }
 
-.shop-info .banner-box > p {
-    margin-bottom: 10px;
-}
+            /deep/.el-upload--text {
+                width: 160px;
+                height: 200px;
+                line-height: 200px;
 
-.shop-info .overall-box > p {
-    margin-bottom: 10px;
-}
+                > img {
+                    width: 160px;
+                    height: 200px;
+                }
+            }
+        }
 
-.shop-info .overall-box > img {
-    width: 160px;
-    height: 200px;
-}
+        .rowNum-box {
+            div {
+                > p {
+                    margin-bottom: 10px;
+                }
 
-.shop-info .rowNum-box div > p {
-    margin-bottom: 10px;
-}
+                > img {
+                    width: 200px;
+                    height: 120px;
+                }
+            }
 
-.shop-info .rowNum-box div.top {
-    margin-bottom: 30px;
-}
+            div.top {
+                margin-bottom: 30px;
+            }
 
-.shop-info .rowNum-box div > img {
-    width: 200px;
-    height: 120px;
-}
+            /deep/ .el-upload--text {
+                width: 200px;
+                height: 120px;
+                line-height: 120px;
+            }
 
-.left-wrap .shop-info .right-info {
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+            /deep/.el-upload--text > img {
+                width: 200px;
+                height: 120px;
+            }
+        }
+    }
 
-.left-wrap .shop-info .right-info .shop-name {
-    float: left;
-    margin-bottom: 40px;
-}
+    .shop-seat {
+        display: flex;
 
-.left-wrap .shop-info .right-info .shop-name > span {
-    margin-right: 30px;
+        .left-box {
+            margin-right: 30px;
+
+            .seat-title {
+                display: flex;
+                justify-content: space-between;
+                width: 300px;
+                margin-bottom: 20px;
+
+                > p {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                }
+
+                p span {
+                    display: block;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 4px;
+                    background-color: #ddd;
+                    margin-right: 6px;
+                    border: 1px solid #ddd;
+                }
+            }
+
+            .seat-box {
+                padding: 20px;
+                padding-bottom: 10px;
+                box-sizing: border-box;
+                background-color: #ddd;
+                display: flex;
+            }
+
+            .input-seat {
+                display: flex;
+                margin-bottom: 20px;
+            }
+        }
+
+        .right-box {
+            margin-top: 94px;
+
+            .min-charge {
+                margin-top: 30px;
+                margin-bottom: 30px;
+                align-items: flex-start;
+
+                .day-mincom {
+                    border: 1px solid #dcdfe6;
+                    border-radius: 4px;
+                    padding: 16px 20px;
+                    width: 80%;
+
+                    > p {
+                        margin-bottom: 16px;
+                        font-size: 14px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        > span {
+                            margin-right: 10px;
+                        }
+                    }
+
+                    > p:last-child {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+
+            > div {
+                display: flex;
+                align-items: center;
+
+                > span {
+                    margin-right: 0;
+                    width: 120px;
+                }
+
+                > span.snacks {
+                    width: 48px !important;
+                }
+            }
+
+            > div.snacks {
+                align-items: flex-start;
+            }
+
+            .seat-detail {
+                margin-bottom: 30px;
+            }
+
+            .seat-prop {
+                margin-bottom: 30px;
+                display: flex;
+                align-items: center;
+
+                .prop-box {
+                    float: left;
+                    padding: 10px;
+                    padding-bottom: 0;
+                    border: 1px solid #ddd;
+
+                    .min-con {
+                        float: left;
+                        margin-right: 0px;
+                    }
+
+                    span {
+                        float: left;
+                        display: block;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 4px;
+                        background-color: #ddd;
+                        margin-right: 10px;
+                        border: 1px solid #ddd;
+                    }
+
+                    span:last-child {
+                        margin-right: 0;
+                    }
+                }
+            }
+
+            .acc-people {
+                margin-bottom: 30px;
+            }
+
+            .lon-retain {
+                display: flex;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .is-toilet {
+                margin-bottom: 30px;
+                display: flex;
+                align-items: center;
+            }
+
+            .mahjong {
+                margin-bottom: 30px;
+            }
+
+            .seat-num {
+                margin-bottom: 30px;
+            }
+
+            .snacks {
+                .snacks-detail {
+                    .mult {
+                        margin: 0 3px;
+                    }
+
+                    li {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 10px;
+
+                        .snacks-name {
+                            max-width: 132px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+
+                    div span:first-child {
+                        margin-right: 30px;
+                    }
+                }
+
+                .snacks-form {
+                    display: flex;
+                    align-items: center;
+
+                    /deep/.el-input__inner {
+                        padding: 0 8px;
+                    }
+                }
+            }
+        }
+    }
+
+    /deep/ .el-upload-list--picture-card .el-upload-list__item {
+        width: 170px;
+        height: 100px;
+    }
+
+    /deep/ .el-upload--picture-card {
+        width: 170px;
+        height: 100px;
+        line-height: 100px;
+    }
 }
 
 .el-tag + .el-tag {
     margin-left: 10px;
-}
-.button-new-tag {
-    margin-left: 10px;
-    height: 32px;
-    line-height: 32px;
-    padding-top: 0;
-    padding-bottom: 0;
-    box-sizing: border-box;
-    font-weight: bolder;
-}
-.input-new-tag {
-    width: 90px;
-    margin-left: 10px;
-    vertical-align: bottom;
 }
 
 .el-tag--small {
@@ -1815,310 +2212,12 @@ export default {
     margin-bottom: 10px;
 }
 
->>> .input-new-tag {
-    vertical-align: middle !important;
-}
-
-.left-wrap .shop-desc > div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.left-wrap .shop-loca {
-    margin-bottom: 30px;
-}
-
-.left-wrap .shop-loca > p {
-    margin-bottom: 10px;
-}
-
-.left-wrap .shop-loca > div span {
-    display: inline-block;
-    height: 32px;
-    padding: 0 10px;
-    line-height: 30px;
-    font-size: 12px;
-    color: #409eff;
-    border: 1px solid #d9ecff;
-    border-radius: 4px;
-    margin: 0 10px 10px 0;
-    box-sizing: border-box;
-    white-space: nowrap;
-    cursor: pointer;
-}
-
 .shop-loca-span {
     background-color: #ecf5ff;
 }
 
-.left-wrap .shop-div {
-    display: flex;
-    margin-bottom: 30px;
-}
-
-.left-wrap .shop-div .shop-div1 {
-    width: 42%;
-    margin-right: 30px;
-}
-
-.left-wrap .shop-label {
-    margin-bottom: 30px;
-}
-
-.left-wrap .shop-label > p {
-    margin-bottom: 10px;
-}
-
-.left-wrap .bussiness-hours {
-    margin-bottom: 30px;
-}
-
-.left-wrap .bussiness-hours > p {
-    margin-bottom: 10px;
-}
-
-.left-wrap .bussiness-hours .time-select {
-    display: flex;
-    align-items: center;
-}
-
-.left-wrap .bussiness-hours .time-select > span {
-    margin: 0 10px;
-}
-
->>> .left-wrap .shop-address .dtl_add {
-    margin: 10px 0;
-}
-
-.left-wrap .shop-address {
-    margin-bottom: 30px;
-}
-
-.left-wrap .shop-address > p {
-    margin-bottom: 10px;
-}
-
-.left-wrap .shop-address .shop-add span {
-    background-color: #ecf5ff;
-    display: inline-block;
-    height: 32px;
-    padding: 0 10px;
-    line-height: 30px;
-    font-size: 12px;
-    color: #409eff;
-    border: 1px solid #d9ecff;
-    border-radius: 4px;
-    margin: 0 10px 10px 0;
-    box-sizing: border-box;
-    white-space: nowrap;
-}
-
-.left-wrap .service-phone {
-    margin-bottom: 30px;
-}
-
-.left-wrap .service-phone > p {
-    margin-bottom: 10px;
-}
-
-.left-wrap .per-con > p {
-    margin-bottom: 10px;
-}
-
-.shop-seat .right-box .min-charge {
-    margin-top: 30px;
-    align-items: flex-start;
-}
-
-.shop-seat .right-box .min-charge .day-mincom {
-    border: 1px solid #dcdfe6;
-    border-radius: 4px;
-    padding: 16px 20px;
-    width: 80%;
-}
-
-.shop-seat .right-box .min-charge .day-mincom > p {
-    margin-bottom: 16px;
-    font-size: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.shop-seat .right-box .min-charge .day-mincom > p:last-child {
-    margin-bottom: 0;
-}
-
-.shop-seat .right-box .min-charge .day-mincom > p > span {
-    margin-right: 10px;
-}
-
-.shop-type > p {
-    margin-bottom: 10px;
-}
-
-.shop-type .type-box::after {
-    display: block;
-    content: '';
-    clear: both;
-}
-
-.shop-type .type-box div > span {
-    display: inline-block;
-    height: 32px;
-    padding: 0 10px;
-    line-height: 30px;
-    font-size: 12px;
-    color: #409eff;
-    border: 1px solid #d9ecff;
-    border-radius: 4px;
-    margin: 0 10px 10px 0;
-    box-sizing: border-box;
-    white-space: nowrap;
-    cursor: pointer;
-}
-
 .shop-type-span {
     background-color: #ecf5ff;
-}
-
-.shop-label .labels > span {
-    display: block;
-    border: 1px solid #409eff;
-    color: #409eff;
-    border-radius: 6px;
-    padding: 6px 20px;
-    float: left;
-    margin: 0 10px 10px 0;
-    background-color: #ecf5ff;
-}
-
-.right-wrap {
-    height: 100%;
-    width: 100%;
-    /* white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; */
-}
-
-.right-wrap h4 {
-    font-weight: normal;
-    display: flex;
-    align-items: center;
-    height: 26px;
-    margin-bottom: 30px;
-    box-sizing: border-box;
-}
-
-.right-wrap h4::before {
-    display: inline-block;
-    content: '';
-    width: 4px;
-    height: 26px;
-    margin-right: 10px;
-    background-color: #000;
-}
-
-.right-wrap .shop-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-}
-
-.right-wrap .shop-info .banner-box {
-    width: 38%;
-}
-
->>> .el-textarea__inner {
-    resize: none !important;
-    line-height: 1.9;
-}
-
->>> .el-upload-list--picture-card .el-upload-list__item {
-    width: 170px;
-    height: 100px;
-}
-
->>> .el-upload--picture-card {
-    width: 170px;
-    height: 100px;
-    line-height: 100px;
-}
-
->>> .overall-box .el-upload--text {
-    width: 160px;
-    height: 200px;
-    line-height: 200px;
-}
-
->>> .overall-box .el-upload--text > img {
-    width: 160px;
-    height: 200px;
-}
-
->>> .rowNum-box .el-upload--text {
-    width: 200px;
-    height: 120px;
-    line-height: 120px;
-}
-
->>> .rowNum-box .el-upload--text > img {
-    width: 200px;
-    height: 120px;
-}
-
-.right-wrap .shop-info .banner-box > div img {
-    width: 170px;
-    height: 100px;
-    margin: 0 10px 10px 0;
-}
-
-.right-wrap .shop-info .banner-box > div div {
-    display: inline-block;
-}
-
-.right-wrap .shop-info .banner-box > div video {
-    width: 170px;
-    height: 100px;
-    margin: 0 10px 10px 0;
-}
-
-.right-wrap .shop-seat {
-    display: flex;
-}
-
-.right-wrap .shop-seat .left-box {
-    margin-right: 30px;
-}
-
-.right-wrap .shop-seat .left-box .seat-title {
-    display: flex;
-    justify-content: space-between;
-    /* width: 360px; */
-    margin-bottom: 20px;
-}
-
-.right-wrap .shop-seat .left-box .seat-title > p {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.right-wrap .shop-seat .left-box .seat-title p span {
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    background-color: #ddd;
-    margin-right: 6px;
-    border: 1px solid #ddd;
-}
-
-.input-seat {
-    display: flex;
-    margin-bottom: 20px;
 }
 
 .not-book {
@@ -2145,14 +2244,6 @@ export default {
     border: 1px solid transparent !important;
 }
 
-.right-wrap .shop-seat .left-box .seat-box {
-    padding: 20px;
-    padding-bottom: 10px;
-    box-sizing: border-box;
-    background-color: #ddd;
-    display: flex;
-}
-
 .seat {
     display: block;
     width: 20px;
@@ -2165,6 +2256,10 @@ export default {
     border: 1px solid #ddd;
 }
 
+.border {
+    border: 1px solid #f00 !important;
+}
+
 .notBook {
     display: block;
     width: 20px;
@@ -2172,7 +2267,7 @@ export default {
     border-radius: 4px;
     margin-bottom: 10px;
     margin-right: 10px;
-    border: 1px solid transparent !important;
+    border: 1px solid transparent;
     background-color: #ddd !important;
     cursor: pointer;
 }
@@ -2184,7 +2279,7 @@ export default {
     border-radius: 4px;
     margin-bottom: 10px;
     margin-right: 10px;
-    border: 1px solid #ddd !important;
+    border: 1px solid #ddd;
     background-color: #fff !important;
     cursor: pointer;
 }
@@ -2196,7 +2291,7 @@ export default {
     border-radius: 4px;
     margin-bottom: 10px;
     margin-right: 10px;
-    border: 1px solid transparent !important;
+    border: 1px solid transparent;
     background-color: #409eff !important;
     cursor: pointer;
 }
@@ -2208,7 +2303,7 @@ export default {
     border-radius: 4px;
     margin-bottom: 10px;
     margin-right: 10px;
-    border: 1px solid transparent !important;
+    border: 1px solid transparent;
     background-color: #f56c6c !important;
     cursor: pointer;
 }
@@ -2220,128 +2315,8 @@ export default {
     border-radius: 4px;
     margin-bottom: 10px;
     margin-right: 10px;
-    border: 1px solid transparent !important;
+    border: 1px solid transparent;
     background-color: #008000 !important;
     cursor: pointer;
-}
-
-.shop-seat .right-box {
-    margin-top: 94px;
-}
-
-.shop-seat .right-box > div {
-    display: flex;
-    align-items: center;
-}
-
-.shop-seat .right-box > div.snacks {
-    align-items: flex-start;
-}
-
-.shop-seat .right-box > div > span {
-    margin-right: 0;
-    width: 120px;
-}
-
-.shop-seat .right-box > div > span.snacks {
-    width: 48px !important;
-}
-
-.shop-seat .right-box .seat-detail {
-    margin-bottom: 30px;
-}
-
-.shop-seat .right-box .seat-prop {
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.seat-num {
-    margin-bottom: 30px;
-}
-
-.seat-detail-span.min-con {
-    float: left;
-    margin-right: 0px;
-    /* width: 132px !important; */
-}
-
-.snacks .snacks-detail li {
-    /* float: left; */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.snacks .snacks-detail li .snacks-name {
-    max-width: 132px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.snacks .snacks-form {
-    display: flex;
-    align-items: center;
-}
-
->>> .snacks .snacks-form .el-input__inner {
-    padding: 0 8px;
-}
-
-.snacks .snacks-detail div span:first-child {
-    margin-right: 30px;
-}
-
-.shop-seat .right-box .seat-prop .prop-box {
-    float: left;
-    padding: 10px;
-    padding-bottom: 0;
-    border: 1px solid #ddd;
-}
-
-.shop-seat .right-box .seat-prop .prop-box span {
-    float: left;
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    background-color: #ddd;
-    margin-right: 10px;
-    border: 1px solid #ddd;
-}
-
-.shop-seat .right-box .seat-prop .prop-box span:last-child {
-    margin-right: 0;
-}
-
-.shop-seat .right-box .acc-people {
-    margin-bottom: 30px;
-}
-
-.shop-seat .right-box .min-charge {
-    margin-bottom: 30px;
-}
-
-.shop-seat .right-box .lon-retain {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.shop-seat .right-box .is-toilet {
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.shop-seat .right-box .mahjong {
-    margin-bottom: 30px;
-}
-
-.mult {
-    margin: 0 3px;
 }
 </style>

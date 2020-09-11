@@ -51,12 +51,13 @@
 
             <!-- 表格部分 -->
             <el-table
+                border
                 ref="multipleTable"
                 :data="tableData"
                 tooltip-effect="dark"
                 style="width: 100%"
             >
-                <el-table-column prop="id" label="ID" fixed type="index"></el-table-column>
+                <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="petName" label="用户昵称"></el-table-column>
                 <el-table-column label="用户手机" min-width="100">
                     <template slot-scope="scope">
@@ -333,7 +334,6 @@ export default {
 
 .basic-info div p {
     margin-bottom: 20px;
-    /* margin-right: 50px; */
     display: flex;
     min-width: 230px;
 }
