@@ -169,6 +169,7 @@
                                 </div>
                                 <div v-else>
                                     <span
+                                        ref="shopTypeSpan"
                                         v-for="(item,index) in shopTypeOpt"
                                         :key="index"
                                         @click="checkType($event,item)"
@@ -662,6 +663,29 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="ktv-banner">
+                            <span>KTV包间示意图：</span>
+                            <div v-if="isReadonly&&presentSeatInfo.sketchMap">
+                                <div v-for="(item,index) in presentSeatInfo.sketchMap" :key="index">
+                                    <img :src="showImgPrefix + item" />
+                                </div>
+                            </div>
+                            <span v-else-if="isReadonly&&!presentSeatInfo.sketchMap">无</span>
+                            <el-upload
+                                v-else
+                                action="1"
+                                list-type="picture-card"
+                                :before-upload="beforektvBannerUpload"
+                                :http-request="uploadktvBannerFiles"
+                                :on-error="uploadError"
+                                :file-list="ktvBannerImgBox"
+                                :on-remove="ktvBannerRemove"
+                            >
+                                <!-- :on-remove="ktvBannerRemove"
+                                :file-list="ktvBannerImgBox"-->
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                        </div>
                         <div class="min-charge">
                             <span class="min-con">最低消费：</span>
                             <div class="day-mincom">
@@ -788,8 +812,8 @@ export default {
             servicePhone: '', //客服电话
             shopType: '', //选择的店铺类型
             shopTypeOpt: ['1', '2', '3', '4'], //所有店铺类型
-            shopTypeOptStrArr: [], //用于回显店铺类型
-            shopTypeOptStr: '', //所选的店铺类型（提交时用到的字符串）
+            shopTypeOptStrArr: [], //回显店铺类型
+            submitShopType: [], //提交所选的店铺类型
             perCon: '', //人均消费
 
             goodsBrief: '', //商品店面简介
@@ -798,7 +822,8 @@ export default {
 
             bannerShowBox: [], //要上传的banner图集和回显的banner图集（回显在自定义的位置）
             bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
-            bannerVideo: [],
+            bannerVideo: [], //回显banner视频
+            ktvBannerImgBox: [], //回显ktv包间示意图（上传图集容器中）
 
             overallImageUrl: '', //商家布局图
             rowNumImageUrl: '', //排号横幅图
@@ -823,6 +848,11 @@ export default {
                     name: '舞台',
                     style: 'stageBook',
                     class: 'stage-book'
+                },
+                {
+                    name: '过道',
+                    style: 'aisleBook',
+                    class: 'aisle-book'
                 }
             ],
             seatStyle: 'canBook', //默认的选座样式
@@ -884,6 +914,27 @@ export default {
             return isJPG || isPNG || isMP4;
         },
 
+        //上传ktv包间示意图之前的验证
+        beforektvBannerUpload(file) {
+            console.log('上传之前', file);
+
+            const isJPG = file.type === 'image/jpeg';
+            const isPNG = file.type === 'image/png';
+            // const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
+
+            //限制上传文件格式
+            if (!isJPG && !isPNG) {
+                this.$message.error('上传文件只能是 JPG / PNG 格式');
+            }
+
+            //显示上传文件大小
+            // if (!isLt2M) {
+            //     this.$message.error('上传文件大小不能超过 2MB!');
+            // }
+
+            return isJPG || isPNG;
+        },
+
         //上传banner图
         uploadBannerFiles(file) {
             let formData = new FormData();
@@ -893,7 +944,25 @@ export default {
                     this.bannerShowBox.push(res.data[0]);
                     this.$message.success('上传成功');
                 }
+
                 console.log('图集', this.bannerShowBox);
+            });
+        },
+
+        //上传ktv包间示意图
+        uploadktvBannerFiles(file) {
+            let formData = new FormData();
+            formData.append('files', file.file);
+            this.$post(this.filesUploadUrl, formData).then((res) => {
+                if (res.code == 0) {
+                    if (!this.presentSeatInfo.sketchMap) {
+                        this.presentSeatInfo.sketchMap = [];
+                    }
+
+                    this.presentSeatInfo.sketchMap.push(res.data[0]);
+                    this.$message.success('上传成功');
+                }
+                console.log('ktv示意图', this.presentSeatInfo.sketchMap);
             });
         },
 
@@ -917,6 +986,36 @@ export default {
             });
         },
 
+        //回显ktv包间示意图（回显在上传图集的容器中）
+        showKtvBannerImg() {
+            if (!!this.presentSeatInfo.sketchMap) {
+
+                this.ktvBannerImgBox = [];
+
+                //给每张图片加上前缀
+                let ktvBannerArr = this.presentSeatInfo.sketchMap.map((item2) => {
+                    return (item2 = this.showImgPrefix + item2);
+                });
+
+                //存入对象，回显到页面上
+                ktvBannerArr.forEach((item3) => {
+                    let obj = {};
+                    obj.url = item3;
+                    this.ktvBannerImgBox.push(obj);
+                });
+            }
+        },
+
+        //回显banner视频（回显在自定义的位置）
+        showBannerVid() {
+            this.bannerVideo = [];
+            this.bannerShowBox.forEach((item, i) => {
+                if (item.search(/.mp4/i) !== -1) {
+                    this.bannerVideo.push(item);
+                }
+            });
+        },
+
         // 删除banner图集
         bannerRemove(file, fileList) {
             console.log('mmm', file);
@@ -927,6 +1026,18 @@ export default {
                 }
             });
             console.log('剩余的图集数组', this.bannerShowBox);
+        },
+
+        // 删除ktv包间示意图
+        ktvBannerRemove(file, fileList) {
+            console.log('mmm', file);
+
+            this.presentSeatInfo.sketchMap.forEach((item, i) => {
+                if (this.showImgPrefix + item == file.url) {
+                    this.presentSeatInfo.sketchMap.splice(i, 1);
+                }
+            });
+            console.log('剩余的图集数组', this.presentSeatInfo.sketchMap);
         },
 
         //上传商家布局图
@@ -993,11 +1104,17 @@ export default {
         checkType(e, item) {
             if (!e.target.className) {
                 e.target.classList.add('shop-type-span');
-                this.shopTypeOptStr += item + ',';
+                this.submitShopType.push(item);
             } else {
                 e.target.classList.remove('shop-type-span');
-                this.shopTypeOptStr = this.shopTypeOptStr.replace(item + ',', '');
+                this.submitShopType.forEach((ele, i) => {
+                    if (ele == item) {
+                        this.submitShopType.splice(i, 1);
+                    }
+                });
             }
+
+            console.log(this.submitShopType);
         },
 
         //点击编辑时，回显banner图集里的视频
@@ -1019,11 +1136,27 @@ export default {
             });
         },
 
+        //回显店铺类型（编辑时）
+        showCheckType() {
+            this.shopTypeOptStrArr.forEach((item, i) => {
+                if (this.shopTypeOpt.includes(item)) {
+                    console.log('回显店铺类型', item);
+                }
+            });
+
+            this.$nextTick(() => {
+                console.log(this.$refs.shopTypeSpan);
+            });
+        },
+
         //编辑商铺信息
         editShopInfo() {
             this.isReadonly = false;
 
+            this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             this.showBannerVideo(); //回显banner图集里的视频
+            this.showCheckType(); //回显店铺类型
 
             //给地图子组件传值（回显地址信息）
             this.mapList.searchAddress = this.searchAddress;
@@ -1033,23 +1166,12 @@ export default {
         //新增店铺
         submitCreatShop() {
             //数组转json形式（零嘴）
-            this.allSeatDetailInfo.forEach((item) => {
-                item.snacks = JSON.stringify(item.snacks);
+            let allSeatDetailInfo = this.cloneSnacks();
+
+            //数组转字符串（ktv示意图）
+            allSeatDetailInfo.forEach((item) => {
+                item.sketchMap = item.sketchMap.join(',');
             });
-
-            //数组转json形式（零嘴）
-            // let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
-            // seatArr.forEach((item) => {
-            //     item.snacks = JSON.stringify(item.snacks);
-            // });
-
-            //将数值型转为字符型（软硬座和有无卫生间）
-            // this.allSeatDetailInfo.forEach((item) => {
-            //     if (item.softHardStatus || item.haveToilet) {
-            //         item.softHardStatus = Number(item.softHardStatus);
-            //         item.haveToilet = Number(item.haveToilet);
-            //     }
-            // });
 
             //要传的值
             let data = {
@@ -1077,8 +1199,8 @@ export default {
                 synopsis: this.shopBrief,
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
-                type: this.shopTypeOptStr,
-                layoutList: this.allSeatDetailInfo
+                type: this.submitShopType.join(','),
+                layoutList: allSeatDetailInfo
             };
 
             console.log('新增时传的值', data);
@@ -1103,22 +1225,14 @@ export default {
         //修改店铺
         submitUpdateShop() {
             //数组转json形式（零嘴）
-            this.allSeatDetailInfo.forEach((item) => {
-                item.snacks = JSON.stringify(item.snacks);
+            let allSeatDetailInfo = this.cloneSnacks();
+
+            //数组转字符串（ktv示意图）
+            allSeatDetailInfo.forEach((item) => {
+                if (typeof item.sketchMap === 'object') {
+                    item.sketchMap = item.sketchMap.join(',');
+                }
             });
-
-            // let seatArr = JSON.parse(JSON.stringify(this.allSeatDetailInfo));
-            // seatArr.forEach((item) => {
-            //     item.snacks = JSON.stringify(item.snacks);
-            // });
-
-            //将数值型转为字符型（软硬座和有无卫生间）
-            // this.allSeatDetailInfo.forEach((item) => {
-            //     if (item.softHardStatus || item.haveToilet) {
-            //         item.softHardStatus = Number(item.softHardStatus);
-            //         item.haveToilet = Number(item.haveToilet);
-            //     }
-            // });
 
             //要传的值
             let data = {
@@ -1147,8 +1261,8 @@ export default {
                 synopsis: this.shopBrief,
                 tableReservationNotes: this.shopMatter,
                 trustAddress: this.trustAddress,
-                type: this.shopTypeOptStr,
-                layoutList: this.allSeatDetailInfo
+                type: this.submitShopType.join(','),
+                layoutList: allSeatDetailInfo
             };
 
             console.log('修改时传的值', data);
@@ -1177,14 +1291,18 @@ export default {
                 } else {
                     this.submitUpdateShop(); //修改店铺
                 }
-                this.isClickSeat = false; //展示当前点击的座位的详细信息
+                this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
+                this.submitShopType = []; //清空店铺类型上传数组
+                this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             }
         },
 
         //取消保存按钮
         cancelSubmit() {
             this.isReadonly = true;
-            this.isClickSeat = false; //展示当前点击的座位的详细信息
+            this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
+            this.submitShopType = []; //清空店铺类型上传数组
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
         },
 
         //删除当前标签
@@ -1211,7 +1329,7 @@ export default {
             this.inputValue = '';
         },
 
-        //查看当前座位信息（修改和添加的情况下）
+        //查看当前座位信息（编辑时）
         lookSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
@@ -1222,17 +1340,18 @@ export default {
                     this.presentSeatInfo = item;
 
                     //修改当前座位的属性值
-                    this.presentSeatInfo.seatAttribute = seatType == 'stageBook' ? 1 : seatType;
+                    this.presentSeatInfo.seatAttribute = seatType;
 
                     //修改当前座位为舞台
                     this.presentSeatInfo.seatType = stageCode;
 
-                    // console.log('当前点击的座位信息', this.presentSeatInfo);
+                    //回显当前座位对应的包间示意图
+                    this.showKtvBannerImg();
                 }
             });
         },
 
-        //查看当前座位信息（普通情况下）
+        //查看当前座位信息（未编辑时）
         lookSeatInfo2(e) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
@@ -1241,7 +1360,9 @@ export default {
             this.allSeatDetailInfo.forEach((item) => {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
                     this.presentSeatInfo = item;
-                    // console.log('当前点击的座位信息', this.presentSeatInfo);
+
+                     //回显当前座位对应的包间示意图
+                    this.showKtvBannerImg();
                 }
             });
         },
@@ -1250,8 +1371,8 @@ export default {
         changeStauts(e, style) {
             this.isClickSeat = true; //展示当前点击的座位的详细信息
 
-            let seatType = style;
-            let stageCode = 3;
+            let seatType = style; //座位属性 1-不可预定 2-可预定
+            let stageCode = 1; //座位类型 1-普通座位 3-过道 4-舞台
 
             //修改当前座位的属性（座位颜色）
             if (!this.isReadonly) {
@@ -1262,27 +1383,30 @@ export default {
                     case 'canBook':
                         seatType = 2;
                         break;
-                    case 'hasBook':
-                        seatType = 3;
-                        break;
-                    case 'inBook':
-                        seatType = 4;
-                        break;
                     case 'stageBook':
+                        seatType = 1;
                         stageCode = 4;
                         break;
+                    case 'aisleBook':
+                        seatType = 1;
+                        stageCode = 3;
+                        break;
                 }
-                this.setSeatInfo(e, style);
-                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息
+                this.setSeatInfo(e, style); //修改当前座位属性
+                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息（编辑时）
             } else {
-                this.lookSeatInfo2(e, seatType, stageCode); //查看当前座位信息
+                this.lookSeatInfo2(e, seatType, stageCode); //查看当前座位信息（未编辑时）
             }
 
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            e.target.classList.add('border'); //定位当前座位
+        },
+
+        //清空座位外边框（定位当前座位）
+        clearSeatBorder() {
             this.$refs.seatSpan.forEach((item) => {
                 item.classList.remove('border');
             });
-
-            e.target.classList.add('border');
         },
 
         //修改当前座位属性
@@ -1317,11 +1441,6 @@ export default {
             this.seatStyle = style;
         },
 
-        //将返回的字符串转为数组
-        strChangeArr(str) {
-            return str.split(',');
-        },
-
         //回显店铺卡座数量（行和列数量）
         getShopSeat(seat) {
             seat = seat.split('x');
@@ -1341,13 +1460,9 @@ export default {
             let snacksObj = {};
             snacksObj.name = this.snackName;
             snacksObj.num = this.snackNum;
-
             this.presentSeatInfo.snacks.push(snacksObj);
-
             this.snackName = '';
             this.snackNum = '';
-
-            // console.log('添加零嘴', this.presentSeatInfo.snacks);
         },
 
         //删除零嘴
@@ -1357,8 +1472,16 @@ export default {
                     this.presentSeatInfo.snacks.splice(i, 1);
                 }
             });
+        },
 
-            // console.log('删除零嘴', this.presentSeatInfo.snacks);
+        //克隆零嘴数组方法
+        cloneSnacks() {
+            let newSeatArr = this.allSeatDetailInfo.map((item) => {
+                let cloneItem = Object.assign({}, item);
+                cloneItem.snacks = JSON.stringify(item.snacks);
+                return cloneItem;
+            });
+            return newSeatArr;
         },
 
         //座位属性回显
@@ -1372,21 +1495,22 @@ export default {
                     //根据返回的座位数组进行匹配，并替换当前座位的属性
                     this.allSeatDetailInfo.forEach((item2) => {
                         if (item2.seatRow == x && item2.seatColumn == y) {
-                            switch (item2.seatAttribute) {
-                                case 1:
-                                    item.classList.add('notBook');
-                                    break;
-                                case 2:
-                                    item.classList.add('canBook');
-                                    break;
-                                case 3:
-                                    item.classList.add('hasBook');
-                                    break;
-                                case 4:
-                                    item.classList.add('inBook');
-                                    break;
+                            //不可预订
+                            if (item2.seatAttribute == 1) {
+                                item.classList.add('notBook');
                             }
 
+                            //可预订
+                            if (item2.seatAttribute == 2) {
+                                item.classList.add('canBook');
+                            }
+
+                            //过道
+                            if (item2.seatType == 3) {
+                                item.classList.add('aisleBook');
+                            }
+
+                            //舞台
                             if (item2.seatType == 4) {
                                 item.classList.add('stageBook');
                             }
@@ -1423,8 +1547,9 @@ export default {
                         seatColumn: i,
                         seatLatestReservationTime: '',
                         seatRow: j,
-                        seatType: 3,
+                        seatType: 1,
                         snacks: [],
+                        sketchMap: [],
                         softHardStatus: '1',
                         weekPriceList: [
                             {
@@ -1504,7 +1629,7 @@ export default {
                     this.districtCode = result.districtCode;
                     this.endBussTime = result.endTime;
                     this.goodsBrief = result.goodsStoreSynopsis;
-                    this.dynamicTags = this.strChangeArr(result.labels);
+                    this.dynamicTags = result.labels.split(',');
                     this.overallImageUrl = result.layoutPicture;
                     this.logoImageUrl = result.logo;
                     let lonlat = result.lonlat;
@@ -1520,20 +1645,14 @@ export default {
                     this.shopBrief = result.synopsis;
                     this.shopMatter = result.tableReservationNotes;
                     this.trustAddress = result.trustAddress;
-                    let shopTypeStr = result.type;
-                    this.shopTypeOptStr = result.type;
+                    this.shopTypeOptStrArr = result.type.split(',');
                     let layoutList = result.layoutList;
 
                     //回显banner图集
                     this.showBannerImg(picture);
 
                     //回显视频banner
-                    this.bannerVideo = [];
-                    this.bannerShowBox.forEach((item, i) => {
-                        if (item.search(/.mp4/i) !== -1) {
-                            this.bannerVideo.push(item);
-                        }
-                    });
+                    this.showBannerVid();
 
                     //回显店铺卡座数量
                     this.getShopSeat(cassette);
@@ -1541,27 +1660,31 @@ export default {
                     //获取经纬度
                     this.getlonlat(lonlat);
 
-                    //门店类型（模拟数据）
-                    this.shopTypeOptStrArr = this.strChangeArr(shopTypeStr.slice(0, shopTypeStr.length - 1)); //转换为数组并赋值，回显到页面上
-
-                    //json字符串转为数组对象形式（零嘴）
+                    //对每个座位进行操作
                     layoutList.forEach((item) => {
-                        item.snacks = JSON.parse(item.snacks);
-                    });
+                        item.snacks = JSON.parse(item.snacks); //零嘴json字符串转为数组对象
 
-                    //将数值型转为字符型（软硬座和有无卫生间）
-                    layoutList.forEach((item) => {
+                        if (!!item.sketchMap) {
+                            item.sketchMap = item.sketchMap.split(','); //ktv包间示意图转为数组
+                        }else{
+                            item.sketchMap = [];
+                        }
+
+                        //将数值型转为字符型（软硬座和有无卫生间）
                         if (item.softHardStatus || item.haveToilet) {
                             item.softHardStatus = item.softHardStatus.toString();
                             item.haveToilet = item.haveToilet.toString();
                         }
                     });
 
-                    this.allSeatDetailInfo = layoutList; //赋值返回的座位信息
+                    //赋值返回的座位信息
+                    this.allSeatDetailInfo = layoutList;
 
-                    this.showSeatAtt(); //座位属性回显
+                    //座位属性回显
+                    this.showSeatAtt();
 
-                    this.initShopLocaStyle(); //店铺定位样式初始化
+                    //店铺定位初始化
+                    this.initShopLocaStyle();
 
                     console.log('当前店铺数据', res.data);
                 } else if (res.code == 600) {
@@ -1573,12 +1696,20 @@ export default {
                         .then(() => {
                             this.isReadonly = false;
                             this.isUpdate = false;
-                            this.createSeatFn();
+                            this.createSeatFn(); //创建座位
+                            this.initShopLocaStyle(); //初始化店铺定位
                         })
                         .catch(() => {
                             this.$router.push('/index');
                         });
                 }
+            });
+        },
+
+        //获取店铺类型
+        getShopType() {
+            this.$post('/api//merchant/store/screening/apiList').then((res) => {
+                console.log('mmmm', res);
             });
         }
     },
@@ -1600,6 +1731,10 @@ export default {
                 }
             }
         }
+    },
+
+    created() {
+        this.getShopType();
     },
 
     mounted() {
@@ -2043,8 +2178,6 @@ export default {
         }
 
         .right-box {
-            margin-top: 94px;
-
             .min-charge {
                 margin-top: 30px;
                 margin-bottom: 30px;
@@ -2187,6 +2320,14 @@ export default {
                     }
                 }
             }
+
+            .ktv-banner {
+                img {
+                    width: 170px;
+                    height: 100px;
+                    margin: 0 10px 0 0;
+                }
+            }
         }
     }
 
@@ -2221,7 +2362,7 @@ export default {
 }
 
 .not-book {
-    background-color: #ddd !important;
+    background-color: #e6a23c !important;
     border: 1px solid transparent !important;
 }
 
@@ -2241,6 +2382,11 @@ export default {
 
 .stage-book {
     background-color: #008000 !important;
+    border: 1px solid transparent !important;
+}
+
+.aisle-book {
+    background-color: #ddd !important;
     border: 1px solid transparent !important;
 }
 
@@ -2268,7 +2414,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     border: 1px solid transparent;
-    background-color: #ddd !important;
+    background-color: #e6a23c !important;
     cursor: pointer;
 }
 
@@ -2284,30 +2430,6 @@ export default {
     cursor: pointer;
 }
 
-.hasBook {
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    border: 1px solid transparent;
-    background-color: #409eff !important;
-    cursor: pointer;
-}
-
-.inBook {
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    border: 1px solid transparent;
-    background-color: #f56c6c !important;
-    cursor: pointer;
-}
-
 .stageBook {
     display: block;
     width: 20px;
@@ -2317,6 +2439,18 @@ export default {
     margin-right: 10px;
     border: 1px solid transparent;
     background-color: #008000 !important;
+    cursor: pointer;
+}
+
+.aisleBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #ddd !important;
     cursor: pointer;
 }
 </style>
