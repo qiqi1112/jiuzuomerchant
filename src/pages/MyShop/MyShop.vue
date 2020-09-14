@@ -172,8 +172,8 @@
                                         ref="shopTypeSpan"
                                         v-for="(item,index) in shopTypeOpt"
                                         :key="index"
-                                        @click="checkType($event,item)"
-                                    >{{item}}</span>
+                                        @click="checkType($event,item.id)"
+                                    >{{item.recommendBrand}}</span>
                                 </div>
                             </div>
                         </div>
@@ -599,7 +599,7 @@
                                 label="2"
                             >无</el-radio>
                         </div>
-                        <div class="min-charge">
+                        <div class="mahjong">
                             <span>机麻：</span>
                             <el-input
                                 v-model="presentSeatInfo.mahjong"
@@ -664,13 +664,13 @@
                             </div>
                         </div>
                         <div class="ktv-banner">
-                            <span>KTV包间示意图：</span>
-                            <div v-if="isReadonly&&presentSeatInfo.sketchMap">
+                            <span>包间示意图：</span>
+                            <div v-if="isReadonly&&presentSeatInfo.sketchMap.length > 0">
                                 <div v-for="(item,index) in presentSeatInfo.sketchMap" :key="index">
                                     <img :src="showImgPrefix + item" />
                                 </div>
                             </div>
-                            <span v-else-if="isReadonly&&!presentSeatInfo.sketchMap">无</span>
+                            <span v-else-if="isReadonly&&presentSeatInfo.sketchMap.length === 0">无</span>
                             <el-upload
                                 v-else
                                 action="1"
@@ -680,6 +680,7 @@
                                 :on-error="uploadError"
                                 :file-list="ktvBannerImgBox"
                                 :on-remove="ktvBannerRemove"
+                                :limit="2"
                             >
                                 <!-- :on-remove="ktvBannerRemove"
                                 :file-list="ktvBannerImgBox"-->
@@ -780,8 +781,8 @@ export default {
                 trustAddress: ''
             },
 
-            fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
-            filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
+            fileUploadUrl: '/admin/system/upload/create', //单文件上传
+            filesUploadUrl: '/admin/system/upload/createBatch', //批量上传文件
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
             isReadonly: true, //编辑信息开关
@@ -811,9 +812,9 @@ export default {
 
             servicePhone: '', //客服电话
             shopType: '', //选择的店铺类型
-            shopTypeOpt: ['1', '2', '3', '4'], //所有店铺类型
+            shopTypeOpt: [], //所有店铺类型
             shopTypeOptStrArr: [], //回显店铺类型
-            submitShopType: [], //提交所选的店铺类型
+            submitShopType: [], //提交所选的店铺类型id
             perCon: '', //人均消费
 
             goodsBrief: '', //商品店面简介
@@ -884,7 +885,7 @@ export default {
         uploadAvatarFile(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.logoImageUrl = res.data;
                     this.$message.success('上传成功');
@@ -939,13 +940,11 @@ export default {
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('files', file.file);
-            this.$post(this.filesUploadUrl, formData).then((res) => {
+            this.$file_post(this.filesUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.bannerShowBox.push(res.data[0]);
                     this.$message.success('上传成功');
                 }
-
-                console.log('图集', this.bannerShowBox);
             });
         },
 
@@ -953,7 +952,7 @@ export default {
         uploadktvBannerFiles(file) {
             let formData = new FormData();
             formData.append('files', file.file);
-            this.$post(this.filesUploadUrl, formData).then((res) => {
+            this.$file_post(this.filesUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     if (!this.presentSeatInfo.sketchMap) {
                         this.presentSeatInfo.sketchMap = [];
@@ -962,7 +961,6 @@ export default {
                     this.presentSeatInfo.sketchMap.push(res.data[0]);
                     this.$message.success('上传成功');
                 }
-                console.log('ktv示意图', this.presentSeatInfo.sketchMap);
             });
         },
 
@@ -988,22 +986,19 @@ export default {
 
         //回显ktv包间示意图（回显在上传图集的容器中）
         showKtvBannerImg() {
-            if (!!this.presentSeatInfo.sketchMap) {
+            this.ktvBannerImgBox = [];
 
-                this.ktvBannerImgBox = [];
+            //给每张图片加上前缀
+            let ktvBannerArr = this.presentSeatInfo.sketchMap.map((item) => {
+                return (item = this.showImgPrefix + item);
+            });
 
-                //给每张图片加上前缀
-                let ktvBannerArr = this.presentSeatInfo.sketchMap.map((item2) => {
-                    return (item2 = this.showImgPrefix + item2);
-                });
-
-                //存入对象，回显到页面上
-                ktvBannerArr.forEach((item3) => {
-                    let obj = {};
-                    obj.url = item3;
-                    this.ktvBannerImgBox.push(obj);
-                });
-            }
+            //存入对象，回显到页面上
+            ktvBannerArr.forEach((item2) => {
+                let obj = {};
+                obj.url = item2;
+                this.ktvBannerImgBox.push(obj);
+            });
         },
 
         //回显banner视频（回显在自定义的位置）
@@ -1018,33 +1013,27 @@ export default {
 
         // 删除banner图集
         bannerRemove(file, fileList) {
-            console.log('mmm', file);
-
             this.bannerShowBox.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
                     this.bannerShowBox.splice(i, 1);
                 }
             });
-            console.log('剩余的图集数组', this.bannerShowBox);
         },
 
         // 删除ktv包间示意图
         ktvBannerRemove(file, fileList) {
-            console.log('mmm', file);
-
             this.presentSeatInfo.sketchMap.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
                     this.presentSeatInfo.sketchMap.splice(i, 1);
                 }
             });
-            console.log('剩余的图集数组', this.presentSeatInfo.sketchMap);
         },
 
         //上传商家布局图
         uploadOverallFile(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.overallImageUrl = res.data;
                     this.$message.success('上传成功');
@@ -1056,7 +1045,7 @@ export default {
         uploadRowNumFile(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.rowNumImageUrl = res.data;
                     this.$message.success('上传成功');
@@ -1068,7 +1057,7 @@ export default {
         uploadAppShopFile(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.appShopImageUrl = res.data;
                     this.$message.success('上传成功');
@@ -1090,13 +1079,17 @@ export default {
                 e.target.classList.add('shop-loca-span');
 
                 //切换店铺定位下标
-                if (e.target.innerHTML == '夜店') {
-                    this.shopLocaIndex = 1;
-                } else if (e.target.innerHTML == '清吧') {
-                    this.shopLocaIndex = 2;
-                } else if (e.target.innerHTML == 'ktv') {
-                    this.shopLocaIndex = 3;
+                switch (e.target.innerHTML) {
+                    case '夜店':
+                        this.shopLocaIndex = 1;
+                        break;
+                    case '清吧':
+                        this.shopLocaIndex = 2;
+                        break;
+                    case 'ktv':
+                        this.shopLocaIndex = 3;
                 }
+                this.getShopType(this.shopLocaIndex); //获取所有店铺类型的值
             }
         },
 
@@ -1113,8 +1106,6 @@ export default {
                     }
                 });
             }
-
-            console.log(this.submitShopType);
         },
 
         //点击编辑时，回显banner图集里的视频
@@ -1139,13 +1130,21 @@ export default {
         //回显店铺类型（编辑时）
         showCheckType() {
             this.shopTypeOptStrArr.forEach((item, i) => {
-                if (this.shopTypeOpt.includes(item)) {
-                    console.log('回显店铺类型', item);
-                }
-            });
+                this.shopTypeOpt.forEach((obj) => {
+                    if (item == obj.recommendBrand) {
+                        console.log('回显店铺类型', obj.recommendBrand);
+                        this.submitShopType.push(obj.id);
 
-            this.$nextTick(() => {
-                console.log(this.$refs.shopTypeSpan);
+                        this.$nextTick(() => {
+                            this.$refs.shopTypeSpan.forEach((item) => {
+                                console.log(item.innerHTML);
+                                if (item.innerHTML == obj.recommendBrand) {
+                                    item.classList.add('shop-type-span');
+                                }
+                            });
+                        });
+                    }
+                });
             });
         },
 
@@ -1156,7 +1155,8 @@ export default {
             this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             this.showBannerVideo(); //回显banner图集里的视频
-            this.showCheckType(); //回显店铺类型
+            this.getShopType(); //获取店铺类型
+            this.showCheckType(); //回显已经选择的店铺类型
 
             //给地图子组件传值（回显地址信息）
             this.mapList.searchAddress = this.searchAddress;
@@ -1205,7 +1205,7 @@ export default {
 
             console.log('新增时传的值', data);
 
-            this.$post('/api/merchant/store/save', data)
+            this.$post('/merchant/store/save', data)
                 .then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
@@ -1229,9 +1229,7 @@ export default {
 
             //数组转字符串（ktv示意图）
             allSeatDetailInfo.forEach((item) => {
-                if (typeof item.sketchMap === 'object') {
-                    item.sketchMap = item.sketchMap.join(',');
-                }
+                item.sketchMap = item.sketchMap.join(',');
             });
 
             //要传的值
@@ -1267,7 +1265,7 @@ export default {
 
             console.log('修改时传的值', data);
 
-            this.$put('/api/merchant/store/update', data)
+            this.$put('/merchant/store/update', data)
                 .then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
@@ -1294,6 +1292,7 @@ export default {
                 this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
                 this.submitShopType = []; //清空店铺类型上传数组
                 this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+                this.showCheckType(); //回显已经选择的店铺类型
             }
         },
 
@@ -1303,6 +1302,7 @@ export default {
             this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
             this.submitShopType = []; //清空店铺类型上传数组
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            this.getShopType(); //获取店铺类型
         },
 
         //删除当前标签
@@ -1329,8 +1329,8 @@ export default {
             this.inputValue = '';
         },
 
-        //查看当前座位信息（编辑时）
-        lookSeatInfo(e, seatType, stageCode) {
+        //查看并编辑当前座位信息
+        lookEditSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
@@ -1351,8 +1351,8 @@ export default {
             });
         },
 
-        //查看当前座位信息（未编辑时）
-        lookSeatInfo2(e) {
+        //查看当前座位信息
+        lookSeatInfo(e) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
@@ -1361,7 +1361,7 @@ export default {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
                     this.presentSeatInfo = item;
 
-                     //回显当前座位对应的包间示意图
+                    //回显当前座位对应的包间示意图
                     this.showKtvBannerImg();
                 }
             });
@@ -1393,9 +1393,9 @@ export default {
                         break;
                 }
                 this.setSeatInfo(e, style); //修改当前座位属性
-                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息（编辑时）
+                this.lookEditSeatInfo(e, seatType, stageCode); //查看当前座位信息（编辑时）
             } else {
-                this.lookSeatInfo2(e, seatType, stageCode); //查看当前座位信息（未编辑时）
+                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息（未编辑时）
             }
 
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
@@ -1522,12 +1522,16 @@ export default {
 
         //店铺定位样式初始化
         initShopLocaStyle() {
-            if (this.shopLocaIndex == 1) {
-                this.$refs.shopLoca[0].classList.add('shop-loca-span');
-            } else if (this.shopLocaIndex == 2) {
-                this.$refs.shopLoca[1].classList.add('shop-loca-span');
-            } else if (this.shopLocaIndex == 3) {
-                this.$refs.shopLoca[2].classList.add('shop-loca-span');
+            switch (this.shopLocaIndex) {
+                case 1:
+                    this.$refs.shopLoca[0].classList.add('shop-loca-span');
+                    break;
+                case 2:
+                    this.$refs.shopLoca[1].classList.add('shop-loca-span');
+                    break;
+                case 3:
+                    this.$refs.shopLoca[2].classList.add('shop-loca-span');
+                    break;
             }
         },
 
@@ -1612,9 +1616,38 @@ export default {
             });
         },
 
+        //回显店铺类型
+        showShopType(arr) {
+            this.shopTypeOptStrArr = [];
+            this.shopTypeOpt.forEach((item) => {
+                if (arr.includes(item.id)) {
+                    this.shopTypeOptStrArr.push(item.recommendBrand);
+                }
+            });
+        },
+
+        //对每个座位进行相关转换
+        changeLayoutList(arr) {
+            arr.forEach((item) => {
+                item.snacks = JSON.parse(item.snacks); //零嘴json字符串转为数组对象
+
+                if (!!item.sketchMap) {
+                    item.sketchMap = item.sketchMap.split(','); //ktv包间示意图转为数组
+                } else {
+                    item.sketchMap = [];
+                }
+
+                //将数值型转为字符型（软硬座和有无卫生间）
+                if (item.softHardStatus || item.haveToilet) {
+                    item.softHardStatus = item.softHardStatus.toString();
+                    item.haveToilet = item.haveToilet.toString();
+                }
+            });
+        },
+
         //回显店铺数据
         getStoreInfo() {
-            this.$get('/api/merchant/store/getStoreInfo').then((res) => {
+            this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     let result = res.data;
 
@@ -1645,8 +1678,14 @@ export default {
                     this.shopBrief = result.synopsis;
                     this.shopMatter = result.tableReservationNotes;
                     this.trustAddress = result.trustAddress;
-                    this.shopTypeOptStrArr = result.type.split(',');
+                    let shopTypeArr = result.type.split(',');
                     let layoutList = result.layoutList;
+
+                    //获取店铺类型
+                    this.getShopType(result.storeLocation);
+
+                    //回显店铺类型
+                    this.showShopType(shopTypeArr);
 
                     //回显banner图集
                     this.showBannerImg(picture);
@@ -1660,22 +1699,8 @@ export default {
                     //获取经纬度
                     this.getlonlat(lonlat);
 
-                    //对每个座位进行操作
-                    layoutList.forEach((item) => {
-                        item.snacks = JSON.parse(item.snacks); //零嘴json字符串转为数组对象
-
-                        if (!!item.sketchMap) {
-                            item.sketchMap = item.sketchMap.split(','); //ktv包间示意图转为数组
-                        }else{
-                            item.sketchMap = [];
-                        }
-
-                        //将数值型转为字符型（软硬座和有无卫生间）
-                        if (item.softHardStatus || item.haveToilet) {
-                            item.softHardStatus = item.softHardStatus.toString();
-                            item.haveToilet = item.haveToilet.toString();
-                        }
-                    });
+                    //对每个座位进行相关转换
+                    this.changeLayoutList(layoutList);
 
                     //赋值返回的座位信息
                     this.allSeatDetailInfo = layoutList;
@@ -1707,9 +1732,13 @@ export default {
         },
 
         //获取店铺类型
-        getShopType() {
-            this.$post('/api//merchant/store/screening/apiList').then((res) => {
-                console.log('mmmm', res);
+        getShopType(index) {
+            let data = {
+                filterModule: index
+            };
+            this.$post('/merchant/store/screening/apiList', data).then((res) => {
+                console.log('mmmm', res.data);
+                this.shopTypeOpt = res.data.storeScreeningDTOS;
             });
         }
     },
@@ -1723,6 +1752,7 @@ export default {
                 }
             }
         },
+
         //列数变化就重新渲染座位
         y(newVal, oldVal) {
             if (!this.isReadonly) {
@@ -1730,11 +1760,36 @@ export default {
                     this.createSeatFn();
                 }
             }
+        },
+
+        //根据包间示意图的个数，来显示与隐藏上传图标
+        'presentSeatInfo.sketchMap': {
+            handler() {
+                if (!this.isReadonly) {
+                    this.$nextTick(() => {
+                        let addPic = document.querySelector('.ktv-banner .el-upload.el-upload--picture-card');
+                        if (addPic !== null) {
+                            if (this.presentSeatInfo.sketchMap.length > 1) {
+                                addPic.style.display = 'none';
+                            } else {
+                                addPic.style.display = 'block';
+                            }
+                        }
+                    });
+                }
+            },
+            deep: true
         }
     },
 
     created() {
         this.getShopType();
+
+        if (process.env.NODE_ENV === 'development') {
+            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+        } else {
+            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
+        }
     },
 
     mounted() {
@@ -2142,7 +2197,7 @@ export default {
             .seat-title {
                 display: flex;
                 justify-content: space-between;
-                width: 300px;
+                width: 400px;
                 margin-bottom: 20px;
 
                 > p {
@@ -2179,8 +2234,6 @@ export default {
 
         .right-box {
             .min-charge {
-                margin-top: 30px;
-                margin-bottom: 30px;
                 align-items: flex-start;
 
                 .day-mincom {
@@ -2210,6 +2263,7 @@ export default {
             > div {
                 display: flex;
                 align-items: center;
+                margin-bottom: 30px;
 
                 > span {
                     margin-right: 0;
@@ -2230,7 +2284,6 @@ export default {
             }
 
             .seat-prop {
-                margin-bottom: 30px;
                 display: flex;
                 align-items: center;
 
@@ -2262,28 +2315,14 @@ export default {
                 }
             }
 
-            .acc-people {
-                margin-bottom: 30px;
-            }
-
             .lon-retain {
                 display: flex;
                 align-items: center;
-                margin-bottom: 30px;
             }
 
             .is-toilet {
-                margin-bottom: 30px;
                 display: flex;
                 align-items: center;
-            }
-
-            .mahjong {
-                margin-bottom: 30px;
-            }
-
-            .seat-num {
-                margin-bottom: 30px;
             }
 
             .snacks {
@@ -2322,10 +2361,32 @@ export default {
             }
 
             .ktv-banner {
+                align-items: flex-start;
+                > span {
+                    width: 142px;
+                }
+                > div {
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: wrap;
+                }
                 img {
-                    width: 170px;
-                    height: 100px;
-                    margin: 0 10px 0 0;
+                    width: 150px;
+                    height: 80px;
+                    margin: 0 8px 6px 0;
+                    border-radius: 6px;
+                }
+                /deep/ .el-upload-list--picture-card .el-upload-list__item {
+                    transition: none;
+                    width: 150px;
+                    height: 80px;
+                    margin: 0 8px 6px 0;
+                }
+
+                /deep/ .el-upload--picture-card {
+                    width: 150px;
+                    height: 80px;
+                    line-height: 80px;
                 }
             }
         }

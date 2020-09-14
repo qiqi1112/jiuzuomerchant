@@ -270,7 +270,7 @@ export default {
                 vip: this.isVipVal
             };
 
-            this.$post('/api/merchant/store/customer/customerLimit', data).then((res) => {
+            this.$post('/merchant/store/customer/customerLimit', data).then((res) => {
                 if (res.code == 0) {
                     // console.log(res.data.list);
                     this.tableData = res.data.list;

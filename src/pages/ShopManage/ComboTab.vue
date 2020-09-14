@@ -151,8 +151,7 @@ export default {
 
     data() {
         return {
-            fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
-            filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
+            fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
             //表单属性
@@ -187,9 +186,16 @@ export default {
         }
     },
 
+    created() {
+        if (process.env.NODE_ENV === 'development') {
+            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+        } else {
+            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
+        }
+    },
+
     mounted() {
         this.assignParentToChild(); //回显商品信息
-        console.log('套餐组件');
     },
 
     methods: {
@@ -233,7 +239,7 @@ export default {
                     goodsIdList: this.comboForm.goodsIdList,
                     name: this.comboForm.goodName
                 };
-                this.$post('/api/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
+                this.$post('/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
                     if (res.code == 0) {
                         this.comboForm.options = res.data;
                         this.antiStatus = true;
@@ -287,7 +293,7 @@ export default {
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.comboForm.bannerImageUrl = res.data;
             });
         },
@@ -296,7 +302,7 @@ export default {
         uploadThumFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.comboForm.thumImageUrl = res.data;
             });
         },
@@ -305,7 +311,7 @@ export default {
         uploadDetailFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.comboForm.detailImageUrl = res.data;
             });
         },
@@ -317,9 +323,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-/* >>>.el-table td,.el-table th {
-    text-align: center !important;
-} */
-</style>

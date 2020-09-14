@@ -131,8 +131,7 @@ export default {
 
     data() {
         return {
-            fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
-            filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
+            fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
             //其他标签页表单--------------------------------------------
@@ -171,6 +170,14 @@ export default {
                 this.sendChildForm();
             },
             deep: true
+        }
+    },
+
+    created() {
+        if (process.env.NODE_ENV === 'development') {
+            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+        } else {
+            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
         }
     },
 
@@ -239,7 +246,7 @@ export default {
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.otherForm.bannerImageUrl = res.data;
             });
         },
@@ -248,7 +255,7 @@ export default {
         uploadThumFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.otherForm.thumImageUrl = res.data;
             });
         },
@@ -257,7 +264,7 @@ export default {
         uploadDetailFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.otherForm.detailImageUrl = res.data;
             });
         },

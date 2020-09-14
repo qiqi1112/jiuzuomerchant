@@ -180,8 +180,7 @@ export default {
 
     data() {
         return {
-            fileUploadUrl: '/file/admin/system/upload/create', //单文件上传
-            filesUploadUrl: '/file/admin/system/upload/createBatch', //批量上传文件
+            fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
             //酒水标签页表单-----------------------------------------
@@ -262,6 +261,14 @@ export default {
         }
     },
 
+    created() {
+        if (process.env.NODE_ENV === 'development') {
+            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+        } else {
+            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
+        }
+    },
+
     mounted() {
         this.assignParentToChild(); //回显商品信息
         console.log('酒水组件');
@@ -335,7 +342,7 @@ export default {
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.drinksForm.bannerImageUrl = res.data;
             });
         },
@@ -344,7 +351,7 @@ export default {
         uploadRecoFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.drinksForm.recoImageUrl = res.data;
             });
         },
@@ -353,7 +360,7 @@ export default {
         uploadThumFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.drinksForm.thumImageUrl = res.data;
             });
         },
@@ -362,7 +369,7 @@ export default {
         uploadDetailFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 this.drinksForm.detailImageUrl = res.data;
             });
         },

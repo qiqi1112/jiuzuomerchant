@@ -436,7 +436,7 @@ export default {
                     .then(() => {
                         let goodsIdList = this.deleteSelect; //要传的参数（要删除的id数组）
 
-                        this.$post('/api/merchant/store/goods/batchDeleteGoods', goodsIdList).then((res) => {
+                        this.$post('/merchant/store/goods/batchDeleteGoods', goodsIdList).then((res) => {
                             if (res.code == 0) {
                                 this.getGoodsInfo();
                                 this.cancelDelete();
@@ -688,7 +688,7 @@ export default {
 
         //添加商品请求
         addGoodsAjaxPost(data) {
-            this.$post('/api/merchant/store/goods/save', data).then((res) => {
+            this.$post('/merchant/store/goods/save', data).then((res) => {
                 if (res.code == 0) {
                     this.getGoodsInfo();
                     this.$message.success('添加成功');
@@ -702,7 +702,7 @@ export default {
 
         //修改商品请求
         updateGoodsAjaxPost(data) {
-            this.$put('/api/merchant/store/goods/update', data).then((res) => {
+            this.$put('/merchant/store/goods/update', data).then((res) => {
                 if (res.code == 0) {
                     this.getGoodsInfo();
                     this.$message.success('修改成功');
@@ -717,7 +717,7 @@ export default {
 
         //商品编辑
         handleEdit(id) {
-            this.$get(`/api/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
+            this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
                 if (res.code == 0) {
                     this.isUpdate = true;
                     this.goodId = id;
@@ -894,7 +894,7 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    this.$Delete(`/api/merchant/store/goods/deleteById/${id}`).then((res) => {
+                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
                         if (res.code == 0) {
                             this.getGoodsInfo(); //重新请求数据
                             this.$message.success('删除成功');
@@ -916,7 +916,7 @@ export default {
                 type: this.value,
                 name: this.searchName
             };
-            this.$post('/api/merchant/store/goods/goodsLimit', data).then((res) => {
+            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
                 if (res.code == 0) {
                     this.dataListCount = res.data.total; //总数据条数
                     this.goodsData = res.data.list; //所有数据
@@ -1128,6 +1128,14 @@ export default {
             });
 
             return Math.min(...newArr); //返回最小值
+        }
+    },
+
+    created() {
+        if (process.env.NODE_ENV === 'development') {
+            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+        } else {
+            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
         }
     },
 

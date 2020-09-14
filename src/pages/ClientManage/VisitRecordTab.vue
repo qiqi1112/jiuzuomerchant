@@ -48,7 +48,7 @@ export default {
                 pageSize: this.pagesize,
                 userId: this.userID
             };
-            this.$post('/api/merchant/store/', data).then((res) => {
+            this.$post('/merchant/store/', data).then((res) => {
                 if (res.code == 0) {
                     this.recordList = res.data.list; //当前页的数据
                     this.dataListCount = res.data.total; //总数据条数
