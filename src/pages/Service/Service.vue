@@ -113,7 +113,7 @@
             }
         },
         created() {
-            this.$socket.disconnect();
+            // this.$socket.disconnect();
         },
         sockets: {
             connect() {
@@ -254,7 +254,7 @@
 
         },
         mounted() {
-            this.$socket.connect();
+            // this.$socket.connect();
         },
         methods: {
             getChat(val, i) {
@@ -289,6 +289,9 @@
             quickRrep(val) {
                 this.sendText = val
             },
+        },
+        beforeDestroy(){
+            this.$socket.disconnect();
         },
         computed: {}
     }

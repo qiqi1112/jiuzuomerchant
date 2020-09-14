@@ -120,7 +120,8 @@
                     }
                 }
                 },
-                serverUrl: '/text/admin/system/upload/createBatch',
+                serverUrl: '/file/admin/system/upload/createBatch',
+                downUrl:'/file/admin/system/upload/down?keyName='
             }
         },
         props:{
@@ -138,7 +139,15 @@
             quillEditor
         },
         created(){
-            console.log(this.formData)
+            if(process.env.NODE_ENV === 'development'){
+                // 开发环境
+                this.serverUrl = '/file/admin/system/upload/createBatch'
+                this.downUrl = '/file/admin/system/upload/down?keyName='
+            }else{
+                this.serverUrl = 'http://47.108.204.66:8078/admin/system/upload/createBatch'
+                this.downUrl = 'http://47.108.204.66:8078/admin/system/upload/down?keyName='
+            }
+            // console.log(this.formData)
             this.content = this.formData.editor_text
             let Size = Quill.import('attributors/style/size')
             Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '20px', '30px']
@@ -168,7 +177,7 @@
                 // 获取光标所在位置          
                 let length = quill.getSelection().index;
                 // 插入图片res.url为服务器返回的图片地址
-                quill.insertEmbed(length, 'image', '/text/admin/system/upload/down?keyName=' + res.data[0])
+                quill.insertEmbed(length, 'image', this.downUrl + res.data[0])
                 // 调整光标到最后         
                 quill.setSelection(length + 1)
                 } else {
@@ -180,7 +189,7 @@
                 let quill = this.$refs.myQuillEditor.quill
                 if (res.code == 0) {
                 let length = quill.getSelection().index;
-                quill.insertEmbed(length, 'video', '/text/admin/system/upload/down?keyName=' + res.data[0]) 
+                quill.insertEmbed(length, 'video', this.downUrl + res.data[0]) 
                 quill.setSelection(length + 1) 
                 } else {
                 this.$message.error('视频插入失败')

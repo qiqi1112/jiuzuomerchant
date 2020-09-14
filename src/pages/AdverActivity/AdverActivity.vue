@@ -356,7 +356,7 @@ export default {
             for(let file of  files){
                 fromdata.append("files",file.raw);
             }
-            this.$post('/text/admin/system/upload/createBatch',fromdata,config).then((res) => {
+            this.$file_post('/admin/system/upload/createBatch',fromdata,config).then((res) => {
                 this.$message.success('上传成功');
             })
         },
