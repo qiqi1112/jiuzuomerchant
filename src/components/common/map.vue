@@ -190,7 +190,7 @@ export default {
         },
         changeStr(data) {
             let address = encodeURI(this.fristForm.address);
-            this.$get(`/map/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`)
+            this.$map_get(`/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`)
                 .then((res) => {
                     if (res.status == 0) {
                         this.addressLists = res.data;

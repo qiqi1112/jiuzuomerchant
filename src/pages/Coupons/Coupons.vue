@@ -200,7 +200,7 @@ export default {
                 category:this.query.coupons,
                 details:this.query.text
             }
-            this.$post('/api/merchant/store/coupon/couponLimit',data).then(res=>{
+            this.$post('/merchant/store/coupon/couponLimit',data).then(res=>{
                 if(res.code == 0){
                     this.tableData = res.data.list
                     this.pageTotal = res.data.total
@@ -297,7 +297,7 @@ export default {
             // this.tableData.splice(1, 1);
             // return
             let str = val.map(v=>{return v.id});
-            this.$post(`/api/merchant/store/coupon/batchDeleteCoupon`,str).then(res=>{
+            this.$post(`/merchant/store/coupon/batchDeleteCoupon`,str).then(res=>{
                 if(res.code == 0){
                     this.$message({message: '删除成功',type: 'success'});
                 }else{
@@ -312,11 +312,11 @@ export default {
             if(!this.editRead){
                 var arr = []
                 // 新增
-                url='/api/merchant/store/coupon/save'
+                url='/merchant/store/coupon/save'
                 id=''
             }else{
                 // 编辑修改
-                url='/api/merchant/store/coupon/update'
+                url='/merchant/store/coupon/update'
                 id=this.couId
                 var arr='';
             }
@@ -373,8 +373,6 @@ export default {
             }
             let arr = this.dynamicValidateForm.domains
             for(let i in arr){
-                console.log(arr[i].start_end)
-                return
                 if(this.form.region == 1){
                     if(!arr[i].minus){
                         this.$message({message: '请输入抵扣金额',type: 'warning'});
@@ -403,6 +401,7 @@ export default {
                     break
                 }
             }
+            this.save()
             if(!this.editRead){
                 // 新增
                 

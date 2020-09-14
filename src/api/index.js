@@ -2,22 +2,12 @@ import request from '../utils/request';
 import axios from 'axios'
 
 import router from "../router";
-// import IP from "./baseUrl";
-import IP from "./ip";
+import {api_request,map_request} from "./ip";
 import Message from "element-ui/packages/message/index.js";
 
 // axios.defaults.timeout = 10000; //请求超时时间 单位(毫秒)
 // axios.defaults.baseURL = 'http://47.108.204.66:8077'
-var token = ''
 // axios.defaults.baseURL = './baseUrl'; //默认地址
-// axios.defaults.baseURL = IP;
-axios.interceptors.request.use(config => {
-    token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''
-    // axios.defaults.headers.common["X-Store-Token"] = token;
-    config.headers.common['X-Store-Token'] = token
-    return config;
-});
-
 
 axios.interceptors.response.use(
     function (response) {
@@ -58,7 +48,7 @@ axios.interceptors.response.use(
 
 function post(url, data = {}) {
     return new Promise((resolve, reject) => {
-        axios.post(url, data).then(response => {
+        api_request.post(url, data).then(response => {
             resolve(response.data);
         }, err => {
             reject(err)
@@ -66,9 +56,21 @@ function post(url, data = {}) {
     })
 }
 
+function map_get(url, data = {}) {
+    return new Promise((resolve, reject) => {
+        map_request.get(url, data).then(response => {
+            resolve(response.data);
+        }, err => {
+            reject(err)
+        })
+    })
+}
+
+
+
 function get(url, data = {}) {
     return new Promise((resolve, reject) => {
-        axios.get(url, data).then(response => {
+        api_request.get(url, data).then(response => {
             resolve(response.data);
         }, err => {
             reject(err)
@@ -78,7 +80,7 @@ function get(url, data = {}) {
 
 function Delete(url, data = {}) {
     return new Promise((resolve, reject) => {
-        axios.delete(url, data).then(response => {
+        api_request.delete(url, data).then(response => {
             resolve(response.data);
         }, err => {
             reject(err)
@@ -88,7 +90,7 @@ function Delete(url, data = {}) {
 
 function put(url, data = {}) {
     return new Promise((resolve, reject) => {
-        axios.put(url, data).then(response => {
+        api_request.put(url, data).then(response => {
             resolve(response.data);
         }, err => {
             reject(err)
@@ -101,5 +103,6 @@ export {
     post,
     get,
     Delete,
-    put
+    put,
+    map_get
 }

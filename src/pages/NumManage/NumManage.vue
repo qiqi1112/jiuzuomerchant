@@ -10,10 +10,14 @@
             </div>
 
             <div class="tit_top">
-                <span class="li_text">当前排号总数<span>24</span></span>
-                <span class="li_text">成功排号数<span>24</span></span>
-                <span class="li_text">今日取消排号数<span>24</span></span>
                 <span class="li_text">今日排号总数<span>24</span></span>
+                <span class="li_text">成功排号数<span>24</span></span>
+                <span class="li_text">当前排号总数<span>24</span></span>
+                <span class="li_text">今日取消排号数<span>24</span></span>
+                <br>
+                <span class="li_text">当前抢座总数<span>24</span></span>
+                <span class="li_text">成功抢座数<span>24</span></span>
+                <span class="li_text">今日抢座总数<span>24</span></span>
             </div>
             
             <div>
@@ -22,8 +26,49 @@
             </div>
 
             <div class="numeral_list">
-                
                 <div class="fl_box">
+                    <div class="column">
+                        <span class="line lw2"></span>
+                        <span>当前抢座</span>
+                    </div>
+                    <ul class="scl_box">
+                        <li class='li_n now_num' v-for="(item,index) in nowNumList" :key="index">
+                            <div class="now_l">
+                                <div>
+                                    <i class="el-icon-s-custom"></i>
+                                    <span class="info">预计人数</span>
+                                    <span>{{item.num}}人</span>
+                                </div>
+                                <div>
+                                    <i class="el-icon-s-marketing"></i>
+                                    <span class="info">预约座位</span>
+                                    <span>{{item.seat_type==1?'沙发软座':'硬座'}}</span>
+                                </div>
+                                <div>
+                                    <i class="el-icon-s-release"></i>
+                                    <span class="info">手机号码</span>
+                                    <span>{{item.tel | phoneNum}}</span>
+                                </div>
+                            </div>
+                            <div class="now_r">
+                                <div>
+                                    当前位于第
+                                    <span class="num"> {{index+1}} </span>
+                                    位（{{item.seat_num}}）
+                                    <span class="has_consum">(已消费：￥ 9525.00)</span> 
+                                </div>
+                                <div>取号时间 <span class="tl">{{item.take_time}}</span></div>
+                                <div>等待时常 <span class="tl"> {{item.wait_time}}</span></div>
+                                <div v-if="index==0 && callNext">
+                                    <span class="stat">处于呼叫中....</span>
+                                    <span class="btn" @click="ensure(item)">确定</span>
+                                    <span class="btn" @click="nextOne(item)">续牌</span>
+                                    <span class="btn" @click="fail(item)">取消</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
                     <div class="column">
                         <span class="line lw2"></span>
                         <span>当前排号</span>
@@ -251,7 +296,7 @@ export default {
 @media screen and (max-width: 1300px) {
     @font-size:12px;
 }
-@font-size:14px;
+@font-size:12px;
 @bor-color:rgb(97, 97, 97);
 #numeral{
     font-size: @font-size;
@@ -349,16 +394,16 @@ export default {
 
                     }
                     .tim{
-                         color: red;
+                        color: red;
                     }
                     .get_lab{
-                         margin-right: 10px;
+                        margin-right: 10px;
                     }
                     .get_tim{
-                         margin-right: 11%;
+                        margin-right: 11%;
                     }
                     .fai_lab{
-                         margin-right: 10px;
+                        margin-right: 10px;
                     }
                 }
             }
@@ -368,7 +413,10 @@ export default {
         }
         .scl_box{
             overflow-y: scroll;
-            height: 700px;
+            height: 435px;
+            .has_consum{
+                color: red;
+            }
         }
         .scl_box::-webkit-scrollbar {display:none}
     }

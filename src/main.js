@@ -17,7 +17,8 @@ import {
     post,
     get,
     Delete,
-    put
+    put,
+    map_get
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
@@ -27,27 +28,28 @@ import filter from './utils/filter'
 Vue.use(less)
 Vue.prototype.$regular = regular
 Vue.prototype.$post = post;
+Vue.prototype.$map_get = map_get;
 Vue.prototype.$get = get;
 Vue.prototype.$Delete = Delete;
 Vue.prototype.$put = put;
 
 
-Vue.use(new VueSocketIO({
-    debug: true,
-    connection: 'http://192.168.31.94:9210',
-    vuex: {
-        store,
-        actionPrefix: 'SOCKET_',
-        mutationPrefix: 'SOCKET_'
-    },
-    options: {
-        path: "/socket.io",
-        transports: [/*'polling', */'websocket'],
-        query: {
-        token: `eyJhbGciOiJSUzI1NiJ9.eyJpZCI6MywiZXhwIjoxNTk5OTg0MjIxLCJwaG9uZSI6IjE4MjgxOTExMDU0IiwidXNlcm5hbWUiOiLlvpDnrJEifQ.0exQHSnN172xd1RQAlZKu1aXmik1pMun02xgBzEh6eGQe0SpDWDhpzhPali_Fa9K6XAx_Idza4M3m_i4Wkdzq3uuRvYEK_6ziQRhdzimZ1-p1ikAs6K3fptLTpU2uGUXjBHCkfc2aU4mxZap_fvu8dP3o-jdAUqgNcC5D6k-PuA`,
-        signature:'123456'
-    }}
-}))
+// Vue.use(new VueSocketIO({
+//     debug: true,
+//     connection: 'http://192.168.31.94:9210',
+//     vuex: {
+//         store,
+//         actionPrefix: 'SOCKET_',
+//         mutationPrefix: 'SOCKET_'
+//     },
+//     options: {
+//         path: "/socket.io",
+//         transports: [/*'polling', */'websocket'],
+//         query: {
+//         token: `eyJhbGciOiJSUzI1NiJ9.eyJpZCI6MywiZXhwIjoxNTk5OTg0MjIxLCJwaG9uZSI6IjE4MjgxOTExMDU0IiwidXNlcm5hbWUiOiLlvpDnrJEifQ.0exQHSnN172xd1RQAlZKu1aXmik1pMun02xgBzEh6eGQe0SpDWDhpzhPali_Fa9K6XAx_Idza4M3m_i4Wkdzq3uuRvYEK_6ziQRhdzimZ1-p1ikAs6K3fptLTpU2uGUXjBHCkfc2aU4mxZap_fvu8dP3o-jdAUqgNcC5D6k-PuA`,
+//         signature:'123456'
+//     }}
+// }))
 
 // Vue.use(VueSocketio, SocketIO('http://192.168.31.94:9210'),{
 //     query: {

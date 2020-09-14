@@ -67,9 +67,8 @@ export default {
                 loginNameOrPhone: this.param.username,
                 loginPassword: this.param.password
             };
-            this.$post('/api/merchant/store/login', data).then(
+            this.$post('/merchant/store/login', data).then(
                 (res) => {
-                    console.log(res);
                     if (res.code == 0) {
                         let obj = {
                             id : res.data.id,
