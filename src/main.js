@@ -18,7 +18,9 @@ import {
     get,
     Delete,
     put,
-    map_get
+    map_get,
+    file_get,
+    file_post,
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
@@ -32,6 +34,8 @@ Vue.prototype.$map_get = map_get;
 Vue.prototype.$get = get;
 Vue.prototype.$Delete = Delete;
 Vue.prototype.$put = put;
+Vue.prototype.$file_get = file_get;
+Vue.prototype.$file_post = file_post;
 
 
 // Vue.use(new VueSocketIO({
