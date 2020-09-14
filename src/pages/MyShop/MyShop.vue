@@ -1070,44 +1070,6 @@ export default {
             this.$message.error('上传失败');
         },
 
-        //切换店铺定位
-        changeShopLoca(e) {
-            if (!this.isReadonly) {
-                this.$refs.shopLoca.forEach((item) => {
-                    item.classList.remove('shop-loca-span');
-                });
-                e.target.classList.add('shop-loca-span');
-
-                //切换店铺定位下标
-                switch (e.target.innerHTML) {
-                    case '夜店':
-                        this.shopLocaIndex = 1;
-                        break;
-                    case '清吧':
-                        this.shopLocaIndex = 2;
-                        break;
-                    case 'ktv':
-                        this.shopLocaIndex = 3;
-                }
-                this.getShopType(this.shopLocaIndex); //获取所有店铺类型的值
-            }
-        },
-
-        //选择店铺类型
-        checkType(e, item) {
-            if (!e.target.className) {
-                e.target.classList.add('shop-type-span');
-                this.submitShopType.push(item);
-            } else {
-                e.target.classList.remove('shop-type-span');
-                this.submitShopType.forEach((ele, i) => {
-                    if (ele == item) {
-                        this.submitShopType.splice(i, 1);
-                    }
-                });
-            }
-        },
-
         //点击编辑时，回显banner图集里的视频
         showBannerVideo() {
             this.$nextTick(() => {
@@ -1127,19 +1089,61 @@ export default {
             });
         },
 
-        //回显店铺类型（编辑时）
+        //切换店铺定位
+        changeShopLoca(e) {
+            if (!this.isReadonly) {
+                this.$refs.shopLoca.forEach((item) => {
+                    item.classList.remove('shop-loca-span');
+                });
+                e.target.classList.add('shop-loca-span');
+
+                //切换店铺定位下标
+                switch (e.target.innerHTML) {
+                    case '夜店':
+                        this.shopLocaIndex = 1;
+                        break;
+                    case '清吧':
+                        this.shopLocaIndex = 2;
+                        break;
+                    case 'ktv':
+                        this.shopLocaIndex = 3;
+                }
+
+                this.getShopType(this.shopLocaIndex); //获取所有店铺类型的值
+
+                this.submitShopType = []; //清空提交id数组
+
+                this.$refs.shopTypeSpan.forEach((item) => {
+                    item.classList.remove('shop-type-span'); //清空所选店铺的样式
+                });
+            }
+        },
+
+        //选择店铺类型
+        checkType(e, item) {
+            if (!e.target.className) {
+                e.target.classList.add('shop-type-span');
+                this.submitShopType.push(item);
+            } else {
+                e.target.classList.remove('shop-type-span');
+                this.submitShopType.forEach((ele, i) => {
+                    if (ele == item) {
+                        this.submitShopType.splice(i, 1);
+                    }
+                });
+            }
+        },
+
+        //回显店铺类型样式（编辑时）
         showCheckType() {
-            this.shopTypeOptStrArr.forEach((item, i) => {
+            this.shopTypeOptStrArr.forEach((item) => {
                 this.shopTypeOpt.forEach((obj) => {
                     if (item == obj.recommendBrand) {
-                        console.log('回显店铺类型', obj.recommendBrand);
-                        this.submitShopType.push(obj.id);
-
+                        this.submitShopType.push(obj.id); //将原有的类型id存入上传数组中
                         this.$nextTick(() => {
-                            this.$refs.shopTypeSpan.forEach((item) => {
-                                console.log(item.innerHTML);
-                                if (item.innerHTML == obj.recommendBrand) {
-                                    item.classList.add('shop-type-span');
+                            this.$refs.shopTypeSpan.forEach((item2) => {
+                                if (item2.innerHTML == obj.recommendBrand) {
+                                    item2.classList.add('shop-type-span'); //回显原有类型对应的样式
                                 }
                             });
                         });
@@ -1292,7 +1296,6 @@ export default {
                 this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
                 this.submitShopType = []; //清空店铺类型上传数组
                 this.clearSeatBorder(); //清空座位外边框（定位当前座位）
-                this.showCheckType(); //回显已经选择的店铺类型
             }
         },
 
@@ -1300,9 +1303,7 @@ export default {
         cancelSubmit() {
             this.isReadonly = true;
             this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
-            this.submitShopType = []; //清空店铺类型上传数组
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
-            this.getShopType(); //获取店铺类型
         },
 
         //删除当前标签
@@ -1616,7 +1617,7 @@ export default {
             });
         },
 
-        //回显店铺类型
+        //回显当前店铺的类型
         showShopType(arr) {
             this.shopTypeOptStrArr = [];
             this.shopTypeOpt.forEach((item) => {
@@ -1682,7 +1683,7 @@ export default {
                     let layoutList = result.layoutList;
 
                     //获取店铺类型
-                    this.getShopType(result.storeLocation);
+                    // this.getShopType(result.storeLocation);
 
                     //回显店铺类型
                     this.showShopType(shopTypeArr);
