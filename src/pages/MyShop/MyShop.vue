@@ -7,7 +7,8 @@
                     <span>店铺信息</span>
                     <el-button type="primary" @click="editShopInfo">编辑</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
-                    <el-button type="info" @click="cancelSubmit" v-if="!isReadonly">取消</el-button>
+                    <el-button type="info" @click="storageInfo" v-if="!isReadonly&&!isUpdate">暂存数据</el-button>
+                    <el-button type="info" @click="cancelSubmit" v-if="!isReadonly&&isUpdate">取消</el-button>
                 </h4>
 
                 <!-- 店铺基本信息 -->
@@ -183,12 +184,14 @@
                 <!-- 店铺地址 -->
                 <div class="shop-address">
                     <p>店铺地址</p>
-                    <p v-if="isReadonly" class="shop-add clearfix">
-                        <span>{{province}}</span>
-                        <span>{{city}}</span>
-                        <span>{{district}}</span>
-                        <span>{{trustAddress}}</span>
-                    </p>
+                    <div v-if="isReadonly" class="shop-add clearfix">
+                        <div v-if="searchAddress">
+                            <span>{{province}}</span>
+                            <span>{{city}}</span>
+                            <span>{{district}}</span>
+                            <span>{{trustAddress}}</span>
+                        </div>
+                    </div>
                     <div v-else>
                         <mapCom @child-data="childData" :mapList="mapList"></mapCom>
                     </div>
@@ -220,18 +223,6 @@
                             :readonly="isReadonly"
                         ></el-input>
                     </div>
-                    <!-- 排号商家提醒 -->
-                    <!-- <div class="shop-remind">
-                        <span>排号商家提醒：</span>
-                        <el-input
-                            type="textarea"
-                            :rows="3"
-                            placeholder="请输入排号商家提醒"
-                            v-model="shopRemind"
-                            style="width:76%"
-                            :readonly="isReadonly"
-                        ></el-input>
-                    </div>-->
                 </div>
             </div>
 
@@ -336,7 +327,7 @@
                             :on-error="uploadError"
                         >
                             <img
-                                v-if="overallImageUrl"
+                                v-if="!!overallImageUrl"
                                 :src="showImgPrefix + overallImageUrl"
                                 class="avatar"
                             />
@@ -576,13 +567,16 @@
                             <span>保留最晚时间：</span>
                             <el-time-select
                                 style="width:50%"
-                                placeholder="请选择时间"
                                 v-model="presentSeatInfo.seatLatestReservationTime"
                                 :readonly="isReadonly"
-                                :picker-options="{
-                                    start: '00:00',
-                                    step: '00:15',
-                                    end: '23:45'
+                                :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
+                                    start: startBussTime,
+                                    step: '00:10',
+                                    end: '23:50'
+                                } : {
+                                    start: startBussTime,
+                                    step: '00:10',
+                                    end: endBussTime
                                 }"
                             ></el-time-select>
                         </div>
@@ -682,8 +676,6 @@
                                 :on-remove="ktvBannerRemove"
                                 :limit="2"
                             >
-                                <!-- :on-remove="ktvBannerRemove"
-                                :file-list="ktvBannerImgBox"-->
                                 <i class="el-icon-plus"></i>
                             </el-upload>
                         </div>
@@ -794,7 +786,7 @@ export default {
             shopBrief: '', //店铺简介
 
             shopLoca: ['夜店', '清吧', 'ktv'], //店铺定位数组
-            shopLocaIndex: 1, //店铺定位下标
+            shopLocaIndex: '', //店铺定位下标
             dynamicTags: [], //店铺标签数组
             inputVisible: false, //添加店铺标签的输入框开关
             inputValue: '', //店铺标签输入框的输入值
@@ -819,7 +811,6 @@ export default {
 
             goodsBrief: '', //商品店面简介
             shopMatter: '', //订桌注意事项
-            shopRemind: '', //排号商家提醒
 
             bannerShowBox: [], //要上传的banner图集和回显的banner图集（回显在自定义的位置）
             bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
@@ -964,19 +955,16 @@ export default {
             });
         },
 
-        //将banner图集字符串分割为数组
-        imgStrChangeArr(str) {
-            let res = str.split(',');
-            let newRes = res.map((item) => {
-                return (item = this.showImgPrefix + item);
-            });
-            return newRes;
-        },
-
         //回显banner图集（回显在上传图集的容器中）
         showBannerImg(picStr) {
             this.bannerImgBox = [];
-            let pictureArr = this.imgStrChangeArr(picStr); //回显在上传图集的容器中
+
+            //给每张图片加上前缀
+            let pictureArr = this.bannerShowBox.map((item) => {
+                return (item = this.showImgPrefix + item);
+            });
+
+            //存入对象，回显到页面上
             pictureArr.forEach((item) => {
                 let obj = {};
                 obj.url = item;
@@ -1113,25 +1101,41 @@ export default {
 
                 this.submitShopType = []; //清空提交id数组
 
-                this.$refs.shopTypeSpan.forEach((item) => {
-                    item.classList.remove('shop-type-span'); //清空所选店铺的样式
-                });
+                if (this.$refs.shopTypeSpan) {
+                    this.$refs.shopTypeSpan.forEach((item) => {
+                        item.classList.remove('shop-type-span'); //清空所选店铺的样式
+                    });
+                }
             }
         },
 
         //选择店铺类型
         checkType(e, item) {
-            if (!e.target.className) {
+            // 多选情况下
+            if (this.shopLocaIndex == 1 || this.shopLocaIndex == 2) {
+                if (!e.target.className) {
+                    e.target.classList.add('shop-type-span');
+                    this.submitShopType.push(item);
+                } else {
+                    e.target.classList.remove('shop-type-span');
+                    this.submitShopType.forEach((ele, i) => {
+                        if (ele == item) {
+                            this.submitShopType.splice(i, 1);
+                        }
+                    });
+                }
+            }
+            // 单选情况下
+            else if (this.shopLocaIndex == 3) {
+                this.submitShopType = [];
+                this.$refs.shopTypeSpan.forEach((i) => {
+                    i.classList.remove('shop-type-span');
+                });
                 e.target.classList.add('shop-type-span');
                 this.submitShopType.push(item);
-            } else {
-                e.target.classList.remove('shop-type-span');
-                this.submitShopType.forEach((ele, i) => {
-                    if (ele == item) {
-                        this.submitShopType.splice(i, 1);
-                    }
-                });
             }
+
+            console.log(this.submitShopType);
         },
 
         //回显店铺类型样式（编辑时）
@@ -1655,7 +1659,6 @@ export default {
                     //返回的所有属性
                     this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
-                    this.shopRemind = result.businessReminder;
                     let cassette = result.cassette;
                     this.city = result.city;
                     this.servicePhone = result.customerServicePhone;
@@ -1669,7 +1672,6 @@ export default {
                     let lonlat = result.lonlat;
                     this.shopName = result.name;
                     this.perCon = result.perCapitaConsumption;
-                    let picture = result.picture;
                     this.bannerShowBox = result.picture.split(',');
                     this.province = result.province;
                     this.rowNumImageUrl = result.rowNumberBanner;
@@ -1683,13 +1685,13 @@ export default {
                     let layoutList = result.layoutList;
 
                     //获取店铺类型
-                    // this.getShopType(result.storeLocation);
+                    this.getShopType(result.storeLocation);
 
                     //回显店铺类型
                     this.showShopType(shopTypeArr);
 
                     //回显banner图集
-                    this.showBannerImg(picture);
+                    this.showBannerImg();
 
                     //回显视频banner
                     this.showBannerVid();
@@ -1723,7 +1725,7 @@ export default {
                             this.isReadonly = false;
                             this.isUpdate = false;
                             this.createSeatFn(); //创建座位
-                            this.initShopLocaStyle(); //初始化店铺定位
+                            this.getStorageInfo(); //获取输入的缓存数据
                         })
                         .catch(() => {
                             this.$router.push('/index');
@@ -1738,9 +1740,154 @@ export default {
                 filterModule: index
             };
             this.$post('/merchant/store/screening/apiList', data).then((res) => {
-                console.log('mmmm', res.data);
-                this.shopTypeOpt = res.data.storeScreeningDTOS;
+                if (res.data) {
+                    this.shopTypeOpt = res.data.storeScreeningDTOS;
+                }
             });
+        },
+
+        //暂存数据
+        storageInfo() {
+            let obj = {
+                logoImageUrl: this.logoImageUrl,
+                shopName: this.shopName,
+                shopBrief: this.shopBrief,
+                shopLocaIndex: this.shopLocaIndex,
+                dynamicTags: this.dynamicTags,
+                startBussTime: this.startBussTime,
+                endBussTime: this.endBussTime,
+                province: this.province,
+                city: this.city,
+                district: this.district,
+                districtCode: this.districtCode,
+                searchAddress: this.searchAddress,
+                trustAddress: this.trustAddress,
+                longitude: this.longitude,
+                latitude: this.latitude,
+                servicePhone: this.servicePhone,
+                shopType: this.shopType,
+                shopTypeOpt: this.shopTypeOpt,
+                shopTypeOptStrArr: this.shopTypeOptStrArr,
+                submitShopType: this.submitShopType,
+                perCon: this.perCon,
+                goodsBrief: this.goodsBrief,
+                shopMatter: this.shopMatter,
+                bannerImgBox: this.bannerImgBox,
+                bannerShowBox: this.bannerShowBox,
+                bannerVideo: this.bannerVideo,
+                ktvBannerImgBox: this.ktvBannerImgBox,
+                overallImageUrl: this.overallImageUrl,
+                rowNumImageUrl: this.rowNumImageUrl,
+                appShopImageUrl: this.appShopImageUrl,
+                x: this.x,
+                y: this.y,
+                allSeatDetailInfo: this.allSeatDetailInfo
+            };
+
+            localStorage.setItem('storageInfo', JSON.stringify(obj));
+
+            this.$message.success('暂存数据成功');
+        },
+
+        //获取缓存
+        getStorageInfo() {
+            let storageInfo = JSON.parse(localStorage.getItem('storageInfo'));
+            console.log(storageInfo);
+
+            if (storageInfo) {
+                this.logoImageUrl = storageInfo.logoImageUrl;
+                this.shopName = storageInfo.shopName;
+                this.shopBrief = storageInfo.shopBrief;
+                this.shopLocaIndex = storageInfo.shopLocaIndex;
+                this.dynamicTags = storageInfo.dynamicTags;
+                this.startBussTime = storageInfo.startBussTime;
+                this.endBussTime = storageInfo.endBussTime;
+                this.province = storageInfo.province;
+                this.city = storageInfo.city;
+                this.district = storageInfo.district;
+                this.districtCode = storageInfo.districtCode;
+                this.searchAddress = storageInfo.searchAddress;
+                this.trustAddress = storageInfo.trustAddress;
+                this.longitude = storageInfo.longitude;
+                this.latitude = storageInfo.latitude;
+                this.servicePhone = storageInfo.servicePhone;
+                this.shopType = storageInfo.shopType;
+                this.shopTypeOpt = storageInfo.shopTypeOpt;
+                this.shopTypeOptStrArr = storageInfo.shopTypeOptStrArr;
+                this.submitShopType = storageInfo.submitShopType;
+                this.perCon = storageInfo.perCon;
+                this.goodsBrief = storageInfo.goodsBrief;
+                this.shopMatter = storageInfo.shopMatter;
+                this.bannerImgBox = storageInfo.bannerImgBox;
+                this.bannerShowBox = storageInfo.bannerShowBox;
+                this.bannerVideo = storageInfo.bannerVideo;
+                this.ktvBannerImgBox = storageInfo.ktvBannerImgBox;
+                this.overallImageUrl = storageInfo.overallImageUrl;
+                this.rowNumImageUrl = storageInfo.rowNumImageUrl;
+                this.appShopImageUrl = storageInfo.appShopImageUrl;
+                this.x = storageInfo.x;
+                this.y = storageInfo.y;
+                this.allSeatDetailInfo = storageInfo.allSeatDetailInfo;
+
+                //给地图子组件传值（回显地址信息）
+                this.mapList.searchAddress = this.searchAddress;
+                this.mapList.trustAddress = this.trustAddress;
+
+                // //回显banner图片
+                this.showBannerImg();
+
+                //回显banner视频
+                this.showBannerVideo();
+
+                // //座位属性回显
+                this.showSeatAtt();
+
+                //店铺定位初始化
+                this.initShopLocaStyle();
+
+                //获取已经选择的店铺类型
+                this.showShopType(this.submitShopType);
+
+                //回显已经选择的店铺类型
+                this.showCheckType();
+            }
+        },
+
+        //清空所有内容
+        clearShopInfo() {
+            this.logoImageUrl = '';
+            this.shopName = '';
+            this.shopBrief = '';
+            this.shopLocaIndex = '';
+            this.dynamicTags = [];
+            this.startBussTime = '';
+            this.endBussTime = '';
+            this.province = '';
+            this.city = '';
+            this.district = '';
+            this.districtCode = '';
+            this.searchAddress = '';
+            this.trustAddress = '';
+            this.longitude = '';
+            this.latitude = '';
+            this.servicePhone = '';
+            this.shopType = '';
+            this.shopTypeOpt = [];
+            this.shopTypeOptStrArr = [];
+            this.submitShopType = [];
+            this.perCon = '';
+            this.goodsBrief = '';
+            this.shopMatter = '';
+            this.bannerImgBox = [];
+            this.bannerShowBox = [];
+            this.bannerVideo = [];
+            this.ktvBannerImgBox = [];
+            this.overallImageUrl = '';
+            this.rowNumImageUrl = '';
+            this.appShopImageUrl = '';
+            this.x = 20;
+            this.y = 20;
+            this.allSeatDetailInfo = [];
         }
     },
 
@@ -1784,7 +1931,8 @@ export default {
     },
 
     created() {
-        this.getShopType();
+        this.clearShopInfo(); //清空所有内容
+        this.getShopType(); //获取店铺类型
 
         if (process.env.NODE_ENV === 'development') {
             this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
@@ -1853,39 +2001,6 @@ export default {
 
             > p {
                 margin-bottom: 10px;
-            }
-
-            /deep/ .avatar-uploader .el-upload {
-                border: 1px dashed #d9d9d9;
-                border-radius: 6px;
-                cursor: pointer;
-                position: relative;
-                overflow: hidden;
-            }
-
-            /deep/ .avatar-uploader .el-upload:hover {
-                border-color: #409eff;
-            }
-
-            /deep/.avatar-uploader-icon {
-                font-size: 28px;
-                color: #8c939d;
-                width: 120px;
-                height: 120px;
-                line-height: 120px;
-                text-align: center;
-            }
-
-            /deep/.avatar {
-                width: 120px;
-                height: 120px;
-                border-radius: 6px;
-                display: block;
-            }
-
-            /deep/.el-upload.el-upload--text {
-                width: 120px;
-                height: 120px;
             }
         }
 
@@ -2403,6 +2518,39 @@ export default {
         height: 100px;
         line-height: 100px;
     }
+}
+
+/deep/ .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/deep/ .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+}
+
+/deep/.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
+}
+
+/deep/.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 6px;
+    display: block;
+}
+
+/deep/.el-upload.el-upload--text {
+    width: 120px;
+    height: 120px;
 }
 
 .el-tag + .el-tag {
