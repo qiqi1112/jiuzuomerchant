@@ -255,9 +255,10 @@ export default {
 
         //搜索操作
         handleSearch() {
-            if (this.searchName) {
-                this.getClientInfo();
-            }
+            // if (this.searchName) {
+            this.currentPage = 1;
+            this.getClientInfo();
+            // }
         },
 
         //获取客户信息
@@ -272,8 +273,8 @@ export default {
 
             this.$post('/merchant/store/customer/customerLimit', data).then((res) => {
                 if (res.code == 0) {
-                    // console.log(res.data.list);
                     this.tableData = res.data.list;
+                    this.dataListCount = res.data.total; //总数据条数
                 }
             });
         }
