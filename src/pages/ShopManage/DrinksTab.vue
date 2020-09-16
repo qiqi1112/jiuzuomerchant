@@ -67,6 +67,14 @@
                         </el-form-item>
                     </el-form>
                 </p>
+                <p>
+                    <span>酒水产地：</span>
+                    <el-input v-model="drinksForm.area" style="width:170px"></el-input>
+                </p>
+                <p>
+                    <span>酒水年份：</span>
+                    <el-input v-model="drinksForm.year" style="width:170px"></el-input>
+                </p>
             </el-form>
             <div class="drinks-update-box">
                 <!-- 广告图 -->
@@ -192,6 +200,9 @@ export default {
                 checkedBanner: false,
                 checkedReco: false,
 
+                area: '', //产地
+                year: '', //年份
+
                 //酒水分类
                 classify: '',
                 classifyOptions: [
@@ -297,6 +308,8 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
+            this.drinksForm.area = this.drinksFormParent.area;
+            this.drinksForm.year = this.drinksFormParent.year;
             this.drinksForm.name = this.drinksFormParent.name;
             this.drinksForm.goodWeight = this.drinksFormParent.goodWeight;
             this.drinksForm.desc = this.drinksFormParent.desc;

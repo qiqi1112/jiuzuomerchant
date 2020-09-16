@@ -272,6 +272,10 @@ export default {
                 nowPrice: '',
                 checkedBanner: false,
                 checkedReco: false,
+
+                area: '', //产地
+                year: '', //年份
+
                 goodWeight: 0, //商品排序
                 recoWeight: 0, //商家推荐位排序
                 classify: '', //酒水分类
@@ -535,6 +539,8 @@ export default {
             }
 
             let data = {
+                area: this.drinksForm.area,
+                year: this.drinksForm.year,
                 infoPicture: this.drinksForm.detailImageUrl,
                 listPicture: this.drinksForm.thumImageUrl,
                 name: this.drinksForm.name,
@@ -823,6 +829,8 @@ export default {
 
         //传值给酒水子组件
         sendDrinksForm(data) {
+            this.drinksForm.area = data.area;
+            this.drinksForm.year = data.year;
             this.drinksForm.name = data.name;
             this.drinksForm.goodWeight = data.goodsSort;
             this.drinksForm.desc = data.synopsis;
@@ -952,6 +960,8 @@ export default {
 
         //清空酒水表单
         clearDrinksForm() {
+            this.drinksForm.area = '';
+            this.drinksForm.year = '';
             this.drinksForm.name = '';
             this.drinksForm.desc = '';
             this.drinksForm.originPrice = '';
@@ -1046,6 +1056,8 @@ export default {
 
         //接收酒水传值
         getChildDrinksForm(data) {
+            this.drinksForm.area = data.area;
+            this.drinksForm.year = data.year;
             this.drinksForm.name = data.name;
             this.drinksForm.desc = data.desc;
             this.drinksForm.checkedBanner = data.checkedBanner == true ? 1 : 2;
@@ -1066,8 +1078,6 @@ export default {
             let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
             this.drinksForm.originPrice = minOriginPrice;
             this.drinksForm.nowPrice = minNowPrice;
-
-            console.log('最低', this.drinksForm.originPrice, this.drinksForm.nowPrice);
         },
 
         //接收小吃传值

@@ -349,6 +349,7 @@
                                     :min="6"
                                     style="width:120px"
                                     label="行数"
+                                    @change="changeSeatNum"
                                 ></el-input-number>
                             </label>
                             <label style="margin-right:30px">
@@ -359,6 +360,7 @@
                                     :min="6"
                                     style="width:120px"
                                     label="列数"
+                                    @change="changeSeatNum"
                                 ></el-input-number>
                             </label>
                         </p>
@@ -1217,6 +1219,7 @@ export default {
                 .then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
+                        localStorage.removeItem('storageInfo');
                         this.$message.success('添加成功');
                         this.isReadonly = true;
                         this.isUpdate = true;
@@ -1308,6 +1311,7 @@ export default {
             this.isReadonly = true;
             this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            this.getStoreInfo(); //重新获取商店数据
         },
 
         //删除当前标签
@@ -1352,6 +1356,8 @@ export default {
 
                     //回显当前座位对应的包间示意图
                     this.showKtvBannerImg();
+
+                    console.log('cccc', this.presentSeatInfo);
                 }
             });
         },
@@ -1398,9 +1404,9 @@ export default {
                         break;
                 }
                 this.setSeatInfo(e, style); //修改当前座位属性
-                this.lookEditSeatInfo(e, seatType, stageCode); //查看当前座位信息（编辑时）
+                this.lookEditSeatInfo(e, seatType, stageCode); //查看并编辑当前座位信息
             } else {
-                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息（未编辑时）
+                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息
             }
 
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
@@ -1527,16 +1533,22 @@ export default {
 
         //店铺定位样式初始化
         initShopLocaStyle() {
-            switch (this.shopLocaIndex) {
-                case 1:
-                    this.$refs.shopLoca[0].classList.add('shop-loca-span');
-                    break;
-                case 2:
-                    this.$refs.shopLoca[1].classList.add('shop-loca-span');
-                    break;
-                case 3:
-                    this.$refs.shopLoca[2].classList.add('shop-loca-span');
-                    break;
+            if (this.shopLocaIndex) {
+                this.$refs.shopLoca.forEach((item) => {
+                    item.classList.remove('shop-loca-span'); //清空所选店铺的样式
+                });
+
+                switch (this.shopLocaIndex) {
+                    case 1:
+                        this.$refs.shopLoca[0].classList.add('shop-loca-span');
+                        break;
+                    case 2:
+                        this.$refs.shopLoca[1].classList.add('shop-loca-span');
+                        break;
+                    case 3:
+                        this.$refs.shopLoca[2].classList.add('shop-loca-span');
+                        break;
+                }
             }
         },
 
@@ -1724,8 +1736,13 @@ export default {
                         .then(() => {
                             this.isReadonly = false;
                             this.isUpdate = false;
-                            this.createSeatFn(); //创建座位
-                            this.getStorageInfo(); //获取输入的缓存数据
+
+                            //如果有缓存就用缓存里的数据，否则就重新创建座位
+                            if (localStorage.getItem('storageInfo')) {
+                                this.getStorageInfo(); //获取输入的缓存数据
+                            } else {
+                                this.createSeatFn(); //创建座位
+                            }
                         })
                         .catch(() => {
                             this.$router.push('/index');
@@ -1839,9 +1856,6 @@ export default {
                 //回显banner视频
                 this.showBannerVideo();
 
-                // //座位属性回显
-                this.showSeatAtt();
-
                 //店铺定位初始化
                 this.initShopLocaStyle();
 
@@ -1850,6 +1864,9 @@ export default {
 
                 //回显已经选择的店铺类型
                 this.showCheckType();
+
+                // //座位属性回显
+                this.showSeatAtt();
             }
         },
 
@@ -1888,28 +1905,17 @@ export default {
             this.x = 20;
             this.y = 20;
             this.allSeatDetailInfo = [];
+        },
+
+        //座位行数/列数改变
+        changeSeatNum() {
+            if (!this.isReadonly) {
+                this.createSeatFn(); //创建座位
+            }
         }
     },
 
     watch: {
-        //行数变化就重新渲染座位
-        x(newVal, oldVal) {
-            if (!this.isReadonly) {
-                if (oldVal != newVal) {
-                    this.createSeatFn();
-                }
-            }
-        },
-
-        //列数变化就重新渲染座位
-        y(newVal, oldVal) {
-            if (!this.isReadonly) {
-                if (oldVal != newVal) {
-                    this.createSeatFn();
-                }
-            }
-        },
-
         //根据包间示意图的个数，来显示与隐藏上传图标
         'presentSeatInfo.sketchMap': {
             handler() {
