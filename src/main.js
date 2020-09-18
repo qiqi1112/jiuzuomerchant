@@ -49,6 +49,7 @@ const i18n = new VueI18n({
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
+    to.path == '/login'? store.commit('showChat', false):store.commit('showChat', true);
     document.title = `${to.meta.title} | 上座`;
     const role = JSON.parse(localStorage.getItem('userInfo'))|| ''
     if(!role && to.path !== '/login'){
@@ -56,22 +57,22 @@ router.beforeEach((to, from, next) => {
         this.$socket.disconnect();
     }else{
         if(role){
-            Vue.use(new VueSocketIO({
-                debug: true,
-                connection: 'http://192.168.31.94:9210',
-                vuex: {
-                    store,
-                    actionPrefix: 'SOCKET_',
-                    mutationPrefix: 'SOCKET_'
-                },
-                options: {
-                    path: "/socket.io",
-                    transports: [/*'polling', */'websocket'],
-                    query: {
-                        token:role.token ,
-                        signature:'123456'
-                    }}
-            }))
+            // Vue.use(new VueSocketIO({
+            //     debug: true,
+            //     connection: 'http://192.168.31.94:9210',
+            //     vuex: {
+            //         store,
+            //         actionPrefix: 'SOCKET_',
+            //         mutationPrefix: 'SOCKET_'
+            //     },
+            //     options: {
+            //         path: "/socket.io",
+            //         transports: [/*'polling', */'websocket'],
+            //         query: {
+            //             token:role.token ,
+            //             signature:'123456'
+            //         }}
+            // }))
         }
         next()
     }

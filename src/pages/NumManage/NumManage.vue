@@ -10,14 +10,14 @@
             </div>
 
             <div class="tit_top">
-                <span class="li_text">今日排号总数<span>24</span></span>
-                <span class="li_text">成功排号数<span>24</span></span>
-                <span class="li_text">当前排号总数<span>24</span></span>
-                <span class="li_text">今日取消排号数<span>24</span></span>
+                <span class="li_text">今日排号总数<span>{{todayData.todayTotalLy}}</span></span>
+                <span class="li_text">今日成功排号数<span>{{todayData.totalSuccessLy}}</span></span>
+                <span class="li_text">今日当前排号总数<span>{{todayData.nowTotalLy}}</span></span>
+                <span class="li_text">今日取消排号数<span>{{todayData.todayCancelTotalLy}}</span></span>
                 <br>
-                <span class="li_text">当前抢座总数<span>24</span></span>
-                <span class="li_text">成功抢座数<span>24</span></span>
-                <span class="li_text">今日抢座总数<span>24</span></span>
+                <span class="li_text">今日当前抢座总数<span>{{todayData.nowTotalVie}}</span></span>
+                <span class="li_text">今日成功抢座数<span>{{todayData.todaySuccessTotalVie}}</span></span>
+                <span class="li_text">今日抢座总数<span>{{todayData.todayTotalVie}}</span></span>
             </div>
             
             <div>
@@ -74,28 +74,28 @@
                         <span>当前排号</span>
                     </div>
                     <ul class="scl_box">
-                        <li class='li_n now_num' v-for="(item,index) in nowNumList" :key="index">
+                        <li class='li_n now_num' v-for="(item,index) in rowList" :key="index">
                             <div class="now_l">
                                 <div>
                                     <i class="el-icon-s-custom"></i>
                                     <span class="info">预计人数</span>
-                                    <span>{{item.num}}人</span>
+                                    <span>{{item.seatCapacity}}人</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-marketing"></i>
                                     <span class="info">预约座位</span>
-                                    <span>{{item.seat_type==1?'沙发软座':'硬座'}}</span>
+                                    <span>{{item.seatType==0?'无要求':(item.seatType==1?'沙发软座':'硬座')}}</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-release"></i>
                                     <span class="info">手机号码</span>
-                                    <span>{{item.tel | phoneNum}}</span>
+                                    <span>{{item.contactTel | phoneNum}}</span>
                                 </div>
                             </div>
                             <div class="now_r">
-                                <div>当前位于第<span class="num"> {{index+1}} </span>位 （{{item.seat_num}}）</div>
-                                <div>取号时间 <span class="tl">{{item.take_time}}</span></div>
-                                <div>等待时常 <span class="tl"> {{item.wait_time}}</span></div>
+                                <div>当前位于第<span class="num"> {{index+1}} </span>位 （{{item.codeNo}}）</div>
+                                <div>取号时间 <span class="tl">{{item.createTime}}</span></div>
+                                <div>等待时常 <span class="tl"> {{item.createTime | timeFormat}}</span></div>
                                 <div v-if="index==0 && callNext">
                                     <span class="stat">处于呼叫中....</span>
                                     <span class="btn" @click="ensure(item)">确定</span>
@@ -115,45 +115,32 @@
                             <el-date-picker
                                 v-model="time_now"
                                 :clearable="false"
-                                type="date"
-                                @focus="focSta=true"
+                                format='yyyy-MM-dd HH:mm'
                                 :editable="false"
+                                type="datetime"
+                                placeholder="选择日期时间"
+                                @focus="focSta=true"
                                 @blur="focSta=false"
-                                :time-arrow-control='true'
-                                placeholder="请选择时间">
+                                default-time="12:00:00">
                             </el-date-picker>
+
                             <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
                     </div>
-                    <ul>
-                        <li class='li_n suc_num'>
+                    <ul class="succ_canc_box">
+                        <li class='li_n suc_num' v-for="(item,index) in successList" :key="index">
                             <div class="su_l">
                                 <i class="el-icon-s-release"></i>
                                 <span class="tel_lab">手机号码</span>
-                                <span class="tel">135****4726</span>
+                                <span class="tel">{{item.contactTel | phoneNum}}</span>
                                 <span class="tex">等待时常</span>
-                                <span class="tim">00:01:10</span>
+                                <span class="tim">{{item.createTime | timeFormat}}</span>
                             </div>
                             <div class="su_l">
                                 <span class="get_lab">取号时间</span>
-                                <span class="get_tim">2020-11-19  23:54:03</span>
-                                <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">2020-11-19  23:55:13</span>
-                            </div>
-                        </li>
-                        <li class='li_n suc_num'>
-                            <div class="su_l">
-                                <i class="el-icon-s-release"></i>
-                                <span class="tel_lab">手机号码</span>
-                                <span class="tel">135****4726</span>
-                                <span class="tex">等待时常</span>
-                                <span class="tim">00:01:10</span>
-                            </div>
-                            <div class="su_l">
-                                <span class="get_lab">取号时间</span>
-                                <span class="get_tim">2020-11-19  23:54:03</span>
-                                <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">2020-11-19  23:55:13</span>
+                                <span class="get_tim">{{item.createTime}}</span>
+                                <!-- <span class="fai_lab">取消时间</span>
+                                <span class="fai_tim">{{item.offTime}}</span> -->
                             </div>
                         </li>
                     </ul>
@@ -166,46 +153,30 @@
                             <el-date-picker
                                 v-model="time_now_no"
                                 :clearable="false"
-                                type="date"
+                                type="datetime"
                                 @focus="focSta=true"
                                 :editable="false"
+                                format='yyyy-MM-dd HH:mm'
                                 @blur="focSta=false"
-                                :time-arrow-control='true'
                                 placeholder="请选择时间">
                             </el-date-picker>
                             <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
                     </div>
-                    <ul>
-                        <li class='li_n fail_num'>
+                    <ul class="succ_canc_box">
+                        <li class='li_n fail_num' v-for="(item,index) in cancelList" :key="index">
                             <div class="su_l">
                                 <i class="el-icon-s-release"></i>
                                 <span class="tel_lab">手机号码</span>
-                                <span class="tel">135****4726</span>
+                                <span class="tel">{{item.contactTel | phoneNum}}</span>
                                 <span class="tex">等待时常</span>
-                                <span class="tim">00:01:10</span>
+                                <span class="tim">{{item.createTime | timeFormat}}</span>
                             </div>
                             <div class="su_l">
                                 <span class="get_lab">取号时间</span>
-                                <span class="get_tim">2020-11-19  23:54:03</span>
+                                <span class="get_tim">{{item.createTime}}</span>
                                 <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">2020-11-19  23:55:13</span>
-                            </div>
-                        </li>
-                        <li class='li_n fail_num'>
-                            <div class="su_l">
-                                <i class="el-icon-s-release"></i>
-                                <span class="tel_lab">手机号码</span>
-                                <span class="tel">135****4726</span>
-                                <span class="tex">等待时常</span>
-                                <span class="tim">00:01:10</span>
-                            </div>
-                          
-                            <div class="su_l">
-                                <span class="get_lab">取号时间</span>
-                                <span class="get_tim">2020-11-19  23:54:03</span>
-                                <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">2020-11-19  23:55:13</span>
+                                <span class="fai_tim">{{item.offTime}}</span>
                             </div>
                         </li>
                     </ul>
@@ -216,6 +187,7 @@
 </template>
 
 <script>
+import { get } from '../../api';
 export default {
     data() {
         return {
@@ -252,12 +224,62 @@ export default {
                     seat_num:'C103'
                 }
             ],
+            todayData:{},//头部展示信息
+            robList:[],//抢座列表
+            rowList:[],//排号列表
+            successList:[],//成功排号列表
+            cancelList:[],//取消排号列表
         };
     },
     created(){
+        this.getData()
         this.time_now_no = this.time_now = new Date()
+
+        // console.log((new Date() - new Date('2020-09-18 16:17:48'))/8640000)
+    },
+    filters:{
+        timeFormat(time){
+            let diff = new Date().getTime() - new Date(time).getTime()
+            let getHours,minutes,seconds,leve1,leve2,leve3
+            leve1 =  diff%(24*3600*1000) 
+            getHours = Math.floor(leve1/(3600*1000))
+            leve2 =  leve1%(3600*1000) 
+            minutes = Math.floor(leve2/(60*1000))
+            leve3 = leve2%(60*1000) 
+            seconds = Math.floor(leve3/1000)
+            if(getHours<10){
+                getHours = '0' + getHours
+            }
+            if(minutes<10){
+                minutes = '0' + minutes
+            }
+            if(seconds<10){
+                seconds = '0' + seconds
+            }
+            return getHours + ':' + minutes + ':' + seconds
+        }
     },
     methods:{
+        getData(){
+            this.$get('/merchant/store/ly/storeLyList').then(res=>{
+                if(res.code == 0){
+                    this.todayData = {
+                        nowTotalLy:res.data.nowTotalLy,
+                        nowTotalVie:res.data.nowTotalVie,
+                        todayCancelTotalLy:res.data.todayCancelTotalLy,
+                        todayTotalLy:res.data.todayTotalLy,
+                        todayTotalVie:res.data.totalSuccessLy,
+                        totalSuccessLy:res.data.totalSuccessLy,
+                    }
+                    // this.robList = res.data
+                    this.rowList = res.data.nowLyList
+                    this.successList = res.data.successLyList
+                    this.cancelList = res.data.cancelLyList
+                }else{
+                    this.$message.error(res.data);
+                }
+            })
+        },
         ensure(val){
             this.callNext = false
             for(let i=0;i<this.nowNumList.length;i++){
@@ -418,6 +440,11 @@ export default {
                 color: red;
             }
         }
+        .succ_canc_box{
+            overflow-y: scroll;
+            height: 920px;
+        }
+        .succ_canc_box::-webkit-scrollbar {display:none}
         .scl_box::-webkit-scrollbar {display:none}
     }
 }
@@ -475,7 +502,7 @@ ul,li{
     padding-right: 0;
 }
 /deep/ .el-date-editor{
-    width: 114px;
+    width: 160px;
 }
 /deep/ .el-input__prefix{
     display: none;

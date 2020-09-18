@@ -101,11 +101,11 @@ export default {
                     index: 'coupons',
                     title: '优惠券'
                 },
-                {
-                    icon: 'el-icon-lx-text',
-                    index: 'service',
-                    title: '客服管理'
-                },
+                // {
+                //     icon: 'el-icon-lx-text',
+                //     index: 'service',
+                //     title: '客服管理'
+                // },
                 {
                     icon: 'el-icon-lx-commentfill',
                     index: 'log',

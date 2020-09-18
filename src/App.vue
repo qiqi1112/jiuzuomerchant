@@ -1,9 +1,11 @@
 <template>
     <div id="app" @click="close">
+        <chatRoom></chatRoom>
         <router-view></router-view>
     </div>
 </template>
 <script>
+import chatRoom from './components/common/ChatRoom'
 export default{
     data(){
         return{
@@ -13,11 +15,14 @@ export default{
     created(){
 
     },
+    components:{
+        chatRoom
+    },
     methods:{
         close(){
             this.$store.commit('change',2)
         }
-    }
+    },
 }
 
 

@@ -9,6 +9,7 @@ const store = new Vuex.Store({
     state:{
         popupState1:false,  
         popupState2:false, 
+        showChatRoom:true,
     },
     getters:{
 
@@ -23,6 +24,9 @@ const store = new Vuex.Store({
             }else if(type == 3){
                 state.popupState1 = true
             }
+        },
+        showChat(state,val){
+            state.showChatRoom = val
         }
     },
     // getters:{

@@ -115,6 +115,7 @@
         created() {
             // this.$socket.disconnect();
         },
+        
         sockets: {
             connect() {
                 console.log('连接成功');
@@ -369,38 +370,7 @@
                             }
                             .self {
                                 text-align: right;
-                                // .headImg{
-                                //     position: absolute;
-                                //     left: 0;
-                                //     flex: .08;
-                                //     img{
-                                //         height: 30px;
-                                //         width: 30px;
-                                //     }
-                                // }
-                                // .msg{
-                                //     position: absolute;
-                                //     flex: .92;
-                                //     left: 50px;
-                                // }
-
                             }
-                            // .other{
-                            //     .headImg{
-                            //         position: absolute;
-                            //         right: 0;
-                            //         flex: .08;
-                            //         img{
-                            //             height: 30px;
-                            //             width: 30px;
-                            //         }
-                            //     }
-                            //     .msg{
-                            //         position: absolute;
-                            //         flex: .92;
-                            //         right: 50px;
-                            //     }
-                            // }
                             .headImg {
                                 flex: .08;
                                 img {

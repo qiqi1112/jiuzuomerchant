@@ -149,7 +149,7 @@ export default {
                 pageNo:1,
                 pageSize:10,
             }
-            this.$post('/api/merchant/store/appraise/appraiseListByStoreId',data).then(res=>{
+            this.$post('/merchant/store/appraise/appraiseListByStoreId',data).then(res=>{
                 if(res.code == 0){
                     let lab = ''
                     res.data.forEach(i=>{

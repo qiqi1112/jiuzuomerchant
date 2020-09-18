@@ -72,13 +72,13 @@ export default new Router({
                         title: '评论管理'
                     }
                 },
-                {
-                    path: '/service',
-                    component: () => import('../pages/Service/Service.vue'),
-                    meta: {
-                        title: '客服管理'
-                    }
-                },
+                // {
+                //     path: '/service',
+                //     component: () => import('../pages/Service/Service.vue'),
+                //     meta: {
+                //         title: '客服管理'
+                //     }
+                // },
                 {
                     path: '/log',
                     component: () => import('../pages/Log/Log.vue'),
