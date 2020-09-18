@@ -6,6 +6,7 @@
                 <h4>
                     <span>店铺信息</span>
                     <el-button type="primary" @click="editShopInfo">编辑</el-button>
+                    <el-button type="success" v-if="!isReadonly">申请商家推荐</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly&&!isUpdate">暂存数据</el-button>
                     <el-button type="info" @click="cancelSubmit" v-if="!isReadonly&&isUpdate">取消</el-button>
@@ -415,7 +416,7 @@
                                 ></span>
                             </div>
                         </div>
-                        <div class="seat-num">
+                        <div>
                             <span>座位号：</span>
                             <el-input
                                 v-model="presentSeatInfo.seatCode"
@@ -424,7 +425,7 @@
                                 :readonly="isReadonly"
                             ></el-input>
                         </div>
-                        <div class="seat-num">
+                        <div>
                             <span>座位类型：</span>
                             <el-radio
                                 :disabled="isReadonly"
@@ -437,7 +438,7 @@
                                 label="2"
                             >硬座</el-radio>
                         </div>
-                        <div class="acc-people">
+                        <div>
                             <span>容纳人数：</span>
                             <el-input
                                 v-model="presentSeatInfo.numberOfPeople"
@@ -534,10 +535,18 @@
                     </div>
                     <!-- 当选择ktv时展示的座位属性 -->
                     <div v-if="isClickSeat && shopLocaIndex == 3" class="right-box">
-                        <p class="seat-detail">座位详情</p>
-                        <div class="seat-prop">
-                            <span>包间属性：</span>
-                            <div class="prop-box">
+                        <!-- 包间类型 -->
+                        <div>
+                            <span>包间类型：</span>
+                            <el-select v-model="ktvType" placeholder="请选择" style="width:50%">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                ></el-option>
+                            </el-select>
+                            <!-- <div class="prop-box">
                                 <span
                                     :class="item.style"
                                     v-for="(item,index) in seatAttOpt"
@@ -545,44 +554,42 @@
                                     :title="item.name"
                                     @click="changeStyle(item.style)"
                                 ></span>
-                            </div>
+                            </div>-->
                         </div>
-                        <div class="seat-num">
-                            <span>包间号/名称：</span>
-                            <el-input
+                        <!-- 包间所属 -->
+                        <div>
+                            <span>包间所属：</span>
+                            <el-radio v-model="ktvClassify" label="1">预定桌</el-radio>
+                            <el-radio v-model="ktvClassify" label="2">AA拼单桌</el-radio>
+                            <!-- <el-input
                                 v-model="presentSeatInfo.seatCode"
                                 placeholder="座位号"
                                 style="width:50%"
                                 :readonly="isReadonly"
+                            ></el-input>-->
+                        </div>
+                        <!-- 包间数量 -->
+                        <div>
+                            <span>包间数量：</span>
+                            <el-input
+                                v-model="presentSeatInfo.numberOfPeople"
+                                placeholder="包间数量/个"
+                                style="width:50%"
+                                :readonly="isReadonly"
                             ></el-input>
                         </div>
-                        <div class="acc-people">
+                        <!-- 容纳人数 -->
+                        <div>
                             <span>容纳人数：</span>
                             <el-input
                                 v-model="presentSeatInfo.numberOfPeople"
-                                placeholder="容纳人数"
+                                placeholder="容纳人数/人"
                                 style="width:50%"
                                 :readonly="isReadonly"
                             ></el-input>
                         </div>
-                        <div class="lon-retain">
-                            <span>保留最晚时间：</span>
-                            <el-time-select
-                                style="width:50%"
-                                v-model="presentSeatInfo.seatLatestReservationTime"
-                                :readonly="isReadonly"
-                                :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
-                                    start: startBussTime,
-                                    step: '00:10',
-                                    end: '23:50'
-                                } : {
-                                    start: startBussTime,
-                                    step: '00:10',
-                                    end: endBussTime
-                                }"
-                            ></el-time-select>
-                        </div>
-                        <div class="seat-num">
+                        <!-- 独立卫生间 -->
+                        <div>
                             <span>独立卫生间：</span>
                             <el-radio
                                 :disabled="isReadonly"
@@ -595,7 +602,8 @@
                                 label="2"
                             >无</el-radio>
                         </div>
-                        <div class="mahjong">
+                        <!-- 机麻 -->
+                        <div>
                             <span>机麻：</span>
                             <el-input
                                 v-model="presentSeatInfo.mahjong"
@@ -604,8 +612,19 @@
                                 :readonly="isReadonly"
                             ></el-input>桌
                         </div>
+                        <!-- 时间段分布 -->
+                        <div class="date-dist">
+                            <p>时间段分布：</p>
+                        </div>
+                        <!-- 零嘴 -->
                         <div class="snacks">
-                            <span class="snacks">零嘴：</span>
+                            <p>
+                                零嘴：
+                                <span
+                                    v-if="presentSeatInfo.snacks.length == 0 && isReadonly"
+                                    style="margin-left:74px"
+                                >无</span>
+                            </p>
                             <div class="snacks-detail">
                                 <ul>
                                     <li v-for="(item,index) in presentSeatInfo.snacks" :key="index">
@@ -631,10 +650,6 @@
                                         >删除</el-button>
                                     </li>
                                 </ul>
-                                <span
-                                    v-if="presentSeatInfo.snacks.length == 0 && isReadonly"
-                                    style="margin-left:74px"
-                                >无</span>
                                 <div class="snacks-form" v-if="!isReadonly">
                                     <el-input
                                         style="width:90px"
@@ -659,7 +674,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="ktv-banner">
+                        <!-- <div class="lon-retain">
+                            <span>保留最晚时间：</span>
+                            <el-time-select
+                                style="width:50%"
+                                v-model="presentSeatInfo.seatLatestReservationTime"
+                                :readonly="isReadonly"
+                                :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
+                                    start: startBussTime,
+                                    step: '00:10',
+                                    end: '23:50'
+                                } : {
+                                    start: startBussTime,
+                                    step: '00:10',
+                                    end: endBussTime
+                                }"
+                            ></el-time-select>
+                        </div>-->
+                        <!-- ktv包间示意图 -->
+                        <!-- <div class="ktv-banner">
                             <span>包间示意图：</span>
                             <div v-if="isReadonly&&presentSeatInfo.sketchMap.length > 0">
                                 <div v-for="(item,index) in presentSeatInfo.sketchMap" :key="index">
@@ -680,8 +713,9 @@
                             >
                                 <i class="el-icon-plus"></i>
                             </el-upload>
-                        </div>
-                        <div class="min-charge">
+                        </div>-->
+                        <!-- 最低消费 -->
+                        <!-- <div class="min-charge">
                             <span class="min-con">最低消费：</span>
                             <div class="day-mincom">
                                 <p>
@@ -748,7 +782,7 @@
                                     ></el-input>元/人
                                 </p>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
@@ -856,7 +890,32 @@ export default {
             isClickSeat: false, //展示当前座位的详细信息开关
 
             snackName: '', //当前座位的零嘴名称
-            snackNum: '' //当前座位的零嘴数量
+            snackNum: '', //当前座位的零嘴数量
+
+            options: [
+                {
+                    value: '选项1',
+                    label: '黄金糕'
+                },
+                {
+                    value: '选项2',
+                    label: '双皮奶'
+                },
+                {
+                    value: '选项3',
+                    label: '蚵仔煎'
+                },
+                {
+                    value: '选项4',
+                    label: '龙须面'
+                },
+                {
+                    value: '选项5',
+                    label: '北京烤鸭'
+                }
+            ],
+            ktvType: '',
+            ktvClassify: ''
         };
     },
     methods: {
@@ -908,27 +967,6 @@ export default {
             return isJPG || isPNG || isMP4;
         },
 
-        //上传ktv包间示意图之前的验证
-        beforektvBannerUpload(file) {
-            console.log('上传之前', file);
-
-            const isJPG = file.type === 'image/jpeg';
-            const isPNG = file.type === 'image/png';
-            // const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
-
-            //限制上传文件格式
-            if (!isJPG && !isPNG) {
-                this.$message.error('上传文件只能是 JPG / PNG 格式');
-            }
-
-            //显示上传文件大小
-            // if (!isLt2M) {
-            //     this.$message.error('上传文件大小不能超过 2MB!');
-            // }
-
-            return isJPG || isPNG;
-        },
-
         //上传banner图
         uploadBannerFiles(file) {
             let formData = new FormData();
@@ -936,22 +974,6 @@ export default {
             this.$file_post(this.filesUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.bannerShowBox.push(res.data[0]);
-                    this.$message.success('上传成功');
-                }
-            });
-        },
-
-        //上传ktv包间示意图
-        uploadktvBannerFiles(file) {
-            let formData = new FormData();
-            formData.append('files', file.file);
-            this.$file_post(this.filesUploadUrl, formData).then((res) => {
-                if (res.code == 0) {
-                    if (!this.presentSeatInfo.sketchMap) {
-                        this.presentSeatInfo.sketchMap = [];
-                    }
-
-                    this.presentSeatInfo.sketchMap.push(res.data[0]);
                     this.$message.success('上传成功');
                 }
             });
@@ -974,23 +996,6 @@ export default {
             });
         },
 
-        //回显ktv包间示意图（回显在上传图集的容器中）
-        showKtvBannerImg() {
-            this.ktvBannerImgBox = [];
-
-            //给每张图片加上前缀
-            let ktvBannerArr = this.presentSeatInfo.sketchMap.map((item) => {
-                return (item = this.showImgPrefix + item);
-            });
-
-            //存入对象，回显到页面上
-            ktvBannerArr.forEach((item2) => {
-                let obj = {};
-                obj.url = item2;
-                this.ktvBannerImgBox.push(obj);
-            });
-        },
-
         //回显banner视频（回显在自定义的位置）
         showBannerVid() {
             this.bannerVideo = [];
@@ -1010,14 +1015,68 @@ export default {
             });
         },
 
+        //上传ktv包间示意图之前的验证
+        // beforektvBannerUpload(file) {
+        //     console.log('上传之前', file);
+
+        //     const isJPG = file.type === 'image/jpeg';
+        //     const isPNG = file.type === 'image/png';
+        //     // const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
+
+        //     //限制上传文件格式
+        //     if (!isJPG && !isPNG) {
+        //         this.$message.error('上传文件只能是 JPG / PNG 格式');
+        //     }
+
+        //     //显示上传文件大小
+        //     // if (!isLt2M) {
+        //     //     this.$message.error('上传文件大小不能超过 2MB!');
+        //     // }
+
+        //     return isJPG || isPNG;
+        // },
+
+        //上传ktv包间示意图
+        // uploadktvBannerFiles(file) {
+        //     let formData = new FormData();
+        //     formData.append('files', file.file);
+        //     this.$file_post(this.filesUploadUrl, formData).then((res) => {
+        //         if (res.code == 0) {
+        //             if (!this.presentSeatInfo.sketchMap) {
+        //                 this.presentSeatInfo.sketchMap = [];
+        //             }
+
+        //             this.presentSeatInfo.sketchMap.push(res.data[0]);
+        //             this.$message.success('上传成功');
+        //         }
+        //     });
+        // },
+
+        //回显ktv包间示意图（回显在上传图集的容器中）
+        // showKtvBannerImg() {
+        //     this.ktvBannerImgBox = [];
+
+        //     //给每张图片加上前缀
+        //     let ktvBannerArr = this.presentSeatInfo.sketchMap.map((item) => {
+        //         return (item = this.showImgPrefix + item);
+        //     });
+
+        //     //存入对象，回显到页面上
+        //     ktvBannerArr.forEach((item2) => {
+        //         let obj = {};
+        //         obj.url = item2;
+        //         this.ktvBannerImgBox.push(obj);
+        //     });
+        // },
+
         // 删除ktv包间示意图
-        ktvBannerRemove(file, fileList) {
-            this.presentSeatInfo.sketchMap.forEach((item, i) => {
-                if (this.showImgPrefix + item == file.url) {
-                    this.presentSeatInfo.sketchMap.splice(i, 1);
-                }
-            });
-        },
+        // ktvBannerRemove(file, fileList) {
+        //     this.presentSeatInfo.sketchMap.forEach((item, i) => {
+        //         if (this.showImgPrefix + item == file.url) {
+        //             this.presentSeatInfo.sketchMap.splice(i, 1);
+        //         }
+        //     });
+        // },
 
         //上传商家布局图
         uploadOverallFile(file) {
@@ -1355,7 +1414,7 @@ export default {
                     this.presentSeatInfo.seatType = stageCode;
 
                     //回显当前座位对应的包间示意图
-                    this.showKtvBannerImg();
+                    // this.showKtvBannerImg();
 
                     console.log('cccc', this.presentSeatInfo);
                 }
@@ -1373,7 +1432,7 @@ export default {
                     this.presentSeatInfo = item;
 
                     //回显当前座位对应的包间示意图
-                    this.showKtvBannerImg();
+                    // this.showKtvBannerImg();
                 }
             });
         },
@@ -2442,12 +2501,13 @@ export default {
                 align-items: center;
             }
 
-            .is-toilet {
-                display: flex;
-                align-items: center;
-            }
-
             .snacks {
+                display: block;
+
+                > p {
+                    margin-bottom: 10px;
+                }
+
                 .snacks-detail {
                     .mult {
                         margin: 0 3px;
@@ -2455,7 +2515,6 @@ export default {
 
                     li {
                         display: flex;
-                        justify-content: space-between;
                         align-items: center;
                         margin-bottom: 10px;
 
@@ -2482,35 +2541,41 @@ export default {
                 }
             }
 
-            .ktv-banner {
-                align-items: flex-start;
-                > span {
-                    width: 142px;
-                }
-                > div {
-                    width: 100%;
-                    display: flex;
-                    flex-wrap: wrap;
-                }
-                img {
-                    width: 150px;
-                    height: 80px;
-                    margin: 0 8px 6px 0;
-                    border-radius: 6px;
-                }
-                /deep/ .el-upload-list--picture-card .el-upload-list__item {
-                    transition: none;
-                    width: 150px;
-                    height: 80px;
-                    margin: 0 8px 6px 0;
-                }
-
-                /deep/ .el-upload--picture-card {
-                    width: 150px;
-                    height: 80px;
-                    line-height: 80px;
+            .date-dist {
+                > p {
+                    margin-bottom: 10px;
                 }
             }
+
+            // .ktv-banner {
+            //     align-items: flex-start;
+            //     > span {
+            //         width: 142px;
+            //     }
+            //     > div {
+            //         width: 100%;
+            //         display: flex;
+            //         flex-wrap: wrap;
+            //     }
+            //     img {
+            //         width: 150px;
+            //         height: 80px;
+            //         margin: 0 8px 6px 0;
+            //         border-radius: 6px;
+            //     }
+            //     /deep/ .el-upload-list--picture-card .el-upload-list__item {
+            //         transition: none;
+            //         width: 150px;
+            //         height: 80px;
+            //         margin: 0 8px 6px 0;
+            //     }
+
+            //     /deep/ .el-upload--picture-card {
+            //         width: 150px;
+            //         height: 80px;
+            //         line-height: 80px;
+            //     }
+            // }
         }
     }
 
