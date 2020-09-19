@@ -53,4 +53,10 @@ export default{
     height: 20px;
     
 }
+.text_over{
+    overflow:hidden; 
+    text-overflow:ellipsis;
+    display:-webkit-box; 
+    -webkit-box-orient:vertical;
+}
 </style>

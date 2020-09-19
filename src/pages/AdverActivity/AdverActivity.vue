@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="">
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
@@ -14,49 +14,54 @@
                     type="primary"
                     icon="el-icon-delete"
                     class="handle-del mr10"
-                    @click="handleEdit()"
+                    @click="addNewAct()"
                 >新增活动</el-button>
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-input v-model="query.text" placeholder="活动主题" class="handle-input mr10"></el-input>
+                <el-date-picker
+                    v-model="query.times"
+                    type="datetimerange"
+                    format='yyyy-MM-dd HH:mm'
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期">
+                </el-date-picker>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
                 :data="tableData"
                 border
                 class="table"
-                 @row-dblclick="lineDb"
+                @row-dblclick="lineDb"
                 ref="multipleTable"
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
             >
-                <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="act_name" min-width="200" label="活动主题"></el-table-column>
-                <el-table-column label="活动简介" min-width="100">
-                    <template slot-scope="scope">{{scope.row.act_release}}</template>
-                </el-table-column>
-                <el-table-column prop="act_introduce" label="活动开始时间" min-width="220"></el-table-column>
-                <el-table-column label="标签" prop="act_lable" min-width="250" align="center">
+                <el-table-column prop="id" label="ID" fixed width="180" align="center"></el-table-column>
+                <el-table-column prop="name" min-width="200" label="活动主题"></el-table-column>
+                <el-table-column label="活动简介" min-width="200">
                     <template slot-scope="scope">
-                        <span class="lab_span"  v-for="(item,index) in scope.row.act_lable" :key="index">{{item}}</span>
+                        <div class="text_over t_o">{{scope.row.synopsis}}</div> 
                     </template>
                 </el-table-column>
-                <el-table-column label="活动缩略图" align="center" min-width="300">
+                <el-table-column prop="startTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
+                <el-table-column prop="endTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
+                <el-table-column label="标签" prop="labelsList" min-width="250" align="center">
+                    <template slot-scope="scope">
+                        <span class="lab_span"  v-for="(item,index) in scope.row.labelsList" :key="index">{{item}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="活动缩略图" align="center" min-width="180">
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
-                            v-for="(item,index) in scope.row.banner_list" :key="index"
-                            :src="item"
-                            :preview-src-list="scope.row.banner_list"
+                            :src="'/file/admin/system/upload/down?keyName='+scope.row.banner"
                         ></el-image>
                     </template>
                 </el-table-column>
                 <el-table-column prop="act_content"  class-name="beyond" min-width="320"  label="活动内容">
                     <template slot-scope="scope">
                         <div class="com_del_box">
-                            {{scope.row.act_content}}
+                            {{scope.row.content | editorText}}
                         </div>
                     </template>
                 </el-table-column>
@@ -89,7 +94,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog :title="doing" :visible.sync="editVisible" width="32%">
+        <el-dialog :title="doing" :visible.sync="editVisible" width="54%" >
             <el-form ref="form" :model='form'  label-width="70px">
                 <div class="column">
                     <span class="line lw2"></span>
@@ -103,6 +108,16 @@
                             </el-form-item>
                             <el-form-item label="活动简介">
                                 <el-input type="textarea" v-model="dynamicValidateForm.dio_introduce"></el-input>
+                            </el-form-item>
+                            <el-form-item label="活动时间">
+                                 <el-date-picker
+                                    v-model="dynamicValidateForm.times"
+                                    type="datetimerange"
+                                    range-separator="至"
+                                    format='yyyy-MM-dd HH:mm'
+                                    start-placeholder="开始日期"
+                                    end-placeholder="结束日期">
+                                </el-date-picker>
                             </el-form-item>
                             <div class="lab_box">
                                 <label class="label">活动标签</label>
@@ -127,20 +142,19 @@
                             </div>
                         </div>                   
                     </div>
-                    <div class="banner">
+                    <div class="banner"  v-loading="loading">
                         <div class="imgs">
                             <p>活动Banner图:</p>
                             <el-upload
+                                class="avatar-uploader"
                                 action="fakeaction"
-                                multiple
-                                list-type="picture-card"
-                                :http-request="uploadSectionFile"
+                                :show-file-list="false"
+                                :on-remove="handleRemove"
                                 :on-change="handleChange"
-                                :limit='5'
-                                :file-list="fileList"
-                                :auto-upload="false"
-                                :on-remove="handleRemove">
-                                <i class="el-icon-plus"></i>
+                                :http-request="uploadSectionFile"
+                                >
+                                <img v-if="dynamicValidateForm.fromdata" :src="'/file/admin/system/upload/down?keyName='+dynamicValidateForm.fromdata" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
                             <el-dialog :visible.sync="dialogVisible">
                                 <img width="100%" :src="dialogImageUrl" alt="" >
@@ -149,13 +163,13 @@
                     </div> 
                 </div>
                 <div class="editor">
-                    <editor :formData="dynamicValidateForm"></editor>
+                    <editor :formData="dynamicValidateForm" @getChild='theEditorContent'></editor>
                 </div>
             </el-form>
-            <!-- <span slot="footer" class="dialog-footer">
+            <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">重置</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span> -->
+            </span>
         </el-dialog>
     </div>
 </template>
@@ -167,46 +181,12 @@ export default {
     data() {
         return {
             query: {
-                address: '',
-                name: '',
+                times:[],
+                text: '',
                 pageIndex: 1,
                 pageSize: 10,
             },
-            fileList: [
-                
-            ],
-            tableData: [
-                {
-                    id:1,
-                    act_name:'双十一秒杀',
-                    act_release:'2020-11-11',
-                    banner_list:['img/2.jpg','img/3.jpg','img/4.jpg'],
-                    act_url:'www.baidu.com',
-                    act_introduce:'企业成员编辑项目后',
-                    act_lable:['秒杀','限时','拼单'],
-                    act_content:'企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示',
-                },
-                {
-                    id:2,
-                    act_name:'春节优惠',
-                    act_release:'2021-01-20',
-                    banner_list:['img/timg.jpg','img/5.jpg','img/6.jpg'],
-                    act_url:'www.baidu.com',
-                    act_introduce:'企业成员编辑项目后',
-                    act_lable:['秒杀'],
-                    act_content:'企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示',
-                },
-                {
-                    id:3,
-                    act_name:'春节优惠aaabb',
-                    act_release:'2021-01-20',
-                    banner_list:['img/timg.jpg','img/2.jpg'],
-                    act_url:'www.baidu.com',
-                    act_introduce:'企业成员编辑项目后',
-                    act_lable:['秒杀','限时'],
-                    act_content:'企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示企业成员编辑项目后，会按时间顺序在这里显示',
-                },
-            ],
+            tableData: [],
             dio_name:'',
             dio_introduce:'',
             multipleSelection: [],
@@ -220,17 +200,18 @@ export default {
             dialogImageUrl:'',
             dialogVisible: false,   
             doing:'',
-            value1: '',
-            addNum:1,
             dynamicValidateForm: {
                 domains: [{
                     value: ''
                 }],//标签
                 dio_name:'',//名字
                 dio_introduce:'',//简介
-                fromdata:[],//图片
+                fromdata:'',//图片
                 editor_text:'',//富文本
-            }
+                times:[],
+                id:''
+            },
+            loading: false
         }
     },  
     components:{
@@ -238,23 +219,9 @@ export default {
     },
     created() {
         this.getData();
-        this.pageTotal = this.tableData.length
     },
     methods: {
         // 新增活动标签相关
-        submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-            if (valid) {
-                alert('submit!');
-            } else {
-                console.log('error submit!!');
-                return false;
-            }
-            });
-        },
-        resetForm(formName) {
-            this.$refs[formName].resetFields();
-        },
         removeDomain(item) {
             var index = this.dynamicValidateForm.domains.indexOf(item)
             if (index !== -1) {
@@ -263,12 +230,21 @@ export default {
         },
         addDomain() {
             this.dynamicValidateForm.domains.push({
-                
             });
         },
-        // 获取 easy-mock 的模拟数据
+        theEditorContent(val){
+            this.dynamicValidateForm.editor_text = val
+        },
         getData() {
-            
+            let data = {
+                name:this.query.text,
+                startTime: this.query.times[0]?this.$regular.timeData(this.query.times[0],3) +':00' : null ,
+                endTime:this.query.times[1]?this.$regular.timeData(this.query.times[1],3) +':00' : null ,
+            }
+            this.$post('/merchant/store/active/getActive',data).then((res) => {
+                this.tableData = res.data
+                this.pageTotal = res.data.length
+            })
         },
         // 触发搜索按钮
         handleSearch() {
@@ -282,8 +258,15 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    this.$message.success('删除成功');
-                    this.tableData.splice(index, 1);
+                    this.$Delete(`/merchant/store/active/deleteById/${row.id}`).then((res) => {
+                        if(res.code == 0){
+                            this.$message.success(`删除成功`);
+                            this.tableData.splice(index, 1);
+                        }else{
+                            this.$message.error(res.msg);
+                        }
+                        this.loading = false
+                    })    
                 })
                 .catch(() => {});
         },
@@ -291,55 +274,99 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
-        delAllSelection() {
-            const length = this.multipleSelection.length;
-            let str = '';
-            this.delList = this.delList.concat(this.multipleSelection);
-            for (let i = 0; i < length; i++) {
-                str += this.multipleSelection[i].name + ' ';
+        // 新增活动
+        addNewAct(index='', row='') {
+            if(this.dynamicValidateForm.id){
+                this.dynamicValidateForm={
+                    domains: [{
+                        value: ''
+                    }],//标签
+                    dio_name:'',//名字
+                    dio_introduce:'',//简介
+                    fromdata:'',//图片
+                    editor_text:'',//富文本
+                    times:[],
+                    id:''
+                }
             }
-            this.$message.error(`删除了${str}`);
-            this.multipleSelection = [];
+            this.editVisible = true;
         },
-        // 编辑操作
-        // handleEdit(index='', row='') {
-        //     this.form = {}
-        //     if(row){
-        //         this.idx = index;
-        //         this.form = row;
-        //     }
-        //     this.editVisible = true;
-        // },
-        lineDb(row, column, event){
-            console.log(row, column, event = '')
-            var file_name = '';
-            for(let i=0;i<row.banner_list.length;i++){
-                file_name =  row.banner_list[i].split('/')
-                this.fileList[i] = {
-                    name:file_name[1],
-                    url:row.banner_list[i]
-                }
-            }
-            let str = '<p>sdf  杀顶发是方式打分杀顶发杀顶f32</p><p>3</p><p>4</p><p>53</p><p>45</p><p><br></p><p>53</p><p>5</p><p>3</p><p>5<span style="color: rgb(230, 0, 0);">23</span></p><p><span style="color: rgb(230, 0, 0);">4</span></p><p><span style="color: rgb(230, 0, 0);">2</span></p><p><span style="color: rgb(230, 0, 0);">42</span></p><p><span style="color: rgb(230, 0, 0);">4</span></p><p><span style="color: rgb(230, 0, 0);">23</span></p><p><span style="color: rgb(230, 0, 0);">4</span></p><p><span style="color: rgb(230, 0, 0);">2阿松大</span></p>'
-            this.dynamicValidateForm.dio_name = row.act_name
-            this.dynamicValidateForm.dio_introduce = row.act_introduce
-            this.dynamicValidateForm.editor_text = str
-            for(let j=0;j<row.act_lable.length;j++){
+        //编辑
+        lineDb(row, index,column, event){
+            this.dynamicValidateForm.dio_name = row.name
+            this.dynamicValidateForm.dio_introduce = row.synopsis
+            this.dynamicValidateForm.id = row.id
+            this.dynamicValidateForm.editor_text = row.content
+            this.dynamicValidateForm.times = [row.startTime,row.endTime]
+            this.dynamicValidateForm.fromdata = row.banner
+            for(let j=0;j<row.labelsList.length;j++){
                 this.dynamicValidateForm.domains[j] = {
-                    value:row.act_lable[j]
+                    value:row.labelsList[j]
                 }
-            }
-            this.form = {}
-            if(row){
-                this.form = row;
             }
             this.editVisible = true;
         },
         // 保存编辑
         saveEdit() {
-            this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            this.$set(this.tableData, this.idx, this.form);
+            let str=''
+            this.dynamicValidateForm.domains.forEach(i=>{
+                str += i.value +','
+            })
+            str = str.substr(0,str.length-1)
+            let data = {
+                content:this.dynamicValidateForm.editor_text,
+                id:this.dynamicValidateForm.id,
+                labels:str,
+                name:this.dynamicValidateForm.dio_name,
+                startTime:this.$regular.timeData(this.dynamicValidateForm.times[0],3) +':00' ,
+                endTime:this.$regular.timeData(this.dynamicValidateForm.times[1],3) +':00' ,
+                synopsis:this.dynamicValidateForm.dio_introduce,
+                banner:this.dynamicValidateForm.fromdata,
+            }
+
+
+            if(!data.name){
+                this.$message.warning(`请输入活动名称`);
+                return 
+            }
+            if(!data.synopsis){
+                this.$message.warning(`请输入活动简介`);
+                return 
+            }
+            if(!data.labels){
+                this.$message.warning(`请输入活动标签`);
+                return 
+            }
+            if(!data.banner){
+                this.$message.warning(`请添加活动图片`);
+                return 
+            }
+            if(!data.startTime){
+                this.$message.warning(`请选择活动开始时间`);
+                return 
+            }
+            if(!data.content){
+                this.$message.warning(`请输入活动内容`);
+                return 
+            }
+
+            let url,type;
+            if(this.dynamicValidateForm.id){
+                type = this.$put
+                url = "/merchant/store/active/update"    
+            }else{
+                type = this.$post
+                url = "/merchant/store/active/save"
+            }
+            type(url,data).then((res) => {
+                if(res.code == 0){
+                    this.$message.success(`操作成功`);
+                    this.editVisible = false;
+                    this.getData()
+                }else{
+                    this.$message.error(res.msg);
+                }
+            })
         },
         // 分页导航
         handlePageChange(val) {
@@ -347,38 +374,48 @@ export default {
             this.getData();
         },
         // 图片上传
-        getimg(){
+        uploadImg(){
             let config = {
                 "Content-Type":"multipart/form-data"
             };
             let fromdata = new FormData();
-            var files = this.dynamicValidateForm.fromdata;
-            for(let file of  files){
-                fromdata.append("files",file.raw);
-            }
-            this.$file_post('/admin/system/upload/createBatch',fromdata,config).then((res) => {
-                this.$message.success('上传成功');
+            fromdata.append('file',this.formData)
+            this.$file_post('/admin/system/upload/create',fromdata,config).then((res) => {
+                if(res.code == 0){
+                    this.dynamicValidateForm.fromdata = res.data
+                }else{
+                    this.$message.error(`图片上传失败，请刷新后再试`);
+                }
+                this.loading = false
             })
         },
         handleRemove(file, fileList) {
-            this.dynamicValidateForm.fromdata.forEach((i,index)=>{
+            this.formData.forEach((i,index)=>{
                 if(file.name == i.name){
-                    this.dynamicValidateForm.fromdata.splice(index,1)
+                    this.formData.splice(index,1)
                 }
             })
         },
         handleChange(file, fileList) {
-            this.formData.push(file)
-            this.dynamicValidateForm.fromdata = this.formData
+            this.formData = file.raw
         },
         uploadSectionFile(file){
+            this.loading = true
+            this.uploadImg()
         },
     }
 };
 </script>
 
 <style scoped lang='less'>
-
+.handle-box{
+    .el-date-editor{
+        margin-right: 10px;
+    }
+}
+.t_o{
+    -webkit-line-clamp: 2;
+}
 .top_info{
     display: flex;
     .activity{
@@ -408,12 +445,16 @@ export default {
             }
             .iptList{
                 width: calc(100% - 70px);
+                i{
+                    cursor: pointer;
+                }
             }
         }
         .addLab{
             height: 32px;
             width: 32px;
             vertical-align: middle;
+            cursor: pointer;
         }
     }
     .banner{
@@ -424,6 +465,32 @@ export default {
                 margin-bottom: 15px;
             }
         }
+    }
+    /deep/.el-upload--text{
+        width: 300px;
+    }
+    /deep/.avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    /deep/.avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    /deep/.avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 298px;
+        height: 178px;
+        display: block;
     }
 }
 .handle-box {

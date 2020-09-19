@@ -431,7 +431,7 @@ export default {
         }
         /deep/ .quick {
             flex: .28;
-            background: #f5f5f5;
+            background: #f9f9f9;
             border-left: 1px solid @border-color;
             box-sizing: border-box;
             .goods_list {

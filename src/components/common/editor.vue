@@ -68,10 +68,10 @@
                 </div>  
             </quill-editor>
         </div>
-        <div class="btn_bom">
+        <!-- <div class="btn_bom">
             <el-button class="editor-btn" @click="submit">重置</el-button>
             <el-button class="editor-btn" type="primary" @click="submit">确定</el-button>
-        </div>
+        </div> -->
 
     </div>
 </template>
@@ -132,8 +132,14 @@
             formData:{
                 deep: true,
                 handler(newValue, oldValue) {
+                    this.content = this.formData.editor_text
                 },
             },
+            content:{
+                handler(newValue, oldValue) {
+                    this.debounce(this.toParent, 500);
+                },
+            }
         },
         components: {
             quillEditor
@@ -161,6 +167,19 @@
             // this.content = '<p>ooo</p><p>1</p><p>1</p><p>1</p><p>1</p><p><br></p><p>1</p><p>1</p><p>3s</p><p>df</p><p>2df2</p><p>2ef分</p><p>22</p><p>ddddd交换机端口积分是否杀顶方式打分杀顶发sf</p><p><strong style="color: rgb(240, 102, 102);">啊大大大师的</strong></p>'
         },
         methods: {
+            // 防抖
+            debounce(fn, wait) {
+                if (this.fun !== null) {
+                    clearTimeout(this.fun);
+                }
+                this.fun = setTimeout(fn, wait);
+            },
+
+            toParent(){
+                this.$emit('getChild',this.content)
+            },
+
+            
             onEditorChange({ editor, html, text }) {
                 this.content = html;
             },

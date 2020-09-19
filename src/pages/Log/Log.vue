@@ -15,15 +15,13 @@
                 :data="tableData" border class="table" 
                 ref="multipleTable" 
                 header-cell-class-name="table-header" 
-                @row-dblclick="lineDb"
             >
-                <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="order_id" min-width="120" label="角色"></el-table-column>
-                <el-table-column prop="user_name" min-width="200" label="访问标题"></el-table-column>
-                <el-table-column prop="order_type" min-width="300" label="访问地址"></el-table-column>  
-                <el-table-column prop="tel" min-width="200" label="备注说明"></el-table-column>
+                <el-table-column prop="id" label="ID" fixed width="180" align="center"></el-table-column>
+                <el-table-column prop="title" min-width="200" label="访问标题"></el-table-column>
+                <el-table-column prop="uri" min-width="300" label="访问地址"></el-table-column>  
+                <el-table-column prop="result" min-width="200" label="备注说明"></el-table-column>
                 <el-table-column prop="order_state" min-width="100" label="访问次数"></el-table-column>
-                <el-table-column prop="creat_time" min-width="200" label="最近访问IP"></el-table-column>
+                <el-table-column prop="ip" min-width="200" label="最近访问IP"></el-table-column>
                 <el-table-column prop="remark" min-width="200" label="最近访问时间"></el-table-column>  
             </el-table>
             <div class="pagination">
@@ -53,56 +51,7 @@ export default {
                 pageSize: 10,
                 tel:'',
             },
-            tableData: [
-                {
-                    id:1,
-                    order_id:'20184512120',
-                    user_name:'张三',
-                    order_type:'预定',
-                    tel:19999999999,
-                    creat_time:'2020-08-12 22:00',
-                    order_state:'1',
-                    pay_type:'微信支付',
-                    pay_time:'2020-08-12 22:10',
-                    total:'1000',
-                    is_coupons:1,
-                    coupons_total:'50',
-                    remark:'快点快点快点快点快点快点',
-                    order_detail:'202卡座'
-                },
-                {
-                    id:2,
-                    order_id:'20184512120',
-                    user_name:'李四',
-                    order_type:'预定',
-                    tel:19999999999,
-                    creat_time:'2020-08-12 22:00',
-                    order_state:'1',
-                    pay_type:'微信支付',
-                    pay_time:'2020-08-12 22:10',
-                    total:'1000',
-                    is_coupons:1,
-                    coupons_total:'50',
-                    remark:'快点快点快点快点快点快点',
-                    order_detail:'202卡座'
-                },
-                {
-                    id:3,
-                    order_id:'20184512120',
-                    user_name:'李四斯',
-                    order_type:'预定',
-                    tel:19999999999,
-                    creat_time:'2020-08-12 22:00',
-                    order_state:'1',
-                    pay_type:'微信支付',
-                    pay_time:'2020-08-12 22:10',
-                    total:'1000',
-                    is_coupons:1,
-                    coupons_total:'50',
-                    remark:'快点快点快点快点快点快点',
-                    order_detail:'202卡座'
-                },
-            ],
+            tableData: [],
             multipleSelection: [],
             delList: [],
             editVisible: false,
@@ -114,26 +63,17 @@ export default {
     },
     created() {
         this.getData();
-        this.pageTotal = this.tableData.length
     },
     methods: {
-        // 获取 easy-mock 的模拟数据
         getData() {
-            
-        },
-        // 触发搜索按钮
-        handleSearch() {
-            this.$set(this.query, 'pageIndex', 1);
-            this.getData();
-        },
- 
-        // 双击某一行
-        lineDb(row, column, event){
-            this.form = {}
-            if(row){
-                this.form = row;
+            let data = {
+                pageSize: 20,
+                pageNo:1,
             }
-            this.editVisible = true;
+            this.$post('/merchant/store/log/logLimit',data).then((res) => {
+                this.tableData = res.data.list
+                this.pageTotal = res.data.total
+            })
         },
         // 分页导航
         handlePageChange(val) {
