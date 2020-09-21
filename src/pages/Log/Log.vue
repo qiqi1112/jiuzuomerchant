@@ -20,9 +20,9 @@
                 <el-table-column prop="title" min-width="200" label="访问标题"></el-table-column>
                 <el-table-column prop="uri" min-width="300" label="访问地址"></el-table-column>  
                 <el-table-column prop="result" min-width="200" label="备注说明"></el-table-column>
-                <el-table-column prop="order_state" min-width="100" label="访问次数"></el-table-column>
+                <!-- <el-table-column prop="order_state" min-width="100" label="访问次数"></el-table-column> -->
                 <el-table-column prop="ip" min-width="200" label="最近访问IP"></el-table-column>
-                <el-table-column prop="remark" min-width="200" label="最近访问时间"></el-table-column>  
+                <el-table-column prop="createTime" min-width="200" label="最近访问时间"></el-table-column>  
             </el-table>
             <div class="pagination">
                 <el-pagination
@@ -67,8 +67,8 @@ export default {
     methods: {
         getData() {
             let data = {
-                pageSize: 20,
-                pageNo:1,
+                pageSize: this.query.pageSize,
+                pageNo:this.query.pageIndex,
             }
             this.$post('/merchant/store/log/logLimit',data).then((res) => {
                 this.tableData = res.data.list
