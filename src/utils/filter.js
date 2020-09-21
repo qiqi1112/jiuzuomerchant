@@ -119,3 +119,20 @@ Vue.filter("payType", function (oldVal) {
     }
     return newVal;
 })
+
+//店铺定位
+Vue.filter("shopLocaShow", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 1:
+            newVal = '夜店';
+            break;
+        case 2:
+            newVal = '清吧';
+            break;
+        case 3:
+            newVal = 'ktv';
+            break;
+    }
+    return newVal;
+})

@@ -1,5 +1,5 @@
 <template>
-    <div class="con-wrap">
+    <div>
         <div class="container">
             <!-- 左边区域 -->
             <div class="left-wrap">
@@ -9,7 +9,7 @@
                     <el-button type="success" v-if="!isReadonly">申请商家推荐</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly&&!isUpdate">暂存数据</el-button>
-                    <el-button type="info" @click="cancelSubmit" v-if="!isReadonly&&isUpdate">取消</el-button>
+                    <el-button @click="cancelSubmit" v-if="!isReadonly&&isUpdate">取消</el-button>
                 </h4>
 
                 <!-- 店铺基本信息 -->
@@ -64,13 +64,16 @@
                 <!-- 店铺定位 -->
                 <div class="shop-loca">
                     <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、零嘴”）</p>
-                    <div>
+                    <div v-if="!isUpdate">
                         <span
                             v-for="(item,index) in shopLoca"
                             :key="index"
                             ref="shopLoca"
                             @click="changeShopLoca"
                         >{{item}}</span>
+                    </div>
+                    <div v-else>
+                        <span class="shop-loca-span">{{shopLocaIndex | shopLocaShow}}</span>
                     </div>
                 </div>
 
@@ -336,124 +339,128 @@
                         </el-upload>
                     </div>
                 </div>
-                <h4>店铺卡座</h4>
-                <div class="shop-seat">
-                    <!-- 左边座位展示 -->
-                    <div class="left-box">
-                        <!-- 座位行数和列数 -->
-                        <p class="input-seat">
-                            <label style="margin-right:30px">
-                                座位行数：
-                                <el-input-number
-                                    :disabled="isReadonly"
-                                    v-model="x"
-                                    :min="6"
-                                    style="width:120px"
-                                    label="行数"
-                                    @change="changeSeatNum"
-                                ></el-input-number>
-                            </label>
-                            <label style="margin-right:30px">
-                                座位列数：
-                                <el-input-number
-                                    :disabled="isReadonly"
-                                    v-model="y"
-                                    :min="6"
-                                    style="width:120px"
-                                    label="列数"
-                                    @change="changeSeatNum"
-                                ></el-input-number>
-                            </label>
-                        </p>
-                        <!-- 座位属性标题 -->
-                        <div class="seat-title">
-                            <p
-                                v-for="(item,index) in seatAttOpt"
-                                :key="index"
-                                @click="changeStyle(item.style)"
-                            >
-                                <span :class="item.class"></span>
-                                {{item.name}}
+                <!-- 店铺卡座 -->
+                <div v-if="shopLocaIndex == 1 || shopLocaIndex == 2">
+                    <h4>店铺卡座</h4>
+                    <div class="shop-seat">
+                        <!-- 左边座位展示 -->
+                        <div class="left-box">
+                            <!-- 座位行数和列数 -->
+                            <p class="input-seat">
+                                <label style="margin-right:30px">
+                                    座位行数：
+                                    <el-input-number
+                                        :disabled="isReadonly"
+                                        v-model="x"
+                                        :min="6"
+                                        style="width:120px"
+                                        label="行数"
+                                        @change="changeSeatNum"
+                                    ></el-input-number>
+                                </label>
+                                <label style="margin-right:30px">
+                                    座位列数：
+                                    <el-input-number
+                                        :disabled="isReadonly"
+                                        v-model="y"
+                                        :min="6"
+                                        style="width:120px"
+                                        label="列数"
+                                        @change="changeSeatNum"
+                                    ></el-input-number>
+                                </label>
                             </p>
-                        </div>
-                        <!-- 回显的座位图 -->
-                        <div
-                            v-if="x&&y"
-                            class="seat-box"
-                            ref="seatBox"
-                            :style="{width:32 * y + 30 + 'px'}"
-                            style="overflow:hidden"
-                        >
-                            <div v-for="(itemY,indexY) in Number(y)" :key="indexY">
-                                <div v-for="(itemX,indexX) in Number(x)" :key="indexX">
-                                    <span
-                                        ref="seatSpan"
-                                        :data-indexX="(indexX + 1)"
-                                        :data-indexY="(indexY + 1)"
-                                        class="seat"
-                                        @click="changeStauts($event,seatStyle)"
-                                        @contextmenu.prevent="changeStauts($event,'canBook')"
-                                    ></span>
+                            <!-- 座位属性标题 -->
+                            <div class="seat-title">
+                                <p
+                                    v-for="(item,index) in seatAttOpt"
+                                    :key="index"
+                                    @click="changeStyle(item.style)"
+                                >
+                                    <span :class="item.class"></span>
+                                    {{item.name}}
+                                </p>
+                            </div>
+                            <!-- 回显的座位图 -->
+                            <div
+                                v-if="x&&y"
+                                class="seat-box"
+                                ref="seatBox"
+                                :style="{width:32 * y + 30 + 'px'}"
+                                style="overflow:hidden"
+                            >
+                                <div v-for="(itemY,indexY) in Number(y)" :key="indexY">
+                                    <div v-for="(itemX,indexX) in Number(x)" :key="indexX">
+                                        <span
+                                            ref="seatSpan"
+                                            :data-indexX="(indexX + 1)"
+                                            :data-indexY="(indexY + 1)"
+                                            class="seat"
+                                            @click="changeStauts($event,seatStyle)"
+                                            @contextmenu.prevent="changeStauts($event,'canBook')"
+                                        ></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- 当选择夜店/清吧时展示的座位属性 -->
-                    <div
-                        v-if="isClickSeat && shopLocaIndex == 1 || isClickSeat && shopLocaIndex == 2"
-                        class="right-box"
-                    >
-                        <p class="seat-detail">座位详情</p>
-                        <div class="seat-prop">
-                            <span>座位属性：</span>
-                            <div class="prop-box">
-                                <span
-                                    :class="item.style"
-                                    v-for="(item,index) in seatAttOpt"
-                                    :key="index"
-                                    :title="item.name"
-                                    @click="changeStyle(item.style)"
-                                ></span>
+                        <!-- 座位属性 -->
+                        <div class="right-box">
+                            <p class="seat-detail">座位详情</p>
+                            <!-- 座位属性 -->
+                            <div class="seat-prop">
+                                <span>座位属性：</span>
+                                <div class="prop-box">
+                                    <span
+                                        :class="item.style"
+                                        v-for="(item,index) in seatAttOpt"
+                                        :key="index"
+                                        :title="item.name"
+                                        @click="changeStyle(item.style)"
+                                    ></span>
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <span>座位号：</span>
-                            <el-input
-                                v-model="presentSeatInfo.seatCode"
-                                placeholder="座位号"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>
-                        </div>
-                        <div>
-                            <span>座位类型：</span>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.softHardStatus"
-                                label="1"
-                            >软座</el-radio>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.softHardStatus"
-                                label="2"
-                            >硬座</el-radio>
-                        </div>
-                        <div>
-                            <span>容纳人数：</span>
-                            <el-input
-                                v-model="presentSeatInfo.numberOfPeople"
-                                placeholder="容纳人数"
-                                style="width:50%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>人
-                        </div>
-                        <div class="lon-retain">
-                            <span>保留最晚时间：</span>
-                            <el-time-select
-                                style="width:50%"
-                                v-model="presentSeatInfo.seatLatestReservationTime"
-                                :readonly="isReadonly"
-                                :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
+                            <!-- 座位号 -->
+                            <div>
+                                <span>座位号：</span>
+                                <el-input
+                                    v-model="presentSeatInfo.seatCode"
+                                    placeholder="座位号"
+                                    style="width:50%"
+                                    :readonly="isReadonly"
+                                ></el-input>
+                            </div>
+                            <!-- 座位类型 -->
+                            <div>
+                                <span>座位类型：</span>
+                                <el-radio
+                                    :disabled="isReadonly"
+                                    v-model="presentSeatInfo.softHardStatus"
+                                    label="1"
+                                >软座</el-radio>
+                                <el-radio
+                                    :disabled="isReadonly"
+                                    v-model="presentSeatInfo.softHardStatus"
+                                    label="2"
+                                >硬座</el-radio>
+                            </div>
+                            <!-- 容纳人数 -->
+                            <div>
+                                <span>容纳人数：</span>
+                                <el-input
+                                    v-model="presentSeatInfo.numberOfPeople"
+                                    placeholder="容纳人数"
+                                    style="width:50%;margin-right:6px"
+                                    :readonly="isReadonly"
+                                ></el-input>人
+                            </div>
+                            <!-- 最晚保留时间 -->
+                            <div class="lon-retain">
+                                <span>保留最晚时间：</span>
+                                <el-time-select
+                                    style="width:50%"
+                                    v-model="presentSeatInfo.seatLatestReservationTime"
+                                    :readonly="isReadonly"
+                                    :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
                                     start: startBussTime,
                                     step: '00:10',
                                     end: '23:50'
@@ -462,175 +469,335 @@
                                     step: '00:10',
                                     end: endBussTime
                                 }"
-                            ></el-time-select>
-                        </div>
-                        <div class="min-charge">
-                            <span class="min-con">最低消费：</span>
-                            <div class="day-mincom">
-                                <p>
-                                    <span>星期一</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[0].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期二</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[1].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期三</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[2].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期四</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[3].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期五</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[4].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期六</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[5].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期七</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[6].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
+                                ></el-time-select>
+                            </div>
+                            <!-- 最低消费 -->
+                            <div class="min-charge">
+                                <span class="min-con">最低消费：</span>
+                                <div class="day-mincom">
+                                    <p>
+                                        <span>星期一</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[0].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                    <p>
+                                        <span>星期二</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[1].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                    <p>
+                                        <span>星期三</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[2].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                    <p>
+                                        <span>星期四</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[3].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                    <p>
+                                        <span>星期五</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[4].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                    <p>
+                                        <span>星期六</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[5].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                    <p>
+                                        <span>星期七</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.weekPriceList[6].price"
+                                            placeholder="最低消费"
+                                            style="width:47%;;margin-right:6px"
+                                            :readonly="isReadonly"
+                                        ></el-input>元/人
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <!-- ktv包间 -->
+                <div v-else>
+                    <h4>KTV包间</h4>
                     <!-- 当选择ktv时展示的座位属性 -->
-                    <div v-if="isClickSeat && shopLocaIndex == 3" class="right-box">
-                        <!-- 包间类型 -->
-                        <div>
-                            <span>包间类型：</span>
-                            <el-select v-model="ktvType" placeholder="请选择" style="width:50%">
-                                <el-option
-                                    v-for="item in options"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
-                                ></el-option>
-                            </el-select>
-                            <!-- <div class="prop-box">
-                                <span
-                                    :class="item.style"
-                                    v-for="(item,index) in seatAttOpt"
+                    <div class="ktv-wrap">
+                        <div class="ktv-left-box">
+                            <!-- 包间类型 -->
+                            <div>
+                                <span>包间类型：</span>
+                                <el-select
+                                    :disabled="isReadonly"
+                                    v-model="presentKtvInfo.roomTypeId"
+                                    placeholder="请选择"
+                                    style="width:50%"
+                                >
+                                    <el-option
+                                        v-for="item in ktvTypeOpt"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id"
+                                    ></el-option>
+                                </el-select>
+                            </div>
+                            <!-- 包间所属 -->
+                            <div>
+                                <span>包间所属：</span>
+                                <el-radio
+                                    :disabled="isReadonly"
+                                    v-model="presentKtvInfo.roomAttribute"
+                                    label="1"
+                                >预定桌</el-radio>
+                                <el-radio
+                                    :disabled="isReadonly"
+                                    v-model="presentKtvInfo.roomAttribute"
+                                    label="2"
+                                >AA拼单桌</el-radio>
+                            </div>
+                            <!-- 包间数量 -->
+                            <div>
+                                <span>包间数量：</span>
+                                <el-input
+                                    v-model="presentKtvInfo.roomNumber"
+                                    placeholder="包间数量/个"
+                                    style="width:50%"
+                                    :readonly="isReadonly"
+                                ></el-input>
+                            </div>
+                            <!-- 容纳人数 -->
+                            <div>
+                                <span>容纳人数：</span>
+                                <el-input
+                                    v-model="presentKtvInfo.capacity"
+                                    placeholder="容纳人数/人"
+                                    style="width:50%"
+                                    :readonly="isReadonly"
+                                ></el-input>
+                            </div>
+                            <!-- 独立卫生间 -->
+                            <div>
+                                <span>独立卫生间：</span>
+                                <el-radio
+                                    :disabled="isReadonly"
+                                    v-model="presentKtvInfo.haveToilet"
+                                    label="1"
+                                >有</el-radio>
+                                <el-radio
+                                    :disabled="isReadonly"
+                                    v-model="presentKtvInfo.haveToilet"
+                                    label="2"
+                                >无</el-radio>
+                            </div>
+                            <!-- 机麻 -->
+                            <div>
+                                <span>机麻：</span>
+                                <el-input
+                                    v-model="presentKtvInfo.mahjong"
+                                    placeholder="机麻数量/桌"
+                                    style="width:50%"
+                                    :readonly="isReadonly"
+                                ></el-input>
+                            </div>
+                            <!-- 时间段分布 -->
+                            <div class="time-quan">
+                                <!-- 回显 -->
+                                <div
+                                    class="date-dist clearfix"
+                                    v-for="(item,index) in presentKtvInfo.roomTimeIntervalList"
                                     :key="index"
-                                    :title="item.name"
-                                    @click="changeStyle(item.style)"
-                                ></span>
-                            </div>-->
-                        </div>
-                        <!-- 包间所属 -->
-                        <div>
-                            <span>包间所属：</span>
-                            <el-radio v-model="ktvClassify" label="1">预定桌</el-radio>
-                            <el-radio v-model="ktvClassify" label="2">AA拼单桌</el-radio>
-                            <!-- <el-input
-                                v-model="presentSeatInfo.seatCode"
-                                placeholder="座位号"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>-->
-                        </div>
-                        <!-- 包间数量 -->
-                        <div>
-                            <span>包间数量：</span>
-                            <el-input
-                                v-model="presentSeatInfo.numberOfPeople"
-                                placeholder="包间数量/个"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>
-                        </div>
-                        <!-- 容纳人数 -->
-                        <div>
-                            <span>容纳人数：</span>
-                            <el-input
-                                v-model="presentSeatInfo.numberOfPeople"
-                                placeholder="容纳人数/人"
-                                style="width:50%"
-                                :readonly="isReadonly"
-                            ></el-input>
-                        </div>
-                        <!-- 独立卫生间 -->
-                        <div>
-                            <span>独立卫生间：</span>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.haveToilet"
-                                label="1"
-                            >有</el-radio>
-                            <el-radio
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfo.haveToilet"
-                                label="2"
-                            >无</el-radio>
-                        </div>
-                        <!-- 机麻 -->
-                        <div>
-                            <span>机麻：</span>
-                            <el-input
-                                v-model="presentSeatInfo.mahjong"
-                                placeholder="机麻数量"
-                                style="width:34%;margin-right:6px"
-                                :readonly="isReadonly"
-                            ></el-input>桌
-                        </div>
-                        <!-- 时间段分布 -->
-                        <div class="date-dist">
-                            <p>时间段分布：</p>
-                        </div>
-                        <!-- 零嘴 -->
-                        <div class="snacks">
-                            <p>
-                                零嘴：
-                                <span
-                                    v-if="presentSeatInfo.snacks.length == 0 && isReadonly"
-                                    style="margin-left:74px"
-                                >无</span>
-                            </p>
-                            <div class="snacks-detail">
-                                <ul>
-                                    <li v-for="(item,index) in presentSeatInfo.snacks" :key="index">
+                                >
+                                    <!-- 时间段 -->
+                                    <div class="data">
+                                        <span>时间段分布：</span>
+                                        <div>
+                                            <el-time-select
+                                                style="width:100px"
+                                                v-model="item.startTime"
+                                                :readonly="isReadonly"
+                                                :picker-options="{
+                                    start: '00:00',
+                                    step: '00:10',
+                                    end: '23:50'
+                                }"
+                                                placeholder="开始"
+                                            ></el-time-select>
+                                            <span style="margin:0 10px">~</span>
+                                            <el-time-select
+                                                style="width:100px"
+                                                v-model="item.endTime"
+                                                :readonly="isReadonly"
+                                                :picker-options="{
+                                    start: '00:00',
+                                  step: '00:10',
+                                  end: '23:50'
+                                }"
+                                                placeholder="结束"
+                                            ></el-time-select>
+                                        </div>
+                                    </div>
+                                    <!-- 最低消费 -->
+                                    <div class="minCon">
+                                        <span>最低消费：</span>
+                                        <el-input
+                                            v-model="item.minConsumption"
+                                            placeholder="最低消费/元"
+                                            style="width:50%"
+                                            :readonly="isReadonly"
+                                        ></el-input>
+                                    </div>
+                                    <!-- 最晚保留时间 -->
+                                    <div class="longRetain">
+                                        <span>最晚保留时间：</span>
+                                        <el-time-select
+                                            style="width:50%"
+                                            placeholder="最晚保留时间"
+                                            v-model="item.latestTime"
+                                            :readonly="isReadonly"
+                                            :picker-options="{
+                                    start: item.startTime,
+                                    step: '00:10',
+                                    end: item.endTime
+                                }"
+                                        ></el-time-select>
+                                    </div>
+                                    <!-- 删除 -->
+                                    <el-button
+                                        @click="delTimeQuan(item)"
+                                        type="danger"
+                                        style="float:right"
+                                    >删除</el-button>
+                                </div>
+
+                                <!-- 新增 -->
+                                <div class="date-dist clearfix">
+                                    <!-- 时间段 -->
+                                    <div class="data">
+                                        <span>时间段分布：</span>
+                                        <div>
+                                            <el-time-select
+                                                style="width:100px"
+                                                v-model="timeQuanObj.startTime"
+                                                :readonly="isReadonly"
+                                                :picker-options="{
+                                    start: '00:00',
+                                    step: '00:10',
+                                    end: '23:50'
+                                }"
+                                                placeholder="开始"
+                                            ></el-time-select>
+                                            <span style="margin:0 10px">~</span>
+                                            <el-time-select
+                                                style="width:100px"
+                                                v-model="timeQuanObj.endTime"
+                                                :readonly="isReadonly"
+                                                :picker-options="{
+                                    start: '00:00',
+                                  step: '00:10',
+                                  end: '23:50'
+                                }"
+                                                placeholder="结束"
+                                            ></el-time-select>
+                                        </div>
+                                    </div>
+                                    <!-- 最低消费 -->
+                                    <div class="minCon">
+                                        <span>最低消费：</span>
+                                        <el-input
+                                            v-model="timeQuanObj.minConsumption"
+                                            placeholder="最低消费/元"
+                                            style="width:50%"
+                                            :readonly="isReadonly"
+                                        ></el-input>
+                                    </div>
+                                    <!-- 最晚保留时间 -->
+                                    <div class="longRetain">
+                                        <span>最晚保留时间：</span>
+                                        <el-time-select
+                                            style="width:50%"
+                                            placeholder="最晚保留时间"
+                                            v-model="timeQuanObj.latestTime"
+                                            :readonly="isReadonly"
+                                            :picker-options="{
+                                    start: timeQuanObj.startTime,
+                                    step: '00:10',
+                                    end: timeQuanObj.endTime
+                                }"
+                                        ></el-time-select>
+                                    </div>
+                                    <!-- 确定 -->
+                                    <el-button
+                                        @click="addTimeQuan"
+                                        type="primary"
+                                        style="float:right"
+                                    >确定</el-button>
+                                </div>
+                            </div>
+                            <!-- 零嘴 -->
+                            <div class="snacks">
+                                <p>
+                                    零嘴：
+                                    <span v-if="isReadonly&&presentKtvInfo.snacks.length == 0">无</span>
+                                </p>
+                                <div class="snacks-detail">
+                                    <!-- 回显 -->
+                                    <ul>
+                                        <li
+                                            v-for="(item,index) in presentKtvInfo.snacks"
+                                            :key="index"
+                                        >
+                                            <el-input
+                                                style="width:90px"
+                                                v-model="item.name"
+                                                placeholder="名称"
+                                                :readonly="isReadonly"
+                                            ></el-input>
+                                            <span class="mult">
+                                                <i class="el-icon-close"></i>
+                                            </span>
+                                            <el-input
+                                                style="width:60px;margin-right:10px"
+                                                v-model="item.num"
+                                                placeholder="数量"
+                                                :readonly="isReadonly"
+                                            ></el-input>
+                                            <el-button
+                                                v-if="!isReadonly"
+                                                @click="deleteSnacks(item)"
+                                                type="danger"
+                                            >删除</el-button>
+                                        </li>
+                                    </ul>
+                                    <!-- 新增 -->
+                                    <div class="snacks-form" v-if="!isReadonly">
                                         <el-input
                                             style="width:90px"
-                                            v-model="item.name"
+                                            v-model="snackObj.name"
                                             placeholder="名称"
                                             :readonly="isReadonly"
                                         ></el-input>
@@ -639,42 +806,56 @@
                                         </span>
                                         <el-input
                                             style="width:60px;margin-right:10px"
-                                            v-model="item.num"
+                                            v-model="snackObj.num"
                                             placeholder="数量"
                                             :readonly="isReadonly"
                                         ></el-input>
                                         <el-button
-                                            v-if="!isReadonly"
-                                            @click="deleteSnacks(item)"
-                                            type="danger"
-                                        >删除</el-button>
-                                    </li>
-                                </ul>
-                                <div class="snacks-form" v-if="!isReadonly">
-                                    <el-input
-                                        style="width:90px"
-                                        v-model="snackName"
-                                        placeholder="名称"
-                                        :readonly="isReadonly"
-                                    ></el-input>
-                                    <span class="mult">
-                                        <i class="el-icon-close"></i>
-                                    </span>
-                                    <el-input
-                                        style="width:60px;margin-right:10px"
-                                        v-model="snackNum"
-                                        placeholder="数量"
-                                        :readonly="isReadonly"
-                                    ></el-input>
-                                    <el-button
-                                        :disabled="isReadonly"
-                                        type="primary"
-                                        @click="addSnacks"
-                                    >确定</el-button>
+                                            :disabled="isReadonly"
+                                            type="primary"
+                                            @click="addSnacks"
+                                        >确定</el-button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- <div class="lon-retain">
+                            <!-- ktv包间示意图 -->
+                            <div class="ktv-banner">
+                                <p>包间示意图：</p>
+                                <div v-if="isReadonly&&presentKtvInfo.sketchMap.length > 0">
+                                    <div
+                                        v-for="(item,index) in presentKtvInfo.sketchMap"
+                                        :key="index"
+                                    >
+                                        <img :src="showImgPrefix + item" />
+                                    </div>
+                                </div>
+                                <span
+                                    v-else-if="isReadonly&&presentKtvInfo.sketchMap.length === 0"
+                                >无</span>
+                                <el-upload
+                                    v-else
+                                    action="1"
+                                    list-type="picture-card"
+                                    :before-upload="beforektvBannerUpload"
+                                    :http-request="uploadktvBannerFiles"
+                                    :on-error="uploadError"
+                                    :file-list="ktvBannerImgBox"
+                                    :on-remove="ktvBannerRemove"
+                                    :limit="4"
+                                >
+                                    <i class="el-icon-plus"></i>
+                                </el-upload>
+                            </div>
+                            <!-- 确定与取消 -->
+                            <div>
+                                <el-button @click="ktvCancelSub" v-if="!isReadonly">取消</el-button>
+                                <el-button @click="ktvSureSub" v-if="!isReadonly" type="primary">确定</el-button>
+                            </div>
+
+                            <!-- 暂时用不到的地方 -->
+                            <div>
+                                <!-- 最晚保留时间  -->
+                                <!-- <div class="lon-retain">
                             <span>保留最晚时间：</span>
                             <el-time-select
                                 style="width:50%"
@@ -690,32 +871,9 @@
                                     end: endBussTime
                                 }"
                             ></el-time-select>
-                        </div>-->
-                        <!-- ktv包间示意图 -->
-                        <!-- <div class="ktv-banner">
-                            <span>包间示意图：</span>
-                            <div v-if="isReadonly&&presentSeatInfo.sketchMap.length > 0">
-                                <div v-for="(item,index) in presentSeatInfo.sketchMap" :key="index">
-                                    <img :src="showImgPrefix + item" />
-                                </div>
-                            </div>
-                            <span v-else-if="isReadonly&&presentSeatInfo.sketchMap.length === 0">无</span>
-                            <el-upload
-                                v-else
-                                action="1"
-                                list-type="picture-card"
-                                :before-upload="beforektvBannerUpload"
-                                :http-request="uploadktvBannerFiles"
-                                :on-error="uploadError"
-                                :file-list="ktvBannerImgBox"
-                                :on-remove="ktvBannerRemove"
-                                :limit="2"
-                            >
-                                <i class="el-icon-plus"></i>
-                            </el-upload>
-                        </div>-->
-                        <!-- 最低消费 -->
-                        <!-- <div class="min-charge">
+                                </div>-->
+                                <!-- 最低消费 -->
+                                <!-- <div class="min-charge">
                             <span class="min-con">最低消费：</span>
                             <div class="day-mincom">
                                 <p>
@@ -782,7 +940,37 @@
                                     ></el-input>元/人
                                 </p>
                             </div>
-                        </div>-->
+                                </div>-->
+                            </div>
+                        </div>
+                        <div class="ktv-right-box">
+                            <ul>
+                                <li v-for="(item,index) in ktvRoomList" :key="index">
+                                    <div class="left-box">
+                                        <p>
+                                            <span>包间类型：</span>
+                                            <span>{{item.roomTypeId}}</span>
+                                        </p>
+                                        <p>
+                                            <span>包间数量：</span>
+                                            <span>{{item.roomNumber}}</span>
+                                        </p>
+                                        <p>
+                                            <span>最低消费：</span>
+                                            <span>{{item.minConsumption}}</span>
+                                        </p>
+                                    </div>
+                                    <div class="right-box" v-if="isReadonly">
+                                        <el-button @click="lookKtvInfo" type="primary">查看</el-button>
+                                    </div>
+                                    <div class="right-box" v-if="!isReadonly">
+                                        <el-button @click="lookKtvInfo" type="primary">查看</el-button>
+                                        <el-button @click="editKtvInfo" type="primary">编辑</el-button>
+                                        <el-button @click="delKtvInfo" type="primary">删除</el-button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -889,33 +1077,36 @@ export default {
             presentSeatInfo: {}, //当前座位对应的详细信息
             isClickSeat: false, //展示当前座位的详细信息开关
 
-            snackName: '', //当前座位的零嘴名称
-            snackNum: '', //当前座位的零嘴数量
+            ktvRoomList: [], //ktv包间集合
+            ktvTypeOpt: [], //ktv包间类型
 
-            options: [
-                {
-                    value: '选项1',
-                    label: '黄金糕'
-                },
-                {
-                    value: '选项2',
-                    label: '双皮奶'
-                },
-                {
-                    value: '选项3',
-                    label: '蚵仔煎'
-                },
-                {
-                    value: '选项4',
-                    label: '龙须面'
-                },
-                {
-                    value: '选项5',
-                    label: '北京烤鸭'
-                }
-            ],
-            ktvType: '',
-            ktvClassify: ''
+            //当前ktv包间配置的零嘴
+            snackObj: {
+                name: '',
+                num: ''
+            },
+
+            //当前ktv包间配置的时间段
+            timeQuanObj: {
+                startTime: '', //开始时间
+                endTime: '', //结束时间
+                latestTime: '', //最晚保留时间
+                minConsumption: '' //最低消费
+            },
+
+            //当前ktv包间对应的详细信息
+            presentKtvInfo: {
+                roomTypeId: '', //包间类型
+                roomAttribute: '1', //包间所属
+                roomNumber: '', //包间数量
+                capacity: '', //容纳人数
+                haveToilet: '2', //独立卫生间
+                mahjong: '', //机麻
+                minConsumption: '', //最低消费（时间段集合里的最低消费）
+                snacks: [], //零嘴
+                sketchMap: [], //包间示意图
+                roomTimeIntervalList: [] //时间段集合
+            }
         };
     },
     methods: {
@@ -1015,68 +1206,68 @@ export default {
             });
         },
 
-        //上传ktv包间示意图之前的验证
-        // beforektvBannerUpload(file) {
-        //     console.log('上传之前', file);
+        // 上传ktv包间示意图之前的验证
+        beforektvBannerUpload(file) {
+            console.log('上传之前', file);
 
-        //     const isJPG = file.type === 'image/jpeg';
-        //     const isPNG = file.type === 'image/png';
-        //     // const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
+            const isJPG = file.type === 'image/jpeg';
+            const isPNG = file.type === 'image/png';
+            // const isLt2M = file.size / 1024 / 1024 < 2; //限制文件大小
 
-        //     //限制上传文件格式
-        //     if (!isJPG && !isPNG) {
-        //         this.$message.error('上传文件只能是 JPG / PNG 格式');
-        //     }
+            //限制上传文件格式
+            if (!isJPG && !isPNG) {
+                this.$message.error('上传文件只能是 JPG / PNG 格式');
+            }
 
-        //     //显示上传文件大小
-        //     // if (!isLt2M) {
-        //     //     this.$message.error('上传文件大小不能超过 2MB!');
-        //     // }
+            //显示上传文件大小
+            // if (!isLt2M) {
+            //     this.$message.error('上传文件大小不能超过 2MB!');
+            // }
 
-        //     return isJPG || isPNG;
-        // },
+            return isJPG || isPNG;
+        },
 
-        //上传ktv包间示意图
-        // uploadktvBannerFiles(file) {
-        //     let formData = new FormData();
-        //     formData.append('files', file.file);
-        //     this.$file_post(this.filesUploadUrl, formData).then((res) => {
-        //         if (res.code == 0) {
-        //             if (!this.presentSeatInfo.sketchMap) {
-        //                 this.presentSeatInfo.sketchMap = [];
-        //             }
+        // 上传ktv包间示意图
+        uploadktvBannerFiles(file) {
+            let formData = new FormData();
+            formData.append('files', file.file);
+            this.$file_post(this.filesUploadUrl, formData).then((res) => {
+                if (res.code == 0) {
+                    if (!this.presentKtvInfo.sketchMap) {
+                        this.presentKtvInfo.sketchMap = [];
+                    }
 
-        //             this.presentSeatInfo.sketchMap.push(res.data[0]);
-        //             this.$message.success('上传成功');
-        //         }
-        //     });
-        // },
+                    this.presentKtvInfo.sketchMap.push(res.data[0]);
+                    this.$message.success('上传成功');
+                }
+            });
+        },
 
-        //回显ktv包间示意图（回显在上传图集的容器中）
-        // showKtvBannerImg() {
-        //     this.ktvBannerImgBox = [];
+        // 回显ktv包间示意图（回显在上传图集的容器中）
+        showKtvBannerImg() {
+            this.ktvBannerImgBox = [];
 
-        //     //给每张图片加上前缀
-        //     let ktvBannerArr = this.presentSeatInfo.sketchMap.map((item) => {
-        //         return (item = this.showImgPrefix + item);
-        //     });
+            //给每张图片加上前缀
+            let ktvBannerArr = this.presentKtvInfo.sketchMap.map((item) => {
+                return (item = this.showImgPrefix + item);
+            });
 
-        //     //存入对象，回显到页面上
-        //     ktvBannerArr.forEach((item2) => {
-        //         let obj = {};
-        //         obj.url = item2;
-        //         this.ktvBannerImgBox.push(obj);
-        //     });
-        // },
+            //存入对象，回显到页面上
+            ktvBannerArr.forEach((item2) => {
+                let obj = {};
+                obj.url = item2;
+                this.ktvBannerImgBox.push(obj);
+            });
+        },
 
         // 删除ktv包间示意图
-        // ktvBannerRemove(file, fileList) {
-        //     this.presentSeatInfo.sketchMap.forEach((item, i) => {
-        //         if (this.showImgPrefix + item == file.url) {
-        //             this.presentSeatInfo.sketchMap.splice(i, 1);
-        //         }
-        //     });
-        // },
+        ktvBannerRemove(file, fileList) {
+            this.presentKtvInfo.sketchMap.forEach((item, i) => {
+                if (this.showImgPrefix + item == file.url) {
+                    this.presentKtvInfo.sketchMap.splice(i, 1);
+                }
+            });
+        },
 
         //上传商家布局图
         uploadOverallFile(file) {
@@ -1131,7 +1322,6 @@ export default {
                         newEle.controls = 'controls';
                         newEle.style = `width:100%;height:100%`;
                         newEle.innerHTML = `<source :src="${this.showImgPrefix}${item.src}" />您的浏览器版本太低，请升级。`;
-
                         item.parentNode.replaceChild(newEle, item); //在该节点的父节点上替换掉之前的img节点，换成video
                     }
                 });
@@ -1373,12 +1563,12 @@ export default {
             this.getStoreInfo(); //重新获取商店数据
         },
 
-        //删除当前标签
+        //删除当前店铺标签
         handleClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
         },
 
-        //点击添加标签按钮
+        //点击添加店铺标签按钮
         showInput() {
             this.inputVisible = true;
             this.$nextTick((_) => {
@@ -1474,9 +1664,11 @@ export default {
 
         //清空座位外边框（定位当前座位）
         clearSeatBorder() {
-            this.$refs.seatSpan.forEach((item) => {
-                item.classList.remove('border');
-            });
+            if (this.$refs.seatSpan) {
+                this.$refs.seatSpan.forEach((item) => {
+                    item.classList.remove('border');
+                });
+            }
         },
 
         //修改当前座位属性
@@ -1525,21 +1717,47 @@ export default {
             this.latitude = lonlat[1];
         },
 
+        //添加时间段
+        addTimeQuan() {
+            let timeQuan = Object.assign({}, this.timeQuanObj);
+            this.presentKtvInfo.roomTimeIntervalList.push(timeQuan);
+            this.timeQuanObj = {
+                startTime: '',
+                endTime: '',
+                latestTime: '',
+                minConsumption: ''
+            };
+        },
+
+        //删除时间段
+        delTimeQuan(item) {
+            this.presentKtvInfo.roomTimeIntervalList.forEach((ele, i) => {
+                if (
+                    ele.startTime == item.startTime &&
+                    ele.endTime == item.endTime &&
+                    ele.latestTime == item.latestTime &&
+                    ele.minConsumption == item.minConsumption
+                ) {
+                    this.presentKtvInfo.roomTimeIntervalList.splice(i, 1);
+                }
+            });
+        },
+
         //添加零嘴
         addSnacks() {
-            let snacksObj = {};
-            snacksObj.name = this.snackName;
-            snacksObj.num = this.snackNum;
-            this.presentSeatInfo.snacks.push(snacksObj);
-            this.snackName = '';
-            this.snackNum = '';
+            let snacksObj = Object.assign({}, this.snackObj);
+            this.presentKtvInfo.snacks.push(snacksObj);
+            this.snackObj = {
+                name: '',
+                num: ''
+            };
         },
 
         //删除零嘴
         deleteSnacks(item) {
-            this.presentSeatInfo.snacks.forEach((ele, i) => {
+            this.presentKtvInfo.snacks.forEach((ele, i) => {
                 if (ele.name == item.name && ele.num == item.num) {
-                    this.presentSeatInfo.snacks.splice(i, 1);
+                    this.presentKtvInfo.snacks.splice(i, 1);
                 }
             });
         },
@@ -1554,72 +1772,84 @@ export default {
             return newSeatArr;
         },
 
+        //查看当前ktv包间信息
+        lookKtvInfo() {
+            console.log('当前ktv包间信息', this.ktvRoomList);
+        },
+
+        //编辑当前ktv包间信息
+        editKtvInfo() {},
+
+        //删除当前ktv包间信息
+        delKtvInfo() {},
+
         //座位属性回显
         showSeatAtt() {
             this.$nextTick(() => {
-                //遍历所有座位
-                this.$refs.seatSpan.forEach((item) => {
-                    let x = item.dataset.indexx; //行
-                    let y = item.dataset.indexy; //列
-
-                    //根据返回的座位数组进行匹配，并替换当前座位的属性
-                    this.allSeatDetailInfo.forEach((item2) => {
-                        if (item2.seatRow == x && item2.seatColumn == y) {
-                            //不可预订
-                            if (item2.seatAttribute == 1) {
-                                item.classList.add('notBook');
+                // console.log(this.$refs.seatSpan);
+                if (this.$refs.seatSpan) {
+                    //遍历所有座位
+                    this.$refs.seatSpan.forEach((item) => {
+                        let x = item.dataset.indexx; //行
+                        let y = item.dataset.indexy; //列
+                        //根据返回的座位数组进行匹配，并替换当前座位的属性
+                        this.allSeatDetailInfo.forEach((item2) => {
+                            if (item2.seatRow == x && item2.seatColumn == y) {
+                                //不可预订
+                                if (item2.seatAttribute == 1) {
+                                    item.classList.add('notBook');
+                                }
+                                //可预订
+                                if (item2.seatAttribute == 2) {
+                                    item.classList.add('canBook');
+                                }
+                                //过道
+                                if (item2.seatType == 3) {
+                                    item.classList.add('aisleBook');
+                                }
+                                //舞台
+                                if (item2.seatType == 4) {
+                                    item.classList.add('stageBook');
+                                }
                             }
-
-                            //可预订
-                            if (item2.seatAttribute == 2) {
-                                item.classList.add('canBook');
-                            }
-
-                            //过道
-                            if (item2.seatType == 3) {
-                                item.classList.add('aisleBook');
-                            }
-
-                            //舞台
-                            if (item2.seatType == 4) {
-                                item.classList.add('stageBook');
-                            }
-                        }
+                        });
                     });
-                });
+                }
             });
         },
 
         //店铺定位样式初始化
         initShopLocaStyle() {
             if (this.shopLocaIndex) {
-                this.$refs.shopLoca.forEach((item) => {
-                    item.classList.remove('shop-loca-span'); //清空所选店铺的样式
-                });
+                this.$nextTick(() => {
+                    this.$refs.shopLoca.forEach((item) => {
+                        item.classList.remove('shop-loca-span'); //清空所选店铺的样式
+                    });
 
-                switch (this.shopLocaIndex) {
-                    case 1:
-                        this.$refs.shopLoca[0].classList.add('shop-loca-span');
-                        break;
-                    case 2:
-                        this.$refs.shopLoca[1].classList.add('shop-loca-span');
-                        break;
-                    case 3:
-                        this.$refs.shopLoca[2].classList.add('shop-loca-span');
-                        break;
-                }
+                    switch (this.shopLocaIndex) {
+                        case 1:
+                            this.$refs.shopLoca[0].classList.add('shop-loca-span');
+                            break;
+                        case 2:
+                            this.$refs.shopLoca[1].classList.add('shop-loca-span');
+                            break;
+                        case 3:
+                            this.$refs.shopLoca[2].classList.add('shop-loca-span');
+                            break;
+                    }
+                });
             }
         },
 
-        //创建座位
+        //创建座位（夜店/清吧）
         createSeatFn() {
             this.allSeatDetailInfo = [];
             //根据行数和列数动态的创建座位
             for (let i = 1; i <= this.y; i++) {
                 for (let j = 1; j <= this.x; j++) {
                     this.allSeatDetailInfo.push({
-                        haveToilet: '1',
-                        mahjong: '',
+                        // haveToilet: '1',
+                        // mahjong: '',
                         minConsumption: 0,
                         numberOfPeople: 1,
                         seatAttribute: 2,
@@ -1628,7 +1858,7 @@ export default {
                         seatLatestReservationTime: '',
                         seatRow: j,
                         seatType: 1,
-                        snacks: [],
+                        // snacks: [],
                         sketchMap: [],
                         softHardStatus: '1',
                         weekPriceList: [
@@ -1702,23 +1932,55 @@ export default {
             });
         },
 
-        //对每个座位进行相关转换
+        //对座位信息进行相关转换
         changeLayoutList(arr) {
             arr.forEach((item) => {
-                item.snacks = JSON.parse(item.snacks); //零嘴json字符串转为数组对象
+                //将数值型转为字符型（软硬座）
+                if (item.softHardStatus || item.haveToilet) {
+                    item.softHardStatus = item.softHardStatus.toString();
+                }
+            });
+        },
 
-                if (!!item.sketchMap) {
+        //对ktv信息进行相关转换
+        changeKtvList(arr) {
+            arr.forEach((item) => {
+                if (item.snacks) {
+                    item.snacks = JSON.parse(item.snacks); //零嘴json字符串转为数组对象
+                }
+
+                if (item.sketchMap) {
                     item.sketchMap = item.sketchMap.split(','); //ktv包间示意图转为数组
                 } else {
                     item.sketchMap = [];
                 }
 
-                //将数值型转为字符型（软硬座和有无卫生间）
+                //将数值型转为字符型（有无卫生间）
                 if (item.softHardStatus || item.haveToilet) {
-                    item.softHardStatus = item.softHardStatus.toString();
                     item.haveToilet = item.haveToilet.toString();
                 }
             });
+        },
+
+        //取消保存ktv包间信息
+        ktvCancelSub() {
+            this.presentKtvInfo = {
+                roomTypeId: '', //包间类型
+                roomAttribute: '1', //包间所属
+                roomNumber: '', //包间数量
+                capacity: '', //容纳人数
+                haveToilet: '2', //独立卫生间
+                mahjong: '', //机麻
+                minConsumption: '', //最低消费（时间段集合里的最低消费）
+                snacks: [], //零嘴
+                sketchMap: [], //包间示意图
+                roomTimeIntervalList: [] //时间段集合
+            };
+        },
+
+        //提交保存ktv包间信息
+        ktvSureSub() {
+            this.ktvRoomList.push(this.presentKtvInfo);
         },
 
         //回显店铺数据
@@ -1753,7 +2015,8 @@ export default {
                     this.shopMatter = result.tableReservationNotes;
                     this.trustAddress = result.trustAddress;
                     let shopTypeArr = result.type.split(',');
-                    let layoutList = result.layoutList;
+                    this.allSeatDetailInfo = result.layoutList;
+                    this.ktvRoomList = result.ktvRoomList;
 
                     //获取店铺类型
                     this.getShopType(result.storeLocation);
@@ -1773,17 +2036,17 @@ export default {
                     //获取经纬度
                     this.getlonlat(lonlat);
 
-                    //对每个座位进行相关转换
-                    this.changeLayoutList(layoutList);
+                    //对座位信息进行相关转换
+                    this.changeLayoutList(this.allSeatDetailInfo);
 
-                    //赋值返回的座位信息
-                    this.allSeatDetailInfo = layoutList;
+                    //对ktv信息进行相关转换
+                    this.changeKtvList(this.ktvRoomList);
 
                     //座位属性回显
                     this.showSeatAtt();
 
                     //店铺定位初始化
-                    this.initShopLocaStyle();
+                    // this.initShopLocaStyle();
 
                     console.log('当前店铺数据', res.data);
                 } else if (res.code == 600) {
@@ -1818,6 +2081,15 @@ export default {
             this.$post('/merchant/store/screening/apiList', data).then((res) => {
                 if (res.data) {
                     this.shopTypeOpt = res.data.storeScreeningDTOS;
+                }
+            });
+        },
+
+        //获取ktv包间类型
+        getKtvType() {
+            this.$get('/merchant/store/ktvDeploy/deployList').then((res) => {
+                if (res.code == 0) {
+                    this.ktvTypeOpt = res.data;
                 }
             });
         },
@@ -1858,6 +2130,7 @@ export default {
                 x: this.x,
                 y: this.y,
                 allSeatDetailInfo: this.allSeatDetailInfo
+                // ktvRoomList : this.ktvRoomList
             };
 
             localStorage.setItem('storageInfo', JSON.stringify(obj));
@@ -1976,20 +2249,22 @@ export default {
 
     watch: {
         //根据包间示意图的个数，来显示与隐藏上传图标
-        'presentSeatInfo.sketchMap': {
+        'presentKtvInfo.sketchMap': {
             handler() {
                 if (!this.isReadonly) {
                     this.$nextTick(() => {
                         let addPic = document.querySelector('.ktv-banner .el-upload.el-upload--picture-card');
                         if (addPic !== null) {
-                            if (this.presentSeatInfo.sketchMap.length > 1) {
+                            if (this.presentKtvInfo.sketchMap.length > 3) {
                                 addPic.style.display = 'none';
                             } else {
-                                addPic.style.display = 'block';
+                                addPic.style.display = 'inline-block';
                             }
                         }
                     });
                 }
+
+                console.log('zxcvzxczx');
             },
             deep: true
         }
@@ -1998,6 +2273,7 @@ export default {
     created() {
         this.clearShopInfo(); //清空所有内容
         this.getShopType(); //获取店铺类型
+        this.getKtvType(); //获取ktv包间类型
 
         if (process.env.NODE_ENV === 'development') {
             this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
@@ -2017,10 +2293,6 @@ export default {
     display: block;
     content: '';
     clear: both;
-}
-
-.con-wrap {
-    height: 100%;
 }
 
 .container {
@@ -2259,7 +2531,7 @@ export default {
 
 .right-wrap {
     height: 100%;
-    width: 100%;
+    width: 65%;
 
     h4 {
         font-weight: normal;
@@ -2500,6 +2772,54 @@ export default {
                 display: flex;
                 align-items: center;
             }
+        }
+    }
+
+    .ktv-wrap {
+        display: flex;
+
+        .ktv-left-box {
+            width: 60%;
+
+            .time-quan {
+                max-height: 420px;
+                width: 70%;
+                overflow-y: auto;
+            }
+
+            .date-dist {
+                border: 1px solid #c0c4cc;
+                border-radius: 4px;
+                padding: 20px 20px 10px;
+                margin-bottom: 20px;
+
+                > div {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 10px;
+
+                    > span {
+                        min-width: 120px;
+                    }
+                }
+
+                .data > div {
+                    display: flex;
+                    align-items: center;
+                }
+            }
+
+            > div {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+
+                > span {
+                    min-width: 120px;
+                }
+            }
 
             .snacks {
                 display: block;
@@ -2541,41 +2861,56 @@ export default {
                 }
             }
 
-            .date-dist {
+            .ktv-banner {
+                display: flex;
+                align-items: flex-start;
                 > p {
                     margin-bottom: 10px;
                 }
+                > div {
+                    width: 100%;
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                img {
+                    width: 130px;
+                    height: 80px;
+                    margin: 0 8px 6px 0;
+                    border-radius: 6px;
+                }
+                /deep/ .el-upload-list--picture-card .el-upload-list__item {
+                    transition: none;
+                    width: 130px;
+                    height: 80px;
+                    margin: 0 8px 6px 0;
+                }
+
+                /deep/ .el-upload--picture-card {
+                    width: 130px;
+                    height: 80px;
+                    line-height: 80px;
+                }
             }
+        }
 
-            // .ktv-banner {
-            //     align-items: flex-start;
-            //     > span {
-            //         width: 142px;
-            //     }
-            //     > div {
-            //         width: 100%;
-            //         display: flex;
-            //         flex-wrap: wrap;
-            //     }
-            //     img {
-            //         width: 150px;
-            //         height: 80px;
-            //         margin: 0 8px 6px 0;
-            //         border-radius: 6px;
-            //     }
-            //     /deep/ .el-upload-list--picture-card .el-upload-list__item {
-            //         transition: none;
-            //         width: 150px;
-            //         height: 80px;
-            //         margin: 0 8px 6px 0;
-            //     }
+        .ktv-right-box {
+            width: 30%;
 
-            //     /deep/ .el-upload--picture-card {
-            //         width: 150px;
-            //         height: 80px;
-            //         line-height: 80px;
-            //     }
-            // }
+            ul li {
+                border: 1px solid #c0c4cc;
+                border-radius: 4px;
+                padding: 10px;
+
+                p {
+                    margin-bottom: 10px;
+                }
+
+                .left-box {
+                }
+
+                .right-box {
+                }
+            }
         }
     }
 
