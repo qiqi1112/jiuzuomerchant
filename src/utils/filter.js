@@ -136,3 +136,31 @@ Vue.filter("shopLocaShow", function (oldVal) {
     }
     return newVal;
 })
+
+//包间属性
+Vue.filter("roomAttr", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case '1':
+            newVal = '预定桌';
+            break;
+        case '2':
+            newVal = 'AA拼单';
+            break;
+    }
+    return newVal;
+})
+
+//包间属性
+Vue.filter("roomType", function (oldVal) {
+    let newVal = '';
+    // switch (oldVal) {
+    //     case '1':
+    //         newVal = '预定桌';
+    //         break;
+    //     case '2':
+    //         newVal = 'AA拼单';
+    //         break;
+    // }
+    return newVal;
+})

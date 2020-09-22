@@ -215,18 +215,6 @@
                             :readonly="isReadonly"
                         ></el-input>
                     </div>
-                    <!-- 订桌注意事项 -->
-                    <div class="shop-matter">
-                        <span>订桌注意事项：</span>
-                        <el-input
-                            type="textarea"
-                            :rows="3"
-                            placeholder="请输入订桌注意事项"
-                            v-model="shopMatter"
-                            style="width:76%"
-                            :readonly="isReadonly"
-                        ></el-input>
-                    </div>
                 </div>
             </div>
 
@@ -251,6 +239,7 @@
                         <el-upload
                             class="banner-show-box"
                             v-else
+                            multiple
                             action="1"
                             list-type="picture-card"
                             :before-upload="beforeBannerUpload"
@@ -404,7 +393,7 @@
                             </div>
                         </div>
                         <!-- 座位属性 -->
-                        <div class="right-box">
+                        <div class="right-box" v-if="isClickSeat">
                             <p class="seat-detail">座位详情</p>
                             <!-- 座位属性 -->
                             <div class="seat-prop">
@@ -482,7 +471,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                     <p>
                                         <span>星期二</span>
@@ -491,7 +480,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                     <p>
                                         <span>星期三</span>
@@ -500,7 +489,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                     <p>
                                         <span>星期四</span>
@@ -509,7 +498,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                     <p>
                                         <span>星期五</span>
@@ -518,7 +507,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                     <p>
                                         <span>星期六</span>
@@ -527,7 +516,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                     <p>
                                         <span>星期七</span>
@@ -536,7 +525,7 @@
                                             placeholder="最低消费"
                                             style="width:47%;;margin-right:6px"
                                             :readonly="isReadonly"
-                                        ></el-input>元/人
+                                        ></el-input>
                                     </p>
                                 </div>
                             </div>
@@ -544,11 +533,11 @@
                     </div>
                 </div>
                 <!-- ktv包间 -->
-                <div v-else>
+                <div v-if="shopLocaIndex == 3">
                     <h4>KTV包间</h4>
                     <!-- 当选择ktv时展示的座位属性 -->
                     <div class="ktv-wrap">
-                        <div class="ktv-left-box">
+                        <div class="ktv-left-box" v-if="isLookKtvInfo && ktvRoomList.length >= 0">
                             <!-- 包间类型 -->
                             <div>
                                 <span>包间类型：</span>
@@ -688,14 +677,17 @@
                                     </div>
                                     <!-- 删除 -->
                                     <el-button
+                                        v-if="!isReadonly"
                                         @click="delTimeQuan(item)"
                                         type="danger"
                                         style="float:right"
                                     >删除</el-button>
                                 </div>
-
                                 <!-- 新增 -->
-                                <div class="date-dist clearfix">
+                                <div
+                                    class="date-dist clearfix"
+                                    v-if="!isReadonly&&presentKtvInfo.roomTimeIntervalList.length < 6"
+                                >
                                     <!-- 时间段 -->
                                     <div class="data">
                                         <span>时间段分布：</span>
@@ -752,6 +744,7 @@
                                     </div>
                                     <!-- 确定 -->
                                     <el-button
+                                        v-if="!isReadonly"
                                         @click="addTimeQuan"
                                         type="primary"
                                         style="float:right"
@@ -797,7 +790,7 @@
                                     <div class="snacks-form" v-if="!isReadonly">
                                         <el-input
                                             style="width:90px"
-                                            v-model="snackObj.name"
+                                            v-model="snacksObj.name"
                                             placeholder="名称"
                                             :readonly="isReadonly"
                                         ></el-input>
@@ -806,7 +799,7 @@
                                         </span>
                                         <el-input
                                             style="width:60px;margin-right:10px"
-                                            v-model="snackObj.num"
+                                            v-model="snacksObj.num"
                                             placeholder="数量"
                                             :readonly="isReadonly"
                                         ></el-input>
@@ -847,102 +840,15 @@
                                 </el-upload>
                             </div>
                             <!-- 确定与取消 -->
-                            <div>
-                                <el-button @click="ktvCancelSub" v-if="!isReadonly">取消</el-button>
-                                <el-button @click="ktvSureSub" v-if="!isReadonly" type="primary">确定</el-button>
-                            </div>
-
-                            <!-- 暂时用不到的地方 -->
-                            <div>
-                                <!-- 最晚保留时间  -->
-                                <!-- <div class="lon-retain">
-                            <span>保留最晚时间：</span>
-                            <el-time-select
-                                style="width:50%"
-                                v-model="presentSeatInfo.seatLatestReservationTime"
-                                :readonly="isReadonly"
-                                :picker-options="startBussTime.slice(0,2) > endBussTime.slice(0,2) ? {
-                                    start: startBussTime,
-                                    step: '00:10',
-                                    end: '23:50'
-                                } : {
-                                    start: startBussTime,
-                                    step: '00:10',
-                                    end: endBussTime
-                                }"
-                            ></el-time-select>
-                                </div>-->
-                                <!-- 最低消费 -->
-                                <!-- <div class="min-charge">
-                            <span class="min-con">最低消费：</span>
-                            <div class="day-mincom">
-                                <p>
-                                    <span>星期一</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[0].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期二</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[1].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期三</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[2].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期四</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[3].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期五</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[4].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期六</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[5].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                                <p>
-                                    <span>星期七</span>
-                                    <el-input
-                                        v-model="presentSeatInfo.weekPriceList[6].price"
-                                        placeholder="最低消费"
-                                        style="width:47%;;margin-right:6px"
-                                        :readonly="isReadonly"
-                                    ></el-input>元/人
-                                </p>
-                            </div>
-                                </div>-->
+                            <div v-if="!isReadonly">
+                                <el-button @click="ktvCancelSub">取消</el-button>
+                                <el-button
+                                    @click="ktvSureSub"
+                                    type="primary"
+                                >{{isUpdateKtvInfo == false ? '新增' : '修改'}}</el-button>
                             </div>
                         </div>
+                        <!-- ktv包间属性列表 -->
                         <div class="ktv-right-box">
                             <ul>
                                 <li v-for="(item,index) in ktvRoomList" :key="index">
@@ -950,6 +856,10 @@
                                         <p>
                                             <span>包间类型：</span>
                                             <span>{{item.roomTypeId}}</span>
+                                        </p>
+                                        <p>
+                                            <span>包间属性：</span>
+                                            <span>{{item.roomAttribute | roomAttr}}</span>
                                         </p>
                                         <p>
                                             <span>包间数量：</span>
@@ -960,13 +870,16 @@
                                             <span>{{item.minConsumption}}</span>
                                         </p>
                                     </div>
-                                    <div class="right-box" v-if="isReadonly">
-                                        <el-button @click="lookKtvInfo" type="primary">查看</el-button>
-                                    </div>
-                                    <div class="right-box" v-if="!isReadonly">
-                                        <el-button @click="lookKtvInfo" type="primary">查看</el-button>
-                                        <el-button @click="editKtvInfo" type="primary">编辑</el-button>
-                                        <el-button @click="delKtvInfo" type="primary">删除</el-button>
+                                    <div class="right-box">
+                                        <el-button
+                                            @click="lookKtvInfo(item)"
+                                            type="primary"
+                                        >{{isReadonly == true ? '查看' : '编辑'}}</el-button>
+                                        <el-button
+                                            @click="delKtvInfo(item)"
+                                            type="danger"
+                                            v-if="!isReadonly"
+                                        >删除</el-button>
                                     </div>
                                 </li>
                             </ul>
@@ -1047,7 +960,6 @@ export default {
 
             x: 20, //座位行数
             y: 20, //座位列数
-
             //座位属性数组
             seatAttOpt: [
                 {
@@ -1072,28 +984,26 @@ export default {
                 }
             ],
             seatStyle: 'canBook', //默认的选座样式
-
             allSeatDetailInfo: [], //所有座位详细信息
             presentSeatInfo: {}, //当前座位对应的详细信息
             isClickSeat: false, //展示当前座位的详细信息开关
 
             ktvRoomList: [], //ktv包间集合
             ktvTypeOpt: [], //ktv包间类型
-
+            isLookKtvInfo: false, //查看或编辑当前ktv包间属性信息的标杆
+            isUpdateKtvInfo: false, //当前确认按钮是否为修改包间属性信息
             //当前ktv包间配置的零嘴
-            snackObj: {
+            snacksObj: {
                 name: '',
                 num: ''
             },
-
             //当前ktv包间配置的时间段
             timeQuanObj: {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '', //最晚保留时间
-                minConsumption: '' //最低消费
+                minConsumption: 0 //最低消费
             },
-
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
                 roomTypeId: '', //包间类型
@@ -1102,7 +1012,7 @@ export default {
                 capacity: '', //容纳人数
                 haveToilet: '2', //独立卫生间
                 mahjong: '', //机麻
-                minConsumption: '', //最低消费（时间段集合里的最低消费）
+                minConsumption: 0, //最低消费（时间段集合里的最低消费）
                 snacks: [], //零嘴
                 sketchMap: [], //包间示意图
                 roomTimeIntervalList: [] //时间段集合
@@ -1164,6 +1074,11 @@ export default {
             formData.append('files', file.file);
             this.$file_post(this.filesUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
+                    let obj = {
+                        name: res.data[0],
+                        url: res.data[0]
+                    };
+
                     this.bannerShowBox.push(res.data[0]);
                     this.$message.success('上传成功');
                 }
@@ -1199,6 +1114,7 @@ export default {
 
         // 删除banner图集
         bannerRemove(file, fileList) {
+            console.log('删除图集', file);
             this.bannerShowBox.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
                     this.bannerShowBox.splice(i, 1);
@@ -1410,8 +1326,10 @@ export default {
         //编辑商铺信息
         editShopInfo() {
             this.isReadonly = false;
-
+            this.isLookKtvInfo = true;
+            this.isUpdateKtvInfo = false;
             this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
+            this.clearKtvInfo(); //清空ktv包间属性数据
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             this.showBannerVideo(); //回显banner图集里的视频
             this.getShopType(); //获取店铺类型
@@ -1424,13 +1342,16 @@ export default {
 
         //新增店铺
         submitCreatShop() {
-            //数组转json形式（零嘴）
-            let allSeatDetailInfo = this.cloneSnacks();
+            let ktvRoomList = [];
+            if (this.shopLocaIndex == 3) {
+                //数组转json形式（零嘴）
+                ktvRoomList = this.cloneSnacks();
 
-            //数组转字符串（ktv示意图）
-            allSeatDetailInfo.forEach((item) => {
-                item.sketchMap = item.sketchMap.join(',');
-            });
+                //数组转字符串（ktv示意图）
+                ktvRoomList.forEach((item) => {
+                    item.sketchMap = item.sketchMap.join(',');
+                });
+            }
 
             //要传的值
             let data = {
@@ -1456,10 +1377,11 @@ export default {
                 startTime: this.startBussTime,
                 storeLocation: this.shopLocaIndex,
                 synopsis: this.shopBrief,
-                tableReservationNotes: this.shopMatter,
+                tableReservationNotes: '订桌注意事项',
                 trustAddress: this.trustAddress,
                 type: this.submitShopType.join(','),
-                layoutList: allSeatDetailInfo
+                layoutList: this.allSeatDetailInfo,
+                ktvRoomList: ktvRoomList
             };
 
             console.log('新增时传的值', data);
@@ -1484,13 +1406,16 @@ export default {
 
         //修改店铺
         submitUpdateShop() {
-            //数组转json形式（零嘴）
-            let allSeatDetailInfo = this.cloneSnacks();
+            let ktvRoomList = [];
+            if (this.shopLocaIndex == 3) {
+                //数组转json形式（零嘴）
+                ktvRoomList = this.cloneSnacks();
 
-            //数组转字符串（ktv示意图）
-            allSeatDetailInfo.forEach((item) => {
-                item.sketchMap = item.sketchMap.join(',');
-            });
+                //数组转字符串（ktv示意图）
+                ktvRoomList.forEach((item) => {
+                    item.sketchMap = item.sketchMap.join(',');
+                });
+            }
 
             //要传的值
             let data = {
@@ -1517,10 +1442,11 @@ export default {
                 startTime: this.startBussTime,
                 storeLocation: this.shopLocaIndex,
                 synopsis: this.shopBrief,
-                tableReservationNotes: this.shopMatter,
+                tableReservationNotes: '订桌注意事项',
                 trustAddress: this.trustAddress,
                 type: this.submitShopType.join(','),
-                layoutList: allSeatDetailInfo
+                layoutList: this.allSeatDetailInfo,
+                ktvRoomList: ktvRoomList
             };
 
             console.log('修改时传的值', data);
@@ -1549,7 +1475,8 @@ export default {
                 } else {
                     this.submitUpdateShop(); //修改店铺
                 }
-                this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
+                this.isClickSeat = false;
+                this.isLookKtvInfo = false;
                 this.submitShopType = []; //清空店铺类型上传数组
                 this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             }
@@ -1558,7 +1485,8 @@ export default {
         //取消保存按钮
         cancelSubmit() {
             this.isReadonly = true;
-            this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
+            this.isClickSeat = false;
+            this.isLookKtvInfo = false;
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             this.getStoreInfo(); //重新获取商店数据
         },
@@ -1603,9 +1531,6 @@ export default {
                     //修改当前座位为舞台
                     this.presentSeatInfo.seatType = stageCode;
 
-                    //回显当前座位对应的包间示意图
-                    // this.showKtvBannerImg();
-
                     console.log('cccc', this.presentSeatInfo);
                 }
             });
@@ -1620,9 +1545,6 @@ export default {
             this.allSeatDetailInfo.forEach((item) => {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
                     this.presentSeatInfo = item;
-
-                    //回显当前座位对应的包间示意图
-                    // this.showKtvBannerImg();
                 }
             });
         },
@@ -1745,9 +1667,9 @@ export default {
 
         //添加零嘴
         addSnacks() {
-            let snacksObj = Object.assign({}, this.snackObj);
+            let snacksObj = Object.assign({}, this.snacksObj);
             this.presentKtvInfo.snacks.push(snacksObj);
-            this.snackObj = {
+            this.snacksObj = {
                 name: '',
                 num: ''
             };
@@ -1764,7 +1686,7 @@ export default {
 
         //克隆零嘴数组方法
         cloneSnacks() {
-            let newSeatArr = this.allSeatDetailInfo.map((item) => {
+            let newSeatArr = this.ktvRoomList.map((item) => {
                 let cloneItem = Object.assign({}, item);
                 cloneItem.snacks = JSON.stringify(item.snacks);
                 return cloneItem;
@@ -1773,20 +1695,51 @@ export default {
         },
 
         //查看当前ktv包间信息
-        lookKtvInfo() {
-            console.log('当前ktv包间信息', this.ktvRoomList);
+        lookKtvInfo(item) {
+            console.log('当前ktv包间信息', item);
+            this.isLookKtvInfo = true;
+            this.isUpdateKtvInfo = true;
+            this.presentKtvInfo = item;
+            this.showKtvBannerImg();
         },
 
-        //编辑当前ktv包间信息
-        editKtvInfo() {},
-
         //删除当前ktv包间信息
-        delKtvInfo() {},
+        delKtvInfo(item) {
+            console.log(item);
+            this.$confirm('确定要删除吗？', '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    this.ktvRoomList.forEach((ele, i) => {
+                        if (item.id) {
+                            if (ele.id == item.id) {
+                                this.ktvRoomList.splice(i, 1);
+                            }
+                        } else {
+                            if (
+                                ele.capacity == item.capacity &&
+                                ele.haveToilet == item.haveToilet &&
+                                ele.mahjong == item.mahjong &&
+                                ele.roomAttribute == item.roomAttribute &&
+                                ele.roomNumber == item.roomNumber &&
+                                ele.roomTimeIntervalList.length == item.roomTimeIntervalList.length &&
+                                ele.roomTypeId == item.roomTypeId &&
+                                ele.sketchMap.length == item.sketchMap.length &&
+                                ele.snacks.length == item.snacks.length
+                            ) {
+                                this.ktvRoomList.splice(i, 1);
+                            }
+                        }
+                    });
+                    this.clearKtvInfo();
+                    this.isUpdateKtvInfo = false;
+                })
+                .catch(() => {});
+        },
 
         //座位属性回显
         showSeatAtt() {
             this.$nextTick(() => {
-                // console.log(this.$refs.seatSpan);
                 if (this.$refs.seatSpan) {
                     //遍历所有座位
                     this.$refs.seatSpan.forEach((item) => {
@@ -1848,18 +1801,14 @@ export default {
             for (let i = 1; i <= this.y; i++) {
                 for (let j = 1; j <= this.x; j++) {
                     this.allSeatDetailInfo.push({
-                        // haveToilet: '1',
-                        // mahjong: '',
                         minConsumption: 0,
                         numberOfPeople: 1,
                         seatAttribute: 2,
                         seatCode: j + '-' + i,
                         seatColumn: i,
-                        seatLatestReservationTime: '',
                         seatRow: j,
+                        seatLatestReservationTime: '',
                         seatType: 1,
-                        // snacks: [],
-                        sketchMap: [],
                         softHardStatus: '1',
                         weekPriceList: [
                             {
@@ -1917,9 +1866,11 @@ export default {
             }
 
             //重新创建座位就要将之前的样式全部清除
-            this.$refs.seatSpan.forEach((item) => {
-                item.className = 'seat';
-            });
+            if (this.$refs.seatSpan) {
+                this.$refs.seatSpan.forEach((item) => {
+                    item.className = 'seat';
+                });
+            }
         },
 
         //回显当前店铺的类型
@@ -1945,25 +1896,37 @@ export default {
         //对ktv信息进行相关转换
         changeKtvList(arr) {
             arr.forEach((item) => {
+                //零嘴json字符串转为数组对象
                 if (item.snacks) {
-                    item.snacks = JSON.parse(item.snacks); //零嘴json字符串转为数组对象
+                    item.snacks = JSON.parse(item.snacks);
+                } else {
+                    item.snacks = [];
                 }
 
+                //ktv包间示意图转为数组
                 if (item.sketchMap) {
-                    item.sketchMap = item.sketchMap.split(','); //ktv包间示意图转为数组
+                    item.sketchMap = item.sketchMap.split(',');
                 } else {
                     item.sketchMap = [];
                 }
 
+                // this.ktvTypeOpt.forEach((ele) => {
+                //     if (item.roomTypeId == ele.id) {
+                //         item.roomTypeId = ele.name;
+                //     }
+                //     // console.log('23132', ele);
+                // });
+
                 //将数值型转为字符型（有无卫生间）
                 if (item.softHardStatus || item.haveToilet) {
+                    item.roomAttribute = item.roomAttribute.toString();
                     item.haveToilet = item.haveToilet.toString();
                 }
             });
         },
 
-        //取消保存ktv包间信息
-        ktvCancelSub() {
+        //清空ktv包间属性编辑区域的数据
+        clearKtvInfo() {
             this.presentKtvInfo = {
                 roomTypeId: '', //包间类型
                 roomAttribute: '1', //包间所属
@@ -1976,11 +1939,39 @@ export default {
                 sketchMap: [], //包间示意图
                 roomTimeIntervalList: [] //时间段集合
             };
+            this.snacksObj = {
+                name: '',
+                num: ''
+            };
+            this.timeQuanObj = {
+                startTime: '', //开始时间
+                endTime: '', //结束时间
+                latestTime: '', //最晚保留时间
+                minConsumption: 0 //最低消费
+            };
+            this.ktvBannerImgBox = [];
+        },
+
+        //取消保存ktv包间信息
+        ktvCancelSub() {
+            this.clearKtvInfo();
+            if (this.isUpdateKtvInfo) {
+                this.isUpdateKtvInfo = false;
+            }
         },
 
         //提交保存ktv包间信息
         ktvSureSub() {
-            this.ktvRoomList.push(this.presentKtvInfo);
+            if (this.isUpdateKtvInfo) {
+                console.log('修改操作');
+                this.$message.success('修改成功');
+                this.isUpdateKtvInfo = false;
+            } else {
+                this.ktvRoomList.push(this.presentKtvInfo);
+                console.log('新增操作');
+                this.$message.success('新增成功');
+            }
+            this.clearKtvInfo();
         },
 
         //回显店铺数据
@@ -1989,7 +1980,6 @@ export default {
                 if (res.code == 0) {
                     let result = res.data;
 
-                    //返回的所有属性
                     this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
                     let cassette = result.cassette;
@@ -2012,7 +2002,6 @@ export default {
                     this.startBussTime = result.startTime;
                     this.shopLocaIndex = result.storeLocation;
                     this.shopBrief = result.synopsis;
-                    this.shopMatter = result.tableReservationNotes;
                     this.trustAddress = result.trustAddress;
                     let shopTypeArr = result.type.split(',');
                     this.allSeatDetailInfo = result.layoutList;
@@ -2045,9 +2034,6 @@ export default {
                     //座位属性回显
                     this.showSeatAtt();
 
-                    //店铺定位初始化
-                    // this.initShopLocaStyle();
-
                     console.log('当前店铺数据', res.data);
                 } else if (res.code == 600) {
                     this.$confirm(res.msg, '提示', {
@@ -2057,6 +2043,7 @@ export default {
                     })
                         .then(() => {
                             this.isReadonly = false;
+                            this.isLookKtvInfo = true;
                             this.isUpdate = false;
 
                             //如果有缓存就用缓存里的数据，否则就重新创建座位
@@ -2129,8 +2116,8 @@ export default {
                 appShopImageUrl: this.appShopImageUrl,
                 x: this.x,
                 y: this.y,
-                allSeatDetailInfo: this.allSeatDetailInfo
-                // ktvRoomList : this.ktvRoomList
+                allSeatDetailInfo: this.allSeatDetailInfo,
+                ktvRoomList: this.ktvRoomList
             };
 
             localStorage.setItem('storageInfo', JSON.stringify(obj));
@@ -2177,6 +2164,7 @@ export default {
                 this.x = storageInfo.x;
                 this.y = storageInfo.y;
                 this.allSeatDetailInfo = storageInfo.allSeatDetailInfo;
+                this.ktvRoomList = storageInfo.ktvRoomList;
 
                 //给地图子组件传值（回显地址信息）
                 this.mapList.searchAddress = this.searchAddress;
@@ -2237,6 +2225,7 @@ export default {
             this.x = 20;
             this.y = 20;
             this.allSeatDetailInfo = [];
+            this.ktvRoomList = [];
         },
 
         //座位行数/列数改变
@@ -2251,7 +2240,7 @@ export default {
         //根据包间示意图的个数，来显示与隐藏上传图标
         'presentKtvInfo.sketchMap': {
             handler() {
-                if (!this.isReadonly) {
+                if (!this.isReadonly && this.shopLocaIndex == 3) {
                     this.$nextTick(() => {
                         let addPic = document.querySelector('.ktv-banner .el-upload.el-upload--picture-card');
                         if (addPic !== null) {
@@ -2785,6 +2774,7 @@ export default {
                 max-height: 420px;
                 width: 70%;
                 overflow-y: auto;
+                margin-bottom: 0;
             }
 
             .date-dist {
@@ -2900,15 +2890,10 @@ export default {
                 border: 1px solid #c0c4cc;
                 border-radius: 4px;
                 padding: 10px;
+                margin-bottom: 20px;
 
                 p {
                     margin-bottom: 10px;
-                }
-
-                .left-box {
-                }
-
-                .right-box {
                 }
             }
         }
