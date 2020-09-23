@@ -954,6 +954,7 @@ export default {
             shopTypeOpt: [], //所有店铺类型
             shopTypeOptStrArr: [], //回显店铺类型
             submitShopType: [], //提交所选的店铺类型id
+            shopTypeArr: '', //返回的所选的店铺类型暂存数组
             perCon: '', //人均消费
 
             goodsBrief: '', //商品店面简介
@@ -1576,15 +1577,25 @@ export default {
             });
         },
 
-        //查看当前座位信息
-        lookSeatInfo(e) {
+        //查看或编辑当前座位信息
+        lookSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
             //匹配当前座位信息
             this.allSeatDetailInfo.forEach((item) => {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
+                    //查看当前座位信息
                     this.presentSeatInfo = item;
+                    // if (this.isReadonly) {
+                    //     //查看当前座位信息
+                    //     this.presentSeatInfo = item;
+                    // } else {
+                    //     //修改当前座位的属性值
+                    //     this.presentSeatInfo.seatAttribute = seatType;
+                    //     //修改当前座位为舞台
+                    //     this.presentSeatInfo.seatType = stageCode;
+                    // }
                 }
             });
         },
@@ -1615,11 +1626,12 @@ export default {
                         break;
                 }
                 this.setSeatInfo(e, style); //修改当前座位属性
-                this.lookEditSeatInfo(e, seatType, stageCode); //查看并编辑当前座位信息
+                this.lookEditSeatInfo(e, seatType, stageCode); //查看或编辑当前座位信息
             } else {
-                this.lookSeatInfo(e, seatType, stageCode); //查看当前座位信息
+                this.lookSeatInfo(e);
             }
 
+            // this.lookEditSeatInfo(e, seatType, stageCode); //查看或编辑当前座位信息
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             e.target.classList.add('border'); //定位当前座位
         },
@@ -1687,7 +1699,7 @@ export default {
                 startTime: '',
                 endTime: '',
                 latestTime: '',
-                minConsumption: ''
+                minConsumption: 0
             };
         },
 
@@ -1950,13 +1962,6 @@ export default {
                     item.sketchMap = [];
                 }
 
-                // this.ktvTypeOpt.forEach((ele) => {
-                //     if (item.roomTypeId == ele.id) {
-                //         item.roomTypeId = ele.name;
-                //     }
-                //     // console.log('23132', ele);
-                // });
-
                 //将数值型转为字符型（有无卫生间）
                 if (item.softHardStatus || item.haveToilet) {
                     item.roomAttribute = item.roomAttribute.toString();
@@ -2046,15 +2051,12 @@ export default {
                     this.shopLocaIndex = result.storeLocation;
                     this.shopBrief = result.synopsis;
                     this.trustAddress = result.trustAddress;
-                    let shopTypeArr = result.type.split(',');
+                    this.shopTypeArr = result.type.split(',');
                     this.allSeatDetailInfo = result.layoutList;
                     this.ktvRoomList = result.ktvRoomList;
 
                     //获取店铺类型
                     this.getShopType(result.storeLocation);
-
-                    //回显店铺类型
-                    this.showShopType(shopTypeArr);
 
                     //回显banner图集
                     this.showBannerImg();
@@ -2111,6 +2113,8 @@ export default {
             this.$post('/merchant/store/screening/apiList', data).then((res) => {
                 if (res.data) {
                     this.shopTypeOpt = res.data.storeScreeningDTOS;
+                    //回显店铺类型
+                    this.showShopType(this.shopTypeArr);
                 }
             });
         },
