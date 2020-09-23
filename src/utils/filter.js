@@ -152,15 +152,12 @@ Vue.filter("roomAttr", function (oldVal) {
 })
 
 //包间属性
-Vue.filter("roomType", function (oldVal) {
+Vue.filter("roomType", function (oldVal, ktvTypeOpt) {
     let newVal = '';
-    // switch (oldVal) {
-    //     case '1':
-    //         newVal = '预定桌';
-    //         break;
-    //     case '2':
-    //         newVal = 'AA拼单';
-    //         break;
-    // }
+    ktvTypeOpt.forEach(item => {
+        if (oldVal == item.id) {
+            newVal = item.name;
+        }
+    })
     return newVal;
 })

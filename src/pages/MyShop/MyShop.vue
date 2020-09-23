@@ -14,7 +14,7 @@
 
                 <!-- 店铺基本信息 -->
                 <div class="shop-info clearfix">
-                    <div class="left-info">
+                    <div class="left-info" v-loading="imgLoading.loading2">
                         <p>店铺招牌logo</p>
                         <img
                             v-if="isReadonly&&logoImageUrl"
@@ -224,7 +224,7 @@
                 <!-- 店铺所有展示图 -->
                 <div class="shop-info">
                     <!-- banner展示图 -->
-                    <div class="banner-box">
+                    <div class="banner-box" v-loading="imgLoading.loading">
                         <p>店铺banner图</p>
                         <div v-if="isReadonly">
                             <div v-for="(item,index) in bannerShowBox" :key="index">
@@ -254,7 +254,7 @@
 
                     <div class="rowNum-box">
                         <!-- 排号横幅图 -->
-                        <div class="top">
+                        <div class="top" v-loading="imgLoading.loading3">
                             <p>排号横幅图</p>
                             <img
                                 v-if="isReadonly&&logoImageUrl"
@@ -278,7 +278,7 @@
                             </el-upload>
                         </div>
                         <!-- 店铺长图 -->
-                        <div class="botm">
+                        <div class="botm" v-loading="imgLoading.loading4">
                             <p>店铺长图（用于展示位置变化）</p>
                             <img
                                 v-if="isReadonly&&logoImageUrl"
@@ -304,7 +304,7 @@
                     </div>
 
                     <!-- 商家布局图 -->
-                    <div class="overall-box">
+                    <div class="overall-box" v-loading="imgLoading.loading5">
                         <p>商家布局图</p>
                         <img
                             v-if="isReadonly&&logoImageUrl"
@@ -537,7 +537,8 @@
                     <h4>KTV包间</h4>
                     <!-- 当选择ktv时展示的座位属性 -->
                     <div class="ktv-wrap">
-                        <div class="ktv-left-box" v-if="isLookKtvInfo && ktvRoomList.length >= 0">
+                        <!-- && ktvRoomList.length >= 0 -->
+                        <div class="ktv-left-box" v-if="isLookKtvInfo">
                             <!-- 包间类型 -->
                             <div>
                                 <span>包间类型：</span>
@@ -812,7 +813,7 @@
                                 </div>
                             </div>
                             <!-- ktv包间示意图 -->
-                            <div class="ktv-banner">
+                            <div class="ktv-banner" v-loading="imgLoading.loading6">
                                 <p>包间示意图：</p>
                                 <div v-if="isReadonly&&presentKtvInfo.sketchMap.length > 0">
                                     <div
@@ -855,7 +856,7 @@
                                     <div class="left-box">
                                         <p>
                                             <span>包间类型：</span>
-                                            <span>{{item.roomTypeId}}</span>
+                                            <span>{{item.roomTypeId | roomType(ktvTypeOpt)}}</span>
                                         </p>
                                         <p>
                                             <span>包间属性：</span>
@@ -901,6 +902,15 @@ export default {
 
     data() {
         return {
+            imgLoading: {
+                loading: false,
+                loading2: false,
+                loading3: false,
+                loading4: false,
+                loading5: false,
+                loading6: false
+            },
+
             //传给地图子组件的值
             mapList: {
                 width: '100%',
@@ -1036,11 +1046,14 @@ export default {
 
         //上传头像
         uploadAvatarFile(file) {
+            this.imgLoading.loading2 = true;
             let formData = new FormData();
             formData.append('file', file.file);
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.logoImageUrl = res.data;
+
+                    this.imgLoading.loading2 = false;
                     this.$message.success('上传成功');
                 }
             });
@@ -1070,23 +1083,28 @@ export default {
 
         //上传banner图
         uploadBannerFiles(file) {
+            this.imgLoading.loading = true;
             let formData = new FormData();
             formData.append('files', file.file);
             this.$file_post(this.filesUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
-                    let obj = {
-                        name: res.data[0],
-                        url: res.data[0]
-                    };
-
+                    //将url添加到上传容器中
                     this.bannerShowBox.push(res.data[0]);
+
+                    //将url添加到视图容器里
+                    let obj = {
+                        url: this.showImgPrefix + res.data[0]
+                    };
+                    this.bannerImgBox.push(obj);
+
+                    this.imgLoading.loading = false;
                     this.$message.success('上传成功');
                 }
             });
         },
 
         //回显banner图集（回显在上传图集的容器中）
-        showBannerImg(picStr) {
+        showBannerImg() {
             this.bannerImgBox = [];
 
             //给每张图片加上前缀
@@ -1096,8 +1114,9 @@ export default {
 
             //存入对象，回显到页面上
             pictureArr.forEach((item) => {
-                let obj = {};
-                obj.url = item;
+                let obj = {
+                    url: item
+                };
                 this.bannerImgBox.push(obj);
             });
         },
@@ -1117,7 +1136,8 @@ export default {
             console.log('删除图集', file);
             this.bannerShowBox.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
-                    this.bannerShowBox.splice(i, 1);
+                    this.bannerShowBox.splice(i, 1); //删除上传容器中的
+                    this.bannerImgBox.splice(i, 1); //删除视图上的
                 }
             });
         },
@@ -1145,15 +1165,24 @@ export default {
 
         // 上传ktv包间示意图
         uploadktvBannerFiles(file) {
+            this.imgLoading.loading6 = true;
             let formData = new FormData();
             formData.append('files', file.file);
             this.$file_post(this.filesUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
+                    //将url添加到上传容器中
                     if (!this.presentKtvInfo.sketchMap) {
                         this.presentKtvInfo.sketchMap = [];
                     }
-
                     this.presentKtvInfo.sketchMap.push(res.data[0]);
+
+                    //将url添加到视图容器中
+                    let obj = {
+                        url: this.showImgPrefix + res.data[0]
+                    };
+                    this.ktvBannerImgBox.push(obj);
+
+                    this.imgLoading.loading6 = false;
                     this.$message.success('上传成功');
                 }
             });
@@ -1170,8 +1199,9 @@ export default {
 
             //存入对象，回显到页面上
             ktvBannerArr.forEach((item2) => {
-                let obj = {};
-                obj.url = item2;
+                let obj = {
+                    url: item2
+                };
                 this.ktvBannerImgBox.push(obj);
             });
         },
@@ -1181,17 +1211,21 @@ export default {
             this.presentKtvInfo.sketchMap.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
                     this.presentKtvInfo.sketchMap.splice(i, 1);
+                    this.ktvBannerImgBox.splice(i, 1);
                 }
             });
         },
 
         //上传商家布局图
         uploadOverallFile(file) {
+            this.imgLoading.loading5 = true;
             let formData = new FormData();
             formData.append('file', file.file);
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.overallImageUrl = res.data;
+
+                    this.imgLoading.loading5 = false;
                     this.$message.success('上传成功');
                 }
             });
@@ -1199,11 +1233,14 @@ export default {
 
         //上传排号横幅图
         uploadRowNumFile(file) {
+            this.imgLoading.loading3 = true;
             let formData = new FormData();
             formData.append('file', file.file);
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.rowNumImageUrl = res.data;
+
+                    this.imgLoading.loading3 = false;
                     this.$message.success('上传成功');
                 }
             });
@@ -1211,11 +1248,14 @@ export default {
 
         //上传店铺长图
         uploadAppShopFile(file) {
+            this.imgLoading.loading4 = true;
             let formData = new FormData();
             formData.append('file', file.file);
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.appShopImageUrl = res.data;
+
+                    this.imgLoading.loading4 = false;
                     this.$message.success('上传成功');
                 }
             });
@@ -1967,6 +2007,9 @@ export default {
                 this.$message.success('修改成功');
                 this.isUpdateKtvInfo = false;
             } else {
+                if (!this.ktvRoomList) {
+                    this.ktvRoomList = [];
+                }
                 this.ktvRoomList.push(this.presentKtvInfo);
                 console.log('新增操作');
                 this.$message.success('新增成功');
@@ -2555,6 +2598,9 @@ export default {
 
         .banner-box {
             width: 38%;
+            /deep/ .el-upload-list--picture-card .el-upload-list__item {
+                transition: none;
+            }
 
             > div {
                 img {
