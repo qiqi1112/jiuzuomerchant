@@ -44,9 +44,27 @@
                 <el-table-column align="center" prop="overTime" min-width="100" label="结束时间"></el-table-column>
                 <el-table-column label="操作" width="300" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-view" @click="handleEdit(scope.$index, scope.row,1)" >查看</el-button>
+                         <el-button
+                            :type="scope.row.apply==1?(scope.row.storeApply==1?'success':'danger'):'danger' "
+                            @click="enable(scope.$index, scope.row)"
+                        >{{scope.row.apply==1?(scope.row.storeApply==1?'已启用':'已禁用'):'已禁用' }}</el-button>
+                        <el-button
+                            type="primary"
+                            @click="handleEdit(scope.$index, scope.row,1)"
+                        >查看</el-button>
+
+                        <el-button
+                            type="primary"
+                            @click="handleEdit(scope.$index, scope.row,2)"
+                        >编辑</el-button>
+                        <!-- <el-button
+                            type="primary"
+                            @click="dtlCoupon(scope.$index, scope.row)"
+                        >删除</el-button> -->
+
+                        <!-- <el-button type="text" icon="el-icon-view" @click="handleEdit(scope.$index, scope.row,1)" >查看</el-button>
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row,2)" >编辑</el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="dtlCoupon(scope.$index, scope.row)">删除</el-button>
+                        <el-button type="text" icon="el-icon-delete" class="red" @click="dtlCoupon(scope.$index, scope.row)">删除</el-button> -->
                     </template>
                 </el-table-column>
             </el-table>
@@ -211,6 +229,7 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
+            this.$set(this.query, 'pageIndex', 1);
             this.getData();
         },
         // 下拉框改变时
@@ -271,10 +290,6 @@ export default {
             this.$set(this.query, 'pageIndex', val);
             this.getData();
         },
-
-        addTicket(){
-
-        },
         // 批量增加优惠券
         addCou() {
             this.dynamicValidateForm.domains.push({
@@ -290,16 +305,25 @@ export default {
         // 多选
         handleSelectionChange(val){
             this.primary_dtl_cou = val
-            console.log()
         },
         //删除已有优惠券
         dtlCoupon(index,val){
-            // this.tableData.splice(1, 1);
-            // return
             let str = val.map(v=>{return v.id});
             this.$post(`/merchant/store/coupon/batchDeleteCoupon`,str).then(res=>{
                 if(res.code == 0){
                     this.$message({message: '删除成功',type: 'success'});
+                    this.getData();
+                }else{
+                    this.$message({message: res.msg,type: 'warning'});
+                }
+            })
+        },
+        // 启用
+        enable(val,index){
+            return
+            this.$post(`/merchant/store/coupon/batchDeleteCoupon${val.id}`).then(res=>{
+                if(res.code == 0){
+                    
                 }else{
                     this.$message({message: res.msg,type: 'warning'});
                 }

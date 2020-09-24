@@ -65,19 +65,19 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center" fixed="right">
+                <el-table-column label="操作" width="280" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button
-                            type="text"
-                            icon="el-icon-edit"
-                            @click="lineDb(scope.row,scope.$index)"
-                        >编辑</el-button>
-                        <el-button
-                            type="text"
-                            icon="el-icon-delete"
-                            class="red"
-                            @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>
+                        <span v-for="(btn,i) in buttons" :key="i" >
+                            <el-button 
+                            style="margin-right:10px"
+                            v-show="scope.row.examine == btn.type" 
+                            :type="btn.color"
+                            :disabled='scope.row.examine != 0 && scope.row.examine != 3'
+                            @click="changeType(scope.row,scope.$index)">
+                            {{btn.text}}</el-button>
+                        </span>
+                        <el-button type="primary" @click="lineDb(scope.row,scope.$index)" >编辑</el-button>
+                        <el-button type="primary" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -167,8 +167,8 @@
                 </div>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">重置</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button @click="editVisible = false">返回</el-button>
+                <el-button type="primary" @click="saveEdit" v-if="dynamicValidateForm.examine==0 || dynamicValidateForm.examine==3">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -209,9 +209,42 @@ export default {
                 fromdata:'',//图片
                 editor_text:'',//富文本
                 times:[],
-                id:''
+                id:'',
+                examine:0,
             },
-            loading: false
+            loading: false,
+            buttons:[
+                {
+                    type:0,
+                    color:'',
+                    text:'提交审核'
+                },
+                {
+                    type:1,
+                    color:'warning',
+                    text:'审核中'
+                },
+                {
+                    type:2,
+                    color:'danger',
+                    text:'审核未通过'
+                },
+                {
+                    type:3,
+                    color:'',
+                    text:'再次提交'
+                },
+                {
+                    type:4,
+                    color:'success',
+                    text:'审核通过'
+                },
+                {
+                    type:5,
+                    color:'info',
+                    text:'已下架'
+                },
+            ]
         }
     },  
     components:{
@@ -245,6 +278,21 @@ export default {
                 this.tableData = res.data
                 this.pageTotal = res.data.length
             })
+        },
+        changeType(val,index){
+            this.$confirm('是否提交审核', '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    this.$get(`/merchant/store/active/apply/${val.id}`).then((res) => {
+                        if(res.code == 0){
+                            this.$set(val,'examine',1)
+                        }else{
+                            this.$message.warning(res.msg);
+                        }
+                    })  
+                })
+                .catch(() => {});
         },
         // 触发搜索按钮
         handleSearch() {
@@ -286,7 +334,8 @@ export default {
                     fromdata:'',//图片
                     editor_text:'',//富文本
                     times:[],
-                    id:''
+                    id:'',
+                    examine:0,
                 }
             }
             this.editVisible = true;
@@ -296,6 +345,7 @@ export default {
             this.dynamicValidateForm.dio_name = row.name
             this.dynamicValidateForm.dio_introduce = row.synopsis
             this.dynamicValidateForm.id = row.id
+            this.dynamicValidateForm.examine = row.examine
             this.dynamicValidateForm.editor_text = row.content
             this.dynamicValidateForm.times = [row.startTime,row.endTime]
             this.dynamicValidateForm.fromdata = row.banner
@@ -322,6 +372,7 @@ export default {
                 endTime:this.$regular.timeData(this.dynamicValidateForm.times[1],3) +':00' ,
                 synopsis:this.dynamicValidateForm.dio_introduce,
                 banner:this.dynamicValidateForm.fromdata,
+                examine:this.dynamicValidateForm.examine
             }
 
 

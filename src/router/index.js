@@ -93,19 +93,6 @@ export default new Router({
                         title: '优惠券'
                     }
                 },
-                // {
-                //     path: '/Advertising',
-                //     component: () => import('../pages/AdverActivity/Advertising.vue'),
-                //     meta: {
-                //         title: '广告栏'
-                //     }
-                // },
-
-
-
-
-
-
 
                 {
                     path: '/dashboard',
