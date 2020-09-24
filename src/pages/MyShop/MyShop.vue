@@ -575,7 +575,7 @@
                                 <span>包间数量：</span>
                                 <el-input
                                     v-model="presentKtvInfo.roomNumber"
-                                    placeholder="包间数量/个"
+                                    placeholder="包间数量（个）"
                                     style="width:50%"
                                     :readonly="isReadonly"
                                 ></el-input>
@@ -585,7 +585,7 @@
                                 <span>容纳人数：</span>
                                 <el-input
                                     v-model="presentKtvInfo.capacity"
-                                    placeholder="容纳人数/人"
+                                    placeholder="容纳人数（人）"
                                     style="width:50%"
                                     :readonly="isReadonly"
                                 ></el-input>
@@ -609,7 +609,7 @@
                                 <span>机麻：</span>
                                 <el-input
                                     v-model="presentKtvInfo.mahjong"
-                                    placeholder="机麻数量/桌"
+                                    placeholder="机麻数量（桌）"
                                     style="width:50%"
                                     :readonly="isReadonly"
                                 ></el-input>
@@ -656,7 +656,7 @@
                                         <span>最低消费：</span>
                                         <el-input
                                             v-model="item.minConsumption"
-                                            placeholder="最低消费/元"
+                                            placeholder="最低消费（元）"
                                             style="width:50%"
                                             :readonly="isReadonly"
                                         ></el-input>
@@ -664,17 +664,20 @@
                                     <!-- 最晚保留时间 -->
                                     <div class="longRetain">
                                         <span>最晚保留时间：</span>
-                                        <el-time-select
+                                        <el-select
+                                            @change="aaa"
+                                            :disabled="isReadonly"
                                             style="width:50%"
-                                            placeholder="最晚保留时间"
                                             v-model="item.latestTime"
-                                            :readonly="isReadonly"
-                                            :picker-options="{
-                                    start: item.startTime,
-                                    step: '00:10',
-                                    end: item.endTime
-                                }"
-                                        ></el-time-select>
+                                            placeholder="最晚保留时间（分钟）"
+                                        >
+                                            <el-option
+                                                v-for="(item,index) in timeQuanArr"
+                                                :key="index"
+                                                :label="item"
+                                                :value="item"
+                                            ></el-option>
+                                        </el-select>
                                     </div>
                                     <!-- 删除 -->
                                     <el-button
@@ -723,7 +726,7 @@
                                         <span>最低消费：</span>
                                         <el-input
                                             v-model="timeQuanObj.minConsumption"
-                                            placeholder="最低消费/元"
+                                            placeholder="最低消费（元）"
                                             style="width:50%"
                                             :readonly="isReadonly"
                                         ></el-input>
@@ -731,17 +734,20 @@
                                     <!-- 最晚保留时间 -->
                                     <div class="longRetain">
                                         <span>最晚保留时间：</span>
-                                        <el-time-select
+                                        <el-select
+                                            @change="aaa"
                                             style="width:50%"
-                                            placeholder="最晚保留时间"
                                             v-model="timeQuanObj.latestTime"
+                                            placeholder="最晚保留时间（分钟）"
                                             :readonly="isReadonly"
-                                            :picker-options="{
-                                    start: timeQuanObj.startTime,
-                                    step: '00:10',
-                                    end: timeQuanObj.endTime
-                                }"
-                                        ></el-time-select>
+                                        >
+                                            <el-option
+                                                v-for="(item,index) in timeQuanArr"
+                                                :key="index"
+                                                :label="item"
+                                                :value="item"
+                                            ></el-option>
+                                        </el-select>
                                     </div>
                                     <!-- 确定 -->
                                     <el-button
@@ -749,7 +755,7 @@
                                         @click="addTimeQuan"
                                         type="primary"
                                         style="float:right"
-                                    >确定</el-button>
+                                    >添加</el-button>
                                 </div>
                             </div>
                             <!-- 零嘴 -->
@@ -808,7 +814,7 @@
                                             :disabled="isReadonly"
                                             type="primary"
                                             @click="addSnacks"
-                                        >确定</el-button>
+                                        >添加</el-button>
                                     </div>
                                 </div>
                             </div>
@@ -854,22 +860,26 @@
                             <ul>
                                 <li v-for="(item,index) in ktvRoomList" :key="index">
                                     <div class="left-box">
-                                        <p>
-                                            <span>包间类型：</span>
-                                            <span>{{item.roomTypeId | roomType(ktvTypeOpt)}}</span>
-                                        </p>
-                                        <p>
-                                            <span>包间属性：</span>
-                                            <span>{{item.roomAttribute | roomAttr}}</span>
-                                        </p>
-                                        <p>
-                                            <span>包间数量：</span>
-                                            <span>{{item.roomNumber}}</span>
-                                        </p>
-                                        <p>
-                                            <span>最低消费：</span>
-                                            <span>{{item.minConsumption}}</span>
-                                        </p>
+                                        <div>
+                                            <p>
+                                                <span>包间类型：</span>
+                                                <span>{{item.roomTypeId | roomType(ktvTypeOpt)}}</span>
+                                            </p>
+                                            <p>
+                                                <span>包间属性：</span>
+                                                <span>{{item.roomAttribute | roomAttr}}</span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p>
+                                                <span>包间数量：</span>
+                                                <span>{{item.roomNumber}}</span>
+                                            </p>
+                                            <p>
+                                                <span>最低消费：</span>
+                                                <span>{{item.minConsumption}}</span>
+                                            </p>
+                                        </div>
                                     </div>
                                     <div class="right-box">
                                         <el-button
@@ -1008,13 +1018,21 @@ export default {
                 name: '',
                 num: ''
             },
+            //  timeQuanObj: {
+            //     startTime: '00:00', //开始时间
+            //     endTime: '00:00', //结束时间
+            //     latestTime: '00:00', //最晚保留时间
+            //     minConsumption: 0 //最低消费
+            // },
             //当前ktv包间配置的时间段
             timeQuanObj: {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '', //最晚保留时间
-                minConsumption: 0 //最低消费
+                minConsumption: '' //最低消费
             },
+            timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
+
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
                 roomTypeId: '', //包间类型
@@ -1031,6 +1049,10 @@ export default {
         };
     },
     methods: {
+        aaa() {
+            console.log(this.timeQuanObj.latestTime);
+        },
+
         //接收地图子组件传过来的参数
         childData(data) {
             if (data) {
@@ -1696,10 +1718,10 @@ export default {
             let timeQuan = Object.assign({}, this.timeQuanObj);
             this.presentKtvInfo.roomTimeIntervalList.push(timeQuan);
             this.timeQuanObj = {
-                startTime: '',
-                endTime: '',
-                latestTime: '',
-                minConsumption: 0
+                startTime: '', //开始时间
+                endTime: '', //结束时间
+                latestTime: '', //最晚保留时间
+                minConsumption: '' //最低消费
             };
         },
 
@@ -1859,7 +1881,7 @@ export default {
                         seatCode: j + '-' + i,
                         seatColumn: i,
                         seatRow: j,
-                        seatLatestReservationTime: '',
+                        seatLatestReservationTime: '00:00',
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [
@@ -1992,7 +2014,7 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '', //最晚保留时间
-                minConsumption: 0 //最低消费
+                minConsumption: '' //最低消费
             };
             this.ktvBannerImgBox = [];
         },
@@ -2934,12 +2956,17 @@ export default {
         }
 
         .ktv-right-box {
-            width: 30%;
+            width: 38%;
+
+            .left-box {
+                display: flex;
+                justify-content: space-between;
+            }
 
             ul li {
                 border: 1px solid #c0c4cc;
                 border-radius: 4px;
-                padding: 10px;
+                padding: 16px;
                 margin-bottom: 20px;
 
                 p {
