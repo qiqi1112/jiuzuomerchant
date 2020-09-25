@@ -48,7 +48,7 @@ export default {
                 address: '',
                 name: '',
                 pageIndex: 1,
-                pageSize: 10,
+                pageSize: 20,
                 tel:'',
             },
             tableData: [],

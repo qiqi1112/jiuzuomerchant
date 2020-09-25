@@ -30,7 +30,7 @@
             @selection-change="handleSelectionChange"
             @row-dblclick="lineDb"
             >
-                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" fixed width="180" align="center"></el-table-column>
                 <el-table-column prop="category" align="center" min-width="100" label="优惠券类型">
                     <template slot-scope="scope">
@@ -319,11 +319,16 @@ export default {
             })
         },
         // 启用
-        enable(val,index){
-            return
-            this.$post(`/merchant/store/coupon/batchDeleteCoupon${val.id}`).then(res=>{
+        enable(index,val){
+            if(val.apply == 0){
+                this.$alert('此优惠券为平台禁用，请联系平台', '提示', {
+                    confirmButtonText: '确定',
+                });
+                return
+            }
+            this.$get(`/merchant/store/coupon/storeApply/${val.id}`).then(res=>{
                 if(res.code == 0){
-                    
+                    this.$set(val,'storeApply',val.storeApply==0?1:0)
                 }else{
                     this.$message({message: res.msg,type: 'warning'});
                 }
