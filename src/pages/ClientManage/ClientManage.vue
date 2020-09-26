@@ -2,9 +2,7 @@
     <div>
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>
-                    <i class="el-icon-lx-calendar"></i> 客户管理
-                </el-breadcrumb-item>
+                <el-breadcrumb-item> <i class="el-icon-lx-calendar"></i> 客户管理 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
 
@@ -18,55 +16,27 @@
                     placeholder="用户昵称"
                     class="handle-input mr10"
                 ></el-input>
-                <el-select
-                    clearable
-                    v-model="collectVal"
-                    placeholder="收藏本店"
-                    style="width:100px"
-                    class="mr10"
-                >
-                    <el-option
-                        v-for="item in collectValOpt"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    ></el-option>
+                <el-select clearable v-model="collectVal" placeholder="收藏本店" style="width: 100px" class="mr10">
+                    <el-option v-for="item in collectValOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
-                <el-select
-                    clearable
-                    v-model="isVipVal"
-                    placeholder="本店会员"
-                    style="width:100px"
-                    class="mr10"
-                >
-                    <el-option
-                        v-for="item in isVipOpt"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    ></el-option>
+                <el-select clearable v-model="isVipVal" placeholder="本店会员" style="width: 100px" class="mr10">
+                    <el-option v-for="item in isVipOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
 
             <!-- 表格部分 -->
-            <el-table
-                border
-                ref="multipleTable"
-                :data="tableData"
-                tooltip-effect="dark"
-                style="width: 100%"
-            >
+            <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
                 <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="petName" label="用户昵称"></el-table-column>
                 <el-table-column label="用户手机" min-width="100">
                     <template slot-scope="scope">
-                        <span>{{scope.row.phone}}</span>
+                        <span>{{ scope.row.phone }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="本店会员" min-width="80">
                     <template slot-scope="scope">
-                        <span>{{scope.row.vip | yesOrNo}}</span>
+                        <span>{{ scope.row.vip | yesOrNo }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="aaMakeUpATableTimes" label="AA拼单次数" min-width="90"></el-table-column>
@@ -76,7 +46,7 @@
                 <el-table-column prop="cancelEffectNumberOfTimes" label="取消排号次数" min-width="100"></el-table-column>
                 <el-table-column label="收藏本店" min-width="100">
                     <template slot-scope="scope">
-                        <span>{{scope.row.collectionMerchantStatus | yesOrNo}}</span>
+                        <span>{{ scope.row.collectionMerchantStatus | yesOrNo }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="numberOfComments" label="评价次数"></el-table-column>
@@ -86,11 +56,7 @@
                 <el-table-column prop="totalConsumptionAmount" label="本店累计消费金额" min-width="135"></el-table-column>
                 <el-table-column label="操作" fixed="right" min-width="80">
                     <template slot-scope="scope">
-                        <el-button
-                            type="primary"
-                            size="mini"
-                            @click="lookInfo(scope.$index, scope.row)"
-                        >查看</el-button>
+                        <el-button type="primary" size="mini" @click="lookInfo(scope.$index, scope.row)">查看</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -102,50 +68,42 @@
                     <div>
                         <p>
                             <span>昵称：</span>
-                            <span>{{userInfo.petName}}</span>
+                            <span>{{ userInfo.petName }}</span>
                         </p>
                         <p>
                             <span>手机：</span>
-                            <span>{{userInfo.phone}}</span>
+                            <span>{{ userInfo.phone }}</span>
                         </p>
                     </div>
                     <div>
                         <p>
                             <span>本店会员：</span>
-                            <span>{{userInfo.vip}}</span>
+                            <span>{{ userInfo.vip }}</span>
                         </p>
                         <p>
                             <span>收藏本店：</span>
-                            <span>{{userInfo.collectionMerchantStatus}}</span>
+                            <span>{{ userInfo.collectionMerchantStatus }}</span>
                         </p>
                         <p>
                             <span>累计消费：</span>
-                            <span>{{userInfo.totalConsumptionAmount}}</span>
+                            <span>{{ userInfo.totalConsumptionAmount }}</span>
                         </p>
                     </div>
                 </div>
 
                 <!-- 对话框里的标签页 -->
-                <el-tabs
-                    style="margin-top:20px"
-                    v-model="activeName"
-                    type="border-card"
-                    @tab-click="handleClick"
-                >
+                <el-tabs style="margin-top: 20px" v-model="activeName" type="border-card" @tab-click="handleClick">
                     <el-tab-pane label="排号记录" name="rowRecord">
-                        <row-record-tab :userID="userInfo.userID" v-if="activeName=='rowRecord'"></row-record-tab>
+                        <row-record-tab :userID="userInfo.userID" v-if="activeName == 'rowRecord'"></row-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="评价记录" name="evalRecord">
-                        <eval-record-tab :userID="userInfo.userID" v-if="activeName=='evalRecord'"></eval-record-tab>
+                        <eval-record-tab :userID="userInfo.userID" v-if="activeName == 'evalRecord'"></eval-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="访问记录" name="visitRecord">
-                        <visit-record-tab
-                            :userID="userInfo.userID"
-                            v-if="activeName=='visitRecord'"
-                        ></visit-record-tab>
+                        <visit-record-tab :userID="userInfo.userID" v-if="activeName == 'visitRecord'"></visit-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="消费记录" name="conRecord">
-                        <con-record-tab :userID="userInfo.userID" v-if="activeName=='conRecord'"></con-record-tab>
+                        <con-record-tab :userID="userInfo.userID" v-if="activeName == 'conRecord'"></con-record-tab>
                     </el-tab-pane>
                 </el-tabs>
                 <div slot="footer" class="dialog-footer">
@@ -155,7 +113,6 @@
 
             <!-- 表格数据分页 -->
             <el-pagination
-                v-if="tableData.length > 0"
                 background
                 layout="prev, pager, next"
                 @current-change="handleCurrentChange"
@@ -240,12 +197,7 @@ export default {
         //查看按钮
         lookInfo(index, row) {
             this.dialogFormVisible = true;
-            this.userInfo.petName = row.petName;
-            this.userInfo.phone = row.phone;
-            this.userInfo.vip = row.vip;
-            this.userInfo.collectionMerchantStatus = row.collectionMerchantStatus;
-            this.userInfo.totalConsumptionAmount = row.totalConsumptionAmount;
-            this.userInfo.userID = row.userId;
+            this.userInfo = row;
         },
 
         //标签页切换操作
@@ -255,10 +207,8 @@ export default {
 
         //搜索操作
         handleSearch() {
-            // if (this.searchName) {
             this.currentPage = 1;
             this.getClientInfo();
-            // }
         },
 
         //获取客户信息

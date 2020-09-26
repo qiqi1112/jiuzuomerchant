@@ -4,13 +4,9 @@
             <el-form ref="drinksForm" :model="drinksForm" label-width="80px">
                 <p>
                     <span>酒水名称：</span>
-                    <el-input v-model="drinksForm.name" style="width:170px;margin-right:20px"></el-input>
+                    <el-input v-model="drinksForm.name" style="width: 170px; margin-right: 20px"></el-input>
                     <!-- 酒水分类 -->
-                    <el-select
-                        v-model="drinksForm.classify"
-                        placeholder="酒水分类"
-                        style="width:150px;margin-right:20px"
-                    >
+                    <el-select v-model="drinksForm.classify" placeholder="酒水分类" style="width: 150px; margin-right: 20px">
                         <el-option
                             v-for="item in drinksForm.classifyOptions"
                             :key="item.value"
@@ -26,7 +22,7 @@
                 </p>
                 <p>
                     <span>酒水包含：</span>
-                    <el-input type="textarea" v-model="drinksForm.desc" style="width:300px;"></el-input>
+                    <el-input type="textarea" v-model="drinksForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p class="drinks-spec">
                     <span>酒水规格：</span>
@@ -36,32 +32,22 @@
                         label-width="100px"
                         class="demo-dynamic"
                     >
-                        <el-form-item
-                            v-for="(item, index) in drinksForm.dynamicValidateForm.domains"
-                            :key="index"
-                        >
+                        <el-form-item v-for="(item, index) in drinksForm.dynamicValidateForm.domains" :key="index">
                             <el-input
                                 v-model="item.specName"
                                 placeholder="规格（如：一箱）"
-                                style="width:132px;margin-right:10px"
+                                style="width: 132px; margin-right: 10px"
                             ></el-input>
-                            <el-input
-                                v-model="item.originalPrice"
-                                placeholder="原价（如：9.99）"
-                                style="width:130px;margin-right:10px"
-                            ></el-input>
-                            <el-input
-                                v-model="item.presentPrice"
-                                placeholder="现价（如：9.99）"
-                                style="width:130px;margin-right:10px"
-                            ></el-input>
+                            <el-input v-model="item.originalPrice" placeholder="原价（如：9.99）" style="width: 170px; margin-right: 10px">
+                                <template slot="append">￥</template>
+                            </el-input>
+                            <el-input v-model="item.presentPrice" placeholder="现价（如：9.99）" style="width: 170px; margin-right: 10px">
+                                <template slot="append">￥</template>
+                            </el-input>
                             <el-button @click="addDomain">
                                 <i class="el-icon-plus"></i>
                             </el-button>
-                            <el-button
-                                v-show="drinksForm.dynamicValidateForm.domains.length > 1"
-                                @click.prevent="removeDomain(item)"
-                            >
+                            <el-button v-show="drinksForm.dynamicValidateForm.domains.length > 1" @click.prevent="removeDomain(item)">
                                 <i class="el-icon-close"></i>
                             </el-button>
                         </el-form-item>
@@ -69,11 +55,13 @@
                 </p>
                 <p>
                     <span>酒水产地：</span>
-                    <el-input v-model="drinksForm.area" style="width:170px"></el-input>
+                    <el-input v-model="drinksForm.area" style="width: 170px"></el-input>
                 </p>
                 <p>
                     <span>酒水年份：</span>
-                    <el-input v-model="drinksForm.year" style="width:170px"></el-input>
+                    <el-input v-model="drinksForm.year" style="width: 170px">
+                        <template slot="append">年</template>
+                    </el-input>
                 </p>
             </el-form>
             <div class="drinks-update-box">
@@ -84,22 +72,18 @@
                         v-model="drinksForm.checkedBanner"
                         label="放至商店广告位"
                         border
-                        style="margin-right:20px"
+                        style="margin-right: 20px"
                     ></el-checkbox>
                     <div class="drinks-div">
                         <el-upload
-                            v-if="drinksForm.checkedBanner&&drinksForm.checkedBanner !== 2"
+                            v-if="drinksForm.checkedBanner && drinksForm.checkedBanner !== 2"
                             class="avatar-uploader"
                             action="1"
                             :show-file-list="false"
                             :http-request="uploadBannerFiles"
                             :on-error="uploadError"
                         >
-                            <img
-                                v-if="drinksForm.bannerImageUrl"
-                                :src="showImgPrefix + drinksForm.bannerImageUrl"
-                                class="avatar"
-                            />
+                            <img v-if="drinksForm.bannerImageUrl" :src="showImgPrefix + drinksForm.bannerImageUrl" class="avatar" />
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
 
@@ -114,26 +98,22 @@
                         v-model="drinksForm.checkedReco"
                         label="放至商家推荐位"
                         border
-                        style="width:88%;margin-bottom: 20px;"
+                        style="width: 88%; margin-bottom: 20px"
                     ></el-checkbox>
-                    <div v-if="drinksForm.checkedReco&&drinksForm.checkedReco !==2">
+                    <div v-if="drinksForm.checkedReco && drinksForm.checkedReco !== 2">
                         <span>推荐位排序：</span>
                         <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>
                     </div>
                     <div class="drinks-div">
                         <el-upload
-                            v-if="drinksForm.checkedReco&&drinksForm.checkedReco !==2"
+                            v-if="drinksForm.checkedReco && drinksForm.checkedReco !== 2"
                             class="avatar-uploader"
                             action="1"
                             :show-file-list="false"
                             :http-request="uploadRecoFiles"
                             :on-error="uploadError"
                         >
-                            <img
-                                v-if="drinksForm.recoImageUrl"
-                                :src="showImgPrefix + drinksForm.recoImageUrl"
-                                class="avatar"
-                            />
+                            <img v-if="drinksForm.recoImageUrl" :src="showImgPrefix + drinksForm.recoImageUrl" class="avatar" />
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                         <span>（*如需商家推荐，请添加推荐位图片）</span>
@@ -152,11 +132,7 @@
                     :http-request="uploadThumFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="drinksForm.thumImageUrl"
-                        :src="showImgPrefix + drinksForm.thumImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="drinksForm.thumImageUrl" :src="showImgPrefix + drinksForm.thumImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -170,11 +146,7 @@
                     :http-request="uploadDetailFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="drinksForm.detailImageUrl"
-                        :src="showImgPrefix + drinksForm.detailImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="drinksForm.detailImageUrl" :src="showImgPrefix + drinksForm.detailImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -308,6 +280,10 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
+            // this.drinksForm = this.drinksFormParent;
+            // this.drinksForm.checkedBanner = this.drinksFormParent.checkedBanner == 1 ? true : false;
+            // this.drinksForm.checkedReco = this.drinksFormParent.checkedReco == 1 ? true : false;
+
             this.drinksForm.area = this.drinksFormParent.area;
             this.drinksForm.year = this.drinksFormParent.year;
             this.drinksForm.name = this.drinksFormParent.name;
@@ -394,6 +370,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-</style>

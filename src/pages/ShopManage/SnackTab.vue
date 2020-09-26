@@ -2,15 +2,10 @@
     <div class="goods-info-box">
         <div class="left-box">
             <el-form ref="snackForm" :model="snackForm" label-width="80px">
-                <!-- <p>
-                    <span>小吃名称：</span>
-                    <el-input v-model="snackForm.name" style="width:200px"></el-input>
-                </p>-->
-
                 <div class="good-name-box">
                     <div>
                         <span>小吃名称：</span>
-                        <el-input v-model="snackForm.name" style="width:160px"></el-input>
+                        <el-input v-model="snackForm.name" style="width: 160px"></el-input>
                     </div>
                     <div>
                         <span>商品排序：</span>
@@ -20,9 +15,9 @@
                 </div>
                 <p>
                     <span>小吃包含：</span>
-                    <el-input type="textarea" v-model="snackForm.desc" style="width:300px;"></el-input>
+                    <el-input type="textarea" v-model="snackForm.desc" style="width: 300px"></el-input>
                 </p>
-                <p class="combo-spec">
+                <p class="drinks-spec">
                     <span>小吃规格：</span>
                     <el-form
                         :model="snackForm.dynamicValidateForm"
@@ -30,32 +25,26 @@
                         label-width="100px"
                         class="demo-dynamic"
                     >
-                        <el-form-item
-                            v-for="(item, index) in snackForm.dynamicValidateForm.domains"
-                            :key="index"
-                        >
+                        <el-form-item v-for="(item, index) in snackForm.dynamicValidateForm.domains" :key="index">
                             <el-input
                                 v-model="item.specName"
                                 placeholder="规格（如：一箱）"
-                                style="width:132px;margin-right:10px"
+                                style="width: 132px; margin-right: 10px"
                             ></el-input>
                             <el-input
                                 v-model="item.originalPrice"
                                 placeholder="原价（如：9.99）"
-                                style="width:130px;margin-right:10px"
+                                style="width: 130px; margin-right: 10px"
                             ></el-input>
                             <el-input
                                 v-model="item.presentPrice"
                                 placeholder="现价（如：9.99）"
-                                style="width:130px;margin-right:10px"
+                                style="width: 130px; margin-right: 10px"
                             ></el-input>
                             <el-button @click="addDomain">
                                 <i class="el-icon-plus"></i>
                             </el-button>
-                            <el-button
-                                v-show="snackForm.dynamicValidateForm.domains.length > 1"
-                                @click.prevent="removeDomain(item)"
-                            >
+                            <el-button v-show="snackForm.dynamicValidateForm.domains.length > 1" @click.prevent="removeDomain(item)">
                                 <i class="el-icon-close"></i>
                             </el-button>
                         </el-form-item>
@@ -68,23 +57,19 @@
                     v-model="snackForm.checkedBanner"
                     label="放至商店广告位"
                     border
-                    style="margin-right:20px"
+                    style="margin-right: 20px"
                 ></el-checkbox>
             </p>
             <!-- 广告图 -->
             <el-upload
-                v-if="snackForm.checkedBanner&&snackForm.checkedBanner !== 2"
+                v-if="snackForm.checkedBanner && snackForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
                 :show-file-list="false"
                 :http-request="uploadBannerFiles"
                 :on-error="uploadError"
             >
-                <img
-                    v-if="snackForm.bannerImageUrl"
-                    :src="showImgPrefix + snackForm.bannerImageUrl"
-                    class="avatar"
-                />
+                <img v-if="snackForm.bannerImageUrl" :src="showImgPrefix + snackForm.bannerImageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <span>（*如需商店轮播推荐，请添加广告图片）</span>
@@ -100,11 +85,7 @@
                     :http-request="uploadThumFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="snackForm.thumImageUrl"
-                        :src="showImgPrefix + snackForm.thumImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="snackForm.thumImageUrl" :src="showImgPrefix + snackForm.thumImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -118,11 +99,7 @@
                     :http-request="uploadDetailFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="snackForm.detailImageUrl"
-                        :src="showImgPrefix + snackForm.detailImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="snackForm.detailImageUrl" :src="showImgPrefix + snackForm.detailImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -279,6 +256,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-</style>

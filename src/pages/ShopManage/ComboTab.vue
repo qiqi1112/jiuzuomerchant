@@ -5,7 +5,7 @@
                 <div class="good-name-box">
                     <div>
                         <span>套餐名称：</span>
-                        <el-input v-model="comboForm.name" style="width:160px"></el-input>
+                        <el-input v-model="comboForm.name" style="width: 160px"></el-input>
                     </div>
                     <div>
                         <span>商品排序：</span>
@@ -15,7 +15,7 @@
                 </div>
                 <p>
                     <span>套餐包含：</span>
-                    <el-input type="textarea" v-model="comboForm.desc" style="width:300px;"></el-input>
+                    <el-input type="textarea" v-model="comboForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p>
                     <span>选择商品：</span>
@@ -28,22 +28,19 @@
                         @focus="selectGoodsList"
                     >
                         <el-option
-                            v-for="(item,index) in comboForm.options"
+                            v-for="(item, index) in comboForm.options"
                             :key="index"
                             :label="item.name"
                             :value="item.id + '+' + item.listPicture + '+' + item.name + '+' + item.originalPrice + '+' + item.presentPrice"
                         ></el-option>
                     </el-select>
                 </p>
-                <p style="width:82%" v-if="comboForm.tableData.length > 0">
+                <p style="width: 82%" v-if="comboForm.tableData.length > 0">
                     <el-table :data="comboForm.tableData" border>
                         <el-table-column prop="goodsName" label="商品名称" width="150"></el-table-column>
                         <el-table-column label="商品图片" width="126">
                             <template slot-scope="scope">
-                                <img
-                                    style="width:100px;height:60px"
-                                    :src="showImgPrefix + scope.row.listPicture"
-                                />
+                                <img style="width: 100px; height: 60px" :src="showImgPrefix + scope.row.listPicture" />
                             </template>
                         </el-table-column>
                         <el-table-column prop="originalPrice" label="原价" width="100"></el-table-column>
@@ -55,25 +52,21 @@
                         </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
-                                <el-button
-                                    size="mini"
-                                    type="danger"
-                                    @click="handleDelete(scope.$index, scope.row)"
-                                >移除</el-button>
+                                <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">移除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
                 </p>
                 <p>
                     <span>套餐原单价：</span>
-                    <el-input v-model="comboForm.originPrice" style="width:120px;margin-right:20px"></el-input>
+                    <el-input v-model="comboForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
 
                     <span>套餐现单价：</span>
-                    <el-input v-model="comboForm.nowPrice" style="width:120px"></el-input>
+                    <el-input v-model="comboForm.nowPrice" style="width: 120px"></el-input>
                 </p>
                 <p class="combo-spec">
                     <span>套餐规格：</span>
-                    <i v-for="(item,index) in comboForm.spec" :key="index">{{item}}</i>
+                    <i v-for="(item, index) in comboForm.spec" :key="index">{{ item }}</i>
                 </p>
             </el-form>
             <p>
@@ -82,23 +75,19 @@
                     v-model="comboForm.checkedBanner"
                     label="放至商店广告位"
                     border
-                    style="margin-right:20px"
+                    style="margin-right: 20px"
                 ></el-checkbox>
             </p>
             <!-- 广告图 -->
             <el-upload
-                v-if="comboForm.checkedBanner&&comboForm.checkedBanner !== 2"
+                v-if="comboForm.checkedBanner && comboForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
                 :show-file-list="false"
                 :http-request="uploadBannerFiles"
                 :on-error="uploadError"
             >
-                <img
-                    v-if="comboForm.bannerImageUrl"
-                    :src="showImgPrefix + comboForm.bannerImageUrl"
-                    class="avatar"
-                />
+                <img v-if="comboForm.bannerImageUrl" :src="showImgPrefix + comboForm.bannerImageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <span>（*如需商店轮播推荐，请添加广告图片）</span>
@@ -114,11 +103,7 @@
                     :http-request="uploadThumFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="comboForm.thumImageUrl"
-                        :src="showImgPrefix + comboForm.thumImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="comboForm.thumImageUrl" :src="showImgPrefix + comboForm.thumImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -133,11 +118,7 @@
                     :http-request="uploadDetailFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="comboForm.detailImageUrl"
-                        :src="showImgPrefix + comboForm.detailImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="comboForm.detailImageUrl" :src="showImgPrefix + comboForm.detailImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -221,14 +202,9 @@ export default {
             };
 
             this.comboForm.goodsIdList.push(goodInfoArr[0]); //存入当前选择的商品id
-
             this.comboForm.tableData.push(obj); //存入当前选择的商品所有信息，用于表格回显
-
             this.comboForm.goodName = ''; //清空选择的选项
-
             this.selectGoodsList(); //重新请求商品列表
-
-            console.log(this.comboForm.tableData);
         },
 
         //请求商品列表
@@ -243,7 +219,6 @@ export default {
                     if (res.code == 0) {
                         this.comboForm.options = res.data;
                         this.antiStatus = true;
-                        console.log(this.comboForm.options);
                     } else {
                         this.antiStatus = true;
                         this.$message.error(res.msg);
@@ -271,6 +246,9 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
+            // this.comboForm = this.comboFormParent;
+            // this.comboForm.checkedBanner = this.comboFormParent.checkedBanner == 1 ? true : false;
+
             this.comboForm.name = this.comboFormParent.name;
             this.comboForm.weight = this.comboFormParent.weight;
             this.comboForm.desc = this.comboFormParent.desc;

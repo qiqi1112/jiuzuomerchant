@@ -2,9 +2,7 @@
     <div>
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>
-                    <i class="el-icon-lx-calendar"></i> 商品管理
-                </el-breadcrumb-item>
+                <el-breadcrumb-item> <i class="el-icon-lx-calendar"></i> 商品管理 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
 
@@ -15,75 +13,44 @@
                 <el-row class="left-handle">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd">添加商品</el-button>
                     <el-button type="danger" icon="el-icon-delete" @click="handleDelAll">批量删除</el-button>
-                    <el-button
-                        v-if="isSelect && goodsData.length > 0"
-                        type="warning"
-                        @click="sureDelAll"
-                    >确定</el-button>
+                    <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
 
                 <!-- 添加商户的对话框 -->
-                <el-dialog
-                    :visible.sync="dialogVisible"
-                    class="add-goods-dialog"
-                    @close="handleCancel"
-                >
+                <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
                     <!-- 编辑当前商品时 -->
                     <el-tabs v-if="isUpdate" v-model="editActiveName">
                         <!-- 套餐标签页 -->
-                        <el-tab-pane v-if="editActiveName=='editCombo'" label="套餐" name="editCombo">
+                        <el-tab-pane v-if="editActiveName == 'editCombo'" label="套餐" name="editCombo">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <combo-tab
-                                :comboFormParent="comboForm"
-                                @comboFormChild="getChildComboForm"
-                            ></combo-tab>
+                            <combo-tab :comboFormParent="comboForm" @comboFormChild="getChildComboForm"></combo-tab>
                         </el-tab-pane>
 
                         <!-- 酒水标签页 -->
-                        <el-tab-pane
-                            v-if="editActiveName=='editDrinks'"
-                            label="酒水"
-                            name="editDrinks"
-                        >
+                        <el-tab-pane v-if="editActiveName == 'editDrinks'" label="酒水" name="editDrinks">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <drinks-tab
-                                :drinksFormParent="drinksForm"
-                                @drinksFormChild="getChildDrinksForm"
-                            ></drinks-tab>
+                            <drinks-tab :drinksFormParent="drinksForm" @drinksFormChild="getChildDrinksForm"></drinks-tab>
                         </el-tab-pane>
 
                         <!-- 小吃标签页 -->
-                        <el-tab-pane v-if="editActiveName=='editSnack'" label="小吃" name="editSnack">
+                        <el-tab-pane v-if="editActiveName == 'editSnack'" label="小吃" name="editSnack">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <snack-tab
-                                :snackFormParent="snackForm"
-                                @snackFormChild="getChildSnackForm"
-                            ></snack-tab>
+                            <snack-tab :snackFormParent="snackForm" @snackFormChild="getChildSnackForm"></snack-tab>
                         </el-tab-pane>
 
                         <!-- 其他标签页 -->
-                        <el-tab-pane v-if="editActiveName=='editOther'" label="其他" name="editOther">
+                        <el-tab-pane v-if="editActiveName == 'editOther'" label="其他" name="editOther">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <div>
-                                <other-tab
-                                    :otherFormParent="otherForm"
-                                    @otherFormChild="getChildOtherForm"
-                                ></other-tab>
+                                <other-tab :otherFormParent="otherForm" @otherFormChild="getChildOtherForm"></other-tab>
                             </div>
                         </el-tab-pane>
 
                         <!-- 会员卡标签页 -->
-                        <el-tab-pane
-                            v-if="editActiveName=='editVipCard'"
-                            label="会员卡"
-                            name="editVipCard"
-                        >
+                        <el-tab-pane v-if="editActiveName == 'editVipCard'" label="会员卡" name="editVipCard">
                             <span class="add-classify-title goods-info">商品信息</span>
-                            <vip-card-tab
-                                :vipCardFormParent="vipCardForm"
-                                @vipCardFormChild="getChildVipCardForm"
-                            ></vip-card-tab>
+                            <vip-card-tab :vipCardFormParent="vipCardForm" @vipCardFormChild="getChildVipCardForm"></vip-card-tab>
                         </el-tab-pane>
                     </el-tabs>
 
@@ -93,7 +60,7 @@
                         <el-tab-pane label="套餐" name="combo">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <combo-tab
-                                v-if="activeName=='combo'"
+                                v-if="activeName == 'combo'"
                                 :comboFormParent="comboForm"
                                 @comboFormChild="getChildComboForm"
                             ></combo-tab>
@@ -103,7 +70,7 @@
                         <el-tab-pane label="酒水" name="drinks">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <drinks-tab
-                                v-if="activeName=='drinks'"
+                                v-if="activeName == 'drinks'"
                                 :drinksFormParent="drinksForm"
                                 @drinksFormChild="getChildDrinksForm"
                             ></drinks-tab>
@@ -113,7 +80,7 @@
                         <el-tab-pane label="小吃" name="snack">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <snack-tab
-                                v-if="activeName=='snack'"
+                                v-if="activeName == 'snack'"
                                 :snackFormParent="snackForm"
                                 @snackFormChild="getChildSnackForm"
                             ></snack-tab>
@@ -123,7 +90,7 @@
                         <el-tab-pane label="其他" name="other">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <other-tab
-                                v-if="activeName=='other'"
+                                v-if="activeName == 'other'"
                                 :otherFormParent="otherForm"
                                 @otherFormChild="getChildOtherForm"
                             ></other-tab>
@@ -133,7 +100,7 @@
                         <el-tab-pane label="会员卡" name="vipCard">
                             <span class="add-classify-title goods-info">商品信息</span>
                             <vip-card-tab
-                                v-if="activeName=='vipCard'"
+                                v-if="activeName == 'vipCard'"
                                 :vipCardFormParent="vipCardForm"
                                 @vipCardFormChild="getChildVipCardForm"
                             ></vip-card-tab>
@@ -155,19 +122,8 @@
                         class="handle-input mr10"
                         clearable
                     ></el-input>
-                    <el-select
-                        v-model="value"
-                        placeholder="选择分类"
-                        class="mr10"
-                        style="width:100px"
-                        clearable
-                    >
-                        <el-option
-                            v-for="item in options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        ></el-option>
+                    <el-select v-model="value" placeholder="选择分类" class="mr10" style="width: 100px" clearable>
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                     <el-button type="primary" icon="el-icon-search" @click="getGoodsInfo">搜索</el-button>
                 </div>
@@ -175,20 +131,15 @@
 
             <!-- 商品列表 -->
             <div class="goodsList">
-                <div
-                    class="goods-box"
-                    v-for="(item,index) in goodsData"
-                    :key="index"
-                    @click="selectGoods"
-                >
+                <div class="goods-box" v-for="(item, index) in goodsData" :key="index" @click="selectGoods">
                     <el-checkbox v-if="isSelect" :data-id="item.id"></el-checkbox>
                     <img :src="showImgPrefix + item.listPicture" alt />
                     <div class="goods-detail">
-                        <h4 title="商品名称">{{item.name}}</h4>
+                        <h4 title="商品名称">{{ item.name }}</h4>
                         <p class="goods-price">
                             售价：
-                            <span>￥{{item.presentPrice}}</span>
-                            <s>￥{{item.originalPrice}}</s>
+                            <span>￥{{ item.presentPrice }}</span>
+                            <s>￥{{ item.originalPrice }}</s>
                         </p>
                         <el-row class="goods-handle">
                             <el-button type="primary" @click="handleEdit(item.id)">编辑</el-button>
@@ -1155,10 +1106,217 @@ export default {
 };
 </script>
 
-<style>
-.goods-info-box .el-textarea__inner {
-    resize: none !important;
-    height: 84px;
+<style lang="less">
+.head-handle {
+    margin-bottom: 30px;
+
+    .left-handle {
+        float: left;
+    }
+
+    .add-classify-title {
+        display: flex;
+        align-items: center;
+    }
+
+    .add-classify-title::before {
+        display: inline-block;
+        content: '';
+        width: 4px;
+        height: 20px;
+        margin-right: 10px;
+        background-color: #999;
+    }
+
+    .add-classify-title.goods-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .goods-info-box {
+        display: flex;
+
+        .avatar-uploader {
+            .el-upload {
+                border: 1px dashed #d9d9d9;
+                border-radius: 6px;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .el-upload:hover {
+                border-color: #409eff;
+            }
+        }
+
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 140px;
+            height: 140px;
+            line-height: 140px;
+            text-align: center;
+        }
+
+        .el-upload--text {
+            width: 140px !important;
+            height: 140px !important;
+        }
+
+        .avatar {
+            width: 140px;
+            height: 140px;
+            display: block;
+        }
+
+        .left-box {
+            width: 70%;
+        }
+
+        .left-box.drinks {
+            width: 70%;
+
+            .drinks-update-box {
+                display: flex;
+
+                .banner-box {
+                    width: 60%;
+                }
+
+                .drinks-div {
+                    margin-top: 20px;
+                }
+            }
+        }
+
+        p {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+
+            > i {
+                display: inline-block;
+                font-style: normal;
+                text-align: center;
+                line-height: 30px;
+                width: 60px;
+                height: 30px;
+                border-radius: 5px;
+                margin-right: 10px;
+                background-color: #999;
+                color: #fff;
+            }
+        }
+
+        p.drinks-spec {
+            align-items: flex-start;
+
+            > span {
+                margin-right: 10px;
+                margin-top: 6px;
+            }
+
+            .el-form-item {
+                margin-bottom: 10px;
+            }
+        }
+
+        .good-name-box {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+
+            > div:first-child {
+                margin-right: 20px;
+            }
+        }
+
+        .el-textarea__inner {
+            resize: none !important;
+            height: 84px;
+        }
+
+        .combo-spec {
+            width: 90%;
+        }
+    }
+
+    .right-handle {
+        float: right;
+
+        .handle-input {
+            width: 170px;
+            display: inline-block;
+        }
+
+        .mr10 {
+            margin-right: 10px;
+        }
+    }
+}
+
+.goodsList {
+    display: flex;
+    justify-content: start;
+    flex-wrap: wrap;
+
+    .goods-box {
+        box-sizing: border-box;
+        width: 12.5%;
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        > img {
+            width: 90%;
+            height: 180px;
+        }
+
+        .goods-detail {
+            width: 90%;
+
+            > h4 {
+                font-size: 14px;
+                margin: 8px 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .goods-price {
+                font-size: 13px;
+                margin-bottom: 8px;
+
+                > span {
+                    margin-right: 6px;
+                }
+            }
+
+            .goods-handle {
+                display: flex;
+                justify-content: space-around;
+
+                .el-button--small,
+                .el-button--small.is-round {
+                    padding: 9px 24px;
+                }
+            }
+        }
+    }
+}
+
+.page {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.el-input-group__append,
+.el-input-group__prepend {
+    padding: 0 10px;
 }
 
 .clearfix::after {
@@ -1171,223 +1329,15 @@ export default {
     background-color: #fff;
 }
 
-.page {
-    text-align: right;
-    margin-top: 20px;
-}
-
-.left-handle {
-    float: left;
-}
-
-.head-handle {
-    margin-bottom: 30px;
-}
-
-.handle-input {
-    width: 170px;
-    display: inline-block;
-}
-
-.mr10 {
-    margin-right: 10px;
-}
-
-.right-handle {
-    float: right;
-}
-
-.goodsList {
-    display: flex;
-    justify-content: start;
-    flex-wrap: wrap;
-}
-
-.goods-box {
-    box-sizing: border-box;
-    width: 12.5%;
-    margin-bottom: 30px;
-    /* border: 1px solid black; */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
 .el-dialog {
     width: 70%;
 }
 
-.banner-box {
-    /* margin-right: 60px; */
-    width: 60%;
-}
-
 .el-form-item__content {
     margin-left: 0 !important;
-    margin-bottom: 10px !important;
-}
-
-.goods-box .goods-detail {
-    width: 90%;
-}
-
-.goods-box .goods-detail > h4 {
-    font-size: 14px;
-    margin: 8px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.goods-box .goods-detail .goods-price {
-    font-size: 13px;
-    margin-bottom: 8px;
-}
-
-.goods-box .goods-detail .goods-price > span {
-    margin-right: 6px;
-}
-
-.goods-box > img {
-    width: 90%;
-    height: 180px;
-}
-
-.goods-box .goods-detail .goods-handle {
-    display: flex;
-    justify-content: space-around;
-}
-
-.goods-box .goods-detail .goods-handle .el-button--small,
-.el-button--small.is-round {
-    padding: 9px 24px;
 }
 
 .el-dialog__header {
     padding: 0 !important;
-}
-
-.add-classify-title {
-    display: flex;
-    align-items: center;
-}
-
-.add-classify-title::before {
-    display: inline-block;
-    content: '';
-    width: 4px;
-    height: 20px;
-    margin-right: 10px;
-    background-color: #999;
-}
-
-.add-classify-title.goods-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    /* margin: 30px 0; */
-}
-
-.goods-info-box {
-    display: flex;
-}
-
-.goods-info-box .left-box {
-    width: 70%;
-}
-
-.goods-info-box .left-box.drinks {
-    width: 70%;
-}
-
-.goods-info-box p {
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.goods-info-box .good-name-box {
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.goods-info-box .good-name-box > div:first-child {
-    margin-right: 20px;
-}
-
-.goods-info-box p > span {
-    margin-right: 10px;
-}
-
-.goods-info-box p > i {
-    display: inline-block;
-    font-style: normal;
-    text-align: center;
-    line-height: 30px;
-    width: 60px;
-    height: 30px;
-    border-radius: 5px;
-    margin-right: 10px;
-    /* border: 1px solid #ddd; */
-    background-color: #999;
-    color: #fff;
-}
-
-.combo-spec {
-    width: 90%;
-    /* border: 1px solid black; */
-}
-
-.drinks-spec .el-form-item {
-    /* display: flex;
-    align-items: center; */
-    margin-bottom: 0px;
-}
-
-.drinks-update {
-    display: flex;
-    justify-content: space-between;
-}
-
-.goods-info-box .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.goods-info-box .avatar-uploader .el-upload:hover {
-    border-color: #409eff;
-}
-
-.goods-info-box .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 140px;
-    height: 140px;
-    line-height: 140px;
-    text-align: center;
-}
-
-.goods-info-box .avatar {
-    width: 140px;
-    height: 140px;
-    display: block;
-}
-
-.goods-info-box .el-upload--text {
-    width: 140px !important;
-    height: 140px !important;
-}
-
-.drinks-update-box {
-    display: flex;
-}
-
-.drinks-update-box div .drinks-div {
-    margin-top: 20px;
 }
 </style>

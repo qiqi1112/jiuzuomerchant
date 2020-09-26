@@ -5,7 +5,7 @@
                 <div class="good-name-box">
                     <div>
                         <span>商品名称：</span>
-                        <el-input v-model="vipCardForm.name" style="width:160px"></el-input>
+                        <el-input v-model="vipCardForm.name" style="width: 160px"></el-input>
                     </div>
                     <div>
                         <span>商品排序：</span>
@@ -15,18 +15,18 @@
                 </div>
                 <p>
                     <span>商品包含：</span>
-                    <el-input type="textarea" v-model="vipCardForm.desc" style="width:300px;"></el-input>
+                    <el-input type="textarea" v-model="vipCardForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p>
                     <span>商品积分：</span>
-                    <el-input v-model="vipCardForm.integral" style="width:120px;margin-right:20px"></el-input>
+                    <el-input v-model="vipCardForm.integral" style="width: 120px; margin-right: 20px"></el-input>
 
                     <span>商品单价：</span>
-                    <el-input v-model="vipCardForm.nowPrice" style="width:120px"></el-input>
+                    <el-input v-model="vipCardForm.nowPrice" style="width: 120px"></el-input>
                 </p>
                 <p class="combo-spec">
                     <span>商品规格：</span>
-                    <i v-for="(item,index) in vipCardForm.spec" :key="index">{{item}}</i>
+                    <i v-for="(item, index) in vipCardForm.spec" :key="index">{{ item }}</i>
                 </p>
             </el-form>
             <p>
@@ -35,23 +35,19 @@
                     v-model="vipCardForm.checkedBanner"
                     label="放至商店广告位"
                     border
-                    style="margin-right:20px"
+                    style="margin-right: 20px"
                 ></el-checkbox>
             </p>
             <!-- 广告图 -->
             <el-upload
-                v-if="vipCardForm.checkedBanner&&vipCardForm.checkedBanner !== 2"
+                v-if="vipCardForm.checkedBanner && vipCardForm.checkedBanner !== 2"
                 class="avatar-uploader"
                 action="1"
                 :show-file-list="false"
                 :http-request="uploadBannerFiles"
                 :on-error="uploadError"
             >
-                <img
-                    v-if="vipCardForm.bannerImageUrl"
-                    :src="showImgPrefix + vipCardForm.bannerImageUrl"
-                    class="avatar"
-                />
+                <img v-if="vipCardForm.bannerImageUrl" :src="showImgPrefix + vipCardForm.bannerImageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <span>（*如需商店轮播推荐，请添加广告图片）</span>
@@ -67,11 +63,7 @@
                     :http-request="uploadThumFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="vipCardForm.thumImageUrl"
-                        :src="showImgPrefix + vipCardForm.thumImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="vipCardForm.thumImageUrl" :src="showImgPrefix + vipCardForm.thumImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -85,11 +77,7 @@
                     :http-request="uploadDetailFiles"
                     :on-error="uploadError"
                 >
-                    <img
-                        v-if="vipCardForm.detailImageUrl"
-                        :src="showImgPrefix + vipCardForm.detailImageUrl"
-                        class="avatar"
-                    />
+                    <img v-if="vipCardForm.detailImageUrl" :src="showImgPrefix + vipCardForm.detailImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </p>
@@ -155,6 +143,9 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
+            // this.vipCardForm = this.vipCardFormParent;
+            // this.vipCardForm.checkedBanner = this.vipCardFormParent.checkedBanner == 1 ? true : false;
+
             this.vipCardForm.name = this.vipCardFormParent.name;
             this.vipCardForm.weight = this.vipCardFormParent.weight;
             this.vipCardForm.desc = this.vipCardFormParent.desc;
@@ -164,8 +155,6 @@ export default {
             this.vipCardForm.bannerImageUrl = this.vipCardFormParent.bannerImageUrl;
             this.vipCardForm.thumImageUrl = this.vipCardFormParent.thumImageUrl;
             this.vipCardForm.detailImageUrl = this.vipCardFormParent.detailImageUrl;
-
-            console.log(this.vipCardForm.bannerImageUrl);
         },
 
         //发送当前子组件的表单信息给父组件
@@ -207,6 +196,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-</style>
