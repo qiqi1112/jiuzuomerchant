@@ -47,24 +47,17 @@ const i18n = new VueI18n({
     messages
 });
 
-Vue.filter('editorText',function(data){
-    return data.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi,'').replace(/<[^>]+?>/g,'').replace(/\s+/g,' ').replace(/ /g,' ').replace(/>/g,' ')
-})
-
-Vue.filter('removeBlank',function(data){
-    return data.replace(/\s[\x00-\xff]*/g,'')
-})
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
-    to.path == '/login'? store.commit('showChat', false):store.commit('showChat', true);
+    to.path == '/login' ? store.commit('showChat', false) : store.commit('showChat', true);
     document.title = `${to.meta.title} | 上座`;
-    const role = JSON.parse(localStorage.getItem('userInfo'))|| ''
-    if(!role && to.path !== '/login'){
+    const role = JSON.parse(localStorage.getItem('userInfo')) || ''
+    if (!role && to.path !== '/login') {
         next('/login');
         this.$socket.disconnect();
-    }else{
-        if(role){
+    } else {
+        if (role) {
             // Vue.use(new VueSocketIO({
             //     debug: true,
             //     connection: 'http://192.168.31.94:9210',

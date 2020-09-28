@@ -113,6 +113,7 @@
 
             <!-- 表格数据分页 -->
             <el-pagination
+                v-if="tableData.length > 0"
                 background
                 layout="prev, pager, next"
                 @current-change="handleCurrentChange"

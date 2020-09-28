@@ -1,5 +1,14 @@
 import Vue from 'vue';
 
+Vue.filter('editorText', function (data) {
+    return data.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
+})
+
+Vue.filter('removeBlank', function (data) {
+    return data.replace(/\s[\x00-\xff]*/g, '')
+})
+
+
 //手机号
 Vue.filter("phoneNum", function (oldVal) {
     let newVal = oldVal.replace(oldVal.slice(3, 7), "****");
@@ -186,6 +195,60 @@ Vue.filter("weekIdxToWord", function (oldVal) {
             break;
         case 7:
             newVal = '七';
+            break;
+    }
+    return newVal;
+})
+
+//支付状态
+Vue.filter("payStatus", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 0:
+            newVal = '已支付';
+            break;
+        case 1:
+            newVal = '待支付';
+            break;
+        case 2:
+            newVal = '未支付';
+            break;
+    }
+    return newVal;
+})
+
+//支付类型
+Vue.filter("payWay", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 0:
+            newVal = '支付宝';
+            break;
+        case 1:
+            newVal = '微信';
+            break;
+        case 2:
+            newVal = '会员积分';
+            break;
+    }
+    return newVal;
+})
+
+//订单状态
+Vue.filter("orderStatus", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 0:
+            newVal = '已接单';
+            break;
+        case 1:
+            newVal = '已拒绝';
+            break;
+        case 2:
+            newVal = '未到店';
+            break;
+        case 3:
+            newVal = '已到店';
             break;
     }
     return newVal;
