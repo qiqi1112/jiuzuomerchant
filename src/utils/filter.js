@@ -238,17 +238,23 @@ Vue.filter("payWay", function (oldVal) {
 Vue.filter("orderStatus", function (oldVal) {
     let newVal = '';
     switch (oldVal) {
-        case 0:
+        case 1:
             newVal = '已接单';
             break;
-        case 1:
+        case 2:
             newVal = '已拒绝';
             break;
-        case 2:
+        case 3:
             newVal = '未到店';
             break;
-        case 3:
+        case 4:
             newVal = '已到店';
+            break;
+        case 5:
+            newVal = '未消费';
+            break;
+        case 6:
+            newVal = '已离开';
             break;
     }
     return newVal;

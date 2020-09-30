@@ -297,10 +297,91 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="smsCode" label="验证码"></el-table-column>
-                <el-table-column label="操作" fixed="right">
-                    <template slot-scope="scope"> </template>
+                <el-table-column label="操作" fixed="right" min-width="350">
+                    <template slot-scope="scope">
+                        <!-- :disabled="scope.row.status !== 0" -->
+                        <el-button :type="scope.row.status == 0 ? 'primary' : 'info'" @click="handleOper(scope.row, 1)">{{
+                            scope.row.status == 1 ? '已接单' : '接单'
+                        }}</el-button>
+                        <el-button :type="scope.row.status == 0 ? 'primary' : 'info'" @click="handleOper2(scope.row, 2)">{{
+                            scope.row.status == 2 ? '已拒单' : '拒单'
+                        }}</el-button>
+                        <el-button
+                            :type="
+                                scope.row.status == 6
+                                    ? 'info'
+                                    : scope.row.status == 5
+                                    ? 'info'
+                                    : scope.row.status == 2
+                                    ? 'info'
+                                    : scope.row.status == 3
+                                    ? 'danger'
+                                    : scope.row.status == 4
+                                    ? 'info'
+                                    : 'primary'
+                            "
+                            @click="handleOper3(scope.row)"
+                            >{{
+                                scope.row.status == 2
+                                    ? '未到店'
+                                    : scope.row.status == 5
+                                    ? '已到店'
+                                    : scope.row.status == 6
+                                    ? '已到店'
+                                    : scope.row.status == 3
+                                    ? '未到店'
+                                    : scope.row.status == 4
+                                    ? '已到店'
+                                    : '确认到店'
+                            }}
+                        </el-button>
+                        <el-button
+                            :type="
+                                scope.row.status == 2
+                                    ? 'info'
+                                    : scope.row.status == 3
+                                    ? 'info'
+                                    : scope.row.status == 5
+                                    ? 'danger'
+                                    : scope.row.status == 6
+                                    ? 'danger'
+                                    : 'primary'
+                            "
+                            @click="handleOper4(scope.row)"
+                            >{{
+                                scope.row.status == 2
+                                    ? '未消费'
+                                    : scope.row.status == 3
+                                    ? '未消费'
+                                    : scope.row.status == 5
+                                    ? '未消费'
+                                    : scope.row.status == 6
+                                    ? '已离开'
+                                    : '确认消费'
+                            }}</el-button
+                        >
+                    </template>
                 </el-table-column>
             </el-table>
+
+            <el-dialog :visible.sync="perDialog">
+                <div v-if="dialogStatus == 3">
+                    <el-radio v-model="radio1" label="3">未到店</el-radio>
+                    <el-radio v-model="radio1" label="4">已到店</el-radio>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="perDialog = false">取 消</el-button>
+                        <el-button type="primary" @click="handleSurePer1">确 定</el-button>
+                    </div>
+                </div>
+                <div v-if="dialogStatus == 4">
+                    <el-radio v-model="radio2" label="5">未消费</el-radio>
+                    <el-radio v-model="radio2" label="6">已离开</el-radio>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="perDialog = false">取 消</el-button>
+                        <el-button type="primary" @click="handleSurePer2">确 定</el-button>
+                    </div>
+                </div>
+            </el-dialog>
 
             <!-- 查看对话框 -->
             <!-- <el-dialog :visible.sync="dialog">
@@ -665,12 +746,18 @@ export default {
             },
 
             dialog: false,
+            perDialog: false,
 
             tableData: [],
 
             form: {},
 
             dialogStatus: 1,
+
+            radio1: '',
+            radio2: '',
+
+            statusId: '',
 
             //订单类型
             orderTypeArr: [
@@ -710,8 +797,8 @@ export default {
 
             isReadonly: true, //编辑信息开关
 
-            x: 20, //座位行数
-            y: 20, //座位列数
+            x: 0, //座位行数
+            y: 0, //座位列数
 
             //座位属性数组
             seatAttOpt: [
@@ -912,6 +999,82 @@ export default {
         handleCurrentChange(val) {
             this.searchObj.currentPage = val;
             this.getOrderInfo(); //请求翻页后的数据
+        },
+
+        handleSurePer1() {
+            (async () => {
+                let data = {
+                    id: this.statusId,
+                    status: this.radio1
+                };
+
+                let res = await this.$put('/merchant/store/order/status', data);
+
+                res.code == 0 && console.log(res);
+            })();
+        },
+        handleSurePer2() {
+            (async () => {
+                let data = {
+                    id: this.statusId,
+                    status: this.radio2
+                };
+
+                let res = await this.$put('/merchant/store/order/status', data);
+
+                res.code == 0 && console.log(res);
+            })();
+        },
+
+        handleOper(row, status) {
+            if (row.status !== 1) {
+                this.$confirm('确定要执行此操作吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        (async () => {
+                            let data = {
+                                id: row.id,
+                                status
+                            };
+
+                            let res = await this.$put('/merchant/store/order/status', data);
+
+                            res.code == 0 && console.log(res);
+                        })();
+                    })
+                    .catch(() => {});
+            }
+        },
+        handleOper2(row, status) {
+            if (row.status !== 2) {
+                this.$confirm('确定要执行此操作吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        (async () => {
+                            let data = {
+                                id: row.id,
+                                status
+                            };
+
+                            let res = await this.$put('/merchant/store/order/status', data);
+
+                            res.code == 0 && console.log(res);
+                        })();
+                    })
+                    .catch(() => {});
+            }
+        },
+        handleOper3(row, status) {
+            this.statusId = row.id;
+            this.dialogStatus = 3;
+            this.perDialog = true;
+        },
+        handleOper4(row, status) {
+            this.statusId = row.id;
+            this.dialogStatus = 4;
+            this.perDialog = true;
         }
     },
 
