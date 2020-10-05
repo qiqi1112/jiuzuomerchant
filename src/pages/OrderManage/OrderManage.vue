@@ -299,14 +299,38 @@
                 <el-table-column prop="smsCode" label="验证码"></el-table-column>
                 <el-table-column label="操作" fixed="right" min-width="350">
                     <template slot-scope="scope">
-                        <!-- :disabled="scope.row.status !== 0" -->
-                        <el-button :type="scope.row.status == 0 ? 'primary' : 'info'" @click="handleOper(scope.row, 1)">{{
-                            scope.row.status == 1 ? '已接单' : '接单'
-                        }}</el-button>
-                        <el-button :type="scope.row.status == 0 ? 'primary' : 'info'" @click="handleOper2(scope.row, 2)">{{
-                            scope.row.status == 2 ? '已拒单' : '拒单'
-                        }}</el-button>
                         <el-button
+                            :disabled="
+                                scope.row.status == 2 ||
+                                scope.row.status == 3 ||
+                                scope.row.status == 4 ||
+                                scope.row.status == 5 ||
+                                scope.row.status == 6
+                            "
+                            :type="scope.row.status == 0 ? 'primary' : scope.row.status == 1 ? 'success' : 'info'"
+                            @click="handleOper(scope.row, 1)"
+                            >{{ scope.row.status == 1 ? '已接单' : '接单' }}</el-button
+                        >
+                        <el-button
+                            :disabled="
+                                scope.row.status == 1 ||
+                                scope.row.status == 3 ||
+                                scope.row.status == 4 ||
+                                scope.row.status == 5 ||
+                                scope.row.status == 6
+                            "
+                            :type="scope.row.status == 0 ? 'primary' : scope.row.status == 2 ? 'danger' : 'info'"
+                            @click="handleOper(scope.row, 2)"
+                            >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
+                        >
+                        <el-button
+                            :disabled="
+                                scope.row.status == 2 ||
+                                scope.row.status == 3 ||
+                                scope.row.status == 4 ||
+                                scope.row.status == 5 ||
+                                scope.row.status == 6
+                            "
                             :type="
                                 scope.row.status == 6
                                     ? 'info'
@@ -317,10 +341,10 @@
                                     : scope.row.status == 3
                                     ? 'danger'
                                     : scope.row.status == 4
-                                    ? 'info'
+                                    ? 'success'
                                     : 'primary'
                             "
-                            @click="handleOper3(scope.row)"
+                            @click="handleOperDialogShow(scope.row, 3)"
                             >{{
                                 scope.row.status == 2
                                     ? '未到店'
@@ -336,6 +360,7 @@
                             }}
                         </el-button>
                         <el-button
+                            :disabled="scope.row.status == 2 || scope.row.status == 3 || scope.row.status == 5 || scope.row.status == 6"
                             :type="
                                 scope.row.status == 2
                                     ? 'info'
@@ -344,10 +369,10 @@
                                     : scope.row.status == 5
                                     ? 'danger'
                                     : scope.row.status == 6
-                                    ? 'danger'
+                                    ? 'success'
                                     : 'primary'
                             "
-                            @click="handleOper4(scope.row)"
+                            @click="handleOperDialogShow(scope.row, 4)"
                             >{{
                                 scope.row.status == 2
                                     ? '未消费'
@@ -370,7 +395,7 @@
                     <el-radio v-model="radio1" label="4">已到店</el-radio>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="perDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="handleSurePer1">确 定</el-button>
+                        <el-button type="primary" @click="handleSurePer(1)">确 定</el-button>
                     </div>
                 </div>
                 <div v-if="dialogStatus == 4">
@@ -378,7 +403,7 @@
                     <el-radio v-model="radio2" label="6">已离开</el-radio>
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="perDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="handleSurePer2">确 定</el-button>
+                        <el-button type="primary" @click="handleSurePer(2)">确 定</el-button>
                     </div>
                 </div>
             </el-dialog>
@@ -394,6 +419,7 @@
             </el-dialog> -->
 
             <el-dialog :visible.sync="dialog">
+                <!-- 订单详情 -->
                 <el-form v-if="dialogStatus == 1" ref="form" :model="form" label-width="100px">
                     <div class="column">
                         <span class="line lw2"></span>
@@ -502,6 +528,7 @@
                     </div>
                 </el-form>
 
+                <!-- 座位详情图 -->
                 <div v-if="dialogStatus == 2">
                     <div class="shop-seat">
                         <!-- 左边座位展示 -->
@@ -613,124 +640,6 @@
 
 <script>
 export default {
-    // name: 'basetable',
-    // data() {
-    //     return {
-    //         query: {
-    //             payStatus: '',
-    //             name: '',
-    //             pageIndex: 1,
-    //             pageSize: 10,
-    //             pageTotal: 0,
-    //             tel: '',
-    //             orderType: '',
-    //             orderNum: ''
-    //         },
-
-    //         //订单类型
-    //         orderTypeOpt: [
-    //             {
-    //                 label: '预定',
-    //                 value: '预定'
-    //             },
-    //             {
-    //                 label: 'AA拼单',
-    //                 value: 'AA拼单'
-    //             }
-    //         ],
-
-    //         //支付状态
-    //         payStatusOpt: [
-    //             {
-    //                 label: '已支付',
-    //                 value: '已支付'
-    //             },
-    //             {
-    //                 label: '未支付',
-    //                 value: '未支付'
-    //             }
-    //         ],
-
-    //         tableData: [],
-
-    //         editVisible: false,
-    //         form: {},
-    //         index: -1,
-    //         rules: {
-    //             user_name: [
-    //                 { required: true, message: '请输入活动名称', trigger: 'blur' }
-    //                 // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-    //             ],
-    //             order_id: [{ required: true, message: '请输入订单号', trigger: 'change' }],
-    //             order_type: [{ type: 'date', required: true, message: '请选择订单类型', trigger: 'change' }],
-    //             tel: [{ type: 'date', required: true, message: '请输入手机号', trigger: 'change' }],
-    //             creat_time: [{ type: 'array', required: true, message: '请选择创建订单时间', trigger: 'change' }],
-    //             order_state: [{ required: true, message: '请选择订单状态', trigger: 'change' }],
-    //             pay_type: [{ required: true, message: '请选择支付状态', trigger: 'blur' }],
-    //             pay_time: [{ required: true, message: '请选择实付时间', trigger: 'blur' }],
-    //             total: [{ required: true, message: '请输入金额', trigger: 'blur' }],
-    //             remark: [{ required: true, message: '请填写备注', trigger: 'blur' }],
-    //             order_detail: [{ required: true, message: '请输入订单内容', trigger: 'blur' }],
-    //             is_coupons: [{ required: true, message: '请选择优惠券类型', trigger: 'blur' }],
-    //             coupons_total: [{ required: true, message: '请输入优惠券金额', trigger: 'blur' }]
-    //         }
-    //     };
-    // },
-
-    // created() {},
-
-    // methods: {
-    //     // 搜索
-    //     handleSearch() {},
-
-    //     // 双击某一行
-    //     lineDb(row, column, event) {
-    //         this.form = {};
-    //         if (row) {
-    //             // this.index = index;
-    //             this.form = row;
-    //         }
-    //         this.editVisible = true;
-
-    //         console.log(row, column, event);
-    //     },
-
-    //     // 编辑操作
-    //     handleLook(index = '', row = '') {
-    //         this.form = {};
-    //         if (row) {
-    //             this.index = index;
-    //             this.form = row;
-    //         }
-    //         this.editVisible = true;
-    //         console.log(row);
-    //     },
-
-    //     // 修改当前状态 已到店/使用中/已离开
-    //     stateEdit(index, row) {
-    //         this.$confirm('确定要修改当前订单状态吗？', '温馨提示', {
-    //             type: 'warning'
-    //         })
-    //             .then(() => {
-    //                 this.$message.success('订单状态修改成功');
-    //                 row.stateUsing++;
-    //                 if (row.stateUsing > 3) {
-    //                     row.stateUsing = 1;
-    //                 }
-    //             })
-    //             .catch(() => {});
-    //     },
-
-    //     //分页
-    //     handlePageChange(val) {},
-
-    //     //查看座位
-    //     lookSeat() {},
-
-    //     //导出Excel
-    //     exportTable() {}
-    // }
-
     data() {
         return {
             searchObj: {
@@ -982,7 +891,7 @@ export default {
                         this.$message.error(res.msg);
                     }
 
-                    console.log(res);
+                    console.log(res.data.list[0].status);
                 } catch (err) {
                     this.$message.error(err.msg);
                 }
@@ -1001,33 +910,9 @@ export default {
             this.getOrderInfo(); //请求翻页后的数据
         },
 
-        handleSurePer1() {
-            (async () => {
-                let data = {
-                    id: this.statusId,
-                    status: this.radio1
-                };
-
-                let res = await this.$put('/merchant/store/order/status', data);
-
-                res.code == 0 && console.log(res);
-            })();
-        },
-        handleSurePer2() {
-            (async () => {
-                let data = {
-                    id: this.statusId,
-                    status: this.radio2
-                };
-
-                let res = await this.$put('/merchant/store/order/status', data);
-
-                res.code == 0 && console.log(res);
-            })();
-        },
-
+        //接单/拒单操作
         handleOper(row, status) {
-            if (row.status !== 1) {
+            if (row.status !== 1 && row.status !== 2) {
                 this.$confirm('确定要执行此操作吗？', '提示', {
                     type: 'warning'
                 })
@@ -1040,41 +925,39 @@ export default {
 
                             let res = await this.$put('/merchant/store/order/status', data);
 
-                            res.code == 0 && console.log(res);
+                            res.code == 0 && this.getOrderInfo();
                         })();
                     })
                     .catch(() => {});
             }
         },
-        handleOper2(row, status) {
-            if (row.status !== 2) {
-                this.$confirm('确定要执行此操作吗？', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-                        (async () => {
-                            let data = {
-                                id: row.id,
-                                status
-                            };
 
-                            let res = await this.$put('/merchant/store/order/status', data);
+        //操作里的对话框的确认按钮
+        handleSurePer(index) {
+            (async () => {
+                let data = {
+                    id: this.statusId,
+                    status: index === 1 ? this.radio1 : this.radio2
+                };
 
-                            res.code == 0 && console.log(res);
-                        })();
-                    })
-                    .catch(() => {});
+                let res = await this.$put('/merchant/store/order/status', data);
+
+                if (res.code == 0) {
+                    this.perDialog = false;
+                    this.getOrderInfo();
+                }
+            })();
+        },
+
+        //操作显示对话框
+        handleOperDialogShow(row, status) {
+            if (row.status == 0) {
+                this.$message.error('请先选择是否接单');
+            } else {
+                this.statusId = row.id;
+                this.dialogStatus = status;
+                this.perDialog = true;
             }
-        },
-        handleOper3(row, status) {
-            this.statusId = row.id;
-            this.dialogStatus = 3;
-            this.perDialog = true;
-        },
-        handleOper4(row, status) {
-            this.statusId = row.id;
-            this.dialogStatus = 4;
-            this.perDialog = true;
         }
     },
 
