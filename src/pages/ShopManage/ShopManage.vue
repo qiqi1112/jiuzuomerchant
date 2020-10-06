@@ -372,6 +372,8 @@ export default {
                     let delId = this.deleteSelect.indexOf(id);
                     this.deleteSelect.splice(delId, 1);
                 }
+
+                console.log(this.deleteSelect);
             }
         },
 
