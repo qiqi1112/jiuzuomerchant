@@ -457,6 +457,8 @@
                             <div>
                                 <span>包间类型：</span>
                                 <el-select
+                                    filterable
+                                    clearable
                                     :disabled="isReadonly"
                                     v-model="presentKtvInfo.roomTypeId"
                                     placeholder="请选择"
