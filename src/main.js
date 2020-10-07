@@ -68,10 +68,10 @@ router.beforeEach((to, from, next) => {
             //     },
             //     options: {
             //         path: "/socket.io",
-            //         transports: [/*'polling', */'websocket'],
+            //         transports: ['websocket','polling'],
             //         query: {
             //             token:role.token ,
-            //             signature:'123456'
+            //             signature:'customer'
             //         }}
             // }))
         }

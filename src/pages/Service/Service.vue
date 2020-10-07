@@ -4,27 +4,27 @@
             <div class="people_list">
                 <ul>
                     <li :class="active == i ? 'active' : ''" @click="getChat(item, i)" v-for="(item, i) in userList" :key="i">
-                        {{ item.user.name }}
+                        {{ item.name }}
                     </li>
                 </ul>
             </div>
             <div class="chat" v-if="now_user.user">
                 <div class="record">
-                    <div class="username">{{ now_user.user.name }}</div>
+                    <div class="username">{{ now_user.name }}</div>
                     <div class="chat_list">
                         <div class="cli">
                             <div class="cmsg" v-for="(item, i) in msgArr" :key="i">
-                                <div class="msg_list" v-if="item.sender == now_user.user.userId">
+                                <div class="msg_list" v-if="item.sender == now_user.userId">
                                     <div class="headImg">
                                         <img src="img/4.jpg" alt="" />
                                     </div>
                                     <div class="msg">
-                                        <div>{{ item.msgBody.str }}</div>
+                                        <div>{{ item.body.txt }}</div>
                                     </div>
                                 </div>
                                 <div class="msg_list self" v-else>
                                     <div class="msg self_msg">
-                                        <div>{{ item.msgBody.str }}</div>
+                                        <div>{{ item.body.txt }}</div>
                                     </div>
                                     <div class="headImg self_img">
                                         <img src="img/3.jpg" alt="" />
@@ -76,8 +76,7 @@ export default {
             activeName: 'first',
             now_user: {
                 // 当前对话框内用户
-                // user:{userId,name,phone,serverId},
-                // room:{roomNo,maxUser,userCount,isTemp,name,announcement,allowShare,locked,closed,timestamp}
+                // {userId,name,onlineTime,offlineTime}
             },
             mySelf: {
                 //我的信息
@@ -88,29 +87,31 @@ export default {
             sendText: null, //发送的消息
             msgArr: [
                 //历史消息
-                // {sender, sendType, roomNo, msgBody:{msgType,str,jsonObj,lng,lat,address,url}, timestamp}
+                // { userId, msgType, sender, receiver,bodyType,body{txt,imgIndex,jsonObj,url,lng,lat,address} }
             ],
             msgConf: {
                 //消息配置
-                SEND_TYPE: { SINGLE: { VALUE: 0, NAME: '单聊' }, GROUP: { VALUE: 1, NAME: '群聊' } },
-                MSG_TYPE: {
-                    TXT: { VALUE: 0, NAME: '文本' },
-                    JSON: { VALUE: 1, NAME: 'JSON' },
-                    IMG: { VALUE: 2, NAME: '图片' },
-                    LOC: { VALUE: 3, NAME: '位置' },
-                    AUDIO: { VALUE: 4, NAME: '音频' },
-                    VIDEO: { VALUE: 5, NAME: '视频' },
-                    FILE: { VALUE: 6, NAME: '文件' }
+                "MSG_TYPE": {
+                    "ADMIN": {"VALUE": 0, "NAME": "系统消息"},
+                    "USER": {"VALUE": 1, "NAME": "个人消息"},
+                    "GROUP": {"VALUE": 2, "NAME": "群消息"}
+                },
+                "BODY_TYPE": {
+                    "TXT": {"VALUE": 0, "NAME": "文本"},
+                    "IMG_INDEX": {"VALUE": 1, "NAME": "表情索引"},
+                    "JSON_OBJ": {"VALUE": 2, "NAME": "JSON"},
+                    "URL_IMG": {"VALUE": 3, "NAME": "图片地址"},
+                    "LNG_LAT": {"VALUE": 4, "NAME": "经纬度"},
+                    "URL_AUDIO": {"VALUE": 5, "NAME": "音频地址"},
+                    "URL_VIDEO": {"VALUE": 6, "NAME": "视频地址"},
+                    "URL_FILE": {"VALUE": 7, "NAME": "文件地址"}
                 }
             },
-            userList: [
+            userlist: [
                 //用户信息
-                // {
-                //      user:{userId,name,phone,serverId},
-                //      room:{roomNo,maxUser,userCount,isTemp,name,announcement,allowShare,locked,closed,timestamp}
-                // }
+                //{userId,name,onlineTime,offlineTime}
             ],
-            oneList: ['asdasdasdasd', '阿发发士大夫胜多负少', '手动阀手动阀手动阀']
+            oneList: ['你好，请问有什么问题呢？', '阿发发士大夫胜多负少', '手动阀手动阀手动阀']
         };
     },
     created() {
@@ -137,118 +138,100 @@ export default {
         //当前延迟（毫秒）
         pong(delay) {},
         //登陆结果
-        hall_connection_push(data) {
+        hall_connection_push(result) {
             let {
-                sender, //发送者admin或用户id
-                sendType, //发送类型0单聊1群聊
-                roomNo, //房间号
-                msgBody, //消息体
-                timestamp //发送时间
-            } = data;
-            //若为JSON对象数据
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.JSON.VALUE) {
-                //异常登陆
-                if (!`${msgBody.jsonObj.code}`.startsWith('200')) {
-                    return console.error(msgBody.jsonObj.msg);
-                }
-                this.mySelf = msgBody.jsonObj.user;
-                //历史消息：注意消息格式{sender, sendType, roomNo, msgBody, timestamp}
-                //TODO 可以在消息内容加入未读字段 例如 msgBody.jsonObj.msgArr.foreach(v=>{v.isRead = false});
-                this.msgArr.concat(msgBody.jsonObj.msgArr);
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
             }
+            let {user,history} = data;
+            //若为JSON对象数据
+            this.mySelf = user;
+            this.msgArr.concat(history);
         },
         //新用户加入
-        hall_user_push(data) {
-            console.log('新用户加入', data);
+        hall_new_user_push(result) {
+            console.log('新用户加入', result);
             let {
-                sender, //发送者admin或用户id
-                sendType, //发送类型0单聊1群聊
-                roomNo, //房间号
-                msgBody, //消息体 注意判断msgBody.msgType
-                timestamp //发送时间
-            } = data;
-            //若为JSON对象数据
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.JSON.VALUE) {
-                //异常登陆
-                if (`${msgBody.jsonObj.code}`.startsWith('200')) {
-                    //TODO 处理用户数据：msgBody.jsonObj.user;
-                    //TODO 处理房间数据：msgBody.jsonObj.room;
-                    this.userList.push(msgBody.jsonObj);
-                }
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
             }
+            let {user} = data;
+            this.userList.push(user);
         },
         //收到消息
-        hall_broadcast_push(data) {
-            console.log('收到消息', data);
+        hall_single_push(result) {
+            console.log('收到消息', result);
+            let {
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
+            }
             //放入历史消息
             //TODO 可以在消息内容加入未读字段 例如data.isRead = false
             this.msgArr.push(data);
-            // this.roomChatText.push(data)
         },
         //用户离线
-        hall_offline_push(data) {
-            console.log('用户下线', data);
+        hall_offline_push(result) {
+            console.log('用户下线', result);
             let {
-                sender, //发送者admin或用户id
-                sendType, //发送类型0单聊1群聊
-                roomNo, //房间号
-                msgBody, //消息体 注意判断msgBody.msgType
-                timestamp //发送时间
-            } = data;
-            //若为JSON对象数据
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.JSON.VALUE) {
-                //异常登陆
-                if (`${msgBody.jsonObj.code}`.startsWith('200')) {
-                    //TODO 处理用户数据：msgBody.jsonObj.user;
-                    //TODO 建议10秒后自动离开对应房间 this.$socket.emit("hall_leave",{roomNo}); 可释放服务器资源
-                }
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
             }
+            //TODO 处理用户数据
         },
         //加入房间
-        hall_join_push(data) {
-            console.log('加入房间', data);
+        hall_join_push(result) {
+            console.log('加入房间', result);
             let {
-                sender, //发送者admin或用户id
-                sendType, //发送类型0单聊1群聊
-                roomNo, //房间号
-                msgBody, //消息体 注意判断msgBody.msgType
-                timestamp //发送时间
-            } = data;
-            //若为JSON对象数据
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.JSON.VALUE) {
-                //异常登陆
-                if (`${msgBody.jsonObj.code}`.startsWith('200')) {
-                    //TODO 处理用户数据：msgBody.jsonObj.user;
-                }
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
             }
+
+            //TODO 处理用户数据
         },
         //离开房间
-        hall_leave_push(data) {
-            console.log('离开房间', data);
+        hall_leave_push(result) {
+            console.log('离开房间', result);
             let {
-                sender, //发送者admin或用户id
-                sendType, //发送类型0单聊1群聊
-                roomNo, //房间号
-                msgBody, //消息体 注意判断msgBody.msgType
-                timestamp //发送时间
-            } = data;
-            //若为JSON对象数据
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.JSON.VALUE) {
-                //异常登陆
-                if (`${msgBody.jsonObj.code}`.startsWith('200')) {
-                    //TODO 处理用户数据：msgBody.jsonObj.user;
-                }
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
             }
+
+            //TODO 处理用户数据
         },
         //错误消息
-        hall_error_push(data) {
-            let { sender, sendType, roomNo, msgBody, timestamp } = data;
-            console.log('操作异常', data);
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.JSON.VALUE) {
-                console.error(msgBody.jsonObj.msg);
-            }
-            if (msgBody.msgType === this.msgConf.MSG_TYPE.TXT.VALUE) {
-                console.error(msgBody.str);
+        hall_error_push(result) {
+            console.log('操作异常', result);
+            let {
+                code,
+                msg,
+                data,
+            } = result;
+            if(code!==200){
+                return console.error(msg);
             }
         }
     },
@@ -260,7 +243,6 @@ export default {
         getChat(val, i) {
             this.now_user = val;
             this.active = i;
-            console.log(this.mySelf.userId, val.room.roomNo);
         },
         send() {
             if (!this.sendText) {
@@ -269,9 +251,10 @@ export default {
             }
             let data = {
                 //消息体,先看类型后取值
-                roomNo: this.now_user.room.roomNo,
-                msgType: this.msgConf.MSG_TYPE.TXT.VALUE,
-                str: this.sendText
+                receiver: this.now_user.userId,
+                bodyType: this.msgConf.BODY_TYPE.TXT.VALUE,
+                txt: this.sendText
+                // imgIndex:null,
                 // jsonObj:null,
                 // lng:"104.069751",
                 // lat:"30.652326",
@@ -279,7 +262,7 @@ export default {
                 // url:"test.png"
             };
 
-            this.$socket.emit('hall_broadcast', data);
+            this.$socket.emit('hall_single', data);
             this.sendText = '';
         },
         handleClick(tab, event) {
