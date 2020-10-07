@@ -309,74 +309,14 @@ export default {
             scrollY:0,
 
             // 座位
-
-            searchObj: {
-                searchPhone: '',
-                searchOrderNum: '',
-                searchOrderType: '',
-                searchPayStatus: '',
-                searchNickName: '',
-
-                dataListCount: 0, //默认当前要显示的数据条数
-                currentPage: 1, //默认显示的页码所在位置（第一页）
-                pagesize: 10 //默认每页要显示多少条数据
-            },
-
             dialog: false,
-            perDialog: false,
-
-            tableData: [],
-
             form: {},
-
             dialogStatus: 1,
-
             radio1: '',
             radio2: '',
-
-            statusId: '',
-
-            //订单类型
-            orderTypeArr: [
-                {
-                    label: '预定桌',
-                    value: '0'
-                },
-                {
-                    label: 'AA拼单',
-                    value: '1'
-                },
-                {
-                    label: '抢座',
-                    value: '2'
-                },
-                {
-                    label: '会员卡',
-                    value: '3'
-                },
-                {
-                    label: '线下添单',
-                    value: '4'
-                }
-            ],
-
-            //支付状态
-            payStatusArr: [
-                {
-                    label: '未支付',
-                    value: '0'
-                },
-                {
-                    label: '已支付',
-                    value: '1'
-                }
-            ],
-
             isReadonly: true, //编辑信息开关
-
             x: 0, //座位行数
             y: 0, //座位列数
-
             //座位属性数组
             seatAttOpt: [
                 {
@@ -584,14 +524,14 @@ export default {
                 color:['#f37b1d','#1cbbb4','#6739b6','#e03997','#9c26b0'],
                 series: [
                     {
-                        name: '访问来源',
+                        name: ' ',
                         type: 'pie',
                         radius: '55%',
                         center: ['50%', '60%'],
                         data: [
-                            {value: 335, name: '排号数 25% （29座）'},
-                            {value: 310, name: '取消排号数 25% （29座）'},
-                            {value: 234, name: '生效排号数 25% （29座）'},
+                            {value: 335, name: '排号数（29座）'},
+                            {value: 310, name: '取消排号数（29座）'},
+                            {value: 234, name: '生效排号数（29座）'},
                         ],
                         emphasis: {
                             itemStyle: {
@@ -656,8 +596,6 @@ export default {
             this.allSeatDetailInfo.forEach((item) => {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
                     this.presentSeatInfo = item;
-
-                    console.log('xxxxx', this.presentSeatInfo);
                 }
             });
         },
