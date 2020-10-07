@@ -62,7 +62,7 @@
             </el-table>
 
             <!-- 对话框 -->
-            <el-dialog :visible.sync="dialogFormVisible">
+            <el-dialog :visible.sync="dialogFormVisible" @close="handleClose">
                 <span class="add-classify-title">用户信息</span>
                 <div class="basic-info">
                     <div>
@@ -92,7 +92,7 @@
                 </div>
 
                 <!-- 对话框里的标签页 -->
-                <el-tabs style="margin-top: 20px" v-model="activeName" type="border-card" @tab-click="handleClick">
+                <el-tabs style="margin-top: 20px" v-model="activeName" type="border-card">
                     <el-tab-pane label="排号记录" name="rowRecord">
                         <row-record-tab :userID="userInfo.userID" v-if="activeName == 'rowRecord'"></row-record-tab>
                     </el-tab-pane>
@@ -107,7 +107,7 @@
                     </el-tab-pane>
                 </el-tabs>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                    <el-button type="primary" @click="handleClose">确 定</el-button>
                 </div>
             </el-dialog>
 
@@ -201,9 +201,10 @@ export default {
             this.userInfo = row;
         },
 
-        //标签页切换操作
-        handleClick(tab, event) {
-            console.log(this.activeName);
+        //关闭对话框
+        handleClose() {
+            dialogFormVisible = false;
+            this.activeName = 'rowRecord';
         },
 
         //搜索操作
