@@ -51,11 +51,114 @@
                     </div>
 
                     <div class="columnar_box">
-                        <div class="column">
+                        <!-- <div class="column">
                             <span class="line lw2"></span>
                             <span>开台数据统计</span>
                         </div>
-                        <div ref='columnar' id="columnarLine" style="width: 90%;height: 500px;"></div> 
+                        <div ref='columnar' id="columnarLine" style="width: 90%;height: 500px;"></div>  -->
+                        <div class="column">
+                            <span class="line lw2"></span>
+                            <span>当前座位详情图</span>
+                        </div>
+                        <div class="seat">
+                            <div class="shop-seat">
+                                <!-- 左边座位展示 -->
+                                <div class="left-box">
+                                    <!-- 座位属性标题 -->
+                                    <div class="seat-title">
+                                        <p v-for="(item, index) in seatAttOpt" :key="index">
+                                            <span :class="item.class"></span>
+                                            {{ item.name }}
+                                        </p>
+                                    </div>
+                                    <!-- 回显的座位图 -->
+                                    <!-- style="overflow: hidden" -->
+                                    <div
+                                        v-if="x && y"
+                                        class="seat-box"
+                                        ref="seatBox"
+                                        :style="{ width: 32 * y + 30 + 'px' }"
+                                    >
+                                        <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
+                                            <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
+                                                <div
+                                                    style="position:relative"
+                                                    ref="seatSpan"
+                                                    :data-indexX="indexX + 1"
+                                                    :data-indexY="indexY + 1"
+                                                    class="seat"
+                                                    @mouseenter="changeStauts"
+                                                    @mouseleave="isClickSeat = false"
+                                                >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 座位属性 -->
+                                <div v-if="isClickSeat" class="seat_detail">
+                                    <div class="right-box" >
+                                    <p class="seat-detail">座位详情</p>
+                                    <!-- 座位号 -->
+                                    <div>
+                                        <span>座位号：</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.seatCode"
+                                            placeholder="座位号"
+                                            style="width: 50%"
+                                            :readonly="isReadonly"
+                                        ></el-input>
+                                    </div>
+                                    <!-- 座位类型 -->
+                                    <div>
+                                        <span>座位类型：</span>
+                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
+                                        <!-- <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio> -->
+                                    </div>
+                                    <!-- 容纳人数 -->
+                                    <div>
+                                        <span>容纳人数：</span>
+                                        <el-input
+                                            v-model="presentSeatInfo.numberOfPeople"
+                                            placeholder="容纳人数"
+                                            style="width: 50%; margin-right: 6px"
+                                            :readonly="isReadonly"
+                                        ></el-input
+                                        >人
+                                    </div>
+                                    <!-- 最晚保留时间 -->
+                                    <div class="lon-retain">
+                                        <span>保留最晚时间：</span>
+                                        <el-time-select
+                                            style="width: 50%"
+                                            v-model="presentSeatInfo.seatLatestReservationTime"
+                                            :readonly="isReadonly"
+                                            :picker-options="{ start: '00:00', step: '00:10', end: '23:50' }"
+                                        ></el-time-select>
+                                    </div>
+                                    <!-- 最低消费 -->
+                                    <div class="min-charge">
+                                        <span class="min-con">最低消费：</span>
+                                        <div class="day-mincom">
+                                            <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
+                                                <span>星期{{ item.weekIndex | weekIdxToWord }}</span>
+                                                <el-input
+                                                    v-model="item.price"
+                                                    placeholder="最低消费"
+                                                    style="width: 47%; margin-right: 6px"
+                                                    :readonly="isReadonly"
+                                                >
+                                                    <template slot="append">￥</template>
+                                                </el-input>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                </div>
+                                
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="m_m">
@@ -204,10 +307,106 @@ export default {
             currentId:1,
             i:0,
             scrollY:0,
+
+            // 座位
+
+            searchObj: {
+                searchPhone: '',
+                searchOrderNum: '',
+                searchOrderType: '',
+                searchPayStatus: '',
+                searchNickName: '',
+
+                dataListCount: 0, //默认当前要显示的数据条数
+                currentPage: 1, //默认显示的页码所在位置（第一页）
+                pagesize: 10 //默认每页要显示多少条数据
+            },
+
+            dialog: false,
+            perDialog: false,
+
+            tableData: [],
+
+            form: {},
+
+            dialogStatus: 1,
+
+            radio1: '',
+            radio2: '',
+
+            statusId: '',
+
+            //订单类型
+            orderTypeArr: [
+                {
+                    label: '预定桌',
+                    value: '0'
+                },
+                {
+                    label: 'AA拼单',
+                    value: '1'
+                },
+                {
+                    label: '抢座',
+                    value: '2'
+                },
+                {
+                    label: '会员卡',
+                    value: '3'
+                },
+                {
+                    label: '线下添单',
+                    value: '4'
+                }
+            ],
+
+            //支付状态
+            payStatusArr: [
+                {
+                    label: '未支付',
+                    value: '0'
+                },
+                {
+                    label: '已支付',
+                    value: '1'
+                }
+            ],
+
+            isReadonly: true, //编辑信息开关
+
+            x: 0, //座位行数
+            y: 0, //座位列数
+
+            //座位属性数组
+            seatAttOpt: [
+                {
+                    name: '不可预订',
+                    style: 'notBook',
+                    class: 'not-book'
+                },
+                {
+                    name: '可预订',
+                    style: 'canBook',
+                    class: 'can-book'
+                },
+                {
+                    name: '舞台',
+                    style: 'stageBook',
+                    class: 'stage-book'
+                },
+                {
+                    name: '过道',
+                    style: 'aisleBook',
+                    class: 'aisle-book'
+                }
+            ],
+
+            allSeatDetailInfo: [], //所有座位详细信息
+            presentSeatInfo: {}, //当前座位对应的详细信息
+            isClickSeat: false //展示当前座位的详细信息开关
         };
     },
     created(){
-
         this.time_now = this.$regular.timeData(new Date().getTime(),5)
         this.days = this.timeDay(this.time_now)
         this.$nextTick(() => {
@@ -228,7 +427,8 @@ export default {
     },
     mounted(){
         this.brokenChart()
-        this.columnarChart()
+        // this.columnarChart()
+        this.seeSeatInfo()
         this.breadChart()
         this.$refs.day_li.addEventListener("wheel", this.myFunction,true);
     },
@@ -303,31 +503,26 @@ export default {
                     {
                         name: '邮件营销',
                         type: 'line',
-                        stack: '总量',
                         data: [120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '联盟广告',
                         type: 'line',
-                        stack: '总量',
                         data: [220, 182, 191, 234, 290, 330, 310,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '视频广告',
                         type: 'line',
-                        stack: '总量',
                         data: [150, 232, 201, 154, 190, 330, 410,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '直接访问',
                         type: 'line',
-                        stack: '总量',
                         data: [320, 332, 301, 334, 390, 330, 320,120, 132, 101, 134, 90, 230, 210]
                     },
                     {
                         name: '搜索引擎',
                         type: 'line',
-                        stack: '总量',
                         data: [820, 932, 901, 934, 1290, 1330, 1320,120, 132, 101, 134, 90, 230, 210]
                     }
                 ]
@@ -357,8 +552,6 @@ export default {
                 },
                 xAxis: {type: 'category'},
                 yAxis: {},
-                // Declare several bar series, each will be mapped
-                // to a column of dataset.source by default.
                 series: [
                     {
                         type: 'bar',
@@ -419,7 +612,124 @@ export default {
         // 切换统计方式
         dayOrMon(num){
             this.day_mon = num
-        }
+        },
+        
+        // 座位相关信息
+        //查看座位信息
+        seeSeatInfo() {
+            this.dialogStatus = 2;
+            this.dialog = true;
+
+            (async () => {
+                try {
+                    let result = await this.$get('/merchant/store/order/layoutList');
+
+                    if (result.code == 0) {
+                        let res = result.data;
+
+                        let cassette = res.cassette;
+                        this.allSeatDetailInfo = res.layoutList;
+
+                        //回显店铺卡座数量
+                        this.getShopSeat(cassette);
+
+                        //对座位信息进行相关转换
+                        this.changeLayoutList(this.allSeatDetailInfo);
+
+                        //座位属性回显
+                        this.showSeatAtt();
+
+                        // console.log(this.allSeatDetailInfo);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            })();
+        },
+
+        //查看当前座位信息
+        lookSeatInfo(e) {
+            let seatRow = Number(e.target.dataset.indexx); //行
+            let seatColumn = Number(e.target.dataset.indexy); //列
+
+            //匹配当前座位信息
+            this.allSeatDetailInfo.forEach((item) => {
+                if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
+                    this.presentSeatInfo = item;
+
+                    console.log('xxxxx', this.presentSeatInfo);
+                }
+            });
+        },
+
+        //座位点击事件
+        changeStauts(e, style) {
+            this.isClickSeat = true; //展示当前点击的座位的详细信息
+            this.lookSeatInfo(e); //查看当前座位信息
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            e.target.classList.add('border'); //定位当前座位
+        },
+
+        //清空座位外边框（定位当前座位）
+        clearSeatBorder() {
+            if (this.$refs.seatSpan) {
+                this.$refs.seatSpan.forEach((item) => {
+                    item.classList.remove('border');
+                });
+            }
+        },
+
+        //对座位信息进行相关转换
+        changeLayoutList(arr) {
+            arr.forEach((item) => {
+                //将数值型转为字符型（软硬座）
+                if (item.softHardStatus || item.haveToilet) {
+                    item.softHardStatus = item.softHardStatus.toString();
+                }
+            });
+        },
+
+        //回显店铺卡座数量（行和列数量）
+        getShopSeat(seat) {
+            seat = seat.split('x');
+            this.x = seat[0];
+            this.y = seat[1];
+        },
+
+        //座位属性回显
+        showSeatAtt() {
+            this.$nextTick(() => {
+                if (this.$refs.seatSpan) {
+                    //遍历所有座位
+                    this.$refs.seatSpan.forEach((item) => {
+                        let x = item.dataset.indexx; //行
+                        let y = item.dataset.indexy; //列
+                        //根据返回的座位数组进行匹配，并替换当前座位的属性
+                        this.allSeatDetailInfo.forEach((item2) => {
+                            if (item2.seatRow == x && item2.seatColumn == y) {
+                                //不可预订
+                                if (item2.seatAttribute == 1) {
+                                    item.classList.add('notBook');
+                                }
+                                //可预订
+                                if (item2.seatAttribute == 2) {
+                                    item.classList.add('canBook');
+                                }
+                                //过道
+                                if (item2.seatType == 3) {
+                                    item.classList.add('aisleBook');
+                                }
+                                //舞台
+                                if (item2.seatType == 4) {
+                                    item.classList.add('stageBook');
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        },
+
     }
 };
 </script>
@@ -616,6 +926,9 @@ export default {
     right: 0;
     top: 14px;
 }
+.seat_detail{
+    padding:20px;box-shadow: 0 0 5px #a5a5a5;border-radius:5px;z-index:1000;background:#fff
+}
 // element  
 .el-rate{
     display: inline-block;
@@ -678,5 +991,200 @@ export default {
 }
 /deep/ .el-input__prefix{
     display: none;
+}
+// 座位
+.shop-seat {
+    display: flex;
+
+    .left-box {
+        margin-right: 30px;
+
+        .seat-title {
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
+            margin-bottom: 20px;
+
+            > p {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            p span {
+                display: block;
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
+                background-color: #ddd;
+                margin-right: 6px;
+                border: 1px solid #ddd;
+            }
+        }
+
+        .seat-box {
+            padding: 20px;
+            padding-bottom: 10px;
+            box-sizing: border-box;
+            background-color: #ddd;
+            display: flex;
+        }
+
+        .input-seat {
+            display: flex;
+            margin-bottom: 20px;
+        }
+    }
+
+    .right-box {
+        .min-charge {
+            align-items: flex-start;
+
+            .day-mincom {
+                border: 1px solid #dcdfe6;
+                border-radius: 4px;
+                padding: 16px 20px;
+                width: 80%;
+
+                > p {
+                    margin-bottom: 16px;
+                    font-size: 14px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    > span {
+                        margin-right: 10px;
+                    }
+                }
+
+                > p:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        > div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+
+            > span {
+                margin-right: 0;
+                width: 120px;
+            }
+
+            > span.snacks {
+                width: 48px !important;
+            }
+        }
+
+        > div.snacks {
+            align-items: flex-start;
+        }
+
+        .seat-detail {
+            margin-bottom: 30px;
+        }
+
+        .lon-retain {
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+.not-book {
+    background-color: #e6a23c !important;
+    border: 1px solid transparent !important;
+}
+
+.can-book {
+    background-color: #fff !important;
+}
+
+.in-book {
+    background-color: #409eff !important;
+    border: 1px solid transparent !important;
+}
+
+.has-book {
+    background-color: #f56c6c !important;
+    border: 1px solid transparent !important;
+}
+
+.stage-book {
+    background-color: #008000 !important;
+    border: 1px solid transparent !important;
+}
+
+.aisle-book {
+    background-color: #ddd !important;
+    border: 1px solid transparent !important;
+}
+
+.seat {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background-color: #fff;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+}
+
+.border {
+    border: 1px solid #f00 !important;
+}
+
+.notBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #e6a23c !important;
+    cursor: pointer;
+}
+
+.canBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff !important;
+    cursor: pointer;
+}
+
+.stageBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #008000 !important;
+    cursor: pointer;
+}
+
+.aisleBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #ddd !important;
+    cursor: pointer;
 }
 </style>
