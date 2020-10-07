@@ -18,23 +18,13 @@
                             <span slot="title">{{ item.title }}</span>
                         </template>
                         <template v-for="subItem in item.subs">
-                            <el-submenu
-                                v-if="subItem.subs"
-                                :index="subItem.index"
-                                :key="subItem.index"
-                            >
+                            <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
                                 <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item
-                                    v-for="(threeItem,i) in subItem.subs"
-                                    :key="i"
-                                    :index="threeItem.index"
-                                >{{ threeItem.title }}</el-menu-item>
+                                <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
+                                    threeItem.title
+                                }}</el-menu-item>
                             </el-submenu>
-                            <el-menu-item
-                                v-else
-                                :index="subItem.index"
-                                :key="subItem.index"
-                            >{{ subItem.title }}</el-menu-item>
+                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
                         </template>
                     </el-submenu>
                 </template>
@@ -101,6 +91,11 @@ export default {
                     index: 'coupons',
                     title: '优惠券'
                 },
+                {
+                    icon: 'el-icon-lx-redpacket_fill',
+                    index: 'financialAudit',
+                    title: '财务审核'
+                },
                 // {
                 //     icon: 'el-icon-lx-text',
                 //     index: 'service',
@@ -110,7 +105,7 @@ export default {
                     icon: 'el-icon-lx-commentfill',
                     index: 'log',
                     title: '操作日志'
-                },
+                }
                 // {
                 //     icon: 'el-icon-s-flag',
                 //     title: '广告活动',
@@ -126,11 +121,6 @@ export default {
                 //         }
                 //     ]
                 // },
-
-
-
-
-
 
                 // {
                 //     icon: 'el-icon-lx-home',
@@ -236,7 +226,7 @@ export default {
     },
     created() {
         // 通过 Event Bus 进行组件间通信，来折叠侧边栏
-        bus.$on('collapse', msg => {
+        bus.$on('collapse', (msg) => {
             this.collapse = msg;
             bus.$emit('collapse-content', msg);
         });
