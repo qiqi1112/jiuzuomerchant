@@ -70,7 +70,7 @@
                 </div>
 
                 <!-- 店铺标签 -->
-                <div class="shop-label">
+                <!-- <div class="shop-label">
                     <p>店铺标签</p>
                     <div class="change-labels">
                         <el-tag
@@ -93,6 +93,12 @@
                             <i class="el-icon-plus"></i>
                         </el-button>
                     </div>
+                </div> -->
+
+                <!-- 客服电话 -->
+                <div class="service-phone">
+                    <p>客服电话</p>
+                    <el-input v-model="servicePhone" placeholder="客服电话" style="width: 24%" :readonly="isReadonly" clearable></el-input>
                 </div>
 
                 <!-- 店铺营业时间，客服电话，人均消费，类型 -->
@@ -140,17 +146,6 @@
                         </div>
                     </div>
                     <div class="shop-div2">
-                        <!-- 客服电话 -->
-                        <div class="service-phone">
-                            <p>客服电话</p>
-                            <el-input
-                                v-model="servicePhone"
-                                placeholder="客服电话"
-                                style="width: 70%"
-                                :readonly="isReadonly"
-                                clearable
-                            ></el-input>
-                        </div>
                         <!-- 店铺类型 -->
                         <div class="shop-type">
                             <p>
@@ -2310,6 +2305,14 @@ export default {
         }
     }
 
+    .service-phone {
+        margin-bottom: 30px;
+
+        > p {
+            margin-bottom: 10px;
+        }
+    }
+
     .shop-div {
         display: flex;
         margin-bottom: 30px;
@@ -2341,14 +2344,6 @@ export default {
         }
 
         .shop-div2 {
-            .service-phone {
-                margin-bottom: 30px;
-
-                > p {
-                    margin-bottom: 10px;
-                }
-            }
-
             .shop-type {
                 > p {
                     margin-bottom: 10px;

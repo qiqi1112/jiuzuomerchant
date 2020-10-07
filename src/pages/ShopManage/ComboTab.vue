@@ -44,8 +44,8 @@
                             </template>
                         </el-table-column>
                         <el-table-column prop="originalPrice" label="原价" width="100"></el-table-column>
-                        <el-table-column prop="presentPrice" label="现价" width="100"></el-table-column>
-                        <el-table-column prop="presentPrice" label="数量" width="160">
+                        <!-- <el-table-column prop="presentPrice" label="现价" width="100"></el-table-column> -->
+                        <el-table-column label="数量" width="160">
                             <template slot-scope="scope">
                                 <el-input-number v-model="scope.row.number" :min="1" label="商品数量"></el-input-number>
                             </template>
@@ -60,9 +60,8 @@
                 <p>
                     <span>套餐原单价：</span>
                     <el-input v-model="comboForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
-
-                    <span>套餐现单价：</span>
-                    <el-input v-model="comboForm.nowPrice" style="width: 120px"></el-input>
+                    <!-- <span>套餐现单价：</span>
+                    <el-input v-model="comboForm.nowPrice" style="width: 120px"></el-input> -->
                 </p>
                 <p class="combo-spec">
                     <span>套餐规格：</span>

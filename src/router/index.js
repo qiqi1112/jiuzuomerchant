@@ -93,6 +93,13 @@ export default new Router({
                         title: '优惠券'
                     }
                 },
+                {
+                    path: '/financialAudit',
+                    component: () => import('../pages/FinancialAudit/FinancialAudit.vue'),
+                    meta: {
+                        title: '财务审核'
+                    }
+                },
 
                 {
                     path: '/dashboard',

@@ -41,9 +41,9 @@
                             <el-input v-model="item.originalPrice" placeholder="原价（如：9.99）" style="width: 170px; margin-right: 10px">
                                 <template slot="append">￥</template>
                             </el-input>
-                            <el-input v-model="item.presentPrice" placeholder="现价（如：9.99）" style="width: 170px; margin-right: 10px">
+                            <!-- <el-input v-model="item.presentPrice" placeholder="现价（如：9.99）" style="width: 170px; margin-right: 10px">
                                 <template slot="append">￥</template>
-                            </el-input>
+                            </el-input> -->
                             <el-button @click="addDomain">
                                 <i class="el-icon-plus"></i>
                             </el-button>

@@ -36,11 +36,11 @@
                                 placeholder="原价（如：9.99）"
                                 style="width: 130px; margin-right: 10px"
                             ></el-input>
-                            <el-input
+                            <!-- <el-input
                                 v-model="item.presentPrice"
                                 placeholder="现价（如：9.99）"
                                 style="width: 130px; margin-right: 10px"
-                            ></el-input>
+                            ></el-input> -->
                             <el-button @click="addDomain">
                                 <i class="el-icon-plus"></i>
                             </el-button>
