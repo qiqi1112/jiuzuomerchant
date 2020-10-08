@@ -98,7 +98,23 @@
                 <!-- 客服电话 -->
                 <div class="service-phone">
                     <p>客服电话</p>
-                    <el-input v-model="servicePhone" placeholder="客服电话" style="width: 24%" :readonly="isReadonly" clearable></el-input>
+                    <!-- 回显 -->
+                    <div class="show-box" v-for="(item, index) in servicePhoneArr" :key="index">
+                        <el-input
+                            v-model="servicePhoneArr[index]"
+                            placeholder="客服电话"
+                            style="width: 26%; margin-right: 10px"
+                            :readonly="isReadonly"
+                            clearable
+                        ></el-input>
+                        <el-button v-if="!isReadonly" type="danger" @click="deleteServicePhone(item)">删除</el-button>
+                    </div>
+
+                    <!-- 新增 -->
+                    <div v-if="!isReadonly">
+                        <el-input v-model="servicePhone" placeholder="客服电话" style="width: 26%; margin-right: 10px" clearable></el-input>
+                        <el-button type="primary" @click="addServicePhone">添加</el-button>
+                    </div>
                 </div>
 
                 <!-- 店铺营业时间，客服电话，人均消费，类型 -->
@@ -812,6 +828,7 @@ export default {
             longitude: '', //经度
             latitude: '', //纬度
 
+            servicePhoneArr: ['123', '234', '345'], //客户电话回显数组
             servicePhone: '', //客服电话
             shopType: '', //选择的店铺类型
             shopTypeOpt: [], //所有店铺类型
@@ -1276,7 +1293,8 @@ export default {
                 businessReminder: '商家排号提醒',
                 cassette: `${this.x}x${this.y}`,
                 city: this.city,
-                customerServicePhone: this.servicePhone,
+                // customerServicePhone: this.servicePhone,
+                customerServicePhoneList: this.servicePhoneArr,
                 district: this.district,
                 districtCode: this.districtCode,
                 endTime: this.endBussTime,
@@ -1341,7 +1359,8 @@ export default {
                 businessReminder: '商家排号提醒',
                 cassette: `${this.x}x${this.y}`,
                 city: this.city,
-                customerServicePhone: this.servicePhone,
+                // customerServicePhone: this.servicePhone,
+                customerServicePhoneList: this.servicePhoneArr,
                 district: this.district,
                 districtCode: this.districtCode,
                 endTime: this.endBussTime,
@@ -1589,6 +1608,22 @@ export default {
                     ele.minConsumption == item.minConsumption
                 ) {
                     this.presentKtvInfo.roomTimeIntervalList.splice(i, 1);
+                }
+            });
+        },
+
+        //添加客服电话
+        addServicePhone() {
+            this.servicePhoneArr.push(this.servicePhone);
+            this.servicePhone = '';
+            console.log(this.servicePhoneArr);
+        },
+
+        //删除客服电话
+        deleteServicePhone(item) {
+            this.servicePhoneArr.forEach((ele, i) => {
+                if (ele == item) {
+                    this.servicePhoneArr.splice(i, 1);
                 }
             });
         },
@@ -1908,7 +1943,8 @@ export default {
                     this.appShopImageUrl = result.appListBigPicture;
                     let cassette = result.cassette;
                     this.city = result.city;
-                    this.servicePhone = result.customerServicePhone;
+                    // this.servicePhone = result.customerServicePhone;
+                    this.servicePhoneArr = result.customerServicePhoneList;
                     this.district = result.district;
                     this.districtCode = result.districtCode;
                     this.endBussTime = result.endTime;
@@ -2022,7 +2058,8 @@ export default {
                 trustAddress: this.trustAddress,
                 longitude: this.longitude,
                 latitude: this.latitude,
-                servicePhone: this.servicePhone,
+                // servicePhone: this.servicePhone,
+                servicePhoneArr: this.servicePhoneArr,
                 shopType: this.shopType,
                 shopTypeOpt: this.shopTypeOpt,
                 shopTypeOptStrArr: this.shopTypeOptStrArr,
@@ -2069,7 +2106,8 @@ export default {
                 this.trustAddress = storageInfo.trustAddress;
                 this.longitude = storageInfo.longitude;
                 this.latitude = storageInfo.latitude;
-                this.servicePhone = storageInfo.servicePhone;
+                // this.servicePhone = storageInfo.servicePhone;
+                this.servicePhoneArr = storageInfo.servicePhoneArr;
                 this.shopType = storageInfo.shopType;
                 this.shopTypeOpt = storageInfo.shopTypeOpt;
                 this.shopTypeOptStrArr = storageInfo.shopTypeOptStrArr;
@@ -2130,7 +2168,8 @@ export default {
             this.trustAddress = '';
             this.longitude = '';
             this.latitude = '';
-            this.servicePhone = '';
+            // this.servicePhone = '';
+            this.servicePhoneArr = [];
             this.shopType = '';
             this.shopTypeOpt = [];
             this.shopTypeOptStrArr = [];
@@ -2307,6 +2346,10 @@ export default {
 
     .service-phone {
         margin-bottom: 30px;
+
+        .show-box {
+            margin-bottom: 10px;
+        }
 
         > p {
             margin-bottom: 10px;
