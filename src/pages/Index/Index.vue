@@ -28,10 +28,10 @@
                 </div>
                 <div class="visitors">
                     <div class="comp">
-                    <span class="line lw2"></span> <span>昨日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
+                    <span class="line lw2"></span> <span>今日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
                     </div>
                     <div class="comp">
-                        <span class="line lw2"></span><span class="jg">昨日新增访客 <i class="xtc">19</i> 人，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
+                        <span class="line lw2"></span><span class="jg">今日新增访客 <i class="xtc">19</i> 人，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
                         <span class="line lw2"></span><span>店铺曝光量 <i class="xtc">234234 P</i></span>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                             <span class="line lw2"></span>
                             <span>营业额</span>
                         </div>
-                        <div ref='broken' id="brokenline" style="width: 90%;height: 500px;"> </div>        
+                        <div ref='broken' id="brokenline" style="width: 98%;height: 500px;"> </div>        
                     </div>
 
                     <div class="columnar_box">
@@ -165,20 +165,20 @@
                     <div class="bread_box">
                         <div class="column">
                             <span class="line lw2"></span>
-                            <span>排号统计 (2020-09-08)</span>
+                            <span>排号统计 ({{format_time}})</span>
                         </div>
-                        <div ref='bread' id="breadLine" style="width: 95%;height: 500px;"></div> 
+                        <div ref='bread' id="breadLine" style="width: 98%;height: 500px;"></div> 
                     </div>
 
                     <div class="Top_goods">
                         <div class="column">
                             <span class="line lw2"></span>
-                            <span>热销TOP榜 (2020-09-08)</span>
+                            <span>热销TOP榜 ({{format_time}})</span>
                         </div>
 
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
-                                <el-tab-pane label="套餐" name="first">
+                                <!-- <el-tab-pane label="套餐" name="first">
                                     <ul>
                                         <li class="top_li" v-for="(item,index) in good_list" :key="index">
                                             <div class="tl">
@@ -194,7 +194,24 @@
                                 </el-tab-pane>
                                 <el-tab-pane label="香槟" name="second">香槟</el-tab-pane>
                                 <el-tab-pane label="啤酒" name="third">啤酒</el-tab-pane>
-                                <el-tab-pane label="小吃" name="fourth">小吃</el-tab-pane>
+                                <el-tab-pane label="小吃" name="fourth">小吃</el-tab-pane> -->
+
+
+                                <el-tab-pane v-for="(item,i) in topList" :key="i" :label="item.label" :name="item.name">
+                                    <ul v-if="item.name == activeName">
+                                        <li class="top_li" v-for="(item,index) in good_list" :key="index">
+                                            <div class="tl">
+                                                <img :src="addUrl + item.listPicture">
+                                            </div>
+                                            <div class="tr">
+                                                <p class="tit">{{item.name}}</p>
+                                                <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p>
+                                                <!-- <p class="good_ifo">昨日已售{{item.sellNum}}瓶</p> -->
+                                                <div class="pro" :style="{width:item.sellNum/100+'px'}"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </el-tab-pane>
                             </el-tabs>
                         </div>
                     </div>
@@ -209,8 +226,9 @@
                                 :editable="false"
                                 @focus="focSta=true"
                                 @blur="focSta=false"
+                                @change='DaysChange'
                                 :time-arrow-control='true'
-                                :placeholder="time_now">
+                                >
                             </el-date-picker>
                             <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
@@ -276,7 +294,7 @@ export default {
                 radio_type:'1',
                 excel_time:'',        
             },
-            activeName: 'first',
+            activeName: '1',
             value2: '',
             time_now:'',
             days:'',
@@ -307,6 +325,27 @@ export default {
             currentId:1,
             i:0,
             scrollY:0,
+            topList:[
+                {
+                    label:'套餐',
+                    name:'1'
+                },
+                {
+                    label:'香槟',
+                    name:'2'
+                },
+                {
+                    label:'啤酒',
+                    name:'3'
+                },
+                {
+                    label:'小吃',
+                    name:'4'
+                },
+            ],
+
+            addUrl:'/file/admin/system/upload/down?keyName=',
+
 
             // 座位
             dialog: false,
@@ -360,12 +399,22 @@ export default {
         })
     },
     watch: {
-        time_now(val) {
-            this.time_now = this.$regular.timeData(val,5)
-            this.days = this.timeDay(this.time_now)        
+        // time_now(val) {
+        //     this.time_now = this.$regular.timeData(val,5)
+        //     this.days = this.timeDay(this.time_now)        
+        // }
+        day_mon(){
+            // this.getData()
+        }
+    },
+    computed:{
+        format_time(){
+            return this.time_now + '-' + this.dayInit(this.active+1)
         }
     },
     mounted(){
+        this.topThree()
+        this.storeInfo()
         this.brokenChart()
         // this.columnarChart()
         this.seeSeatInfo()
@@ -373,6 +422,64 @@ export default {
         this.$refs.day_li.addEventListener("wheel", this.myFunction,true);
     },
     methods:{
+
+        // top榜
+        topThree(){
+            let data = {
+                // localDate: this.time_now + '-' + this.dayInit(this.active+1),
+                localDate: '2020-10-06',
+                storeId: "",
+                type: +this.activeName
+            }
+            this.$post('/merchant/store/getSell',data).then(res=>{
+                if(res.code == 0){
+                    this.good_list = res.data
+                }else{
+                    this.$message.warning(res.msg);
+                }
+            })
+        },
+
+        storeInfo(){
+            let data = {
+                localDate: this.time_now + '-' + this.dayInit(this.active+1),
+                storeId: "",
+                type: this.day_mon
+            }
+            this.$post('/merchant/store/getHomePage',data).then(res=>{
+                if(res.code == 0){
+                    console.log(res)
+                }else{
+                    this.$message.warning(res.msg);
+                }
+            })
+        },
+
+        debounce(fn, wait) {    
+            var timeout = null;    
+            if (this.fun!==null){
+                clearTimeout(this.fun)
+            }
+            this.fun = setTimeout(fn,wait)
+        },
+        // 日期选择
+        timeDay(time){
+            let trr = time.split('-')
+            let day = new Date(trr[0],trr[1],0).getDate()
+            return day
+        },
+
+
+        // 天数加0
+        dayInit(time){
+            if(time<10){
+                time = '0' + time
+               return time
+            }
+            return time
+        },
+
+        // day切换
         myFunction(e){
             e.stopPropagation()
             e.preventDefault(); 
@@ -391,13 +498,24 @@ export default {
                 this.scrollY +=1
                 this.active -=1
             }
+            this.debounce(this.topThree,800)
         },
-        // 日期选择
-        timeDay(time){
-            let trr = time.split('-')
-            let day = new Date(trr[0],trr[1],0).getDate()
-            return day
+        // 年月切换
+        DaysChange(val){
+            this.time_now = this.$regular.timeData(val,5)
+            this.days = this.timeDay(this.time_now)     
+            this.topThree()
         },
+        // top类型切换
+        handleClick(tab, event) {
+            this.topThree()
+        },
+        // 切换统计方式
+        dayOrMon(num){
+            this.day_mon = num
+        },
+
+
         // 导出
         downEx(){
             if(!this.form.excel_time){
@@ -544,14 +662,6 @@ export default {
                 ]
             };
             breadLine.setOption(option);
-        },
-        // top
-         handleClick(tab, event) {
-            // console.log(tab, event);
-        },
-        // 切换统计方式
-        dayOrMon(num){
-            this.day_mon = num
         },
         
         // 座位相关信息
@@ -763,6 +873,7 @@ export default {
                 img{
                     width: 100%;
                     border-radius: 5px;
+                    height: 100%;
                 }
             }
             .tr{
