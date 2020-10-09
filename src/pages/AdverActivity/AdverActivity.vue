@@ -12,7 +12,7 @@
             <div class="handle-box">
                 <el-button
                     type="primary"
-                    icon="el-icon-delete"
+                    icon="el-icon-edit"
                     class="handle-del mr10"
                     @click="addNewAct()"
                 >新增活动</el-button>

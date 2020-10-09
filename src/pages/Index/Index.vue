@@ -13,26 +13,34 @@
                     <h2 class="title"> <span class="line lw1"></span><span>PlayHouse</span> </h2>
                     <div class="store_eva">
                         <div class="st">
-                            <div>12717</div>
+                            <div>{{topData.collectionTotal}}</div>
                             <div>本店收藏总数</div>
                         </div>
                         <div class="st">
-                            <div>999</div>
+                            <div>{{topData.commentTotal}}</div>
                             <div>当前评论条数</div>
                         </div>
                         <div class="st star ">
                             <span>店铺评分</span>
-                            <el-rate disabled-void-icon-class="not el-icon-star-on"  disabled-void-color='#b1b1b1!important' v-model="value" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
+                            <el-rate disabled-void-icon-class="not el-icon-star-on"  disabled-void-color='#b1b1b1!important' v-model="topData.score" disabled show-score text-color="#ff9900" score-template="{value}"></el-rate>
                         </div>
                     </div>
                 </div>
                 <div class="visitors">
                     <div class="comp">
-                    <span class="line lw2"></span> <span>今日客访数 <i class="xtc">527</i> 次，同比昨日<span>上涨</span> <i class="xtc"> 36 </i>次</span> 
+                        <span class="line lw2"></span>
+                        <span>
+                            今日客访数 <i class="xtc">{{topData.visitTimes}}</i> 次，同比昨日
+                            <span>上涨</span> 
+                            <i class="xtc"> {{topData.visitTimes}} </i>人
+                        </span> 
                     </div>
                     <div class="comp">
-                        <span class="line lw2"></span><span class="jg">今日新增访客 <i class="xtc">19</i> 人，同比昨日<span class="xj">下降</span> <i class="xtc"> 3 </i>人</span>
-                        <span class="line lw2"></span><span>店铺曝光量 <i class="xtc">234234 P</i></span>
+                        <span class="line lw2"></span>
+                        <span class="jg">今日新增新用户 <i class="xtc">19</i> 人，同比昨日
+                        <span class="xj">下降</span> 
+                        <i class="xtc"> 3 </i>人</span>
+                        <span class="line lw2"></span><span>店铺曝光量 <i class="xtc">{{topData.exposureTotal}} P</i></span>
                     </div>
                 </div>
                 <div class="to_view">
@@ -51,28 +59,24 @@
                     </div>
 
                     <div class="columnar_box">
-                        <!-- <div class="column">
+                        <div class="column">
                             <span class="line lw2"></span>
                             <span>开台数据统计</span>
                         </div>
-                        <div ref='columnar' id="columnarLine" style="width: 90%;height: 500px;"></div>  -->
-                        <div class="column">
+                        <div ref='columnar' id="columnarLine" style="width: 90%;height: 500px;"></div> 
+                        <!-- <div class="column">
                             <span class="line lw2"></span>
                             <span>当前座位详情图</span>
                         </div>
                         <div class="seat">
                             <div class="shop-seat">
-                                <!-- 左边座位展示 -->
                                 <div class="left-box">
-                                    <!-- 座位属性标题 -->
                                     <div class="seat-title">
                                         <p v-for="(item, index) in seatAttOpt" :key="index">
                                             <span :class="item.class"></span>
                                             {{ item.name }}
                                         </p>
                                     </div>
-                                    <!-- 回显的座位图 -->
-                                    <!-- style="overflow: hidden" -->
                                     <div
                                         v-if="x && y"
                                         class="seat-box"
@@ -95,11 +99,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- 座位属性 -->
                                 <div v-if="isClickSeat" class="seat_detail">
                                     <div class="right-box" >
                                     <p class="seat-detail">座位详情</p>
-                                    <!-- 座位号 -->
                                     <div>
                                         <span>座位号：</span>
                                         <el-input
@@ -109,13 +111,11 @@
                                             :readonly="isReadonly"
                                         ></el-input>
                                     </div>
-                                    <!-- 座位类型 -->
                                     <div>
                                         <span>座位类型：</span>
                                         <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
-                                        <!-- <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio> -->
+                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
                                     </div>
-                                    <!-- 容纳人数 -->
                                     <div>
                                         <span>容纳人数：</span>
                                         <el-input
@@ -126,7 +126,6 @@
                                         ></el-input
                                         >人
                                     </div>
-                                    <!-- 最晚保留时间 -->
                                     <div class="lon-retain">
                                         <span>保留最晚时间：</span>
                                         <el-time-select
@@ -136,7 +135,6 @@
                                             :picker-options="{ start: '00:00', step: '00:10', end: '23:50' }"
                                         ></el-time-select>
                                     </div>
-                                    <!-- 最低消费 -->
                                     <div class="min-charge">
                                         <span class="min-con">最低消费：</span>
                                         <div class="day-mincom">
@@ -158,7 +156,7 @@
                                 </div>
                                 
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="m_m">
@@ -178,25 +176,6 @@
 
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
-                                <!-- <el-tab-pane label="套餐" name="first">
-                                    <ul>
-                                        <li class="top_li" v-for="(item,index) in good_list" :key="index">
-                                            <div class="tl">
-                                                <img src="../../assets/img/img.jpg" alt="">
-                                            </div>
-                                            <div class="tr">
-                                                <p class="tit">{{item.title}}</p>
-                                                <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p>
-                                                <div class="pro" :style="{width:item.sold/10+'px'}"></div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </el-tab-pane>
-                                <el-tab-pane label="香槟" name="second">香槟</el-tab-pane>
-                                <el-tab-pane label="啤酒" name="third">啤酒</el-tab-pane>
-                                <el-tab-pane label="小吃" name="fourth">小吃</el-tab-pane> -->
-
-
                                 <el-tab-pane v-for="(item,i) in topList" :key="i" :label="item.label" :name="item.name">
                                     <ul v-if="item.name == activeName">
                                         <li class="top_li" v-for="(item,index) in good_list" :key="index">
@@ -205,8 +184,8 @@
                                             </div>
                                             <div class="tr">
                                                 <p class="tit">{{item.name}}</p>
-                                                <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p>
-                                                <!-- <p class="good_ifo">昨日已售{{item.sellNum}}瓶</p> -->
+                                                <!-- <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p> -->
+                                                <p class="good_ifo">昨日已售{{item.sellNum}}瓶</p>
                                                 <div class="pro" :style="{width:item.sellNum/100+'px'}"></div>
                                             </div>
                                         </li>
@@ -346,6 +325,8 @@ export default {
 
             addUrl:'/file/admin/system/upload/down?keyName=',
 
+            topData:{},
+            storeDate:[],
 
             // 座位
             dialog: false,
@@ -416,7 +397,7 @@ export default {
         this.topThree()
         this.storeInfo()
         this.brokenChart()
-        // this.columnarChart()
+        this.columnarChart()
         this.seeSeatInfo()
         this.breadChart()
         this.$refs.day_li.addEventListener("wheel", this.myFunction,true);
@@ -426,10 +407,10 @@ export default {
         // top榜
         topThree(){
             let data = {
-                // localDate: this.time_now + '-' + this.dayInit(this.active+1),
-                localDate: '2020-10-06',
+                localDate: this.time_now + '-' + this.dayInit(this.active+1),
                 storeId: "",
-                type: +this.activeName
+                type: +this.activeName,
+                timeType:this.day_mon
             }
             this.$post('/merchant/store/getSell',data).then(res=>{
                 if(res.code == 0){
@@ -444,11 +425,12 @@ export default {
             let data = {
                 localDate: this.time_now + '-' + this.dayInit(this.active+1),
                 storeId: "",
-                type: this.day_mon
+                type: this.day_mon,
             }
             this.$post('/merchant/store/getHomePage',data).then(res=>{
                 if(res.code == 0){
-                    console.log(res)
+                    this.topData = res.data[0]
+                    this.storeDate = res.data
                 }else{
                     this.$message.warning(res.msg);
                 }
@@ -534,7 +516,7 @@ export default {
                 tooltip: {
                     trigger: 'axis'
                 },
-                color: ['#0081ff','#1cbbb4','#e54d42','#a5673f','#39b54a','#f37b1d'],
+                color: ['#39b54a','#f37b1d'],
                 legend: {
                     // data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
                 },
@@ -559,30 +541,10 @@ export default {
                 },
                 series: [
                     {
-                        name: '邮件营销',
+                        name: '营业额',
                         type: 'line',
                         data: [120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210]
                     },
-                    {
-                        name: '联盟广告',
-                        type: 'line',
-                        data: [220, 182, 191, 234, 290, 330, 310,120, 132, 101, 134, 90, 230, 210]
-                    },
-                    {
-                        name: '视频广告',
-                        type: 'line',
-                        data: [150, 232, 201, 154, 190, 330, 410,120, 132, 101, 134, 90, 230, 210]
-                    },
-                    {
-                        name: '直接访问',
-                        type: 'line',
-                        data: [320, 332, 301, 334, 390, 330, 320,120, 132, 101, 134, 90, 230, 210]
-                    },
-                    {
-                        name: '搜索引擎',
-                        type: 'line',
-                        data: [820, 932, 901, 934, 1290, 1330, 1320,120, 132, 101, 134, 90, 230, 210]
-                    }
                 ]
             };
     

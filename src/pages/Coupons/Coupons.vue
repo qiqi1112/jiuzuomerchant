@@ -9,7 +9,7 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="handleEdit()">添加</el-button>
+                <el-button type="primary" icon="el-icon-edit" class="handle-del mr10" @click="handleEdit()">添加</el-button>
                 <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="dtlCoupon('',primary_dtl_cou)">删除</el-button>
                 <el-input v-model="query.text" placeholder="关键字" class="handle-input mr10"></el-input>
                  <el-select v-model="query.coupons" placeholder="优惠券类型" class="handle-select mr10">
@@ -23,7 +23,7 @@
 
             <el-table 
             :data="tableData"
-            border 
+            border  
             class="table" 
             ref="multipleTable" 
             header-cell-class-name="table-header" 
