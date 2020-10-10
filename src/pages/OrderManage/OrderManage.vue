@@ -279,6 +279,13 @@
                 <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="createBy" label="订单发起人"></el-table-column>
                 <el-table-column prop="contactName" label="预订用户"></el-table-column>
+                <el-table-column label="座位号/包间号">
+                    <template slot-scope="scope">
+                        <!-- <span >111</span> -->
+                        <el-link v-if="scope.row.status == 4" @click="editSeat(scope.row)">111</el-link>
+                        <span v-else>111</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="contactTel" label="预定手机"></el-table-column>
                 <el-table-column prop="orderType" label="订单类型"></el-table-column>
                 <el-table-column prop="orderNo" label="总订单号"></el-table-column>
@@ -389,6 +396,21 @@
                 </el-table-column>
             </el-table>
 
+            <!-- 修改座位/包间号对话框 -->
+            <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog">
+                <!-- <el-form :model="form">
+                    <el-form-item label="座位号/包间号">
+                        <el-input v-model="form.name"></el-input>
+                    </el-form-item>
+                </el-form> -->
+                <el-input v-model="form" placeholder="请输入座位号/包间号"></el-input>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="seatDia = false">取 消</el-button>
+                    <el-button type="primary" @click="handleEditSeat">确 定</el-button>
+                </div>
+            </el-dialog>
+
+            <!-- 是否到店与是否消费对话框 -->
             <el-dialog :visible.sync="perDialog">
                 <div v-if="dialogStatus == 3">
                     <el-radio v-model="radio1" label="3">未到店</el-radio>
@@ -656,6 +678,7 @@ export default {
 
             dialog: false,
             perDialog: false,
+            seatDia: false,
 
             tableData: [],
 
@@ -740,6 +763,17 @@ export default {
     },
 
     methods: {
+        //修改座位号/包间号
+        editSeat(seatNum) {
+            this.seatDia = true;
+            console.log(seatNum);
+        },
+
+        //确认修改座位号/包间号
+        handleEditSeat() {
+            this.seatDia = false;
+        },
+
         //查看座位信息
         seeSeatInfo() {
             this.dialogStatus = 2;
@@ -891,6 +925,8 @@ export default {
                         this.$message.error(res.msg);
                     }
 
+                    console.log(res.data);
+
                     console.log(res.data.list[0].status);
                 } catch (err) {
                     this.$message.error(err.msg);
@@ -968,161 +1004,6 @@ export default {
 </script>
 
  <style scoped lang='less'>
-// @border-color: #7a7a7a;
-// .handle-box {
-//     margin-bottom: 20px;
-// }
-
-// .handle-select {
-//     width: 120px;
-// }
-
-// .handle-input {
-//     width: 300px;
-//     display: inline-block;
-// }
-// .table {
-//     width: 100%;
-//     font-size: 14px;
-// }
-// .red {
-//     color: #ff0000;
-// }
-// .mr10 {
-//     margin-right: 10px;
-// }
-// .table-td-thumb {
-//     display: inline-block;
-//     margin: auto;
-//     width: 40px;
-//     height: 40px;
-//     margin-right: 10px;
-// }
-// .table-td-thumb img {
-//     width: 100%;
-//     height: 100%;
-// }
-// /* /deep/ .beyond{
-//     overflow:hidden;
-//     text-overflow:ellipsis;
-//     display:-webkit-box;
-//     -webkit-box-orient:vertical;
-//     -webkit-line-clamp:2;
-// } */
-// /* 弹窗 */
-// .order_detail {
-//     display: flex;
-//     .ol {
-//         flex: 1;
-//         .or_li {
-//             display: flex;
-//             margin-bottom: 20px;
-//         }
-//         .or_lab {
-//             flex: 0.3;
-//             width: 100px;
-//         }
-//         .or_info {
-//             flex: 0.7;
-//             width: 100px;
-//             border: 1px solid @border-color;
-//             border-radius: 5px;
-//             padding: 7px 10px;
-//             box-sizing: border-box;
-//         }
-//         .ors {
-//             margin-right: 41px;
-//         }
-//         .sta {
-//             color: #488c05;
-//         }
-//         .total {
-//             display: inline-block;
-//             border: 1px solid @border-color;
-//             padding: 5px 7px;
-//             border-radius: 5px;
-//             margin-left: 20px;
-//         }
-//         .or_t {
-//             flex: 0.7;
-//         }
-//         .dl {
-//             margin: 20px 0;
-//             .old_t {
-//                 margin-left: 75px;
-//             }
-//         }
-//         .tr {
-//             text-align: right;
-//         }
-//     }
-//     .or {
-//         flex: 1;
-//         // text-indent: 50px;
-//         display: flex;
-//         .orl {
-//             flex: 0.2;
-//             padding-left: 50px;
-//         }
-//         .orr {
-//             flex: 0.65;
-//             .seat,
-//             .coupons {
-//                 border-bottom: 1px solid @border-color;
-//                 margin-bottom: 10px;
-//             }
-//             .drinks {
-//                 height: 220px;
-//                 overflow-y: scroll;
-//             }
-//             .drinks::-webkit-scrollbar {
-//                 display: none;
-//             }
-//             .tit {
-//                 color: rgb(236, 126, 0);
-//                 margin-bottom: 10px;
-//             }
-//             .oli {
-//                 line-height: 32px;
-//                 span {
-//                     display: inline-block;
-//                 }
-//                 .olil {
-//                     width: 42%;
-//                 }
-//                 .olir {
-//                     width: 58%;
-//                     span {
-//                         text-decoration: line-through;
-//                         color: rgb(138, 138, 138);
-//                     }
-//                 }
-//             }
-//             .save {
-//                 text-align: right;
-//             }
-//             .onu {
-//                 line-height: 20px;
-//             }
-//         }
-//     }
-// }
-
-// // element
-// /deep/.el-dialog {
-//     width: 46% !important;
-//     min-width: 876px;
-// }
-// /deep/.el-dialog__header {
-//     padding: 0;
-// }
-// /deep/ .el-dialog__body {
-//     padding-top: 10px;
-// }
-// /deep/.handle-input {
-//     width: 150px;
-// }
-
 .not-book {
     background-color: #e6a23c !important;
     border: 1px solid transparent !important;
@@ -1319,9 +1200,6 @@ export default {
 }
 
 @border-color: #7a7a7a;
-/deep/ .el-dialog__header {
-    padding: 0;
-}
 
 .handle-box {
     margin-bottom: 20px;
@@ -1439,13 +1317,25 @@ export default {
     }
 }
 
+/deep/.seat-dialog {
+    .el-dialog {
+        width: 20% !important;
+    }
+}
+
 /deep/.el-dialog {
-    width: 80% !important;
+    width: 80%;
     // min-width: 876px;
 }
+
 /deep/.el-dialog__header {
-    padding: 0;
+    padding: 20px 20px 10px;
 }
+
+/deep/.el-dialog__body {
+    padding: 0px 20px 30px 20px;
+}
+
 /deep/.handle-input {
     width: 150px;
 }
