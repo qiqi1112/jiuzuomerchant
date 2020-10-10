@@ -1,6 +1,6 @@
 <template>
     <div id="app" @click="close">
-        <chatRoom></chatRoom>
+        <!-- <chatRoom></chatRoom> -->
         <router-view></router-view>
     </div>
 </template>

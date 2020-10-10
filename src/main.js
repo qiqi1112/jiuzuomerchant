@@ -54,12 +54,12 @@ router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | 上座`;
     const role = JSON.parse(localStorage.getItem('userInfo')) || ''
     if (!role && to.path !== '/login') {
-        next('/login');
         this.$socket.disconnect();
+        next('/login');
     } else {
         if (role) {
             // Vue.use(new VueSocketIO({
-            //     debug: true,
+            //     debug: false,
             //     connection: 'http://192.168.31.94:9210',
             //     vuex: {
             //         store,
@@ -72,7 +72,8 @@ router.beforeEach((to, from, next) => {
             //         query: {
             //             token:role.token ,
             //             signature:'customer'
-            //         }}
+            //         }
+            //     }
             // }))
         }
         next()

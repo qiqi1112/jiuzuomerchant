@@ -115,7 +115,7 @@ export default {
         };
     },
     created(){
-        this.$socket.disconnect();
+        // this.$socket.disconnect();
     },
     sockets: {
         connect() {
@@ -278,7 +278,7 @@ export default {
         }
     },
     mounted() {
-        this.$socket.connect();
+        // this.$socket.connect();
     },
     beforeDestroy(){
         this.$socket.disconnect();

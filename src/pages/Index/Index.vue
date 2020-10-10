@@ -31,15 +31,19 @@
                         <span class="line lw2"></span>
                         <span>
                             今日客访数 <i class="xtc">{{topData.visitTimes}}</i> 次，同比昨日
-                            <span>上涨</span> 
-                            <i class="xtc"> {{topData.visitTimes}} </i>人
+                            <span class="sz" v-if="topData.visitorsML=='+'">上涨</span> 
+                            <span class="xj" v-if="topData.visitorsML=='-'">下降</span> 
+                            <i class="xtc"> {{topData.yesterdayVisitors}} </i>人
                         </span> 
                     </div>
                     <div class="comp">
                         <span class="line lw2"></span>
-                        <span class="jg">今日新增新用户 <i class="xtc">19</i> 人，同比昨日
-                        <span class="xj">下降</span> 
-                        <i class="xtc"> 3 </i>人</span>
+                        <span class="jg">
+                            今日新增新用户 <i class="xtc">{{topData.newUserTimes}}</i> 人，同比昨日
+                            <span class="sz" v-if="topData.newUserML=='+'">上涨</span> 
+                            <span class="xj" v-if="topData.newUserML=='-'">下降</span> 
+                            <i class="xtc"> {{topData.yesterdayNewUser}} </i>人
+                        </span>
                         <span class="line lw2"></span><span>店铺曝光量 <i class="xtc">{{topData.exposureTotal}} P</i></span>
                     </div>
                 </div>
@@ -368,6 +372,8 @@ export default {
     },
     created(){
         this.time_now = this.$regular.timeData(new Date().getTime(),5)
+        this.scrollY =  - (new Date().getDate() - 8)
+        this.active = new Date().getDate()-1
         this.days = this.timeDay(this.time_now)
         this.$nextTick(() => {
             let day = this.$refs.day
@@ -429,7 +435,19 @@ export default {
             }
             this.$post('/merchant/store/getHomePage',data).then(res=>{
                 if(res.code == 0){
-                    this.topData = res.data[0]
+                    this.topData = res.data[0]   
+                    let yesterdayNewUser = res.data[0].newUserTimes - res.data[1].newUserTimes  // 较昨日 新增 新用户
+                    let yesterdayVisitors = res.data[0].visitTimes - res.data[1].visitTimes  // 较昨日 新增 访客
+                    if(yesterdayNewUser>=0){
+                        yesterdayNewUser = '+' + yesterdayNewUser
+                    }
+                    if(yesterdayVisitors>=0){
+                        yesterdayVisitors =  '+' + yesterdayVisitors
+                    }
+                    this.$set(this.topData,'yesterdayNewUser',yesterdayNewUser.toString().substring(1))
+                    this.$set(this.topData,'yesterdayVisitors',yesterdayVisitors.toString().substring(1))
+                    this.$set(this.topData,'newUserML',yesterdayNewUser.toString().substring(0,1))
+                    this.$set(this.topData,'visitorsML',yesterdayVisitors.toString().substring(0,1))
                     this.storeDate = res.data
                 }else{
                     this.$message.warning(res.msg);
@@ -907,6 +925,10 @@ export default {
 }
 .xj{
     color: rgb(55, 55, 177);
+    font-weight: 600;
+}
+.sz{
+    color: #ff6600;
     font-weight: 600;
 }
 .choose{
