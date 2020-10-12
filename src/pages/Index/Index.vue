@@ -428,8 +428,14 @@ export default {
                 if(res.code == 0){
                     this.topData = res.data[0]   
                     this.allGraph = res.data
-                    let yesterdayNewUser = res.data[0].newUserTimes - res.data[1].newUserTimes  // 较昨日 新增 新用户
-                    let yesterdayVisitors = res.data[0].visitTimes - res.data[1].visitTimes  // 较昨日 新增 访客
+                    let yesterdayNewUser = '',yesterdayVisitors = ''
+                    if(res.data.length <=1){
+                        yesterdayNewUser = res.data[0].newUserTimes
+                        yesterdayVisitors = res.data[0].visitTimes
+                    }else{
+                        yesterdayNewUser = res.data[0].newUserTimes - res.data[1].newUserTimes  // 较昨日 新增 新用户
+                        yesterdayVisitors = res.data[0].visitTimes - res.data[1].visitTimes  // 较昨日 新增 访客
+                    }
                     if(yesterdayNewUser>=0){
                         yesterdayNewUser = '+' + yesterdayNewUser
                     }
