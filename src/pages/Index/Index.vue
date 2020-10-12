@@ -48,8 +48,8 @@
                     </div>
                 </div>
                 <div class="to_view">
-                    <div><span  :class="day_mon==1?'t_way':''" @click="dayOrMon(1)">按天数据统计</span></div>
-                    <div><span  :class="day_mon==2?'t_way':''" @click="dayOrMon(2)">按月数据统计</span></div>
+                    <div><span  :class="day_mon==1?'t_way':''" @click="day_mon = 1">按天数据统计</span></div>
+                    <div><span  :class="day_mon==2?'t_way':''" @click="day_mon = 2">按月数据统计</span></div>
                 </div>
             </div>
             <div class="main_box">
@@ -67,7 +67,7 @@
                             <span class="line lw2"></span>
                             <span>开台数据统计</span>
                         </div>
-                        <div ref='columnar' id="columnarLine" style="width: 90%;height: 500px;"></div> 
+                        <div ref='columnar' id="columnarLine" style="width: 98%;height: 500px;"></div> 
                         <!-- <div class="column">
                             <span class="line lw2"></span>
                             <span>当前座位详情图</span>
@@ -177,11 +177,10 @@
                             <span class="line lw2"></span>
                             <span>热销TOP榜 ({{format_time}})</span>
                         </div>
-
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
                                 <el-tab-pane v-for="(item,i) in topList" :key="i" :label="item.label" :name="item.name">
-                                    <ul v-if="item.name == activeName">
+                                    <ul >
                                         <li class="top_li" v-for="(item,index) in good_list" :key="index">
                                             <div class="tl">
                                                 <img :src="addUrl + item.listPicture">
@@ -189,10 +188,11 @@
                                             <div class="tr">
                                                 <p class="tit">{{item.name}}</p>
                                                 <!-- <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p> -->
-                                                <p class="good_ifo">昨日已售{{item.sellNum}}瓶</p>
+                                                <p class="good_ifo">今日已售{{item.sellNum}}瓶</p>
                                                 <div class="pro" :style="{width:item.sellNum/100+'px'}"></div>
                                             </div>
                                         </li>
+                                        <div v-if="good_list == ''">该类型今日暂无销量</div>
                                     </ul>
                                 </el-tab-pane>
                             </el-tabs>
@@ -282,29 +282,7 @@ export default {
             time_now:'',
             days:'',
             active:7,
-            good_list:[
-                {
-                    id:1,
-                    title:'Dom Perignon法国唐培里侬香槟王',
-                    img:'../../assets/img/img.jpg',
-                    ml:'150',
-                    sold:42,
-                },
-                {
-                    id:2,
-                    title:'Dom Perignon法国唐培里侬香槟王',
-                    img:'../../assets/img/img.jpg',
-                    ml:'80',
-                    sold:1380,
-                },
-                {
-                    id:3,
-                    title:'Dom Perignon法国唐培里侬香槟王',
-                    img:'../../assets/img/img.jpg',
-                    ml:'170',
-                    sold:2506,
-                },
-            ],
+            good_list:[],
             currentId:1,
             i:0,
             scrollY:0,
@@ -367,7 +345,8 @@ export default {
 
             allSeatDetailInfo: [], //所有座位详细信息
             presentSeatInfo: {}, //当前座位对应的详细信息
-            isClickSeat: false //展示当前座位的详细信息开关
+            isClickSeat: false, //展示当前座位的详细信息开关
+            allGraph:[],//图形统计数据 全部
         };
     },
     created(){
@@ -391,8 +370,18 @@ export default {
         //     this.days = this.timeDay(this.time_now)        
         // }
         day_mon(){
-            // this.getData()
-        }
+            this.topThree()
+            this.storeInfo()
+        },
+        // days(newVal,oldVal){
+        //     let poor=''
+        //     if(newVal < this.active+1){
+        //         poor = this.active+1 - newVal
+        //         this.scrollY = this.scrollY + poor
+        //         this.active = newVal-1
+        //     }
+        //     this.topThree()
+        // }
     },
     computed:{
         format_time(){
@@ -402,14 +391,10 @@ export default {
     mounted(){
         this.topThree()
         this.storeInfo()
-        this.brokenChart()
-        this.columnarChart()
         this.seeSeatInfo()
-        this.breadChart()
         this.$refs.day_li.addEventListener("wheel", this.myFunction,true);
     },
     methods:{
-
         // top榜
         topThree(){
             let data = {
@@ -420,7 +405,13 @@ export default {
             }
             this.$post('/merchant/store/getSell',data).then(res=>{
                 if(res.code == 0){
-                    this.good_list = res.data
+                    let effective = []
+                    res.data.forEach(i=>{
+                        if(i.sellNum > 0){
+                            effective.push(i)
+                        }   
+                    })
+                    this.good_list = effective
                 }else{
                     this.$message.warning(res.msg);
                 }
@@ -436,6 +427,7 @@ export default {
             this.$post('/merchant/store/getHomePage',data).then(res=>{
                 if(res.code == 0){
                     this.topData = res.data[0]   
+                    this.allGraph = res.data
                     let yesterdayNewUser = res.data[0].newUserTimes - res.data[1].newUserTimes  // 较昨日 新增 新用户
                     let yesterdayVisitors = res.data[0].visitTimes - res.data[1].visitTimes  // 较昨日 新增 访客
                     if(yesterdayNewUser>=0){
@@ -449,6 +441,9 @@ export default {
                     this.$set(this.topData,'newUserML',yesterdayNewUser.toString().substring(0,1))
                     this.$set(this.topData,'visitorsML',yesterdayVisitors.toString().substring(0,1))
                     this.storeDate = res.data
+                    this.brokenChart()
+                    this.breadChart()
+                    this.columnarChart()
                 }else{
                     this.$message.warning(res.msg);
                 }
@@ -468,8 +463,6 @@ export default {
             let day = new Date(trr[0],trr[1],0).getDate()
             return day
         },
-
-
         // 天数加0
         dayInit(time){
             if(time<10){
@@ -478,7 +471,6 @@ export default {
             }
             return time
         },
-
         // day切换
         myFunction(e){
             e.stopPropagation()
@@ -503,18 +495,20 @@ export default {
         // 年月切换
         DaysChange(val){
             this.time_now = this.$regular.timeData(val,5)
-            this.days = this.timeDay(this.time_now)     
+            this.days = this.timeDay(this.time_now)   
+            let poor=''
+            // 切换月份时  天数不够的  自动定位到选中月最后一天
+            if(this.days < this.active+1){
+                poor = this.active+1 - this.days
+                this.scrollY = this.scrollY + poor
+                this.active = this.days-1
+            }
             this.topThree()
         },
         // top类型切换
         handleClick(tab, event) {
             this.topThree()
         },
-        // 切换统计方式
-        dayOrMon(num){
-            this.day_mon = num
-        },
-
 
         // 导出
         downEx(){
@@ -526,6 +520,11 @@ export default {
         },
         // 折现图
         brokenChart(){
+            let price = [],time=[]
+            this.allGraph.forEach(i=>{
+                price.unshift(i.businessPrice)
+                time.unshift(i.time)
+            })    
             let brokenline = echarts.init(this.$refs.broken);
             let option = {
                 dataZoom: {
@@ -552,7 +551,7 @@ export default {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['6', '7', '8', '9', '10', '11', '12','13', '14', '15', '16', '17', '18', '19']
+                    data: time
                 },
                 yAxis: {
                     type: 'value'
@@ -561,7 +560,7 @@ export default {
                     {
                         name: '营业额',
                         type: 'line',
-                        data: [120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210]
+                        data: price
                     },
                 ]
             };
@@ -571,6 +570,12 @@ export default {
         },
         // 柱状图
         columnarChart(){
+            let numeral = []
+            this.allGraph.forEach(i=>{
+                numeral.unshift([i.time,i.openTableTimes,i.reserveTableTimes,i.visitTimes])
+            })
+            numeral.unshift(['product', '开台数', '预定桌数', '访问记录'])
+            
             let columnarLine = echarts.init(this.$refs.columnar)
             let option = {
                 color:[ '#f0d264','#82c8a0','#7fccde', '#6698cb', '#cb99c5'],
@@ -579,21 +584,17 @@ export default {
                 dataZoom: {
                     type: 'inside',
                 },
+                grid: {
+                    right: '4%',
+                    bottom: '6%',
+                },
                 dataset: {
-                    source: [
-                        ['product', '开台数', '预定桌数', '访问记录'],
-                        ['7', 43.3, 85.8, 93.7],
-                        ['8', 83.1, 73.4, 55.1],
-                        ['9', 86.4, 65.2, 82.5],
-                        ['10', 72.4, 53.9, 39.1]
-                    ]
+                    source: numeral
                 },
                 xAxis: {type: 'category'},
                 yAxis: {},
                 series: [
-                    {
-                        type: 'bar',
-                    },
+                    {type: 'bar'},
                     {type: 'bar'},
                     {type: 'bar'}
                 ]
@@ -602,6 +603,23 @@ export default {
         },
         // 饼图
         breadChart(){
+            let numeral = []
+            if(this.topData){
+                numeral = [
+                    {value:this.topData.numberOfTimes,name:'排号数'},
+                    {value:this.topData.grabQuantity,name:'抢座数'},
+                    {value:this.topData.cancelEffectNumberOfTimes,name:'用户取消数'},
+                    {value:this.topData.effectiveQuantity,name:'生效数'},
+                ]
+            }else{
+                numeral = [
+                    {value:0,name:'排号数'},
+                    {value:0,name:'抢座数'},
+                    {value:0,name:'用户取消数'},
+                    {value:0,name:'生效数'},
+                ]
+            }
+            
             let breadLine = echarts.init(this.$refs.bread)
             let option = {
                 title: {
@@ -626,11 +644,7 @@ export default {
                         type: 'pie',
                         radius: '55%',
                         center: ['50%', '60%'],
-                        data: [
-                            {value: 335, name: '排号数（29座）'},
-                            {value: 310, name: '取消排号数（29座）'},
-                            {value: 234, name: '生效排号数（29座）'},
-                        ],
+                        data: numeral,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,
