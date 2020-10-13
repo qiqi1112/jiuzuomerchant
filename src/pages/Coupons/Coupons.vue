@@ -28,7 +28,6 @@
             ref="multipleTable" 
             header-cell-class-name="table-header" 
             @selection-change="handleSelectionChange"
-            @row-dblclick="lineDb"
             >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" fixed width="180" align="center"></el-table-column>
@@ -289,14 +288,6 @@ export default {
             //     this.idx = index;
             //     this.form = row;
             // }
-            this.editVisible = true;
-        },
-        // 双击某一行
-        lineDb(row, column, event){
-            this.form = {}
-            if(row){
-                this.form = row;
-            }
             this.editVisible = true;
         },
         // 分页导航

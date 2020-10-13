@@ -173,7 +173,7 @@ export default {
             this.form = {}
             if(row){
                 this.idx = index;
-                this.form = row;
+                this.form = this.$regular.deep(row);
             }
             this.editVisible = true;
         },
@@ -181,7 +181,7 @@ export default {
         lineDb(row, column, event){
             this.form = {}
             if(row){
-                this.form = row;
+                this.form = this.$regular.deep(row);
             }
             this.editVisible = true;
         },

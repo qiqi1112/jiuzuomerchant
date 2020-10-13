@@ -127,9 +127,6 @@
                                             v-for="(domain, index) in dynamicValidateForm.domains"
                                             :key="domain.key"
                                             :prop="'domains.' + index + '.value'"
-                                            :rules="{
-                                            required: true, message: '标签不能为空', trigger: 'blur'
-                                            }"
                                         >
                                             <el-input v-model="domain.value"></el-input>
                                             <i class="el-icon-error" @click.prevent="removeDomain(domain)"></i>
@@ -342,17 +339,28 @@ export default {
         },
         //编辑
         lineDb(row, index,column, event){
-            this.dynamicValidateForm.dio_name = row.name
-            this.dynamicValidateForm.dio_introduce = row.synopsis
-            this.dynamicValidateForm.id = row.id
-            this.dynamicValidateForm.examine = row.examine
-            this.dynamicValidateForm.editor_text = row.content
-            this.dynamicValidateForm.times = [row.startTime,row.endTime]
-            this.dynamicValidateForm.fromdata = row.banner
+            this.dynamicValidateForm = {
+                domains: [{
+                    value: ''
+                }],
+                dio_name:'',
+                dio_introduce:'',
+                fromdata:'',
+                editor_text:'',
+                times:[],
+                id:'',
+                examine:0,
+            },
+            
+            this.$set(this.dynamicValidateForm,'dio_name',row.name)
+            this.$set(this.dynamicValidateForm,'dio_introduce',row.synopsis)
+            this.$set(this.dynamicValidateForm,'id',row.id)
+            this.$set(this.dynamicValidateForm,'examine',row.examine)
+            this.$set(this.dynamicValidateForm,'editor_text',row.content)
+            this.$set(this.dynamicValidateForm,'times',[row.startTime,row.endTime])
+            this.$set(this.dynamicValidateForm,'fromdata',row.banner)
             for(let j=0;j<row.labelsList.length;j++){
-                this.dynamicValidateForm.domains[j] = {
-                    value:row.labelsList[j]
-                }
+                this.$set(this.dynamicValidateForm.domains,j,{value:row.labelsList[j]})
             }
             this.editVisible = true;
         },
@@ -374,8 +382,6 @@ export default {
                 banner:this.dynamicValidateForm.fromdata,
                 examine:this.dynamicValidateForm.examine
             }
-
-
             if(!data.name){
                 this.$message.warning(`请输入活动名称`);
                 return 

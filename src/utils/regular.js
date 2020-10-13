@@ -1,8 +1,8 @@
 /*
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2020-08-27 11:22:15
+ * @Last Modified by: xu.xiao
+ * @Last Modified time: 2020-10-13 14:02:42
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -89,6 +89,11 @@ function timeData(timestamp, type = 1) {
 function addZero(num) {
     return num < 10 ? '0' + num : num
 }
+// 深拷贝简单转换
+function deep(val) { 
+    let str = JSON.stringify(val)
+    return JSON.parse(str);
+}
 
 //时间戳转换
 function timestampToTime(timestamp) {
@@ -109,5 +114,6 @@ export default {
     email,
     timeData,
     inputText,
-    timestampToTime
+    timestampToTime,
+    deep
 }
