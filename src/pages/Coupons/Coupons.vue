@@ -40,6 +40,7 @@
                 <el-table-column align="center" prop="details" min-width="80" label="优惠详情"></el-table-column>  
                 <el-table-column prop="sum" align="center" min-width="150" label="发布张数"></el-table-column>
                 <el-table-column align="center" prop="remainder" min-width="80" label="剩余张数"></el-table-column>  
+                <el-table-column align="center" prop="grantTime" min-width="100" label="截止发放时间"></el-table-column>
                 <el-table-column align="center" prop="beginTime" min-width="100" label="开始时间"></el-table-column>
                 <el-table-column align="center" prop="overTime" min-width="100" label="结束时间"></el-table-column>
                 <el-table-column label="操作" width="300" align="center" fixed="right">
@@ -150,6 +151,7 @@
                                             </div>
 
                                             <div class="block">
+                                                 <span>开始结束时间：</span>
                                                 <el-date-picker
                                                 v-model="domain.start_end"
                                                 type="daterange"
@@ -157,6 +159,16 @@
                                                 range-separator="至"
                                                 start-placeholder="开始日期"
                                                 end-placeholder="结束日期">
+                                                </el-date-picker>
+                                            </div>
+
+                                            <div class="block">
+                                                <span>截止发放时间：</span>
+                                                <el-date-picker
+                                                    v-model="domain.offTime"
+                                                    :disabled='readOnly'
+                                                    type="date"
+                                                    placeholder="截止发放时间">
                                                 </el-date-picker>
                                             </div>
                                         </el-form-item>
@@ -240,6 +252,7 @@ export default {
                     minus:'',
                     give:'',
                     start_end:'',
+                    offTime:'',
                 }]
             }
         },
@@ -264,6 +277,7 @@ export default {
                         start_end:[
                             row.beginTime,row.overTime
                         ],
+                        offTime:row.grantTime,
                     }],
                 }
             }else{
@@ -308,7 +322,13 @@ export default {
         },
         //删除已有优惠券
         dtlCoupon(index,val){
-            let str = val.map(v=>{return v.id});
+            let str;
+            if(val.length){
+                str = val.map(v=>{return v.id});
+            }else{
+                str = val.id
+                str = str.split(',')
+            }
             this.$post(`/merchant/store/coupon/batchDeleteCoupon`,str).then(res=>{
                 if(res.code == 0){
                     this.$message({message: '删除成功',type: 'success'});
@@ -368,7 +388,8 @@ export default {
                     overTime: this.$regular.timeData(i.start_end[1],1),
                     remainder: Number(i.give),
                     source: 0,
-                    sum: Number(i.give)
+                    sum: Number(i.give),
+                    grantTime:this.$regular.timeData(i.offTime,2),
                 }
                 if(!this.editRead){
                     // 新增 
@@ -387,6 +408,7 @@ export default {
                     }else{
                         this.$message({message: '新增成功',type: 'success'});
                     }
+                    this.getData()
                     this.editVisible = false
                 }else{
                     this.$message({message: res.mesg,type: 'warning'});
@@ -427,6 +449,10 @@ export default {
                 }
                 if(!arr[i].start_end){
                     this.$message({message: '请选择时间',type: 'warning'});
+                    break
+                }
+                if(!arr[i].offTime){
+                    this.$message({message: '请选择截止发放时间',type: 'warning'});
                     break
                 }
             }
