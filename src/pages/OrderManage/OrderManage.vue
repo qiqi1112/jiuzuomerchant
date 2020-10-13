@@ -281,9 +281,8 @@
                 <el-table-column prop="contactName" label="预订用户"></el-table-column>
                 <el-table-column label="座位号/包间号">
                     <template slot-scope="scope">
-                        <!-- <span >111</span> -->
-                        <el-link v-if="scope.row.status == 4" @click="editSeat(scope.row)">111</el-link>
-                        <span v-else>111</span>
+                        <el-link v-if="scope.row.status == 4" @click="editSeat(scope.row)">{{ scope.row.seatCode }}</el-link>
+                        <span v-else>{{ scope.row.seatCode }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="contactTel" label="预定手机"></el-table-column>
@@ -397,15 +396,15 @@
             </el-table>
 
             <!-- 修改座位/包间号对话框 -->
-            <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog">
+            <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog" @close="handleCancel">
                 <!-- <el-form :model="form">
                     <el-form-item label="座位号/包间号">
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
                 </el-form> -->
-                <el-input v-model="form" placeholder="请输入座位号/包间号"></el-input>
+                <el-input v-model="seatNum" placeholder="请输入座位号/包间号"></el-input>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="seatDia = false">取 消</el-button>
+                    <el-button @click="handleCancel">取 消</el-button>
                     <el-button type="primary" @click="handleEditSeat">确 定</el-button>
                 </div>
             </el-dialog>
@@ -691,6 +690,9 @@ export default {
 
             statusId: '',
 
+            upSeatId: '', //当前要修改的id
+            seatNum: '', //当前要修改的座位号
+
             //订单类型
             orderTypeArr: [
                 {
@@ -764,14 +766,37 @@ export default {
 
     methods: {
         //修改座位号/包间号
-        editSeat(seatNum) {
+        editSeat(row) {
             this.seatDia = true;
-            console.log(seatNum);
+            this.upSeatId = row.id;
         },
 
         //确认修改座位号/包间号
         handleEditSeat() {
+            (async () => {
+                let data = {
+                    id: this.upSeatId,
+                    value: this.seatNum
+                };
+
+                let res = await this.$put('/merchant/store/order/seatOrRoom', data);
+
+                if (res.code == 0) {
+                    this.$message.success('修改成功');
+                    this.getOrderInfo();
+                    this.seatDia = false;
+                } else {
+                    this.$message.error('修改失败');
+                }
+
+                console.log('zzz', res);
+            })();
+        },
+
+        //取消修改座位号/包间号
+        handleCancel() {
             this.seatDia = false;
+            this.seatNum = '';
         },
 
         //查看座位信息
