@@ -171,35 +171,6 @@ Vue.filter("roomType", function (oldVal, ktvTypeOpt) {
     return newVal;
 })
 
-//星期数字转文字
-Vue.filter("weekIdxToWord", function (oldVal) {
-    let newVal = '';
-    switch (oldVal) {
-        case 1:
-            newVal = '一';
-            break;
-        case 2:
-            newVal = '二';
-            break;
-        case 3:
-            newVal = '三';
-            break;
-        case 4:
-            newVal = '四';
-            break;
-        case 5:
-            newVal = '五';
-            break;
-        case 6:
-            newVal = '六';
-            break;
-        case 7:
-            newVal = '七';
-            break;
-    }
-    return newVal;
-})
-
 //支付状态
 Vue.filter("payStatus", function (oldVal) {
     let newVal = '';

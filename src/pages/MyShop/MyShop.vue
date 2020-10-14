@@ -443,7 +443,7 @@
                                 <span class="min-con">最低消费：</span>
                                 <div class="day-mincom">
                                     <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                        <span>星期{{ item.weekIndex | weekIdxToWord }}</span>
+                                        <span>{{ item.weekIndex | dayOfWeek }}</span>
                                         <el-input
                                             v-model="item.price"
                                             placeholder="最低消费"

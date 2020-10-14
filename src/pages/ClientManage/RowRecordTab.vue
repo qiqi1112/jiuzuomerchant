@@ -1,23 +1,47 @@
 <template>
     <div>
         <ul class="tabs-box">
-            <li v-for="(item,index) in recordList" :key="index">
+            <li v-for="(item, index) in recordList" :key="index">
+                <div v-if="propUserInfo.activeName == 'rowRecord'">
+                    <p>
+                        <span>取号类型：</span>
+                        <span>{{ item.seatCapacity }}</span>
+                    </p>
+                    <p>
+                        <span>取号状态：</span>
+                        <span>{{ item.seatType | seatType }}</span>
+                    </p>
+                </div>
+                <div v-if="propUserInfo.activeName == 'evalRecord'">
+                    <p>
+                        <span>消费类型：</span>
+                        <span>{{ item.orderType | conType }}</span>
+                    </p>
+                    <p>
+                        <span>打分：</span>
+                        <span>{{ item.appraiseLevel }}</span>
+                    </p>
+                </div>
+                <div v-if="propUserInfo.activeName == 'conRecord'">
+                    <p>
+                        <span>支付方式：</span>
+                        <span>{{ item.payWay | payType }}</span>
+                    </p>
+                    <p>
+                        <span>金额：</span>
+                        <span>{{ item.payAmount }}</span>
+                    </p>
+                </div>
+
                 <p>
-                    <span>排号预计人数：</span>
-                    <span>{{item.seatCapacity}}</span>
-                </p>
-                <p>
-                    <span>座位选择：</span>
-                    <span>{{item.seatType | seatType}}</span>
-                </p>
-                <p>
-                    <span>{{item.createTime}}</span>
-                    <span>{{item.dayOfWeak | dayOfWeek}}</span>
+                    <span>{{ item.createTime }}</span>
+                    <span>{{ item.dayOfWeak | dayOfWeek }}</span>
                 </p>
             </li>
         </ul>
         <!-- 对话框里的标签页数据分页 -->
         <el-pagination
+            v-if="recordList.length > 0"
             background
             layout="prev, pager, next"
             @current-change="handleCurrentChange"
@@ -31,14 +55,15 @@
 
 <script>
 export default {
-    props: ['userID'],
+    props: ['propUserInfo'],
 
     data() {
         return {
             dataListCount: 0, //默认当前要显示的数据条数
             currentPage: 1, //默认显示的页码所在位置（第一页）
             pagesize: 6, //默认每页要显示多少条数据
-            recordList: [] //记录数据
+            recordList: [], //记录数据
+            url: '' //请求地址
         };
     },
 
@@ -49,25 +74,43 @@ export default {
             this.getRowRecord(); //重新请求翻页后的数据
         },
 
+        //获取请求地址
+        getUrl() {
+            switch (this.propUserInfo.activeName) {
+                case 'rowRecord':
+                    this.url = '/merchant/store/ly/userHistory';
+                    break;
+                case 'evalRecord':
+                    this.url = '/merchant/store/appraise/appraiseLimitByUser';
+                    break;
+                case 'conRecord':
+                    this.url = '/merchant/store/appraise/storeListByUser';
+                    break;
+            }
+        },
+
         //获取记录数据
         getRowRecord() {
             let data = {
                 pageNo: this.currentPage,
                 pageSize: this.pagesize,
-                userId: this.userID
+                userId: this.propUserInfo.userId
             };
 
-            this.$post('/merchant/store/queue/queueLimitByUser', data).then((res) => {
+            this.$post(this.url, data).then((res) => {
                 if (res.code == 0) {
                     this.recordList = res.data.list; //当前页的数据
                     this.dataListCount = res.data.total; //总数据条数
-                    // console.log(this.recordList);
                 }
             });
         }
     },
 
     created() {
+        this.getUrl();
+    },
+
+    mounted() {
         this.getRowRecord();
     }
 };

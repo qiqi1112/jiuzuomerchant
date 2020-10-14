@@ -17,10 +17,10 @@
                     class="handle-input mr10"
                 ></el-input>
                 <el-select clearable v-model="collectVal" placeholder="收藏本店" style="width: 100px" class="mr10">
-                    <el-option v-for="item in collectValOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    <el-option v-for="item in selectOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
                 <el-select clearable v-model="isVipVal" placeholder="本店会员" style="width: 100px" class="mr10">
-                    <el-option v-for="item in isVipOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    <el-option v-for="item in selectOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
                 </el-select>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
@@ -94,17 +94,17 @@
                 <!-- 对话框里的标签页 -->
                 <el-tabs style="margin-top: 20px" v-model="activeName" type="border-card">
                     <el-tab-pane label="排号记录" name="rowRecord">
-                        <row-record-tab :userID="userInfo.userID" v-if="activeName == 'rowRecord'"></row-record-tab>
+                        <row-record-tab :propUserInfo="propUserInfo" v-if="activeName == 'rowRecord'"></row-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="评价记录" name="evalRecord">
-                        <eval-record-tab :userID="userInfo.userID" v-if="activeName == 'evalRecord'"></eval-record-tab>
-                    </el-tab-pane>
-                    <el-tab-pane label="访问记录" name="visitRecord">
-                        <visit-record-tab :userID="userInfo.userID" v-if="activeName == 'visitRecord'"></visit-record-tab>
+                        <row-record-tab :propUserInfo="propUserInfo" v-if="activeName == 'evalRecord'"></row-record-tab>
                     </el-tab-pane>
                     <el-tab-pane label="消费记录" name="conRecord">
-                        <con-record-tab :userID="userInfo.userID" v-if="activeName == 'conRecord'"></con-record-tab>
+                        <row-record-tab :propUserInfo="propUserInfo" v-if="activeName == 'conRecord'"></row-record-tab>
                     </el-tab-pane>
+                    <!-- <el-tab-pane label="访问记录" name="visitRecord">
+                        <row-record-tab :propUserInfo="propUserInfo" v-if="activeName == 'visitRecord'"></row-record-tab>
+                    </el-tab-pane> -->
                 </el-tabs>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="handleClose">确 定</el-button>
@@ -128,36 +128,19 @@
 
 <script>
 import rowRecordTab from './RowRecordTab';
-import evalRecordTab from './EvalRecordTab';
-import visitRecordTab from './VisitRecordTab';
-import conRecordTab from './ConRecordTab';
 
 export default {
     components: {
-        rowRecordTab,
-        evalRecordTab,
-        visitRecordTab,
-        conRecordTab
+        rowRecordTab
     },
 
     data() {
         return {
             searchName: '', //用户昵称
             collectVal: '', //收藏本店
-            //是否收藏本店
-            collectValOpt: [
-                {
-                    value: 1,
-                    label: '是'
-                },
-                {
-                    value: 0,
-                    label: '否'
-                }
-            ],
             isVipVal: '', //本店会员
             //是否收藏本店
-            isVipOpt: [
+            selectOpt: [
                 {
                     value: 1,
                     label: '是'
@@ -167,6 +150,7 @@ export default {
                     label: '否'
                 }
             ],
+
             tableData: [], //表格数据
 
             dataListCount: 0, //默认当前要显示的数据条数
@@ -176,16 +160,20 @@ export default {
             dialogFormVisible: false, //对话框的开启与隐藏
             activeName: 'rowRecord', //默认显示的标签页
 
-            //用户相关属性
-            userInfo: {
-                petName: '',
-                phone: '',
-                vip: '',
-                collectionMerchantStatus: '',
-                totalConsumptionAmount: '',
-                userID: ''
+            userInfo: {}, //用户相关属性
+
+            //传给子组件的值
+            propUserInfo: {
+                userId: '',
+                activeName: 'rowRecord'
             }
         };
+    },
+
+    watch: {
+        activeName(newVal) {
+            this.propUserInfo.activeName = newVal;
+        }
     },
 
     methods: {
@@ -199,11 +187,12 @@ export default {
         lookInfo(index, row) {
             this.dialogFormVisible = true;
             this.userInfo = row;
+            this.propUserInfo.userId = row.userId;
         },
 
         //关闭对话框
         handleClose() {
-            dialogFormVisible = false;
+            this.dialogFormVisible = false;
             this.activeName = 'rowRecord';
         },
 
@@ -238,31 +227,26 @@ export default {
 };
 </script>
 
-<style>
-.el-table td,
-.el-table th {
-    text-align: center !important;
-}
-
-.page {
+<style scoped lang='less'>
+/deep/.page {
     text-align: right;
     margin-top: 20px;
 }
 
 .handle-box {
     margin-bottom: 20px;
+
+    .handle-input {
+        width: 170px;
+        display: inline-block;
+    }
+
+    .mr10 {
+        margin-right: 10px;
+    }
 }
 
-.handle-input {
-    width: 170px;
-    display: inline-block;
-}
-
-.mr10 {
-    margin-right: 10px;
-}
-
-.el-dialog__header {
+/deep/.el-dialog__header {
     padding: 0;
 }
 
@@ -281,42 +265,42 @@ export default {
     background-color: #999;
 }
 
-.basic-info div {
-    display: flex;
+.basic-info {
+    div {
+        display: flex;
+
+        p {
+            margin-bottom: 20px;
+            display: flex;
+            min-width: 260px;
+
+            span:first-child {
+                display: block;
+                min-width: 80px;
+            }
+        }
+    }
 }
 
-.basic-info div p {
-    margin-bottom: 20px;
-    display: flex;
-    min-width: 230px;
-}
+.tabs-box {
+    li {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px dashed #ddd;
+        padding: 14px 0;
 
-.basic-info div p span:first-child {
-    display: block;
-    min-width: 100px;
-}
+        p {
+            width: 33.3333%;
 
-.tabs-box li {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px dashed #ddd;
-    padding: 14px 0;
-}
+            span:first-child {
+                margin-right: 10px;
+            }
+        }
 
-.tabs-box li p {
-    width: 33.3333%;
-}
-
-.tabs-box li p:last-child {
-    text-align: right;
-}
-
-.visit-tab.tabs-box li p:last-child {
-    width: 100%;
-    text-align: right;
-}
-
-.tabs-box li p span:first-child {
-    margin-right: 10px;
+        p:last-child {
+            width: 100%;
+            text-align: right;
+        }
+    }
 }
 </style>

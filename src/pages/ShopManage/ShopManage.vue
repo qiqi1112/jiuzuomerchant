@@ -132,7 +132,7 @@
             <!-- 商品列表 -->
             <div class="goodsList">
                 <div class="goods-box" v-for="(item, index) in goodsData" :key="index" @click="selectGoods">
-                    <el-checkbox v-if="isSelect" :data-id="item.id"></el-checkbox>
+                    <el-checkbox v-if="isSelect" :data-id="item.id" class="checkbox"></el-checkbox>
                     <img :src="showImgPrefix + item.listPicture" alt />
                     <div class="goods-detail">
                         <h4 title="商品名称">{{ item.name }}</h4>
@@ -1272,10 +1272,18 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        position: relative;
+
+        .checkbox {
+            position: absolute;
+            top: -1px;
+            right: 5%;
+        }
 
         > img {
             width: 90%;
             height: 180px;
+            border-radius: 2px;
         }
 
         .goods-detail {

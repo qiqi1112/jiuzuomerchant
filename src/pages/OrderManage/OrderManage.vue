@@ -1,237 +1,4 @@
 <template>
-    <!-- <div id="order_msg">
-        <div class="crumbs">
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 订单管理
-                </el-breadcrumb-item>
-            </el-breadcrumb>
-        </div>
-        <div class="container">
-            <div class="handle-box">
-                <el-input
-                    v-model="query.name"
-                    placeholder="用户名"
-                    clearable
-                    class="handle-input mr10"
-                ></el-input>
-                <el-input v-model="query.tel" placeholder="手机号" clearable class="handle-input mr10"></el-input>
-                <el-input
-                    v-model="query.orderNum"
-                    placeholder="订单号"
-                    clearable
-                    class="handle-input mr10"
-                ></el-input>
-                <el-select
-                    v-model="query.orderType"
-                    placeholder="订单类型"
-                    class="mr10"
-                    style="width:100px"
-                    clearable
-                >
-                    <el-option
-                        v-for="item in orderTypeOpt"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    ></el-option>
-                </el-select>
-
-                <el-select
-                    v-model="query.payStatus"
-                    placeholder="支付状态"
-                    class="mr10"
-                    style="width:100px"
-                    clearable
-                >
-                    <el-option
-                        v-for="item in payStatusOpt"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    ></el-option>
-                </el-select>
-
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" class="handle-del mr10" @click="lookSeat">查看座位</el-button>
-                <el-button
-                    type="primary"
-                    icon="el-icon-download"
-                    class="handle-del mr10"
-                    @click="exportTable"
-                >Excel导出</el-button>
-            </div>
-
-            <el-table
-                :data="tableData"
-                border
-                class="table"
-                ref="multipleTable"
-                header-cell-class-name="table-header"
-                @row-dblclick="lineDb"
-            >
-                <el-table-column prop="id" label="ID" fixed width="80" align="center"></el-table-column>
-                <el-table-column prop="order_id" min-width="120" label="订单发起人"></el-table-column>
-                <el-table-column prop="order_id" min-width="120" label="预定用户"></el-table-column>
-                <el-table-column prop="tel" min-width="120" label="预定手机">
-                    <template slot-scope="scope">
-                        <span>{{scope.row.tel | phoneNum}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="order_type" min-width="100" label="订单类型"></el-table-column>
-                <el-table-column prop="order_state" min-width="200" label="总订单号"></el-table-column>
-                <el-table-column prop="user_name" min-width="180" label="订单号"></el-table-column>
-                <el-table-column prop="creat_time" min-width="150" label="支付状态"></el-table-column>
-                <el-table-column prop="order_state" min-width="100" label="支付类型"></el-table-column>
-                <el-table-column prop="remark" min-width="200" label="实付金额"></el-table-column>
-                <el-table-column prop="remark" min-width="200" label="商品原价"></el-table-column>
-                <el-table-column prop="pay_type" min-width="200" label="优惠卷"></el-table-column>
-                <el-table-column prop="pay_time" min-width="200" label="备注信息"></el-table-column>
-                <el-table-column prop="total" min-width="150" label="订单发起时间"></el-table-column>
-                <el-table-column prop="order_detail" min-width="150" label="订单支付时间"></el-table-column>
-                <el-table-column prop="is_coupons" min-width="200" label="订单信息"></el-table-column>
-                <el-table-column label="操作" width="180" align="center" fixed="right">
-                    <template slot-scope="scope">
-                        <el-button
-                            size="mini"
-                            :disabled="scope.row.stateUsing==3"
-                            :type="scope.row.stateUsing==1?'success':(scope.row.stateUsing==2?'danger':'info')"
-                            @click="stateEdit(scope.$index, scope.row)"
-                        >{{scope.row.stateUsing==1?'已到店':(scope.row.stateUsing==2?'使用中':'已离开')}}</el-button>
-                        <el-button
-                            size="mini"
-                            type="primary"
-                            @click="handleLook(scope.$index, scope.row)"
-                        >查看</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                    background
-                    layout="total, prev, pager, next"
-                    :current-page="query.pageIndex"
-                    :page-size="query.pageSize"
-                    :total="query.pageTotal"
-                    @current-change="handlePageChange"
-                ></el-pagination>
-            </div>
-        </div>
-        <el-dialog :visible.sync="editVisible" width="32%">
-            <el-form ref="form" :model="form" label-width="100px">
-                <div class="column">
-                    <span class="line lw2"></span>
-                    <span>订单信息</span>
-                </div>
-
-                <div class="order_detail">
-                    <div class="ol">
-                        <div class="or_li">
-                            <span class="or_lab">预定用户：</span>
-                            <span class="or_info">张十周年</span>
-                        </div>
-                        <div class="or_li">
-                            <span class="or_lab">预定手机：</span>
-                            <span class="or_info">19999999999</span>
-                        </div>
-                        <div class="or_li">
-                            <span class="or_lab">预定备注信息：</span>
-                            <span class="or_info">帮我提前打理好卫生吧，我这里来的是比较重要的领导，会早点来</span>
-                        </div>
-                        <div class="or_li">
-                            <span class="or_lab">订单号：</span>
-                            <span class="or_info">Mugabsj587416594KSJD54</span>
-                        </div>
-                        <div>
-                            <span>订单类型：&nbsp;</span>
-                            <span class="ors">预定桌</span>
-                            <span>支付状态：&nbsp;</span>
-                            <span class="ors sta">已支付</span>
-                            <span>支付方式：&nbsp;</span>
-                            <span>微信</span>
-                        </div>
-
-                        <div>
-                            <div class="dl">
-                                <span>支付金额：</span>
-                                <span class="total">￥1298.00</span>
-                                <span class="old_t">商品原价：</span>
-                                <span class="total">￥1298.00</span>
-                            </div>
-                            <div class="dl tr">
-                                <span>优惠券优惠：</span>
-                                <span class="total">￥1298.00</span>
-                            </div>
-                        </div>
-
-                        <div class="or_li">
-                            <span class="or_lab">下单时间：</span>
-                            <span class="or_t">2020-09-23 09:56:28 星期三</span>
-                        </div>
-                        <div class="or_li">
-                            <span class="or_lab">支付时间：</span>
-                            <span class="or_t">2020-09-23 09:56:28 星期三</span>
-                        </div>
-                    </div>
-                    <div class="or">
-                        <div class="orl">清单详情：</div>
-                        <div class="orr">
-                            <div class="seat">
-                                <p class="tit">座位信息</p>
-                                <div class="oli">
-                                    <span class="olil">座位号</span>
-                                    <span class="olir">K5座</span>
-                                </div>
-                                <div class="oli">
-                                    <span class="olil">容纳人数</span>
-                                    <span class="olir">8人</span>
-                                </div>
-                                <div class="oli">
-                                    <span class="olil">保留时间</span>
-                                    <span class="olir">最晚至 20：30</span>
-                                </div>
-                                <div class="oli">
-                                    <span class="olil">抵消金额</span>
-                                    <span class="olir">￥ 1000.00</span>
-                                </div>
-                            </div>
-                            <div class="coupons">
-                                <p class="tit">优惠卷</p>
-                                <div class="oli">满1000减50</div>
-                            </div>
-                            <div class="drinks">
-                                <p class="tit">酒水清单</p>
-                                <div class="oli">
-                                    <span class="olil">商品名称</span>
-                                    <span class="olir">
-                                        ￥246.00
-                                        <span>￥246.00</span>
-                                    </span>
-                                </div>
-                                <div class="onu">
-                                    <span class="olil">*1</span>
-                                </div>
-                                <div class="oli">
-                                    <span class="olil">抵消金额</span>
-                                    <span class="olir">
-                                        ￥246.00
-                                        <span>￥246.00</span>
-                                    </span>
-                                </div>
-                                <div class="onu">
-                                    <span class="olil">*2</span>
-                                </div>
-                            </div>
-                            <div class="save">
-                                <el-button type="primary">返回</el-button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </el-form>
-        </el-dialog>
-    </div> -->
-
     <div>
         <div class="crumbs">
             <el-breadcrumb separator="/">
@@ -277,7 +44,7 @@
             <!-- 表格部分 -->
             <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
                 <el-table-column label="ID" fixed type="index"></el-table-column>
-                <el-table-column prop="createBy" label="订单发起人"></el-table-column>
+                <el-table-column prop="createBy" label="订单发起人" min-width="150"></el-table-column>
                 <el-table-column prop="contactName" label="预订用户"></el-table-column>
                 <el-table-column label="座位号/包间号">
                     <template slot-scope="scope">
@@ -287,7 +54,7 @@
                 </el-table-column>
                 <el-table-column prop="contactTel" label="预定手机"></el-table-column>
                 <el-table-column prop="orderType" label="订单类型"></el-table-column>
-                <el-table-column prop="orderNo" label="总订单号"></el-table-column>
+                <el-table-column prop="orderNo" label="总订单号" min-width="160"></el-table-column>
                 <el-table-column prop="orderId" label="订单号"></el-table-column>
                 <el-table-column prop="payStatus" label="支付状态"></el-table-column>
                 <el-table-column prop="payWay" label="支付类型"></el-table-column>
@@ -295,9 +62,9 @@
                 <el-table-column prop="payableAmount" label="商品原价"></el-table-column>
                 <el-table-column prop="details" label="优惠券"></el-table-column>
                 <el-table-column prop="remarks" label="备注信息"></el-table-column>
-                <el-table-column prop="createTime" label="订单发起时间"></el-table-column>
-                <el-table-column prop="paidTime" label="订单支付时间"></el-table-column>
-                <el-table-column prop="storeName" label="订单信息">
+                <el-table-column prop="createTime" label="订单发起时间" min-width="140"></el-table-column>
+                <el-table-column prop="paidTime" label="订单支付时间" min-width="140"></el-table-column>
+                <el-table-column prop="storeName" label="订单信息" min-width="100">
                     <template slot-scope="scope">
                         <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row)">查看订单</el-link>
                     </template>
@@ -397,11 +164,6 @@
 
             <!-- 修改座位/包间号对话框 -->
             <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog" @close="handleCancel">
-                <!-- <el-form :model="form">
-                    <el-form-item label="座位号/包间号">
-                        <el-input v-model="form.name"></el-input>
-                    </el-form-item>
-                </el-form> -->
                 <el-input v-model="seatNum" placeholder="请输入座位号/包间号"></el-input>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancel">取 消</el-button>
@@ -429,125 +191,137 @@
                 </div>
             </el-dialog>
 
-            <!-- 查看对话框 -->
-            <!-- <el-dialog :visible.sync="dialog">
-                <span class="add-classify-title">订单信息</span>
-                <div class="basic-info"></div>
-                <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialog = false">取 消</el-button>
-                    <el-button type="primary" @click="handleSureEdit">确 定</el-button>
-                </div>
-            </el-dialog> -->
-
+            <!-- 查看订单与查看座位对话框 -->
             <el-dialog :visible.sync="dialog">
                 <!-- 订单详情 -->
-                <el-form v-if="dialogStatus == 1" ref="form" :model="form" label-width="100px">
-                    <div class="column">
-                        <span class="line lw2"></span>
-                        <span>订单信息</span>
-                    </div>
-                    <div class="order_detail">
-                        <div class="ol">
-                            <div class="or_li">
-                                <span class="or_lab">预定用户：</span>
-                                <span class="or_info">{{ form.contactName }}</span>
-                            </div>
-                            <div class="or_li">
-                                <span class="or_lab">预定手机：</span>
-                                <span class="or_info">{{ form.contactTel }}</span>
-                            </div>
-                            <div class="or_li">
-                                <span class="or_lab">预定备注信息：</span>
-                                <span class="or_info">{{ form.remarks }}</span>
-                            </div>
-                            <div class="or_li">
-                                <span class="or_lab">订单号：</span>
-                                <span class="or_info">{{ form.orderNo }}</span>
-                            </div>
-                            <div>
-                                <span>订单类型：&nbsp;</span>
-                                <span class="ors">{{ form.orderType == 0 ? '预定桌' : 'AA拼单' }}</span>
-                                <span>支付状态：&nbsp;</span>
-                                <span class="ors sta">{{ form.payStatus | payStatus }}</span>
-                                <span>支付方式：&nbsp;</span>
-                                <span>{{ form.payWay | payWay }}</span>
-                            </div>
+                <span class="add-classify-title">{{ dialogStatus == 1 ? '订单信息' : '座位信息' }} </span>
+                <div class="basic-info">
+                    <el-form v-if="dialogStatus == 1" ref="form" class="info-wrap" :model="form" label-width="110px">
+                        <div class="info-box left">
+                            <el-form-item label="预定用户：">
+                                <el-input v-model="form.contactName" readonly></el-input>
+                            </el-form-item>
+                            <el-form-item label="预定手机：">
+                                <el-input v-model="form.contactTel" readonly></el-input>
+                            </el-form-item>
+                            <el-form-item label="预定备注信息：">
+                                <el-input type="textarea" v-model="form.remarks" readonly></el-input>
+                            </el-form-item>
+                            <el-form-item label="订单号：">
+                                <el-input v-model="form.orderNo" readonly></el-input>
+                            </el-form-item>
 
-                            <div>
-                                <div class="dl">
-                                    <span>实付金额：</span>
-                                    <span class="total">{{ form.orderAmount }}</span>
-                                    <span class="old_t">商品原价：</span>
-                                    <span class="total">{{ form.payableAmount }}</span>
+                            <div class="info1">
+                                <div>
+                                    订单类型：
+                                    <span>{{ form.orderType == 0 ? '预定桌' : 'AA拼单' }}</span>
                                 </div>
-                                <div class="dl tr">
-                                    <span>优惠券优惠：</span>
-                                    <span class="total">{{ form.couponAmount }}</span>
+                                <div>
+                                    支付状态：
+                                    <span>{{ form.payStatus | payStatus }}</span>
+                                </div>
+                                <div>
+                                    支付方式：
+                                    <span>{{ form.payWay | payWay }}</span>
                                 </div>
                             </div>
 
-                            <div class="or_li">
-                                <span class="or_lab">下单时间：</span>
-                                <span class="or_t">{{ form.createTime }}</span>
+                            <div class="info2">
+                                <div>
+                                    <el-form-item label="实付金额：">
+                                        <el-input v-model="form.orderAmount" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+                                </div>
+                                <div>
+                                    <el-form-item label="商品原价：">
+                                        <el-input v-model="form.payableAmount" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="优惠券优惠：">
+                                        <el-input v-model="form.minAmount" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+                                </div>
                             </div>
-                            <div class="or_li">
-                                <span class="or_lab">支付时间：</span>
-                                <span class="or_t">{{ form.payTime }}</span>
-                            </div>
-                        </div>
-                        <div class="or">
-                            <div class="orl">清单详情：</div>
-                            <div class="orr">
-                                <div class="seat">
-                                    <p class="tit">座位信息</p>
-                                    <div class="oli">
-                                        <span class="olil">座位号</span>
-                                        <span class="olir">{{ form.seatCode }}</span>
-                                    </div>
-                                    <div class="oli">
-                                        <span class="olil">容纳人数</span>
-                                        <span class="olir">{{ form.seatCapacity }}</span>
-                                    </div>
-                                    <div class="oli">
-                                        <span class="olil">保留时间</span>
-                                        <span class="olir">{{ form.retentionTime }}</span>
-                                    </div>
-                                    <div class="oli">
-                                        <span class="olil">抵消金额</span>
-                                        <span class="olir">{{ form.discountFee }}</span>
-                                    </div>
+
+                            <div class="info3">
+                                <div>
+                                    下单时间：
+                                    <span>{{ form.createTime }}</span>
+                                    <span>{{ form.createTimeWeek | dayOfWeek }}</span>
                                 </div>
-                                <div class="coupons">
-                                    <p class="tit">优惠卷</p>
-                                    <div class="oli">{{ form.details }}</div>
+                                <div>
+                                    支付时间：
+                                    <span>{{ form.payTime }}</span>
+                                    <span>{{ form.payTimeWeek | dayOfWeek }}</span>
                                 </div>
-                                <div class="drinks">
-                                    <p class="tit">酒水清单</p>
-                                    <div v-for="(item, index) in form.goodsList" :key="index">
-                                        <div class="oli">
-                                            <span class="olil">{{ item.goodsName }}</span>
-                                            <span class="olir">
-                                                {{ item.activityPrice }}
-                                                <span>{{ item.originalPrice }}</span>
-                                            </span>
-                                        </div>
-                                        <div class="onu">
-                                            <span class="olil">x{{ item.quantity }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="save">
-                                    <el-button @click="dialog = false">取 消</el-button>
-                                    <el-button type="primary" @click="dialog = false">确 定</el-button>
-                                </div>
-                                <!-- <div slot="footer" class="dialog-footer">
-                                    <el-button @click="dialog = false">取 消</el-button>
-                                    <el-button type="primary" @click="handleSureEdit">确 定</el-button>
-                                </div> -->
                             </div>
                         </div>
-                    </div>
-                </el-form>
+                        <div class="info-box right">
+                            <div class="right-info-title">
+                                <span> 清单详情：</span>
+                            </div>
+                            <div class="right-list">
+                                <div>
+                                    <p class="title">座位信息</p>
+                                    <div class="list-box">
+                                        <p>
+                                            <span>座位号</span>
+                                            <span>{{ form.seatCode }}</span>
+                                        </p>
+                                        <p>
+                                            <span>容纳人数</span>
+                                            <span>{{ form.seatCapacity }}人</span>
+                                        </p>
+                                        <p>
+                                            <span>保留时间</span>
+                                            <span>最晚至{{ form.retentionTime }}</span>
+                                        </p>
+                                        <p>
+                                            <span>抵消金额</span>
+                                            <span>￥{{ form.discountFee }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="title">酒水清单</p>
+                                    <div class="list-box">
+                                        <div class="drink-list" v-for="(item, index) in form.goodsList" :key="index">
+                                            <div class="good-box">
+                                                <div class="good-name">{{ item.goodsName }}</div>
+                                                <span>x{{ item.quantity }}</span>
+                                            </div>
+                                            <div>
+                                                <span>￥{{ item.activityPrice }}</span>
+                                                <span class="unline">￥{{ item.originalPrice }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="title">优惠券</p>
+                                    <div class="list-box">
+                                        <p>{{ form.details }}</p>
+                                    </div>
+                                </div>
+                                <div class="change-seat" v-if="form.changeSeat && form.changeSeatTime">
+                                    <p>
+                                        <span>经商家换座：</span>
+                                        <span>{{ form.changeSeat }}</span>
+                                    </p>
+                                    <p>
+                                        <span>换座时间：</span>
+                                        <span>{{ form.changeSeatTime }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </el-form>
+                </div>
 
                 <!-- 座位详情图 -->
                 <div v-if="dialogStatus == 2">
@@ -641,6 +415,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="dialog = false">确 定</el-button>
                 </div>
             </el-dialog>
 
@@ -773,24 +551,28 @@ export default {
 
         //确认修改座位号/包间号
         handleEditSeat() {
-            (async () => {
-                let data = {
-                    id: this.upSeatId,
-                    value: this.seatNum
-                };
+            if (this.seatNum) {
+                (async () => {
+                    let data = {
+                        id: this.upSeatId,
+                        value: this.seatNum
+                    };
 
-                let res = await this.$put('/merchant/store/order/seatOrRoom', data);
+                    let res = await this.$put('/merchant/store/order/seatOrRoom', data);
 
-                if (res.code == 0) {
-                    this.$message.success('修改成功');
-                    this.getOrderInfo();
-                    this.seatDia = false;
-                } else {
-                    this.$message.error('修改失败');
-                }
+                    if (res.code == 0) {
+                        this.$message.success('修改成功');
+                        this.getOrderInfo();
+                        this.seatDia = false;
+                    } else {
+                        this.$message.error('修改失败');
+                    }
 
-                console.log('zzz', res);
-            })();
+                    console.log('zzz', res);
+                })();
+            } else {
+                this.$message.error('请输入要修改的座位号/包间号');
+            }
         },
 
         //取消修改座位号/包间号
@@ -822,8 +604,6 @@ export default {
 
                         //座位属性回显
                         this.showSeatAtt();
-
-                        // console.log(this.allSeatDetailInfo);
                     }
                 } catch (error) {
                     console.log(error);
@@ -914,7 +694,7 @@ export default {
             });
         },
 
-        //查看信息
+        //查看订单信息
         handleLookInfo(row) {
             this.dialogStatus = 1;
             this.dialog = true;
@@ -924,7 +704,7 @@ export default {
 
                 this.form = res.data;
 
-                // console.log('详细信息', this.form);
+                console.log('详细信息', this.form);
             })();
         },
 
@@ -1224,8 +1004,6 @@ export default {
     }
 }
 
-@border-color: #7a7a7a;
-
 .handle-box {
     margin-bottom: 20px;
 
@@ -1244,113 +1022,133 @@ export default {
     margin-top: 20px;
 }
 
-/* 弹窗 */
-.order_detail {
+.add-classify-title {
     display: flex;
-    .ol {
-        flex: 1;
-        .or_li {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .or_lab {
-            flex: 0.3;
-            width: 100px;
-        }
-        .or_info {
-            flex: 0.7;
-            width: 100px;
-            border: 1px solid @border-color;
-            border-radius: 5px;
-            padding: 7px 10px;
-            box-sizing: border-box;
-        }
-        .ors {
-            margin-right: 41px;
-        }
-        .sta {
-            color: #488c05;
-        }
-        .total {
-            display: inline-block;
-            border: 1px solid @border-color;
-            padding: 5px 7px;
-            border-radius: 5px;
-            margin-left: 20px;
-        }
-        .or_t {
-            flex: 0.7;
-        }
-        .dl {
-            margin: 20px 0;
-            .old_t {
-                margin-left: 75px;
-            }
-        }
-        .tr {
-            text-align: right;
-        }
-    }
-    .or {
-        flex: 1;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.add-classify-title::before {
+    display: inline-block;
+    content: '';
+    width: 4px;
+    height: 20px;
+    margin-right: 10px;
+    background-color: #999;
+}
+
+.basic-info {
+    .info-wrap {
         display: flex;
-        .orl {
-            flex: 0.2;
-            padding-left: 50px;
-        }
-        .orr {
-            flex: 0.65;
-            .seat,
-            .coupons {
-                border-bottom: 1px solid @border-color;
-                margin-bottom: 10px;
+        justify-content: space-between;
+
+        .info-box {
+            width: 50%;
+
+            .info1 {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 18px;
             }
-            .drinks {
-                height: 220px;
-                overflow-y: scroll;
+
+            .info2 {
+                display: flex;
+                justify-content: space-between;
             }
-            .drinks::-webkit-scrollbar {
-                display: none;
-            }
-            .tit {
-                color: rgb(236, 126, 0);
-                margin-bottom: 10px;
-            }
-            .oli {
-                line-height: 32px;
+
+            .info3 {
+                > div {
+                    margin-bottom: 18px;
+                }
+
                 span {
-                    display: inline-block;
+                    margin-left: 30px;
                 }
-                .olil {
-                    width: 42%;
+            }
+        }
+
+        .info-box.right {
+            box-sizing: border-box;
+            padding-left: 60px;
+            display: flex;
+
+            .right-info-title {
+                margin-right: 20px;
+            }
+
+            .right-list {
+                display: flex;
+                flex-direction: column;
+
+                .title {
+                    color: #f00;
+                    margin-bottom: 18px;
                 }
-                .olir {
-                    width: 58%;
-                    span {
+
+                .list-box {
+                    border-bottom: 1px solid #c0c4cc;
+                    margin-bottom: 18px;
+
+                    p {
+                        display: flex;
+                        margin-bottom: 18px;
+
+                        :first-child {
+                            width: 160px;
+                        }
+                    }
+                }
+
+                .drink-list {
+                    display: flex;
+                    margin-bottom: 18px;
+
+                    .good-box {
+                        width: 160px;
+
+                        .good-name {
+                            margin-bottom: 6px;
+                        }
+                    }
+
+                    .unline {
                         text-decoration: line-through;
-                        color: rgb(138, 138, 138);
+                        color: #bcbcbc;
+                        margin-left: 10px;
+                    }
+                }
+
+                .change-seat {
+                    p {
+                        margin-bottom: 18px;
+                        display: flex;
+                        :first-child {
+                            width: 120px;
+                        }
                     }
                 }
             }
-            .save {
-                text-align: right;
-            }
-            .onu {
-                line-height: 20px;
-            }
         }
     }
+}
+
+/deep/ .el-textarea__inner {
+    resize: none !important;
+    line-height: 2;
 }
 
 /deep/.seat-dialog {
     .el-dialog {
         width: 20% !important;
     }
+
+    .el-dialog__header {
+        padding: 20px 20px 40px;
+    }
 }
 
-/deep/.el-dialog {
-    width: 80%;
-    // min-width: 876px;
+/deep/ .el-input-group__append {
+    padding: 0 10px;
 }
 
 /deep/.el-dialog__header {
