@@ -115,3 +115,29 @@ export default {
     }
 };
 </script>
+
+<style lang="less" scoped>
+.tabs-box {
+    li {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px dashed #ddd;
+        padding: 14px 0;
+
+        > div {
+            display: flex;
+            justify-content: space-between;
+
+            p {
+                margin-right: 200px;
+            }
+        }
+
+        > p:last-child {
+            span:first-child {
+                margin-right: 20px;
+            }
+        }
+    }
+}
+</style>

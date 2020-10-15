@@ -28,14 +28,14 @@
             <el-table-column prop="numberOfTimes" label="优惠券使用"></el-table-column>
             <el-table-column label="订单详情" min-width="80">
                 <template slot-scope="scope">
-                    <el-button type="text">文字按钮</el-button>
+                    <el-button type="text">查看订单</el-button>
                 </template>
             </el-table-column>
             <el-table-column prop="cancelEffectNumberOfTimes" label="验证码" min-width="100"></el-table-column>
             <el-table-column prop="numberOfComments" label="订单发起时间"></el-table-column>
             <el-table-column prop="visitMerchantTimes" label="订单支付时间" min-width="100"></el-table-column>
             <el-table-column prop="lastConsumptionTime" label="订单结束时间" min-width="135"></el-table-column>
-            <el-table-column label="操作" fixed="right" min-width="80">
+            <el-table-column label="操作" fixed="right" min-width="110">
                 <template slot-scope="scope">
                     <el-button type="primary" size="mini" @click="lookInfo(scope.$index, scope.row)">请求审核</el-button>
                 </template>

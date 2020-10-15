@@ -9,9 +9,9 @@
         <div class="container">
             <!-- 头部模块 -->
             <div class="handle-box">
-                <el-button type="primary" @click="activeChange('tradeOrder')">交易订单</el-button>
-                <el-button type="primary" @click="activeChange('tradeRecord')">交易记录</el-button>
-                <el-button type="primary" @click="activeChange('myAccount')">我的账户</el-button>
+                <el-button :type="activeName == 'tradeOrder' ? 'primary' : ''" @click="activeChange('tradeOrder')">交易订单</el-button>
+                <el-button :type="activeName == 'tradeRecord' ? 'primary' : ''" @click="activeChange('tradeRecord')">交易记录</el-button>
+                <el-button :type="activeName == 'myAccount' ? 'primary' : ''" @click="activeChange('myAccount')">我的账户</el-button>
                 <el-input
                     clearable
                     @keydown.13.native="handleSearch"

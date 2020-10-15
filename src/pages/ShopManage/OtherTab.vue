@@ -116,7 +116,7 @@ export default {
             fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
-            //其他标签页表单--------------------------------------------
+            //其他标签页表单
             otherForm: {
                 name: '',
                 weight: 0,
@@ -165,7 +165,6 @@ export default {
 
     mounted() {
         this.assignParentToChild(); //回显商品信息
-        console.log('其他组件');
     },
 
     methods: {
@@ -178,19 +177,7 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
-            this.otherForm.name = this.otherFormParent.name;
-            this.otherForm.weight = this.otherFormParent.weight;
-            this.otherForm.desc = this.otherFormParent.desc;
-            this.otherForm.originPrice = this.otherFormParent.originPrice;
-            this.otherForm.nowPrice = this.otherFormParent.nowPrice;
-            this.otherForm.checkedBanner = this.otherFormParent.checkedBanner == 1 ? true : false;
-            this.otherForm.bannerImageUrl = this.otherFormParent.bannerImageUrl;
-            this.otherForm.thumImageUrl = this.otherFormParent.thumImageUrl;
-            this.otherForm.detailImageUrl = this.otherFormParent.detailImageUrl;
-            this.otherForm.dynamicValidateForm.domains = this.otherFormParent.dynamicValidateForm.domains;
-            this.otherForm.skuCodeArr = this.otherFormParent.skuCodeArr;
-
-            console.log('其他的父组件传过来的值', this.otherFormParent);
+            this.otherForm = Object.assign({}, this.otherFormParent);
         },
 
         //发送当前子组件的表单信息给父组件

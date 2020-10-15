@@ -281,26 +281,4 @@ export default {
         }
     }
 }
-
-.tabs-box {
-    li {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px dashed #ddd;
-        padding: 14px 0;
-
-        p {
-            width: 33.3333%;
-
-            span:first-child {
-                margin-right: 10px;
-            }
-        }
-
-        p:last-child {
-            width: 100%;
-            text-align: right;
-        }
-    }
-}
 </style>

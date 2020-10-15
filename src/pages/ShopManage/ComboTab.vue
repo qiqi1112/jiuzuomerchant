@@ -19,16 +19,9 @@
                 </p>
                 <p>
                     <span>选择商品：</span>
-                    <el-select
-                        v-model="comboForm.goodName"
-                        filterable
-                        remote
-                        placeholder="请选择"
-                        @change="selectGoodInfo"
-                        @focus="selectGoodsList"
-                    >
+                    <el-select v-model="goodName" filterable remote placeholder="请选择" @change="selectGoodInfo" @focus="selectGoodsList">
                         <el-option
-                            v-for="(item, index) in comboForm.options"
+                            v-for="(item, index) in options"
                             :key="index"
                             :label="item.name"
                             :value="item.id + '+' + item.listPicture + '+' + item.name + '+' + item.originalPrice + '+' + item.presentPrice"
@@ -65,7 +58,7 @@
                 </p>
                 <p class="combo-spec">
                     <span>套餐规格：</span>
-                    <i v-for="(item, index) in comboForm.spec" :key="index">{{ item }}</i>
+                    <i v-for="(item, index) in spec" :key="index">{{ item }}</i>
                 </p>
             </el-form>
             <p>
@@ -132,7 +125,7 @@ export default {
     data() {
         return {
             fileUploadUrl: '/admin/system/upload/create', //单文件上传
-            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
+            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片前缀
 
             //表单属性
             comboForm: {
@@ -141,16 +134,16 @@ export default {
                 desc: '',
                 originPrice: '',
                 nowPrice: '',
-                spec: ['默认'],
                 checkedBanner: false,
                 bannerImageUrl: '', //广告图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
-                options: [], //输入框请求到的商品信息数组
-                goodName: '', //选中的商品对应的信息
                 tableData: [], //渲染表格时的所有商品数据
                 goodsIdList: [] //所有已选择的商品对应的id
             },
+            spec: ['默认'], //商品规格数组
+            options: [], //输入框请求到的商品信息数组
+            goodName: '', //选中的商品对应的信息
 
             antiStatus: true //防抖状态值
         };
@@ -188,7 +181,7 @@ export default {
 
         //处理当前选中的商品信息
         selectGoodInfo() {
-            let goodInfoArr = this.comboForm.goodName.split('+'); //将字符串拆分成数组
+            let goodInfoArr = this.goodName.split('+'); //将字符串拆分成数组
 
             //将商品相关信息存入对象
             let obj = {
@@ -202,7 +195,7 @@ export default {
 
             this.comboForm.goodsIdList.push(goodInfoArr[0]); //存入当前选择的商品id
             this.comboForm.tableData.push(obj); //存入当前选择的商品所有信息，用于表格回显
-            this.comboForm.goodName = ''; //清空选择的选项
+            this.goodName = ''; //清空选择的选项
             this.selectGoodsList(); //重新请求商品列表
         },
 
@@ -212,16 +205,15 @@ export default {
                 this.antiStatus = false;
                 let data = {
                     goodsIdList: this.comboForm.goodsIdList,
-                    name: this.comboForm.goodName
+                    name: this.goodName
                 };
                 this.$post('/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
                     if (res.code == 0) {
-                        this.comboForm.options = res.data;
-                        this.antiStatus = true;
+                        this.options = res.data;
                     } else {
-                        this.antiStatus = true;
                         this.$message.error(res.msg);
                     }
+                    this.antiStatus = true;
                 });
             }
         },
@@ -245,20 +237,7 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
-            // this.comboForm = this.comboFormParent;
-            // this.comboForm.checkedBanner = this.comboFormParent.checkedBanner == 1 ? true : false;
-
-            this.comboForm.name = this.comboFormParent.name;
-            this.comboForm.weight = this.comboFormParent.weight;
-            this.comboForm.desc = this.comboFormParent.desc;
-            this.comboForm.originPrice = this.comboFormParent.originPrice;
-            this.comboForm.nowPrice = this.comboFormParent.nowPrice;
-            this.comboForm.checkedBanner = this.comboFormParent.checkedBanner == 1 ? true : false;
-            this.comboForm.bannerImageUrl = this.comboFormParent.bannerImageUrl;
-            this.comboForm.thumImageUrl = this.comboFormParent.thumImageUrl;
-            this.comboForm.detailImageUrl = this.comboFormParent.detailImageUrl;
-            this.comboForm.tableData = this.comboFormParent.tableData;
-            this.comboForm.goodsIdList = this.comboFormParent.goodsIdList;
+            this.comboForm = Object.assign({}, this.comboFormParent);
         },
 
         //发送当前子组件的表单信息给父组件

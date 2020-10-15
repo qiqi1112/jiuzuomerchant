@@ -7,12 +7,7 @@
                     <el-input v-model="drinksForm.name" style="width: 170px; margin-right: 20px"></el-input>
                     <!-- 酒水分类 -->
                     <el-select v-model="drinksForm.classify" placeholder="酒水分类" style="width: 150px; margin-right: 20px">
-                        <el-option
-                            v-for="item in drinksForm.classifyOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        ></el-option>
+                        <el-option v-for="item in classifyOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </p>
                 <p>
@@ -163,7 +158,7 @@ export default {
             fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
-            //酒水标签页表单-----------------------------------------
+            //酒水标签页表单
             drinksForm: {
                 name: '',
                 desc: '',
@@ -171,49 +166,11 @@ export default {
                 nowPrice: '',
                 checkedBanner: false,
                 checkedReco: false,
-
                 area: '', //产地
                 year: '', //年份
-
-                //酒水分类
-                classify: '',
-                classifyOptions: [
-                    {
-                        label: '红酒',
-                        value: 1
-                    },
-                    {
-                        label: '白酒',
-                        value: 2
-                    },
-                    {
-                        label: '啤酒',
-                        value: 3
-                    },
-                    {
-                        label: '香槟',
-                        value: 4
-                    },
-                    {
-                        label: '洋酒',
-                        value: 5
-                    },
-                    {
-                        label: '调制酒',
-                        value: 6
-                    },
-                    {
-                        label: '饮料',
-                        value: 7
-                    }
-                ],
-
-                //商品排序
-                goodWeight: 0,
-
-                //商家推荐位排序
-                recoWeight: 0,
-
+                classify: '', //酒水分类
+                goodWeight: 0, //商品排序
+                recoWeight: 0, //商家推荐位排序
                 bannerImageUrl: '', //广告图
                 recoImageUrl: '', //推荐位图
                 thumImageUrl: '', //缩略图
@@ -231,7 +188,38 @@ export default {
                     ]
                 },
                 skuCodeArr: [] //sku码数组
-            }
+            },
+
+            classifyOptions: [
+                {
+                    label: '红酒',
+                    value: 1
+                },
+                {
+                    label: '白酒',
+                    value: 2
+                },
+                {
+                    label: '啤酒',
+                    value: 3
+                },
+                {
+                    label: '香槟',
+                    value: 4
+                },
+                {
+                    label: '洋酒',
+                    value: 5
+                },
+                {
+                    label: '调制酒',
+                    value: 6
+                },
+                {
+                    label: '饮料',
+                    value: 7
+                }
+            ]
         };
     },
 
@@ -280,27 +268,7 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
-            // this.drinksForm = this.drinksFormParent;
-            // this.drinksForm.checkedBanner = this.drinksFormParent.checkedBanner == 1 ? true : false;
-            // this.drinksForm.checkedReco = this.drinksFormParent.checkedReco == 1 ? true : false;
-
-            this.drinksForm.area = this.drinksFormParent.area;
-            this.drinksForm.year = this.drinksFormParent.year;
-            this.drinksForm.name = this.drinksFormParent.name;
-            this.drinksForm.goodWeight = this.drinksFormParent.goodWeight;
-            this.drinksForm.desc = this.drinksFormParent.desc;
-            this.drinksForm.originPrice = this.drinksFormParent.originPrice;
-            this.drinksForm.nowPrice = this.drinksFormParent.nowPrice;
-            this.drinksForm.checkedBanner = this.drinksFormParent.checkedBanner == 1 ? true : false;
-            this.drinksForm.checkedReco = this.drinksFormParent.checkedReco == 1 ? true : false;
-            this.drinksForm.classify = this.drinksFormParent.classify;
-            this.drinksForm.recoWeight = this.drinksFormParent.recoWeight;
-            this.drinksForm.bannerImageUrl = this.drinksFormParent.bannerImageUrl;
-            this.drinksForm.recoImageUrl = this.drinksFormParent.recoImageUrl;
-            this.drinksForm.thumImageUrl = this.drinksFormParent.thumImageUrl;
-            this.drinksForm.detailImageUrl = this.drinksFormParent.detailImageUrl;
-            this.drinksForm.dynamicValidateForm.domains = this.drinksFormParent.dynamicValidateForm.domains;
-            this.drinksForm.skuCodeArr = this.drinksFormParent.skuCodeArr;
+            this.drinksForm = Object.assign({}, this.drinksFormParent);
         },
 
         //酒水规格添加按钮
@@ -323,7 +291,6 @@ export default {
             //删除一个规格就添加到这个删除规格数组里
             if (item.skuCode !== '') {
                 this.drinksForm.skuCodeArr.push(item.skuCode);
-                console.log('规格', this.drinksForm.skuCodeArr);
             }
         },
 

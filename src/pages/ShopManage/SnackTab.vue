@@ -178,19 +178,7 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
-            this.snackForm.name = this.snackFormParent.name;
-            this.snackForm.weight = this.snackFormParent.weight;
-            this.snackForm.desc = this.snackFormParent.desc;
-            this.snackForm.originPrice = this.snackFormParent.originPrice;
-            this.snackForm.nowPrice = this.snackFormParent.nowPrice;
-            this.snackForm.checkedBanner = this.snackFormParent.checkedBanner == 1 ? true : false;
-            this.snackForm.bannerImageUrl = this.snackFormParent.bannerImageUrl;
-            this.snackForm.thumImageUrl = this.snackFormParent.thumImageUrl;
-            this.snackForm.detailImageUrl = this.snackFormParent.detailImageUrl;
-            this.snackForm.dynamicValidateForm.domains = this.snackFormParent.dynamicValidateForm.domains;
-            this.snackForm.skuCodeArr = this.snackFormParent.skuCodeArr;
-
-            console.log('xxx', this.snackForm.checkedBanner);
+            this.snackForm = Object.assign({}, this.snackFormParent);
         },
 
         //发送当前子组件的表单信息给父组件

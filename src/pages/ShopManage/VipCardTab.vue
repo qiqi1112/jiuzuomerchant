@@ -26,7 +26,7 @@
                 </p>
                 <p class="combo-spec">
                     <span>商品规格：</span>
-                    <i v-for="(item, index) in vipCardForm.spec" :key="index">{{ item }}</i>
+                    <i v-for="(item, index) in spec" :key="index">{{ item }}</i>
                 </p>
             </el-form>
             <p>
@@ -94,19 +94,19 @@ export default {
             fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
 
-            //会员卡标签页表单--------------------------------------------
+            //会员卡标签页表单
             vipCardForm: {
                 name: '',
                 weight: 0,
                 desc: '',
                 integral: '', //积分
                 nowPrice: '',
-                spec: ['默认'],
                 checkedBanner: false,
                 bannerImageUrl: '', //广告图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '' //详情图
-            }
+            },
+            spec: ['默认']
         };
     },
 
@@ -143,18 +143,7 @@ export default {
 
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
-            // this.vipCardForm = this.vipCardFormParent;
-            // this.vipCardForm.checkedBanner = this.vipCardFormParent.checkedBanner == 1 ? true : false;
-
-            this.vipCardForm.name = this.vipCardFormParent.name;
-            this.vipCardForm.weight = this.vipCardFormParent.weight;
-            this.vipCardForm.desc = this.vipCardFormParent.desc;
-            this.vipCardForm.integral = this.vipCardFormParent.integral;
-            this.vipCardForm.nowPrice = this.vipCardFormParent.nowPrice;
-            this.vipCardForm.checkedBanner = this.vipCardFormParent.checkedBanner == 1 ? true : false;
-            this.vipCardForm.bannerImageUrl = this.vipCardFormParent.bannerImageUrl;
-            this.vipCardForm.thumImageUrl = this.vipCardFormParent.thumImageUrl;
-            this.vipCardForm.detailImageUrl = this.vipCardFormParent.detailImageUrl;
+            this.vipCardForm = Object.assign({}, this.vipCardFormParent);
         },
 
         //发送当前子组件的表单信息给父组件
