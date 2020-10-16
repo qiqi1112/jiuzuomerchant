@@ -32,33 +32,33 @@
                         <span>当前抢座</span>
                     </div>
                     <ul class="scl_box">
-                        <li class='li_n now_num' v-for="(item,index) in nowNumList" :key="index">
+                        <li class='li_n now_num' v-for="(item,index) in robList" :key="index">
                             <div class="now_l">
                                 <div>
                                     <i class="el-icon-s-custom"></i>
                                     <span class="info">预计人数</span>
-                                    <span>{{item.num}}人</span>
+                                    <span>{{item.seatCapacity}}人</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-marketing"></i>
                                     <span class="info">预约座位</span>
-                                    <span>{{item.seat_type==1?'沙发软座':'硬座'}}</span>
+                                    <span>{{item.seatType==0?'无要求':(item.seatType==1?'沙发软座':'硬座')}}</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-release"></i>
                                     <span class="info">手机号码</span>
-                                    <span>{{item.tel | phoneNum}}</span>
+                                    <span>{{item.contactTel | phoneNum}}</span>
                                 </div>
                             </div>
                             <div class="now_r">
                                 <div>
                                     当前位于第
                                     <span class="num"> {{index+1}} </span>
-                                    位（{{item.seat_num}}）
-                                    <span class="has_consum">(已消费：￥ 9525.00)</span> 
+                                    位（{{item.codeNo}}）
+                                    <span class="has_consum">(已消费：￥ {{item.paidAmount}})</span> 
                                 </div>
-                                <div>取号时间 <span class="tl">{{item.take_time}}</span></div>
-                                <div>等待时常 <span class="tl"> {{item.wait_time}}</span></div>
+                                <div>取号时间 <span class="tl">{{item.createTime}}</span></div>
+                                <div>等待时常 <span class="tl"> {{item.createTime | timeFormat}}</span></div>
                                 <div v-if="index==0 && callNext">
                                     <span class="stat">处于呼叫中....</span>
                                     <span class="btn" @click="ensure(item)">确定</span>
@@ -109,9 +109,9 @@
                 <div class="fl_box">
                     <div class="column" >
                         <span class="line lw2"></span>
-                        <span>成功排号记录</span>
-
+                        <span>成功记录</span>
                         <div class="time-ch">
+                            
                             <el-date-picker
                                 v-model="time_now"
                                 :clearable="false"
@@ -127,6 +127,10 @@
                             <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
                     </div>
+                    <div class="btns">
+                        <div class="tab_btn" @click="sucOrCan(1,1)" :class="suc_type==1?'on':'canc'">成功排号记录</div>
+                        <div class="tab_btn" @click="sucOrCan(1,2)" :class="suc_type==2?'on':'canc'">成功抢座记录</div>
+                    </div>
                     <ul class="succ_canc_box">
                         <li class='li_n suc_num' v-for="(item,index) in successList" :key="index">
                             <div class="su_l">
@@ -137,10 +141,8 @@
                                 <span class="tim">{{item.createTime | timeFormat}}</span>
                             </div>
                             <div class="su_l">
-                                <span class="get_lab">取号时间</span>
-                                <span class="get_tim">{{item.createTime}}</span>
-                                <!-- <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">{{item.offTime}}</span> -->
+                                <span class="fai_lab">取消时间</span>
+                                <span class="fai_tim">{{item.offTime}}</span>
                             </div>
                         </li>
                     </ul>
@@ -148,7 +150,7 @@
                 <div class="fl_box">
                     <div class="column">
                         <span class="line lw2"></span>
-                        <span>取消排号记录</span>
+                        <span>取消记录</span>
                         <div class="time-ch">
                             <el-date-picker
                                 v-model="time_now_no"
@@ -162,6 +164,10 @@
                             </el-date-picker>
                             <i class="jt " :class="focSta?'el-icon-caret-top':'el-icon-caret-bottom'"></i>
                         </div>
+                    </div>
+                    <div class="btns">
+                        <div class="tab_btn" @click="sucOrCan(0,1)" :class="can_type==1?'on':'canc'">取消排号记录</div>
+                        <div class="tab_btn" @click="sucOrCan(0,2)" :class="can_type==2?'on':'canc'">取消抢座记录</div>
                     </div>
                     <ul class="succ_canc_box">
                         <li class='li_n fail_num' v-for="(item,index) in cancelList" :key="index">
@@ -229,6 +235,9 @@ export default {
             rowList:[],//排号列表
             successList:[],//成功排号列表
             cancelList:[],//取消排号列表
+
+            suc_type:1,
+            can_type:1,
         };
     },
     created(){
@@ -268,10 +277,11 @@ export default {
                         nowTotalVie:res.data.nowTotalVie,
                         todayCancelTotalLy:res.data.todayCancelTotalLy,
                         todayTotalLy:res.data.todayTotalLy,
-                        todayTotalVie:res.data.totalSuccessLy,
+                        todayTotalVie:res.data.todayTotalVie,
                         totalSuccessLy:res.data.totalSuccessLy,
+                        todaySuccessTotalVie:res.data.todaySuccessTotalVie
                     }
-                    // this.robList = res.data
+                    this.robList = res.data.nowVieList
                     this.rowList = res.data.nowLyList
                     this.successList = res.data.successLyList
                     this.cancelList = res.data.cancelLyList
@@ -286,6 +296,17 @@ export default {
                 if(val.id == this.nowNumList[i].id){
                     this.nowNumList.splice(i,1)
                 }
+            }
+        },
+        // 成功，取消 记录  按钮切换
+        sucOrCan(isTrue,type){
+            if(isTrue == 1){
+                // 成功记录按钮切换
+                type == 1?this.suc_type = 1 : this.suc_type = 2
+                // 还剩下 切换成功或取消 数据展示
+            }else{
+                // 取消记录按钮切换
+                type == 1?this.can_type = 1 : this.can_type = 2
             }
         },
         nextOne(val){
@@ -343,7 +364,6 @@ export default {
         display: flex;
         .fl_box{
             flex: 1;
-            
             .li_n{
                 border: 1px solid @bor-color;
                 border-radius: 5px;
@@ -358,7 +378,7 @@ export default {
             .now_num{
                 display: flex;
                 .now_l{
-                    flex: .45;
+                    flex: .42;
                     div{
                         margin-bottom: 10px;
                         i{
@@ -370,7 +390,7 @@ export default {
                     }
                 }
                 .now_r{
-                    flex: .55;
+                    flex: .58;
                     div{
                         margin-bottom: 6px;
                     }
@@ -431,6 +451,21 @@ export default {
             }
             .jt{
                 margin-top: 3px;
+            }
+            .btns{
+                margin-bottom:20px;
+                .tab_btn{
+                    display:inline-block;
+                    padding:10px;
+                    color:white;
+                    cursor: pointer;
+                }   
+                .on{
+                    background:#409EFF;
+                }
+                .canc{
+                    background:#c1c1c1;
+                }
             }
         }
         .scl_box{
