@@ -113,7 +113,7 @@ export default {
 
         //关闭对话框
         handleClose() {
-            dialogFormVisible = false;
+            this.dialogFormVisible = false;
             this.activeName = 'rowRecord';
         },
 
@@ -147,3 +147,41 @@ export default {
     }
 };
 </script>
+
+<style lang="less" scoped>
+/deep/.el-dialog__header {
+    padding: 0;
+}
+
+.add-classify-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.add-classify-title::before {
+    display: inline-block;
+    content: '';
+    width: 4px;
+    height: 20px;
+    margin-right: 10px;
+    background-color: #999;
+}
+
+.basic-info {
+    div {
+        display: flex;
+
+        p {
+            margin-bottom: 20px;
+            display: flex;
+            min-width: 230px;
+
+            span:first-child {
+                display: block;
+                min-width: 100px;
+            }
+        }
+    }
+}
+</style>

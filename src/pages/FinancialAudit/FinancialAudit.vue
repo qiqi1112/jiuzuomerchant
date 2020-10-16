@@ -99,12 +99,7 @@ export default {
 };
 </script>
 
-<style>
-.el-table td,
-.el-table th {
-    text-align: center !important;
-}
-
+<style lang="less" scoped>
 .page {
     text-align: right;
     margin-top: 20px;
@@ -121,64 +116,6 @@ export default {
 
 .mr10 {
     margin: 0 10px 0 30px;
-}
-
-.el-dialog__header {
-    padding: 0;
-}
-
-.add-classify-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.add-classify-title::before {
-    display: inline-block;
-    content: '';
-    width: 4px;
-    height: 20px;
-    margin-right: 10px;
-    background-color: #999;
-}
-
-.basic-info div {
-    display: flex;
-}
-
-.basic-info div p {
-    margin-bottom: 20px;
-    display: flex;
-    min-width: 230px;
-}
-
-.basic-info div p span:first-child {
-    display: block;
-    min-width: 100px;
-}
-
-.tabs-box li {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px dashed #ddd;
-    padding: 14px 0;
-}
-
-.tabs-box li p {
-    width: 33.3333%;
-}
-
-.tabs-box li p:last-child {
-    text-align: right;
-}
-
-.visit-tab.tabs-box li p:last-child {
-    width: 100%;
-    text-align: right;
-}
-
-.tabs-box li p span:first-child {
-    margin-right: 10px;
 }
 
 .audit-all {

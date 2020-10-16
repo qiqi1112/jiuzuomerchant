@@ -828,7 +828,7 @@ export default {
             longitude: '', //经度
             latitude: '', //纬度
 
-            servicePhoneArr: ['123', '234', '345'], //客户电话回显数组
+            servicePhoneArr: [], //客户电话回显数组
             servicePhone: '', //客服电话
             shopType: '', //选择的店铺类型
             shopTypeOpt: [], //所有店铺类型
@@ -888,12 +888,6 @@ export default {
                 name: '',
                 num: ''
             },
-            //  timeQuanObj: {
-            //     startTime: '00:00', //开始时间
-            //     endTime: '00:00', //结束时间
-            //     latestTime: '00:00', //最晚保留时间
-            //     minConsumption: 0 //最低消费
-            // },
             //当前ktv包间配置的时间段
             timeQuanObj: {
                 startTime: '', //开始时间
@@ -902,7 +896,6 @@ export default {
                 minConsumption: '' //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
-
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
                 roomTypeId: '', //包间类型
@@ -910,7 +903,7 @@ export default {
                 roomNumber: '', //包间数量
                 capacity: '', //容纳人数
                 haveToilet: '2', //独立卫生间
-                mahjong: '', //机麻
+                mahjong: 0, //机麻
                 minConsumption: 0, //最低消费（时间段集合里的最低消费）
                 snacks: [], //零嘴
                 sketchMap: [], //包间示意图
@@ -919,6 +912,24 @@ export default {
         };
     },
     methods: {
+        //验证所有输入的值
+        checkFormInfo() {
+            !this.shopName && this.$message.error('请输入店铺名称');
+            return;
+            !this.shopLocaIndex && this.$message.error('请选择店铺定位');
+            return;
+            !this.startBussTime && this.$message.error('请选择开始营业时间');
+            return;
+            !this.endBussTime && this.$message.error('请选择结束营业时间');
+            return;
+            !this.servicePhone && this.$message.error('请输入客服电话');
+            return;
+
+            !this.perCon && this.$message.error('请输入店铺人均消费');
+            return;
+            !this.overallImageUrl && this.$message.error('请上传商家布局图');
+        },
+
         //接收地图子组件传过来的参数
         childData(data) {
             if (data) {
@@ -935,8 +946,6 @@ export default {
 
         //上传头像之前的验证
         beforeAvatarUpload(file) {
-            console.log('上传之前', file);
-
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
             const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
@@ -979,7 +988,7 @@ export default {
             }
         },
 
-        //上传头像
+        //上传logo
         uploadAvatarFile(file) {
             this.imgLoading.loading2 = true;
             let formData = new FormData();
@@ -987,7 +996,6 @@ export default {
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.logoImageUrl = res.data;
-
                     this.imgLoading.loading2 = false;
                     this.$message.success('上传成功');
                 }
@@ -1009,6 +1017,8 @@ export default {
                         url: this.showImgPrefix + res.data[0]
                     };
                     this.bannerImgBox.push(obj);
+
+                    this.showBannerVideo(); //回显视频
 
                     this.imgLoading.loading = false;
                     this.$message.success('上传成功');
@@ -1046,7 +1056,6 @@ export default {
 
         // 删除banner图集
         bannerRemove(file, fileList) {
-            console.log('删除图集', file);
             this.bannerShowBox.forEach((item, i) => {
                 if (this.showImgPrefix + item == file.url) {
                     this.bannerShowBox.splice(i, 1); //删除上传容器中的
@@ -1116,7 +1125,6 @@ export default {
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.overallImageUrl = res.data;
-
                     this.imgLoading.loading5 = false;
                     this.$message.success('上传成功');
                 }
@@ -1131,7 +1139,6 @@ export default {
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.rowNumImageUrl = res.data;
-
                     this.imgLoading.loading3 = false;
                     this.$message.success('上传成功');
                 }
@@ -1146,7 +1153,6 @@ export default {
             this.$file_post(this.fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.appShopImageUrl = res.data;
-
                     this.imgLoading.loading4 = false;
                     this.$message.success('上传成功');
                 }
@@ -1206,7 +1212,7 @@ export default {
                     });
                 }
 
-                this.$alert('定位一经保存，则不可更改，请慎重选择！', '提示');
+                this.$alert('店铺定位一经保存，则不可更改，请慎重选择！', '提示');
             }
         },
 
@@ -1227,7 +1233,7 @@ export default {
                 }
             }
             // 单选情况下
-            else if (this.shopLocaIndex == 3) {
+            if (this.shopLocaIndex == 3) {
                 this.submitShopType = [];
                 this.$refs.shopTypeSpan.forEach((i) => {
                     i.classList.remove('shop-type-span');
@@ -1257,30 +1263,36 @@ export default {
             });
         },
 
-        //编辑商铺信息
-        editShopInfo() {
-            this.isReadonly = false;
-            this.isLookKtvInfo = true;
-            this.isUpdateKtvInfo = false;
-            this.isClickSeat = false; //关闭展示当前点击的座位的详细信息
-            this.clearKtvInfo(); //清空ktv包间属性数据
-            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
-            this.showBannerVideo(); //回显banner图集里的视频
-            this.getShopType(); //获取店铺类型
-            this.showCheckType(); //回显已经选择的店铺类型
-
-            //给地图子组件传值（回显地址信息）
+        //给地图子组件传值（编辑店铺时）
+        sendInfoToMap() {
             this.mapList.searchAddress = this.searchAddress;
             this.mapList.trustAddress = this.trustAddress;
         },
 
-        //新增店铺
-        submitCreatShop() {
+        //点击编辑后的操作
+        editShopInit() {
+            this.isReadonly = false;
+            this.isLookKtvInfo = true;
+            this.isUpdateKtvInfo = false;
+            this.isClickSeat = false;
+        },
+
+        //编辑商铺信息
+        editShopInfo() {
+            this.editShopInit(); //初始化操作
+            this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
+            this.getShopType(); //获取店铺类型
+            this.showCheckType(); //回显已经选择的店铺类型
+            this.showBannerVideo(); //回显banner图集里的视频
+            this.clearKtvInfo(); //清空ktv包间属性数据
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+        },
+
+        //新增/修改店铺
+        submitShopRequest() {
             let ktvRoomList = [];
             if (this.shopLocaIndex == 3) {
-                //数组转json形式（零嘴）
-                ktvRoomList = this.cloneSnacks();
-
+                ktvRoomList = this.cloneSnacks(); //数组转json形式（零嘴）
                 //数组转字符串（ktv示意图）
                 ktvRoomList.forEach((item) => {
                     item.sketchMap = item.sketchMap.join(',');
@@ -1290,7 +1302,6 @@ export default {
             //要传的值
             let data = {
                 appListBigPicture: this.appShopImageUrl,
-                businessReminder: '商家排号提醒',
                 cassette: `${this.x}x${this.y}`,
                 city: this.city,
                 // customerServicePhone: this.servicePhone,
@@ -1312,6 +1323,7 @@ export default {
                 startTime: this.startBussTime,
                 storeLocation: this.shopLocaIndex,
                 synopsis: this.shopBrief,
+                businessReminder: '商家排号提醒',
                 tableReservationNotes: '订桌注意事项',
                 trustAddress: this.trustAddress,
                 type: this.submitShopType.join(','),
@@ -1319,103 +1331,45 @@ export default {
                 ktvRoomList: ktvRoomList
             };
 
-            console.log('新增时传的值', data);
+            if (this.isUpdate) {
+                data.id = this.shopId;
+                console.log('修改时传的值', data);
 
-            this.$post('/merchant/store/save', data)
-                .then((res) => {
+                this.$put('/merchant/store/update', data).then((res) => {
+                    if (res.code == 0) {
+                        this.getStoreInfo();
+                        this.$message.success('修改成功');
+                        this.submitShopType = []; //清空店铺类型上传数组
+                        this.isReadonly = true;
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                });
+            } else {
+                console.log('新增时传的值', data);
+
+                this.$post('/merchant/store/save', data).then((res) => {
                     if (res.code == 0) {
                         this.getStoreInfo();
                         localStorage.removeItem('storageInfo');
                         this.$message.success('添加成功');
+                        this.submitShopType = []; //清空店铺类型上传数组
                         this.isReadonly = true;
                         this.isUpdate = true;
                     } else {
                         this.$message.error(res.msg);
                     }
-                })
-                .catch((err) => {
-                    this.isReadonly = true;
-                    console.log(err);
-                });
-        },
-
-        //修改店铺
-        submitUpdateShop() {
-            let ktvRoomList = [];
-            if (this.shopLocaIndex == 3) {
-                //数组转json形式（零嘴）
-                ktvRoomList = this.cloneSnacks();
-
-                //数组转字符串（ktv示意图）
-                ktvRoomList.forEach((item) => {
-                    item.sketchMap = item.sketchMap.join(',');
                 });
             }
-
-            //要传的值
-            let data = {
-                id: this.shopId,
-                appListBigPicture: this.appShopImageUrl,
-                businessReminder: '商家排号提醒',
-                cassette: `${this.x}x${this.y}`,
-                city: this.city,
-                // customerServicePhone: this.servicePhone,
-                customerServicePhoneList: this.servicePhoneArr,
-                district: this.district,
-                districtCode: this.districtCode,
-                endTime: this.endBussTime,
-                goodsStoreSynopsis: this.goodsBrief,
-                labels: this.dynamicTags.join(','),
-                layoutPicture: this.overallImageUrl,
-                logo: this.logoImageUrl,
-                lonlat: `${this.longitude},${this.latitude}`,
-                name: this.shopName,
-                perCapitaConsumption: this.perCon,
-                picture: this.bannerShowBox.join(','),
-                province: this.province,
-                rowNumberBanner: this.rowNumImageUrl,
-                searchAddress: this.searchAddress,
-                startTime: this.startBussTime,
-                storeLocation: this.shopLocaIndex,
-                synopsis: this.shopBrief,
-                tableReservationNotes: '订桌注意事项',
-                trustAddress: this.trustAddress,
-                type: this.submitShopType.join(','),
-                layoutList: this.allSeatDetailInfo,
-                ktvRoomList: ktvRoomList
-            };
-
-            console.log('修改时传的值', data);
-
-            this.$put('/merchant/store/update', data)
-                .then((res) => {
-                    if (res.code == 0) {
-                        this.getStoreInfo();
-                        this.$message.success('修改成功');
-                        this.isReadonly = true;
-                    } else {
-                        this.$message.error(res.msg);
-                    }
-                })
-                .catch((err) => {
-                    this.isReadonly = true;
-                    console.log(err);
-                });
         },
 
         //保存按钮
         submitShopInfo() {
-            if (!this.isReadonly) {
-                if (!this.isUpdate) {
-                    this.submitCreatShop(); //新增店铺
-                } else {
-                    this.submitUpdateShop(); //修改店铺
-                }
-                this.isClickSeat = false;
-                this.isLookKtvInfo = false;
-                this.submitShopType = []; //清空店铺类型上传数组
-                this.clearSeatBorder(); //清空座位外边框（定位当前座位）
-            }
+            this.checkFormInfo(); //验证所有输入的值
+            this.submitShopRequest(); //新增/修改店铺
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            this.isClickSeat = false;
+            this.isLookKtvInfo = false;
         },
 
         //取消保存按钮
@@ -1423,8 +1377,8 @@ export default {
             this.isReadonly = true;
             this.isClickSeat = false;
             this.isLookKtvInfo = false;
-            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             this.getStoreInfo(); //重新获取商店数据
+            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
         },
 
         //删除当前店铺标签
@@ -1451,29 +1405,8 @@ export default {
             this.inputValue = '';
         },
 
-        //查看并编辑当前座位信息
-        lookEditSeatInfo(e, seatType, stageCode) {
-            let seatRow = Number(e.target.dataset.indexx); //行
-            let seatColumn = Number(e.target.dataset.indexy); //列
-
-            //匹配当前座位信息
-            this.allSeatDetailInfo.forEach((item) => {
-                if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
-                    this.presentSeatInfo = item;
-
-                    //修改当前座位的属性值
-                    this.presentSeatInfo.seatAttribute = seatType;
-
-                    //修改当前座位为舞台
-                    this.presentSeatInfo.seatType = stageCode;
-
-                    console.log('cccc', this.presentSeatInfo);
-                }
-            });
-        },
-
         //查看或编辑当前座位信息
-        lookSeatInfo(e, seatType, stageCode) {
+        lookEditSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
@@ -1482,15 +1415,14 @@ export default {
                 if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
                     //查看当前座位信息
                     this.presentSeatInfo = item;
-                    // if (this.isReadonly) {
-                    //     //查看当前座位信息
-                    //     this.presentSeatInfo = item;
-                    // } else {
-                    //     //修改当前座位的属性值
-                    //     this.presentSeatInfo.seatAttribute = seatType;
-                    //     //修改当前座位为舞台
-                    //     this.presentSeatInfo.seatType = stageCode;
-                    // }
+
+                    //修改当前座位信息
+                    if (!this.isReadonly) {
+                        //修改当前座位的属性
+                        this.presentSeatInfo.seatAttribute = seatType;
+                        //修改当前座位为舞台/过道
+                        this.presentSeatInfo.seatType = stageCode;
+                    }
                 }
             });
         },
@@ -1521,12 +1453,11 @@ export default {
                         break;
                 }
                 this.setSeatInfo(e, style); //修改当前座位属性
-                this.lookEditSeatInfo(e, seatType, stageCode); //查看或编辑当前座位信息
+                this.lookEditSeatInfo(e, seatType, stageCode); //编辑当前座位信息
             } else {
-                this.lookSeatInfo(e);
+                this.lookEditSeatInfo(e); //查看当前座位信息
             }
 
-            // this.lookEditSeatInfo(e, seatType, stageCode); //查看或编辑当前座位信息
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             e.target.classList.add('border'); //定位当前座位
         },
@@ -1616,7 +1547,6 @@ export default {
         addServicePhone() {
             this.servicePhoneArr.push(this.servicePhone);
             this.servicePhone = '';
-            console.log(this.servicePhoneArr);
         },
 
         //删除客服电话
@@ -1659,7 +1589,6 @@ export default {
 
         //查看当前ktv包间信息
         lookKtvInfo(item) {
-            console.log('当前ktv包间信息', item);
             this.isLookKtvInfo = true;
             this.isUpdateKtvInfo = true;
             this.presentKtvInfo = item;
@@ -1668,7 +1597,6 @@ export default {
 
         //删除当前ktv包间信息
         delKtvInfo(item) {
-            console.log(item);
             this.$confirm('确定要删除吗？', '提示', {
                 type: 'warning'
             })
@@ -1850,7 +1778,7 @@ export default {
         changeLayoutList(arr) {
             arr.forEach((item) => {
                 //将数值型转为字符型（软硬座）
-                if (item.softHardStatus || item.haveToilet) {
+                if (item.softHardStatus) {
                     item.softHardStatus = item.softHardStatus.toString();
                 }
             });
@@ -1873,8 +1801,8 @@ export default {
                     item.sketchMap = [];
                 }
 
-                //将数值型转为字符型（有无卫生间）
-                if (item.softHardStatus || item.haveToilet) {
+                //将数值型转为字符型
+                if (item.roomAttribute || item.haveToilet) {
                     item.roomAttribute = item.roomAttribute.toString();
                     item.haveToilet = item.haveToilet.toString();
                 }
@@ -1889,7 +1817,7 @@ export default {
                 roomNumber: '', //包间数量
                 capacity: '', //容纳人数
                 haveToilet: '2', //独立卫生间
-                mahjong: '', //机麻
+                mahjong: 0, //机麻
                 minConsumption: '', //最低消费（时间段集合里的最低消费）
                 snacks: [], //零嘴
                 sketchMap: [], //包间示意图
@@ -1919,7 +1847,6 @@ export default {
         //提交保存ktv包间信息
         ktvSureSub() {
             if (this.isUpdateKtvInfo) {
-                console.log('修改操作');
                 this.$message.success('修改成功');
                 this.isUpdateKtvInfo = false;
             } else {
@@ -1927,7 +1854,6 @@ export default {
                     this.ktvRoomList = [];
                 }
                 this.ktvRoomList.push(this.presentKtvInfo);
-                console.log('新增操作');
                 this.$message.success('新增成功');
             }
             this.clearKtvInfo();
@@ -1938,7 +1864,6 @@ export default {
             this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     let result = res.data;
-
                     this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
                     let cassette = result.cassette;
@@ -2005,7 +1930,7 @@ export default {
 
                             //如果有缓存就用缓存里的数据，否则就重新创建座位
                             if (localStorage.getItem('storageInfo')) {
-                                this.getStorageInfo(); //获取输入的缓存数据
+                                this.getStorageInfo(); //获取缓存数据
                             } else {
                                 this.createSeatFn(); //创建座位
                             }
@@ -2070,7 +1995,6 @@ export default {
                 bannerImgBox: this.bannerImgBox,
                 bannerShowBox: this.bannerShowBox,
                 bannerVideo: this.bannerVideo,
-                ktvBannerImgBox: this.ktvBannerImgBox,
                 overallImageUrl: this.overallImageUrl,
                 rowNumImageUrl: this.rowNumImageUrl,
                 appShopImageUrl: this.appShopImageUrl,
@@ -2088,7 +2012,6 @@ export default {
         //获取缓存
         getStorageInfo() {
             let storageInfo = JSON.parse(localStorage.getItem('storageInfo'));
-            console.log(storageInfo);
 
             if (storageInfo) {
                 this.logoImageUrl = storageInfo.logoImageUrl;
@@ -2118,7 +2041,6 @@ export default {
                 this.bannerImgBox = storageInfo.bannerImgBox;
                 this.bannerShowBox = storageInfo.bannerShowBox;
                 this.bannerVideo = storageInfo.bannerVideo;
-                this.ktvBannerImgBox = storageInfo.ktvBannerImgBox;
                 this.overallImageUrl = storageInfo.overallImageUrl;
                 this.rowNumImageUrl = storageInfo.rowNumImageUrl;
                 this.appShopImageUrl = storageInfo.appShopImageUrl;
@@ -2128,8 +2050,7 @@ export default {
                 this.ktvRoomList = storageInfo.ktvRoomList;
 
                 //给地图子组件传值（回显地址信息）
-                this.mapList.searchAddress = this.searchAddress;
-                this.mapList.trustAddress = this.trustAddress;
+                this.sendInfoToMap();
 
                 // //回显banner图片
                 this.showBannerImg();
@@ -2149,45 +2070,6 @@ export default {
                 // //座位属性回显
                 this.showSeatAtt();
             }
-        },
-
-        //清空所有内容
-        clearShopInfo() {
-            this.logoImageUrl = '';
-            this.shopName = '';
-            this.shopBrief = '';
-            this.shopLocaIndex = '';
-            this.dynamicTags = [];
-            this.startBussTime = '';
-            this.endBussTime = '';
-            this.province = '';
-            this.city = '';
-            this.district = '';
-            this.districtCode = '';
-            this.searchAddress = '';
-            this.trustAddress = '';
-            this.longitude = '';
-            this.latitude = '';
-            // this.servicePhone = '';
-            this.servicePhoneArr = [];
-            this.shopType = '';
-            this.shopTypeOpt = [];
-            this.shopTypeOptStrArr = [];
-            this.submitShopType = [];
-            this.perCon = '';
-            this.goodsBrief = '';
-            this.shopMatter = '';
-            this.bannerImgBox = [];
-            this.bannerShowBox = [];
-            this.bannerVideo = [];
-            this.ktvBannerImgBox = [];
-            this.overallImageUrl = '';
-            this.rowNumImageUrl = '';
-            this.appShopImageUrl = '';
-            this.x = 20;
-            this.y = 20;
-            this.allSeatDetailInfo = [];
-            this.ktvRoomList = [];
         },
 
         //座位行数/列数改变
@@ -2214,15 +2096,12 @@ export default {
                         }
                     });
                 }
-
-                console.log('zxcvzxczx');
             },
             deep: true
         }
     },
 
     created() {
-        this.clearShopInfo(); //清空所有内容
         this.getShopType(); //获取店铺类型
         this.getKtvType(); //获取ktv包间类型
 

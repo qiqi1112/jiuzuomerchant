@@ -5,11 +5,11 @@
                 <div v-if="propUserInfo.activeName == 'rowRecord'">
                     <p>
                         <span>取号类型：</span>
-                        <span>{{ item.seatCapacity }}</span>
+                        <span>{{ item.type }}</span>
                     </p>
                     <p>
                         <span>取号状态：</span>
-                        <span>{{ item.seatType | seatType }}</span>
+                        <span>{{ item.isOff == 1 ? '取消' : '未取消' }}</span>
                     </p>
                 </div>
                 <div v-if="propUserInfo.activeName == 'evalRecord'">
