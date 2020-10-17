@@ -6,7 +6,7 @@
                 <h4>
                     <span>店铺信息</span>
                     <el-button type="primary" @click="editShopInfo">编辑</el-button>
-                    <el-button type="success" v-if="!isReadonly">申请商家推荐</el-button>
+                    <el-button type="success" @click="storeRecommend" v-if="!isReadonly">申请商家推荐</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly && !isUpdate">暂存数据</el-button>
                     <el-button @click="cancelSubmit" v-if="!isReadonly && isUpdate">取消</el-button>
@@ -151,11 +151,12 @@
                         <div class="per-con">
                             <p>店铺人均消费</p>
                             <el-input
+                                type="number"
                                 v-model="perCon"
                                 placeholder="人均消费"
-                                style="width: 62%; margin-right: 6px"
+                                style="width: 70%; margin-right: 6px"
                                 :readonly="isReadonly"
-                                clearable
+                                min="0"
                             >
                                 <template slot="append">￥/人</template>
                             </el-input>
@@ -406,14 +407,22 @@
                             <!-- 容纳人数 -->
                             <div>
                                 <span>容纳人数：</span>
-                                <el-input
+                                <el-input-number
+                                    v-model="presentSeatInfo.numberOfPeople"
+                                    controls-position="right"
+                                    placeholder="容纳人数"
+                                    style="width: 50%; margin-right: 6px"
+                                    :disabled="isReadonly"
+                                    :min="1"
+                                ></el-input-number>
+                                <!-- <el-input
                                     v-model="presentSeatInfo.numberOfPeople"
                                     placeholder="容纳人数"
                                     style="width: 50%; margin-right: 6px"
                                     :readonly="isReadonly"
                                     type="number"
                                 >
-                                </el-input>
+                                </el-input> -->
                             </div>
                             <!-- 最晚保留时间 -->
                             <div class="lon-retain">
@@ -487,22 +496,38 @@
                             <!-- 包间数量 -->
                             <div>
                                 <span>包间数量：</span>
-                                <el-input
+                                <el-input-number
+                                    v-model="presentKtvInfo.roomNumber"
+                                    controls-position="right"
+                                    :min="1"
+                                    placeholder="包间数量"
+                                    style="width: 50%"
+                                    :disabled="isReadonly"
+                                ></el-input-number>
+                                <!-- <el-input
                                     v-model="presentKtvInfo.roomNumber"
                                     placeholder="包间数量"
                                     style="width: 50%"
                                     :readonly="isReadonly"
-                                ></el-input>
+                                ></el-input> -->
                             </div>
                             <!-- 容纳人数 -->
                             <div>
                                 <span>容纳人数：</span>
-                                <el-input
+                                <el-input-number
+                                    controls-position="right"
+                                    :min="1"
+                                    v-model="presentKtvInfo.capacity"
+                                    placeholder="容纳人数"
+                                    style="width: 50%"
+                                    :disabled="isReadonly"
+                                ></el-input-number>
+                                <!-- <el-input
                                     v-model="presentKtvInfo.capacity"
                                     placeholder="容纳人数"
                                     style="width: 50%"
                                     :readonly="isReadonly"
-                                ></el-input>
+                                ></el-input> -->
                             </div>
                             <!-- 独立卫生间 -->
                             <div>
@@ -513,12 +538,20 @@
                             <!-- 机麻 -->
                             <div>
                                 <span>机麻：</span>
-                                <el-input
+                                <el-input-number
+                                    controls-position="right"
+                                    :min="0"
+                                    v-model="presentKtvInfo.mahjong"
+                                    placeholder="机麻数量"
+                                    style="width: 50%"
+                                    :disabled="isReadonly"
+                                ></el-input-number>
+                                <!-- <el-input
                                     v-model="presentKtvInfo.mahjong"
                                     placeholder="机麻数量"
                                     style="width: 50%"
                                     :readonly="isReadonly"
-                                ></el-input>
+                                ></el-input> -->
                             </div>
                             <!-- 时间段分布 -->
                             <div class="time-quan">
@@ -561,6 +594,8 @@
                                             placeholder="最低消费"
                                             style="width: 50%"
                                             :readonly="isReadonly"
+                                            type="number"
+                                            min="0"
                                         >
                                             <template slot="append">￥</template>
                                         </el-input>
@@ -622,10 +657,12 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
+                                            type="number"
                                             v-model="timeQuanObj.minConsumption"
                                             placeholder="最低消费"
                                             style="width: 50%"
                                             :readonly="isReadonly"
+                                            min="0"
                                         >
                                             <template slot="append">￥</template>
                                         </el-input>
@@ -662,19 +699,22 @@
                                     <ul>
                                         <li v-for="(item, index) in presentKtvInfo.snacks" :key="index">
                                             <el-input
-                                                style="width: 90px"
+                                                style="width: 170px"
                                                 v-model="item.name"
                                                 placeholder="名称"
                                                 :readonly="isReadonly"
+                                                clearable
                                             ></el-input>
                                             <span class="mult">
                                                 <i class="el-icon-close"></i>
                                             </span>
                                             <el-input
-                                                style="width: 60px; margin-right: 10px"
+                                                style="width: 70px; margin-right: 10px"
                                                 v-model="item.num"
                                                 placeholder="数量"
                                                 :readonly="isReadonly"
+                                                min="1"
+                                                type="number"
                                             ></el-input>
                                             <el-button v-if="!isReadonly" @click="deleteSnacks(item)" type="danger">删除</el-button>
                                         </li>
@@ -682,19 +722,22 @@
                                     <!-- 新增 -->
                                     <div class="snacks-form" v-if="!isReadonly">
                                         <el-input
-                                            style="width: 90px"
+                                            style="width: 170px"
                                             v-model="snacksObj.name"
                                             placeholder="名称"
                                             :readonly="isReadonly"
+                                            clearable
                                         ></el-input>
                                         <span class="mult">
                                             <i class="el-icon-close"></i>
                                         </span>
                                         <el-input
-                                            style="width: 60px; margin-right: 10px"
+                                            style="width: 70px; margin-right: 10px"
                                             v-model="snacksObj.num"
                                             placeholder="数量"
                                             :readonly="isReadonly"
+                                            min="1"
+                                            type="number"
                                         ></el-input>
                                         <el-button :disabled="isReadonly" type="primary" @click="addSnacks">添加</el-button>
                                     </div>
@@ -893,18 +936,18 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '', //最晚保留时间
-                minConsumption: '' //最低消费
+                minConsumption: 0 //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
                 roomTypeId: '', //包间类型
                 roomAttribute: '1', //包间所属
-                roomNumber: '', //包间数量
-                capacity: '', //容纳人数
+                roomNumber: 1, //包间数量
+                capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
                 mahjong: 0, //机麻
-                minConsumption: 0, //最低消费（时间段集合里的最低消费）
+                minConsumption: '', //最低消费（时间段集合里的最低消费）
                 snacks: [], //零嘴
                 sketchMap: [], //包间示意图
                 roomTimeIntervalList: [] //时间段集合
@@ -914,20 +957,39 @@ export default {
     methods: {
         //验证所有输入的值
         checkFormInfo() {
-            !this.shopName && this.$message.error('请输入店铺名称');
-            return;
-            !this.shopLocaIndex && this.$message.error('请选择店铺定位');
-            return;
-            !this.startBussTime && this.$message.error('请选择开始营业时间');
-            return;
-            !this.endBussTime && this.$message.error('请选择结束营业时间');
-            return;
-            !this.servicePhone && this.$message.error('请输入客服电话');
-            return;
-
-            !this.perCon && this.$message.error('请输入店铺人均消费');
-            return;
-            !this.overallImageUrl && this.$message.error('请上传商家布局图');
+            if (!this.shopName) {
+                this.$message.error('请输入店铺名称');
+            } else if (!this.shopBrief) {
+                this.$message.error('请输入店铺简介');
+            } else if (!this.logoImageUrl) {
+                this.$message.error('请上传店铺logo');
+            } else if (!this.shopLocaIndex) {
+                this.$message.error('请选择店铺定位');
+            } else if (this.servicePhoneArr.length == 0) {
+                this.$message.error('请输入客服电话');
+            } else if (!this.startBussTime) {
+                this.$message.error('请选择开始营业时间');
+            } else if (!this.endBussTime) {
+                this.$message.error('请选择结束营业时间');
+            } else if (this.submitShopType.length == 0) {
+                this.$message.error('请选择店铺类型');
+            } else if (!this.perCon) {
+                this.$message.error('请输入店铺人均消费');
+            } else if (!this.searchAddress) {
+                this.$message.error('请输入地址');
+            } else if (!this.trustAddress) {
+                this.$message.error('请输入详细地址');
+            } else if (!this.goodsBrief) {
+                this.$message.error('请输入商品店名简介');
+            } else if (this.bannerShowBox.length == 0) {
+                this.$message.error('请上传店铺banner图');
+            } else if (!this.rowNumImageUrl) {
+                this.$message.error('请上传排号横幅图');
+            } else if (!this.appShopImageUrl) {
+                this.$message.error('请上传店铺长图');
+            } else if (!this.overallImageUrl) {
+                this.$message.error('请上传商家布局图');
+            }
         },
 
         //接收地图子组件传过来的参数
@@ -942,6 +1004,20 @@ export default {
                 this.searchAddress = data.title;
                 this.trustAddress = data.trustAddress;
             }
+        },
+
+        //申请商家推荐
+        storeRecommend() {
+            this.$get('/merchant/store/recommend/storeRecommend').then((res) => {
+                console.log(res);
+            });
+        },
+
+        //获取申请商家推荐状态
+        storeRecommendType() {
+            this.$get('/merchant/store/recommend/storeRecommendType').then((res) => {
+                console.log(res);
+            });
         },
 
         //上传头像之前的验证
@@ -974,6 +1050,46 @@ export default {
                 this.$message.error('上传文件只能是 JPG / PNG / MP4 格式');
                 return false;
             }
+
+            if (file.type === 'video/mp4') {
+                //限制上传视频个数
+                let isVideo = false;
+                this.bannerShowBox.forEach((item) => {
+                    if (item.replace(/.+\./, '') == 'mp4' || item.replace(/.+\./, '') == 'MP4') {
+                        isVideo = true;
+                        return;
+                    }
+                });
+                if (isVideo) {
+                    this.$message.error('最多只能上传1个短视频');
+                    return false;
+                }
+
+                //限制上传视频时长
+                return new Promise((resolve, reject) => {
+                    this.getVideoTime(file).then((res) => {
+                        if (res > 15) {
+                            this.$message.error('视频时长请控制在15秒以内');
+                            reject();
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
+            }
+        },
+
+        //获取视频时长
+        getVideoTime(file) {
+            let url = URL.createObjectURL(file);
+            let audioElement = new Audio(url);
+            let duration;
+            return new Promise((resolve, reject) => {
+                audioElement.addEventListener('loadedmetadata', (e) => {
+                    duration = audioElement.duration; //视频时长/s
+                    resolve(duration);
+                });
+            });
         },
 
         // 上传单图之前的验证
@@ -1221,8 +1337,12 @@ export default {
             // 多选情况下
             if (this.shopLocaIndex == 1 || this.shopLocaIndex == 2) {
                 if (!e.target.className) {
-                    e.target.classList.add('shop-type-span');
-                    this.submitShopType.push(item);
+                    if (this.submitShopType.length < 3) {
+                        e.target.classList.add('shop-type-span');
+                        this.submitShopType.push(item);
+                    } else {
+                        this.$message.error('最多选取3个店铺类型');
+                    }
                 } else {
                     e.target.classList.remove('shop-type-span');
                     this.submitShopType.forEach((ele, i) => {
@@ -1279,6 +1399,7 @@ export default {
 
         //编辑商铺信息
         editShopInfo() {
+            this.storeRecommendType();
             this.editShopInit(); //初始化操作
             this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
             this.getShopType(); //获取店铺类型
@@ -1341,9 +1462,10 @@ export default {
                         this.$message.success('修改成功');
                         this.submitShopType = []; //清空店铺类型上传数组
                         this.isReadonly = true;
-                    } else {
-                        this.$message.error(res.msg);
                     }
+                    // else {
+                    //     this.$message.error(res.msg);
+                    // }
                 });
             } else {
                 console.log('新增时传的值', data);
@@ -1356,9 +1478,10 @@ export default {
                         this.submitShopType = []; //清空店铺类型上传数组
                         this.isReadonly = true;
                         this.isUpdate = true;
-                    } else {
-                        this.$message.error(res.msg);
                     }
+                    // else {
+                    //     this.$message.error(res.msg);
+                    // }
                 });
             }
         },
@@ -1698,7 +1821,7 @@ export default {
                         seatCode: j + '-' + i,
                         seatColumn: i,
                         seatRow: j,
-                        seatLatestReservationTime: '00:00',
+                        seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [
@@ -1814,8 +1937,8 @@ export default {
             this.presentKtvInfo = {
                 roomTypeId: '', //包间类型
                 roomAttribute: '1', //包间所属
-                roomNumber: '', //包间数量
-                capacity: '', //容纳人数
+                roomNumber: 1, //包间数量
+                capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
                 mahjong: 0, //机麻
                 minConsumption: '', //最低消费（时间段集合里的最低消费）
@@ -1831,7 +1954,7 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '', //最晚保留时间
-                minConsumption: '' //最低消费
+                minConsumption: 0 //最低消费
             };
             this.ktvBannerImgBox = [];
         },
@@ -2075,8 +2198,23 @@ export default {
         //座位行数/列数改变
         changeSeatNum() {
             if (!this.isReadonly) {
+                this.isClickSeat = false;
                 this.createSeatFn(); //创建座位
             }
+        },
+
+        //监听上传图片个数，显示与隐藏上传图标
+        imgUploadWatch(dom, eleArr, len) {
+            this.$nextTick(() => {
+                let addPic = document.querySelector(`${dom} .el-upload.el-upload--picture-card`);
+                if (addPic !== null) {
+                    if (eleArr.length > len) {
+                        addPic.style.display = 'none';
+                    } else {
+                        addPic.style.display = 'inline-block';
+                    }
+                }
+            });
         }
     },
 
@@ -2085,16 +2223,17 @@ export default {
         'presentKtvInfo.sketchMap': {
             handler() {
                 if (!this.isReadonly && this.shopLocaIndex == 3) {
-                    this.$nextTick(() => {
-                        let addPic = document.querySelector('.ktv-banner .el-upload.el-upload--picture-card');
-                        if (addPic !== null) {
-                            if (this.presentKtvInfo.sketchMap.length > 3) {
-                                addPic.style.display = 'none';
-                            } else {
-                                addPic.style.display = 'inline-block';
-                            }
-                        }
-                    });
+                    this.imgUploadWatch('.ktv-banner', this.presentKtvInfo.sketchMap, 3);
+                }
+            },
+            deep: true
+        },
+
+        //根据上传的banner图个数，来显示与隐藏上传图标
+        bannerShowBox: {
+            handler() {
+                if (!this.isReadonly) {
+                    this.imgUploadWatch('.banner-show-box', this.bannerShowBox, 5);
                 }
             },
             deep: true
