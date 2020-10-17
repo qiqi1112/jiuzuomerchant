@@ -8,7 +8,6 @@
                     </el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
-
             <div class="tit_top">
                 <span class="li_text">今日排号总数<span>{{todayData.todayTotalLy}}</span></span>
                 <span class="li_text">今日成功排号数<span>{{todayData.totalSuccessLy}}</span></span>
@@ -55,15 +54,16 @@
                                     当前位于第
                                     <span class="num"> {{index+1}} </span>
                                     位（{{item.codeNo}}）
-                                    <span class="has_consum">(已消费：￥ {{item.paidAmount}})</span> 
+                                    <span class="has_consum">(已消费:￥{{item.paidAmount}})</span> 
                                 </div>
                                 <div>取号时间 <span class="tl">{{item.createTime}}</span></div>
                                 <div>等待时常 <span class="tl"> {{item.createTime | timeFormat}}</span></div>
-                                <div v-if="index==0 && callNext">
+                                <!-- <div v-if="index==0 && callNext"> -->
+                                <div v-if="item.callStatus == 1">
                                     <span class="stat">处于呼叫中....</span>
-                                    <span class="btn" @click="ensure(item)">确定</span>
-                                    <span class="btn" @click="nextOne(item)">续牌</span>
-                                    <span class="btn" @click="fail(item)">取消</span>
+                                    <span class="btn" @click="ensure(item,2)">确定</span>
+                                    <span class="btn" @click="nextOne(item,2)">续牌</span>
+                                    <span class="btn" @click="fail(item,2)">取消</span>
                                 </div>
                             </div>
                         </li>
@@ -96,11 +96,12 @@
                                 <div>当前位于第<span class="num"> {{index+1}} </span>位 （{{item.codeNo}}）</div>
                                 <div>取号时间 <span class="tl">{{item.createTime}}</span></div>
                                 <div>等待时常 <span class="tl"> {{item.createTime | timeFormat}}</span></div>
-                                <div v-if="index==0 && callNext">
+                                <!-- <div v-if="index==0 && callNext && robList.length==0"> -->
+                                <div v-if="item.callStatus == 1">
                                     <span class="stat">处于呼叫中....</span>
-                                    <span class="btn" @click="ensure(item)">确定</span>
-                                    <span class="btn" @click="nextOne(item)">续牌</span>
-                                    <span class="btn" @click="fail(item)">取消</span>
+                                    <span class="btn" @click="ensure(item,1)">确定</span>
+                                    <span class="btn" @click="nextOne(item,1)">续牌</span>
+                                    <span class="btn" @click="fail(item,1)">取消</span>
                                 </div>
                             </div>
                         </li>
@@ -111,7 +112,6 @@
                         <span class="line lw2"></span>
                         <span>成功记录</span>
                         <div class="time-ch">
-                            
                             <el-date-picker
                                 v-model="time_now"
                                 :clearable="false"
@@ -128,21 +128,31 @@
                         </div>
                     </div>
                     <div class="btns">
-                        <div class="tab_btn" @click="sucOrCan(1,1)" :class="suc_type==1?'on':'canc'">成功排号记录</div>
-                        <div class="tab_btn" @click="sucOrCan(1,2)" :class="suc_type==2?'on':'canc'">成功抢座记录</div>
+                        <div class="tab_btn" @click="sucOrCan(1,1)" :class="suc_type==1?'on':'canc'">排号</div>
+                        <div class="tab_btn" @click="sucOrCan(1,2)" :class="suc_type==2?'on':'canc'">抢座</div>
                     </div>
                     <ul class="succ_canc_box">
-                        <li class='li_n suc_num' v-for="(item,index) in successList" :key="index">
+                        <li class='li_n suc_num' v-for="(item,index) in showSuccess" :key="index">
                             <div class="su_l">
-                                <i class="el-icon-s-release"></i>
-                                <span class="tel_lab">手机号码</span>
-                                <span class="tel">{{item.contactTel | phoneNum}}</span>
-                                <span class="tex">等待时常</span>
-                                <span class="tim">{{item.createTime | timeFormat}}</span>
+                                <div class="atl">
+                                    <i class="el-icon-s-release"></i>
+                                    <span class="tel_lab">手机号码</span>
+                                    <span class="tel">{{item.contactTel | phoneNum}}</span>
+                                </div>
+                                <div class="atl" v-show="suc_type==2">
+                                    <span class="tel_lab">消费金额</span>
+                                    <span class="tim">￥{{item.paidAmount}}</span>
+                                </div>
                             </div>
                             <div class="su_l">
-                                <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">{{item.offTime}}</span>
+                                <div class="atl">
+                                    <span class="fai_lab">{{suc_type==1?'排号时间':'抢座时间'}}</span>
+                                    <span class="fai_tim">{{item.createTime}}</span>
+                                </div>
+                                <div class="atl">
+                                    <span class="fai_lab">入座时间</span>
+                                    <span class="fai_tim">{{item.callTime}}</span>
+                                </div>
                             </div>
                         </li>
                     </ul>
@@ -166,23 +176,33 @@
                         </div>
                     </div>
                     <div class="btns">
-                        <div class="tab_btn" @click="sucOrCan(0,1)" :class="can_type==1?'on':'canc'">取消排号记录</div>
-                        <div class="tab_btn" @click="sucOrCan(0,2)" :class="can_type==2?'on':'canc'">取消抢座记录</div>
+                        <div class="tab_btn on">排号</div>
+                        <!-- <div class="tab_btn" @click="sucOrCan(0,1)" :class="can_type==1?'on':'canc'">排号</div> -->
+                        <!-- <div class="tab_btn" @click="sucOrCan(0,2)" :class="can_type==2?'on':'canc'">取消抢座记录</div> -->
                     </div>
                     <ul class="succ_canc_box">
                         <li class='li_n fail_num' v-for="(item,index) in cancelList" :key="index">
                             <div class="su_l">
-                                <i class="el-icon-s-release"></i>
-                                <span class="tel_lab">手机号码</span>
-                                <span class="tel">{{item.contactTel | phoneNum}}</span>
-                                <span class="tex">等待时常</span>
-                                <span class="tim">{{item.createTime | timeFormat}}</span>
+                                <div class="atl">
+                                    <i class="el-icon-s-release"></i>
+                                    <span class="tel_lab">手机号码</span>
+                                    <span class="tel">{{item.contactTel | phoneNum}}</span>
+                                </div>
+
+                                <div class="atl">
+                                    <span class="tex">等待时常</span>
+                                    <span class="tim">{{item.createTime | timeFormat}}</span>
+                                </div>
                             </div>
                             <div class="su_l">
-                                <span class="get_lab">取号时间</span>
-                                <span class="get_tim">{{item.createTime}}</span>
-                                <span class="fai_lab">取消时间</span>
-                                <span class="fai_tim">{{item.offTime}}</span>
+                                <div class="atl">
+                                    <span class="get_lab">取号时间</span>
+                                    <span class="get_tim">{{item.createTime}}</span>
+                                </div>
+                                <div class="atl">
+                                    <span class="fai_lab">取消时间</span>
+                                    <span class="fai_tim">{{item.offTime}}</span>
+                                </div>
                             </div>
                         </li>
                     </ul>
@@ -234,7 +254,11 @@ export default {
             robList:[],//抢座列表
             rowList:[],//排号列表
             successList:[],//成功排号列表
+            successVieList:[],//成功抢座列表
             cancelList:[],//取消排号列表
+            // cancelVieList:[],//取消抢座列表
+
+            showSuccess:[],//成功数组 显示抢座/排号
 
             suc_type:1,
             can_type:1,
@@ -243,8 +267,14 @@ export default {
     created(){
         this.getData()
         this.time_now_no = this.time_now = new Date()
-
-        // console.log((new Date() - new Date('2020-09-18 16:17:48'))/8640000)
+    },
+    watch:{
+        suc_type(val){
+            val==1?this.showSuccess = this.successList : this.showSuccess = this.successVieList
+        },
+        // can_type(val){
+        //     val==1?this.showCancel = this.cancelList : this.showCancel = this.cancelVieList
+        // }
     },
     filters:{
         timeFormat(time){
@@ -283,53 +313,135 @@ export default {
                     }
                     this.robList = res.data.nowVieList
                     this.rowList = res.data.nowLyList
-                    this.successList = res.data.successLyList
+                    this.showSuccess = this.successList = res.data.successLyList
                     this.cancelList = res.data.cancelLyList
+                    this.successVieList = res.data.successVieList
+                    // this.cancelVieList = res.data.cancelLyList
                 }else{
                     this.$message.error(res.data);
                 }
             })
         },
-        ensure(val){
-            this.callNext = false
-            for(let i=0;i<this.nowNumList.length;i++){
-                if(val.id == this.nowNumList[i].id){
-                    this.nowNumList.splice(i,1)
-                }
-            }
-        },
+        
         // 成功，取消 记录  按钮切换
         sucOrCan(isTrue,type){
             if(isTrue == 1){
                 // 成功记录按钮切换
                 type == 1?this.suc_type = 1 : this.suc_type = 2
-                // 还剩下 切换成功或取消 数据展示
             }else{
                 // 取消记录按钮切换
                 type == 1?this.can_type = 1 : this.can_type = 2
             }
         },
-        nextOne(val){
-            this.callNext = false
-            this.nowNumList[0] = this.nowNumList.splice(1,1,this.nowNumList[0])[0]
+
+        // 确定
+        ensure(val,type){
+            
+            // this.callNext = false
+            this.$get(`/merchant/store/ly/calling/${val.id}/${type}`).then(res=>{
+                if(res.code == 0){
+                    
+                }else{
+                    this.$message.error(res.data);
+                }
+            })
+
+            // for(let i=0;i<this.nowNumList.length;i++){
+            //     if(val.id == this.nowNumList[i].id){
+            //         this.nowNumList.splice(i,1)
+            //     }
+            // }
         },
+        // 续牌
+        nextOne(val,type){
+            this.$get(`/merchant/store/ly/setContinuation/${val.id}/${type}`).then(res=>{
+                if(res.code == 0){
+                    this.getData()
+                }else{
+                    this.$message.error(res.data);
+                }
+            })  
+            // this.callNext = false
+            // this.nowNumList[0] = this.nowNumList.splice(1,1,this.nowNumList[0])[0]
+        },
+        // 取消
         fail(val){
-            this.callNext = false
+            // this.callNext = false
             for(let i=0;i<this.nowNumList.length;i++){
                 if(val.id == this.nowNumList[i].id){
                     this.nowNumList.splice(i,1)
                 }
             }
         },
+        // 呼叫下一位
         call(){
-            if(this.callNext){
-                this.$message.error({
-                    message: '当前排号订单未处理',
-                    center: true
-                });
+            let id = null,type = null,status=null,qz_time='',ph_time;
+            let qiangzuo = this.robList
+            let paihao = this.rowList
+            /*
+                判断robList>0  用于查看是否有抢座订单
+                有点击续牌时  判断robList是否>=1  大于1 传值 抢座第2条数据 否则 传入排号第1条数据  没有排号则提示
+                continuationStatus  续牌 1    未续牌  2
+                callStatus  呼叫 1   未呼叫  2
+
+
+                续牌之后  有   续牌时间
+                当有2个续牌时  判断续牌时间点 
+            */
+
+            qz_time = qiangzuo.map(v=>{return v.continuationTime})
+            ph_time = paihao.map(v=>{return v.continuationTime})
+
+            console.log(qz_time,ph_time)
+            
+            if(qiangzuo.length>0){
+                if(qiangzuo.length == 1 && qiangzuo[0].continuationStatus == 1){
+                    id = paihao[0].id
+                    type = 1
+                    status = paihao[0].callStatus
+                }else if(qiangzuo.length > 1 && qiangzuo[0].continuationStatus == 1){
+                    id = qiangzuo[1].id
+                    type = 2
+                    status = qiangzuo[1].callStatus
+                }else{
+                    id = qiangzuo[0].id
+                    type = 2
+                    status = qiangzuo[0].callStatus
+                }
+            }else{
+                // 进入这里 代表无抢座订单
+                if(paihao.length>0){
+                    if(paihao.length == 1 && paihao[0].continuationStatus == 1){
+                        id = paihao[0].id
+                        type = 1
+                        status = paihao[0].callStatus
+                    }else if(paihao.length == 1 && paihao[0].continuationStatus == 1){
+                        id = paihao[1].id
+                        type = 1
+                        status = paihao[1].callStatus
+                    }else{
+                        id = paihao[0].id
+                        type = 1
+                        status = paihao[0].callStatus
+                    }
+                }
+            }
+            if(!id){
+                this.$message.error({message: '当前没有订单'})
                 return
             }
-            this.callNext = true
+            if(status == 1){
+                this.$message.error({message: '当前已有订单未处理'})
+                return
+            }
+            this.$get(`/merchant/store/ly/setCall/${id}/${type}`).then(res=>{
+                if(res.code == 0){
+                    // this.callNext = true
+                    this.getData()
+                }else{
+                    this.$message.error(res.data);
+                }
+            })    
         }
     }
 };
@@ -418,9 +530,18 @@ export default {
                     }
                 }
             }
+            // @media screen and (max-width: 1400px) {
+            //     .now_num{
+            //         display: inherit;
+            //     }
+            // }
             .suc_num,.fail_num{
                 .su_l{
-                    margin-bottom: 10px;
+                    display: flex;
+                    .atl{
+                        flex: 1;
+                        margin-bottom: 10px;
+                    }
                     i{
                         font-size: 18px;
                         margin-right: 15px;
@@ -428,9 +549,7 @@ export default {
                     .tel_lab{
                         margin-right: 7%;
                     }
-                    .tel{
-                        margin-right: 11%;
-                    }
+                  
                     .tex{
                         margin-right: 10px;
 
@@ -448,6 +567,11 @@ export default {
                         margin-right: 10px;
                     }
                 }
+                // @media screen and (max-width: 1400px) {
+                //     .su_l{
+                //         display: inherit;
+                //     }
+                // }
             }
             .jt{
                 margin-top: 3px;
@@ -456,7 +580,7 @@ export default {
                 margin-bottom:20px;
                 .tab_btn{
                     display:inline-block;
-                    padding:10px;
+                    padding:8px 30px;
                     color:white;
                     cursor: pointer;
                 }   
@@ -542,4 +666,7 @@ ul,li{
 /deep/ .el-input__prefix{
     display: none;
 }
+
+
+
 </style>

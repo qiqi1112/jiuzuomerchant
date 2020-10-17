@@ -51,7 +51,7 @@ const i18n = new VueI18n({
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
     to.path == '/login' ? store.commit('showChat', false) : store.commit('showChat', true);
-    document.title = `${to.meta.title} | 上座`;
+    document.title = `${to.meta.title} | 玖座`;
     const role = JSON.parse(localStorage.getItem('userInfo')) || ''
     if (!role && to.path !== '/login') {
         this.$socket.disconnect();
