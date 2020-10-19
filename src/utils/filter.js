@@ -230,3 +230,20 @@ Vue.filter("orderStatus", function (oldVal) {
     }
     return newVal;
 })
+
+//申请商家推荐状态
+Vue.filter("recoType", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 1:
+            newVal = '申请商家推荐';
+            break;
+        case 2:
+            newVal = '等待审核';
+            break;
+        case 3:
+            newVal = '申请成功';
+            break;
+    }
+    return newVal;
+})

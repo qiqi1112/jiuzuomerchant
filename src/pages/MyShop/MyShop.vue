@@ -6,7 +6,12 @@
                 <h4>
                     <span>店铺信息</span>
                     <el-button type="primary" @click="editShopInfo">编辑</el-button>
-                    <el-button type="success" @click="storeRecommend" v-if="!isReadonly">申请商家推荐</el-button>
+                    <el-button
+                        :type="recoType == 1 ? 'primary' : recoType == 2 ? 'warning' : 'success'"
+                        @click="storeRecommend"
+                        v-if="!isReadonly && recoType"
+                        >{{ recoType | recoType }}
+                    </el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly && !isUpdate">暂存数据</el-button>
                     <el-button @click="cancelSubmit" v-if="!isReadonly && isUpdate">取消</el-button>
@@ -849,6 +854,7 @@ export default {
             isReadonly: true, //编辑信息开关
             isUpdate: true, //判断当前操作为修改还是新增店铺
 
+            recoType: '', //申请推荐位状态
             shopId: '', //门店ID
             logoImageUrl: '', //店铺logo
             shopName: '', //店铺名称
@@ -1008,15 +1014,28 @@ export default {
 
         //申请商家推荐
         storeRecommend() {
-            this.$get('/merchant/store/recommend/storeRecommend').then((res) => {
-                console.log(res);
-            });
+            if (this.recoType == 1) {
+                this.$confirm('确定要申请商家推荐吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$get('/merchant/store/recommend/storeRecommend').then((res) => {
+                            if (res.code === 0) {
+                                this.$message.success('申请成功，请等待审核');
+                                this.storeRecommendType();
+                            }
+                        });
+                    })
+                    .catch(() => {});
+            }
         },
 
         //获取申请商家推荐状态
         storeRecommendType() {
             this.$get('/merchant/store/recommend/storeRecommendType').then((res) => {
-                console.log(res);
+                if (res.code === 0) {
+                    this.recoType = res.data.type;
+                }
             });
         },
 

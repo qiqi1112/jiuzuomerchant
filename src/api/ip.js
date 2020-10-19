@@ -1,4 +1,4 @@
-let api,tengxun,file,token
+let api, tengxun, file, token
 import axios from 'axios'
 if (process.env.NODE_ENV === "development") {
   api = "/api";
@@ -12,18 +12,18 @@ if (process.env.NODE_ENV === "development") {
 
 
 const api_request = axios.create({
-    baseURL:api,
-    timeout:20000
+  baseURL: api,
+  timeout: 20000
 })
 
 const file_request = axios.create({
-  baseURL:file,
-  timeout:20000
+  baseURL: file,
+  timeout: 20000
 })
 
 const map_request = axios.create({
-    baseURL:tengxun,
-    timeout:20000
+  baseURL: tengxun,
+  timeout: 20000
 })
 
 api_request.interceptors.request.use(config => {
@@ -44,8 +44,8 @@ file_request.interceptors.request.use(config => {
   return config;
 });
 
-export{
-    api_request,
-    map_request,
-    file_request
+export {
+  api_request,
+  map_request,
+  file_request
 };
