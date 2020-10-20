@@ -141,10 +141,10 @@
                             <span>￥{{ item.presentPrice }}</span>
                             <s>￥{{ item.originalPrice }}</s>
                         </p>
-                        <el-row class="goods-handle">
+                        <div class="goods-handle">
                             <el-button type="primary" @click="handleEdit(item.id)">编辑</el-button>
                             <el-button type="danger" @click="handleDelete(item.id)">删除</el-button>
-                        </el-row>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1022,6 +1022,14 @@ export default {
             }
         }
 
+        .left-box.vip-card {
+            width: 55%;
+        }
+
+        .right-box.vip-card {
+            width: 45%;
+        }
+
         p {
             margin-bottom: 30px;
             display: flex;
@@ -1138,6 +1146,7 @@ export default {
             .goods-handle {
                 display: flex;
                 justify-content: space-around;
+                // justify-content: space-between;
 
                 .el-button--small,
                 .el-button--small.is-round {

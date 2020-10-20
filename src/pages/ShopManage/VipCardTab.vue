@@ -1,6 +1,6 @@
 <template>
     <div class="goods-info-box">
-        <div class="left-box">
+        <div class="left-box vip-card">
             <el-form ref="vipCardForm" :model="vipCardForm" label-width="80px">
                 <div class="good-name-box">
                     <div>
@@ -52,11 +52,20 @@
             </el-upload>
             <span>（*如需商店轮播推荐，请添加广告图片）</span>
         </div>
-        <div class="right-box">
+        <div class="right-box vip-card">
             <!-- 缩略图 -->
-            <p>
+            <div class="thum">
                 <span>商品缩略图：</span>
-                <el-upload
+                <div class="image-box" v-if="thumImageBox">
+                    <img
+                        ref="thumImg"
+                        @click="chooseThumImg(item.picture, $event)"
+                        :src="showImgPrefix + item.picture"
+                        v-for="(item, index) in thumImageBox"
+                        :key="index"
+                    />
+                </div>
+                <!-- <el-upload
                     class="avatar-uploader"
                     action="1"
                     :show-file-list="false"
@@ -65,8 +74,8 @@
                 >
                     <img v-if="vipCardForm.thumImageUrl" :src="showImgPrefix + vipCardForm.thumImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                </el-upload>
-            </p>
+                </el-upload> -->
+            </div>
             <!-- 详情图 -->
             <p>
                 <span>商品详情图：</span>
@@ -106,7 +115,8 @@ export default {
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '' //详情图
             },
-            spec: ['默认']
+            spec: ['默认'],
+            thumImageBox: [] //后台配置的图片
         };
     },
 
@@ -130,10 +140,40 @@ export default {
 
     mounted() {
         this.assignParentToChild(); //回显商品信息
-        console.log('会员卡组件');
     },
 
     methods: {
+        //选择会员卡片
+        chooseThumImg(item, e) {
+            this.$refs.thumImg.forEach((item) => {
+                item.classList.remove('border');
+            });
+            e.target.classList.add('border');
+            this.vipCardForm.thumImageUrl = item;
+        },
+
+        //获取会员卡片
+        getVipCard() {
+            this.$get('/merchant/store/goods/getVipPhoto').then((res) => {
+                if (res.code === 0) {
+                    this.thumImageBox = res.data;
+                    this.showVipCard();
+                }
+            });
+        },
+
+        //回显会员卡片
+        showVipCard() {
+            this.$nextTick(() => {
+                this.$refs.thumImg.forEach((item) => {
+                    let imgSrc = item.getAttribute('src');
+                    if (imgSrc == this.showImgPrefix + this.vipCardForm.thumImageUrl) {
+                        item.classList.add('border');
+                    }
+                });
+            });
+        },
+
         //关闭广告位操作
         removeBanner() {
             if (!this.vipCardForm.checkedBanner) {
@@ -144,6 +184,7 @@ export default {
         //回显父组件传过来的值（编辑商品）
         assignParentToChild() {
             this.vipCardForm = Object.assign({}, this.vipCardFormParent);
+            this.getVipCard();
         },
 
         //发送当前子组件的表单信息给父组件
@@ -161,13 +202,13 @@ export default {
         },
 
         //上传缩略图
-        uploadThumFiles(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
-                this.vipCardForm.thumImageUrl = res.data;
-            });
-        },
+        // uploadThumFiles(file) {
+        //     let formData = new FormData();
+        //     formData.append('file', file.file);
+        //     this.$file_post(this.fileUploadUrl, formData).then((res) => {
+        //         this.vipCardForm.thumImageUrl = res.data;
+        //     });
+        // },
 
         //上传详情图
         uploadDetailFiles(file) {
@@ -185,3 +226,34 @@ export default {
     }
 };
 </script>
+
+<style lang="less" scoped>
+.right-box {
+    .thum {
+        > span {
+            min-width: 84px;
+        }
+
+        display: flex;
+        margin-bottom: 30px;
+
+        .image-box {
+            font-size: 0;
+            img {
+                width: 140px;
+                height: 70px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                box-sizing: border-box;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.border {
+    box-sizing: border-box;
+    border: 2px solid #f56c6c;
+}
+</style>
