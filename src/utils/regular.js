@@ -1,16 +1,15 @@
 /*
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
- * @Last Modified by: xu.xiao
- * @Last Modified time: 2020-10-13 14:02:42
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2020-10-21 14:20:19
  */
 
 import Message from "element-ui/packages/message/index.js";
 // 
 // 手机号码验证
 function phone(val) {
-    if (!(/^1[3456789]\d{9}$/.test(val))) {
-        Message.error('手机号格式不正确，请重新输入');
+    if (!(/(^0\d{2,3}\-\d{7,8}$)|(^1[3|4|5|6|7|8][0-9]{9}$)/.test(val))) {
         return false;
     }
 }
@@ -18,7 +17,6 @@ function phone(val) {
 //验证金额
 function money(val) {
     if (!/^\d+(\.\d{1,2})?$/.test(val)) {
-        Message.error("金额有误，请重新输入");
         return false;
     }
 }
@@ -90,7 +88,7 @@ function addZero(num) {
     return num < 10 ? '0' + num : num
 }
 // 深拷贝简单转换
-function deep(val) { 
+function deep(val) {
     let str = JSON.stringify(val)
     return JSON.parse(str);
 }
@@ -110,6 +108,7 @@ function timestampToTime(timestamp) {
 
 export default {
     phone,
+    money,
     idCard,
     email,
     timeData,

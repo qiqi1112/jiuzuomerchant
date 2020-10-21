@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="container">
+        <div class="container" v-loading="wrapLoading">
             <!-- 左边区域 -->
             <div class="left-wrap">
                 <h4>
@@ -42,7 +42,7 @@
                             <el-input
                                 v-model="shopName"
                                 placeholder="请输入店名"
-                                style="width: 70%"
+                                style="width: 76%"
                                 :readonly="isReadonly"
                                 clearable
                             ></el-input>
@@ -65,7 +65,8 @@
 
                 <!-- 店铺定位 -->
                 <div class="shop-loca">
-                    <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、零嘴”）</p>
+                    <p>店铺定位</p>
+                    <!-- <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、零嘴”）</p> -->
                     <div v-if="!isUpdate">
                         <span v-for="(item, index) in shopLoca" :key="index" ref="shopLoca" @click="changeShopLoca">{{ item }}</span>
                     </div>
@@ -152,16 +153,15 @@
                                 ></el-time-select>
                             </div>
                         </div>
-                        <!-- 店铺人均消费 -->
+                        <!-- 店铺人均消费  type="number"-->
                         <div class="per-con">
                             <p>店铺人均消费</p>
                             <el-input
-                                type="number"
+                                @blur="checkPrice(perCon)"
                                 v-model="perCon"
                                 placeholder="人均消费"
                                 style="width: 70%; margin-right: 6px"
                                 :readonly="isReadonly"
-                                min="0"
                             >
                                 <template slot="append">￥/人</template>
                             </el-input>
@@ -459,8 +459,8 @@
                                     <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
                                         <span>{{ item.weekIndex | dayOfWeek }}</span>
                                         <el-input
+                                            @blur="checkPrice(item.price)"
                                             v-model="item.price"
-                                            placeholder="最低消费"
                                             style="width: 47%; margin-right: 6px"
                                             :readonly="isReadonly"
                                         >
@@ -957,7 +957,10 @@ export default {
                 snacks: [], //零嘴
                 sketchMap: [], //包间示意图
                 roomTimeIntervalList: [] //时间段集合
-            }
+            },
+
+            wrapLoading: false, //加载开关
+            allRegRight: false //全部验证通过的开关
         };
     },
     methods: {
@@ -965,36 +968,64 @@ export default {
         checkFormInfo() {
             if (!this.shopName) {
                 this.$message.error('请输入店铺名称');
+                return;
             } else if (!this.shopBrief) {
                 this.$message.error('请输入店铺简介');
+                return;
             } else if (!this.logoImageUrl) {
                 this.$message.error('请上传店铺logo');
+                return;
             } else if (!this.shopLocaIndex) {
                 this.$message.error('请选择店铺定位');
+                return;
             } else if (this.servicePhoneArr.length == 0) {
                 this.$message.error('请输入客服电话');
+                return;
             } else if (!this.startBussTime) {
                 this.$message.error('请选择开始营业时间');
+                return;
             } else if (!this.endBussTime) {
                 this.$message.error('请选择结束营业时间');
+                return;
             } else if (this.submitShopType.length == 0) {
                 this.$message.error('请选择店铺类型');
+                return;
             } else if (!this.perCon) {
                 this.$message.error('请输入店铺人均消费');
+                return;
+            } else if (this.$regular.money(this.perCon) === false) {
+                this.$message.error('请输入正确格式的店铺人均消费');
+                return;
             } else if (!this.searchAddress) {
                 this.$message.error('请输入地址');
+                return;
             } else if (!this.trustAddress) {
                 this.$message.error('请输入详细地址');
+                return;
             } else if (!this.goodsBrief) {
                 this.$message.error('请输入商品店名简介');
+                return;
             } else if (this.bannerShowBox.length == 0) {
                 this.$message.error('请上传店铺banner图');
+                return;
             } else if (!this.rowNumImageUrl) {
                 this.$message.error('请上传排号横幅图');
+                return;
             } else if (!this.appShopImageUrl) {
                 this.$message.error('请上传店铺长图');
+                return;
             } else if (!this.overallImageUrl) {
                 this.$message.error('请上传商家布局图');
+                return;
+            } else {
+                this.allRegRight = true;
+            }
+        },
+
+        //验证金额
+        checkPrice(price) {
+            if (this.$regular.money(price) === false) {
+                this.$message.error('请输入正确格式的金额');
             }
         },
 
@@ -1428,8 +1459,20 @@ export default {
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
         },
 
+        //请求成功后，处理的操作
+        requestSuccessInit(txt) {
+            this.getStoreInfo();
+            this.$message.success('添加成功');
+            this.submitShopType = [];
+            this.isReadonly = true;
+            this.allRegRight = false;
+            this.wrapLoading = false;
+        },
+
         //新增/修改店铺
         submitShopRequest() {
+            this.wrapLoading = true;
+
             let ktvRoomList = [];
             if (this.shopLocaIndex == 3) {
                 ktvRoomList = this.cloneSnacks(); //数组转json形式（零嘴）
@@ -1477,30 +1520,18 @@ export default {
 
                 this.$put('/merchant/store/update', data).then((res) => {
                     if (res.code == 0) {
-                        this.getStoreInfo();
-                        this.$message.success('修改成功');
-                        this.submitShopType = []; //清空店铺类型上传数组
-                        this.isReadonly = true;
+                        this.requestSuccessInit('修改成功');
                     }
-                    // else {
-                    //     this.$message.error(res.msg);
-                    // }
                 });
             } else {
                 console.log('新增时传的值', data);
 
                 this.$post('/merchant/store/save', data).then((res) => {
                     if (res.code == 0) {
-                        this.getStoreInfo();
+                        this.requestSuccessInit('新增成功');
                         localStorage.removeItem('storageInfo');
-                        this.$message.success('添加成功');
-                        this.submitShopType = []; //清空店铺类型上传数组
-                        this.isReadonly = true;
                         this.isUpdate = true;
                     }
-                    // else {
-                    //     this.$message.error(res.msg);
-                    // }
                 });
             }
         },
@@ -1508,10 +1539,12 @@ export default {
         //保存按钮
         submitShopInfo() {
             this.checkFormInfo(); //验证所有输入的值
-            this.submitShopRequest(); //新增/修改店铺
-            this.clearSeatBorder(); //清空座位外边框（定位当前座位）
-            this.isClickSeat = false;
-            this.isLookKtvInfo = false;
+            if (this.allRegRight) {
+                this.submitShopRequest(); //新增/修改店铺
+                this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+                this.isClickSeat = false;
+                this.isLookKtvInfo = false;
+            }
         },
 
         //取消保存按钮
@@ -1687,7 +1720,11 @@ export default {
 
         //添加客服电话
         addServicePhone() {
-            this.servicePhoneArr.push(this.servicePhone);
+            if (this.$regular.phone(this.servicePhone) === false) {
+                this.$message.error('电话格式不正确，请重新输入');
+            } else {
+                this.servicePhoneArr.push(this.servicePhone);
+            }
             this.servicePhone = '';
         },
 
@@ -2310,16 +2347,18 @@ export default {
         display: inline-block;
         content: '';
         width: 4px;
+        height: 30px;
         margin-right: 10px;
         background-color: #000;
     }
 
     .shop-info {
+        display: flex;
         margin-bottom: 30px;
 
         .left-info {
             width: 30%;
-            float: left;
+            // float: left;
 
             > span {
                 font-size: 12px;
@@ -2346,6 +2385,10 @@ export default {
             }
 
             .shop-brief {
+                > span {
+                    // min-width: 100px;
+                }
+
                 display: flex;
                 align-items: center;
             }
@@ -2546,6 +2589,7 @@ export default {
 
     .shop-info {
         display: flex;
+        justify-content: space-between;
         margin-bottom: 40px;
 
         img {
@@ -2586,7 +2630,7 @@ export default {
         }
 
         .rowNum-box {
-            margin-right: 100px;
+            // margin-right: 100px;
         }
 
         .overall-box {
@@ -2691,7 +2735,7 @@ export default {
                 .day-mincom {
                     border: 1px solid #dcdfe6;
                     border-radius: 4px;
-                    padding: 16px 20px;
+                    padding: 16px 0;
                     width: 80%;
 
                     > p {
@@ -2962,6 +3006,17 @@ export default {
 /deep/ .el-input-group__append,
 .el-input-group__prepend {
     padding: 0 10px;
+}
+
+/deep/.right-wrap .day-mincom {
+    .el-input-group__append,
+    .el-input-group__prepend {
+        padding: 0 5px;
+    }
+
+    .el-input__inner {
+        padding: 0 5px;
+    }
 }
 
 /deep/ .el-input--suffix .el-input__inner {
