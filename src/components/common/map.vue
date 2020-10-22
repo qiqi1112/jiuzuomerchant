@@ -105,7 +105,7 @@ export default {
     },
     mounted() {
         this.mapTX();
-        let geolocation = new qq.maps.Geolocation('ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS', 'dingzuo');
+        let geolocation = new qq.maps.Geolocation('UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ', 'dingzuo');
         geolocation.getLocation(this.showPosition, this.showPositionErr, { timeout: 20000 });
     },
     watch: {
@@ -190,7 +190,7 @@ export default {
         },
         changeStr(data) {
             let address = encodeURI(this.fristForm.address);
-            this.$map_get(`/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS`)
+            this.$map_get(`/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ`)
                 .then((res) => {
                     if (res.status == 0) {
                         this.addressLists = res.data;
@@ -243,7 +243,7 @@ export default {
                 };
                 var script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'http://map.qq.com/api/js?v=2.exp&callback=init&key=ABIBZ-Z7JR6-H7KSV-MXCVY-GS5RS-RJFNS';
+                script.src = 'http://map.qq.com/api/js?v=2.exp&callback=init&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ';
                 script.onerror = reject;
                 document.head.appendChild(script);
             });

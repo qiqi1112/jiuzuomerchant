@@ -336,11 +336,10 @@ export default {
 
         // 确定
         ensure(val,type){
-            
             // this.callNext = false
             this.$get(`/merchant/store/ly/calling/${val.id}/${type}`).then(res=>{
                 if(res.code == 0){
-                    
+                    this.getData()
                 }else{
                     this.$message.error(res.data);
                 }
@@ -354,9 +353,43 @@ export default {
         },
         // 续牌
         nextOne(val,type){
-            this.$get(`/merchant/store/ly/setContinuation/${val.id}/${type}`).then(res=>{
+            let nextId = null,nextType = null
+            if(val.paidAmount){
+                //当前时抢座
+                if(this.robList[1]){
+                    // 抢  有
+                    nextId = this.robList[1].id
+                    nextType = 2
+                }else{
+                    if(rowList[0]){
+                        nextId = this.rowList[0].id
+                        nextType = 1
+                    }else{
+                        nextId = null
+                        nextType = null
+                    }
+                }
+            }else{
+                // 当前时排号
+                if(rowList[1]){
+                    nextId = this.rowList[1].id
+                    nextType = 1
+                }else{
+                    nextId = null
+                    nextType = null
+                }
+            }
+            let data = {
+                id:+val.id,
+                type:+type,
+                nextId:+nextId,
+                nextType:+nextType
+
+            }
+            this.$post(`/merchant/store/ly/setContinuation`,data).then(res=>{
                 if(res.code == 0){
                     this.getData()
+                    // this.call()
                 }else{
                     this.$message.error(res.data);
                 }
@@ -368,10 +401,19 @@ export default {
         fail(val){
             // this.callNext = false
             for(let i=0;i<this.nowNumList.length;i++){
-                if(val.id == this.nowNumList[i].id){
-                    this.nowNumList.splice(i,1)
+                // if(val.id == this.nowNumList[i].id){
+                //     this.nowNumList.splice(i,1)
+                // }
+                if(res.code == 0){
+                    this.getData()
+                }else{
+                    this.$message.error(res.data);
                 }
             }
+        },
+        // 根据时间排序
+        sortArr(a,b){
+            return a.continuationTime - b.continuationTime
         },
         // 呼叫下一位
         call(){
@@ -389,21 +431,46 @@ export default {
                 当有2个续牌时  判断续牌时间点 
             */
 
-            qz_time = qiangzuo.map(v=>{return v.continuationTime})
-            ph_time = paihao.map(v=>{return v.continuationTime})
+            // console.log(qz_time,ph_time)
+            let continuationTime = []
+            for(let i=0;i<qiangzuo.length;i++){
+                if(qiangzuo[i].continuationTime){
+                    continuationTime.push(qiangzuo[i])
+                }
+            }
 
-            console.log(qz_time,ph_time)
+            let sort_time = continuationTime.sort(this.sortArr)
+
+            if(sort_time.length<2){
+                for(let j=0;j<paihao.length;j++){
+                    if(paihao[j].continuationTime){
+                        continuationTime.push(paihao[j])
+                    }
+                }
+            }
+
             
             if(qiangzuo.length>0){
                 if(qiangzuo.length == 1 && qiangzuo[0].continuationStatus == 1){
-                    id = paihao[0].id
-                    type = 1
-                    status = paihao[0].callStatus
+                    // 抢座长度=1且处于续牌状态  再次点击下一位时  传排号的第一条
+                    if(paihao.length<1){
+                        //排号没有订单时
+                        id = qiangzuo[0].id
+                        type = 2
+                        status = qiangzuo[0].callStatus
+                    }else{
+                        // 排号有订单
+                        id = paihao[0].id
+                        type = 1
+                        status = paihao[0].callStatus
+                    }
                 }else if(qiangzuo.length > 1 && qiangzuo[0].continuationStatus == 1){
+                    // 抢座长度>1且 第一条处于续牌状态  再次点击下一位时  传抢座的第2条
                     id = qiangzuo[1].id
                     type = 2
                     status = qiangzuo[1].callStatus
-                }else{
+                }
+                else{
                     id = qiangzuo[0].id
                     type = 2
                     status = qiangzuo[0].callStatus
@@ -415,7 +482,7 @@ export default {
                         id = paihao[0].id
                         type = 1
                         status = paihao[0].callStatus
-                    }else if(paihao.length == 1 && paihao[0].continuationStatus == 1){
+                    }else if(paihao.length > 1 && paihao[0].continuationStatus == 1){
                         id = paihao[1].id
                         type = 1
                         status = paihao[1].callStatus
@@ -426,6 +493,19 @@ export default {
                     }
                 }
             }
+
+            
+
+            if(sort_time.length>1){
+                //当已存在2条续牌状态时  传时间早的
+                id = sort_time[0].id
+                sort_time[0].paidAmount?type = 2:type = 1
+                status = sort_time[0].callStatus
+            }
+
+            console.log(id,type)
+
+
             if(!id){
                 this.$message.error({message: '当前没有订单'})
                 return
@@ -434,6 +514,7 @@ export default {
                 this.$message.error({message: '当前已有订单未处理'})
                 return
             }
+            
             this.$get(`/merchant/store/ly/setCall/${id}/${type}`).then(res=>{
                 if(res.code == 0){
                     // this.callNext = true
