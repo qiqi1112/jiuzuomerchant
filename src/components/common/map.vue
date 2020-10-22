@@ -14,19 +14,15 @@
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
             <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>-->
             <div class="city" @click.stop>
-                <span>{{value}}</span>
+                <span>{{ value }}</span>
                 <span class="changeCity" @click.stop="showCityFun()">切换城市</span>
                 <div class="cityList" v-if="showCity">
-                    <div class="all" v-for="(c,i) in city" :key="i">
+                    <div class="all" v-for="(c, i) in city" :key="i">
                         <div class="province">
-                            <span>{{c.label}}</span>
+                            <span>{{ c.label }}</span>
                         </div>
                         <div class="city">
-                            <span
-                                @click="changeCity(j)"
-                                v-for="(j,index) in c.children"
-                                :key="index"
-                            >{{j.label}}</span>
+                            <span @click="changeCity(j)" v-for="(j, index) in c.children" :key="index">{{ j.label }}</span>
                         </div>
                     </div>
                 </div>
@@ -35,16 +31,16 @@
                 <el-input v-model="fristForm.dtl_address" @blur="trustAddress" placeholder="请输入详细地址"></el-input>
             </div>
             <ul class="add_list" v-if="showList">
-                <div v-if="addressLists!=''">
-                    <li @click="assignText(item)" v-for="(item,index) in addressLists" :key="index">
-                        {{item.title}}
-                        <span>{{item.address}}</span>
+                <div v-if="addressLists != ''">
+                    <li @click="assignText(item)" v-for="(item, index) in addressLists" :key="index">
+                        {{ item.title }}
+                        <span>{{ item.address }}</span>
                     </li>
                 </div>
                 <div v-else class="notAdd">没有相关地址~</div>
             </ul>
         </div>
-        <div id="container" ref="container" :style="{width:mapWidth,height:maiHeight}"></div>
+        <div id="container" ref="container" :style="{ width: mapWidth, height: maiHeight }"></div>
     </div>
 </template>
 
@@ -115,7 +111,7 @@ export default {
                 // this.childData()
             },
             deep: true
-        },
+        }
 
         // 'fristForm.dtl_address': {
         //     handler: function (newVal, oldVal) {
@@ -137,7 +133,6 @@ export default {
         trustAddress() {
             this.childData();
         },
-        
 
         childData() {
             console.log(this.fristForm.dtl_address);
@@ -194,7 +189,7 @@ export default {
                 .then((res) => {
                     if (res.status == 0) {
                         this.addressLists = res.data;
-                        this.add_info = res.data[0]
+                        this.add_info = res.data[0];
 
                         // console.log(res.data);
                     } else if (res.status == 330) {

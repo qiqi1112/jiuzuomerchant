@@ -56,7 +56,7 @@ export default {
 
     data() {
         return {
-            searchName: '', //用户昵称
+            searchName: '', //关键词
             tableData: [], //表格数据
 
             dataListCount: 0, //默认当前要显示的数据条数

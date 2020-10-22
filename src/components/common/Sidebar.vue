@@ -105,6 +105,11 @@ export default {
                     icon: 'el-icon-lx-commentfill',
                     index: 'log',
                     title: '操作日志'
+                },
+                {
+                    icon: 'el-icon-lx-commentfill',
+                    index: 'setting',
+                    title: '设置'
                 }
                 // {
                 //     icon: 'el-icon-s-flag',

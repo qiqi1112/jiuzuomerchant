@@ -328,22 +328,28 @@
                                 <label style="margin-right: 30px">
                                     座位行数：
                                     <el-input-number
+                                        :step="1"
+                                        step-strictly
                                         :disabled="isReadonly"
                                         v-model="x"
                                         :min="6"
                                         style="width: 120px"
                                         label="行数"
+                                        @blur="checkNull(x, '座位行数')"
                                         @change="changeSeatNum"
                                     ></el-input-number>
                                 </label>
                                 <label style="margin-right: 30px">
                                     座位列数：
                                     <el-input-number
+                                        :step="1"
+                                        step-strictly
                                         :disabled="isReadonly"
                                         v-model="y"
                                         :min="6"
                                         style="width: 120px"
                                         label="列数"
+                                        @blur="checkNull(y, '座位列数')"
                                         @change="changeSeatNum"
                                     ></el-input-number>
                                 </label>
@@ -401,6 +407,7 @@
                                     placeholder="座位号"
                                     style="width: 50%"
                                     :readonly="isReadonly"
+                                    @blur="checkNull(presentSeatInfo.seatCode, '座位号')"
                                 ></el-input>
                             </div>
                             <!-- 座位类型 -->
@@ -413,12 +420,15 @@
                             <div>
                                 <span>容纳人数：</span>
                                 <el-input-number
+                                    :step="1"
+                                    step-strictly
                                     v-model="presentSeatInfo.numberOfPeople"
                                     controls-position="right"
                                     placeholder="容纳人数"
                                     style="width: 50%; margin-right: 6px"
                                     :disabled="isReadonly"
                                     :min="1"
+                                    @blur="checkNull(presentSeatInfo.numberOfPeople, '容纳人数')"
                                 ></el-input-number>
                                 <!-- <el-input
                                     v-model="presentSeatInfo.numberOfPeople"
@@ -433,6 +443,7 @@
                             <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
+                                    @change="checkNull(presentSeatInfo.seatLatestReservationTime, '保留最晚时间')"
                                     style="width: 50%"
                                     placeholder="最晚保留时间"
                                     v-model="presentSeatInfo.seatLatestReservationTime"
@@ -483,7 +494,6 @@
                                 <span>包间类型：</span>
                                 <el-select
                                     filterable
-                                    clearable
                                     :disabled="isReadonly"
                                     v-model="presentKtvInfo.roomTypeId"
                                     placeholder="请选择"
@@ -502,6 +512,9 @@
                             <div>
                                 <span>包间数量：</span>
                                 <el-input-number
+                                    @blur="checkNull(presentKtvInfo.roomNumber, '包间数量')"
+                                    :step="1"
+                                    step-strictly
                                     v-model="presentKtvInfo.roomNumber"
                                     controls-position="right"
                                     :min="1"
@@ -520,6 +533,9 @@
                             <div>
                                 <span>容纳人数：</span>
                                 <el-input-number
+                                    @blur="checkNull(presentKtvInfo.capacity, '容纳人数')"
+                                    :step="1"
+                                    step-strictly
                                     controls-position="right"
                                     :min="1"
                                     v-model="presentKtvInfo.capacity"
@@ -542,8 +558,11 @@
                             </div>
                             <!-- 机麻 -->
                             <div>
-                                <span>机麻：</span>
+                                <span>机麻数量：</span>
                                 <el-input-number
+                                    @blur="checkNull(presentKtvInfo.mahjong, '机麻')"
+                                    :step="1"
+                                    step-strictly
                                     controls-position="right"
                                     :min="0"
                                     v-model="presentKtvInfo.mahjong"
@@ -567,6 +586,7 @@
                                         <span>时间段分布：</span>
                                         <div>
                                             <el-time-select
+                                                @change="checkNull(item.startTime, '开始时间')"
                                                 style="width: 100px"
                                                 v-model="item.startTime"
                                                 :readonly="isReadonly"
@@ -579,6 +599,7 @@
                                             ></el-time-select>
                                             <span style="margin: 0 10px">~</span>
                                             <el-time-select
+                                                @change="checkNull(item.endTime, '结束时间')"
                                                 style="width: 100px"
                                                 v-model="item.endTime"
                                                 :readonly="isReadonly"
@@ -595,11 +616,11 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
+                                            @blur="checkPrice(item.minConsumption)"
                                             v-model="item.minConsumption"
                                             placeholder="最低消费"
                                             style="width: 50%"
                                             :readonly="isReadonly"
-                                            type="number"
                                             min="0"
                                         >
                                             <template slot="append">￥</template>
@@ -662,7 +683,6 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
-                                            type="number"
                                             v-model="timeQuanObj.minConsumption"
                                             placeholder="最低消费"
                                             style="width: 50%"
@@ -714,12 +734,11 @@
                                                 <i class="el-icon-close"></i>
                                             </span>
                                             <el-input
+                                                :onkeyup="(item.num = item.num.replace(/^(0+)|[^\d]+/g, ''))"
                                                 style="width: 70px; margin-right: 10px"
                                                 v-model="item.num"
                                                 placeholder="数量"
                                                 :readonly="isReadonly"
-                                                min="1"
-                                                type="number"
                                             ></el-input>
                                             <el-button v-if="!isReadonly" @click="deleteSnacks(item)" type="danger">删除</el-button>
                                         </li>
@@ -737,12 +756,11 @@
                                             <i class="el-icon-close"></i>
                                         </span>
                                         <el-input
+                                            :onkeyup="(snacksObj.num = snacksObj.num.replace(/^(0+)|[^\d]+/g, ''))"
                                             style="width: 70px; margin-right: 10px"
                                             v-model="snacksObj.num"
                                             placeholder="数量"
                                             :readonly="isReadonly"
-                                            min="1"
-                                            type="number"
                                         ></el-input>
                                         <el-button :disabled="isReadonly" type="primary" @click="addSnacks">添加</el-button>
                                     </div>
@@ -1014,7 +1032,7 @@ export default {
             } else if (!this.appShopImageUrl) {
                 this.$message.error('请上传店铺长图');
                 return;
-            } else if (!this.overallImageUrl) {
+            } else if (!this.overallImageUrl && this.shopLocaIndex != 3) {
                 this.$message.error('请上传商家布局图');
                 return;
             } else {
@@ -1026,6 +1044,14 @@ export default {
         checkPrice(price) {
             if (this.$regular.money(price) === false) {
                 this.$message.error('请输入正确格式的金额');
+            }
+        },
+
+        //非空验证
+        checkNull(item, txt) {
+            console.log('xxx', item);
+            if (item === '' || item === undefined || item === null) {
+                this.$message.error(`${txt}不能为空`);
             }
         },
 
@@ -1694,14 +1720,26 @@ export default {
 
         //添加时间段
         addTimeQuan() {
-            let timeQuan = Object.assign({}, this.timeQuanObj);
-            this.presentKtvInfo.roomTimeIntervalList.push(timeQuan);
-            this.timeQuanObj = {
-                startTime: '', //开始时间
-                endTime: '', //结束时间
-                latestTime: '', //最晚保留时间
-                minConsumption: '' //最低消费
-            };
+            if (this.timeQuanObj.startTime === '' || this.timeQuanObj.startTime === null) {
+                this.$message.error('开始时间不能为空');
+            } else if (this.timeQuanObj.endTime === '' || this.timeQuanObj.endTime === null) {
+                this.$message.error('结束时间不能为空');
+            } else if (this.timeQuanObj.latestTime === '') {
+                this.$message.error('最晚保留时间不能为空');
+            } else if (this.timeQuanObj.minConsumption === '') {
+                this.$message.error('最低消费不能为空');
+            } else if (this.$regular.money(this.timeQuanObj.minConsumption) === false) {
+                this.$message.error('请输入正确格式的金额');
+            } else {
+                let timeQuan = Object.assign({}, this.timeQuanObj);
+                this.presentKtvInfo.roomTimeIntervalList.push(timeQuan);
+                this.timeQuanObj = {
+                    startTime: '', //开始时间
+                    endTime: '', //结束时间
+                    latestTime: '', //最晚保留时间
+                    minConsumption: '' //最低消费
+                };
+            }
         },
 
         //删除时间段
@@ -1739,12 +1777,18 @@ export default {
 
         //添加零嘴
         addSnacks() {
-            let snacksObj = Object.assign({}, this.snacksObj);
-            this.presentKtvInfo.snacks.push(snacksObj);
-            this.snacksObj = {
-                name: '',
-                num: ''
-            };
+            if (!this.snacksObj.name) {
+                this.$message.error('请输入零嘴名称');
+            } else if (!this.snacksObj.num) {
+                this.$message.error('请输入零嘴数量');
+            } else {
+                let snacksObj = Object.assign({}, this.snacksObj);
+                this.presentKtvInfo.snacks.push(snacksObj);
+                this.snacksObj = {
+                    name: '',
+                    num: ''
+                };
+            }
         },
 
         //删除零嘴
@@ -1771,6 +1815,7 @@ export default {
             this.isLookKtvInfo = true;
             this.isUpdateKtvInfo = true;
             this.presentKtvInfo = item;
+            // this.presentKtvInfo = Object.assign({}, item);
             this.showKtvBannerImg();
         },
 
@@ -2020,22 +2065,34 @@ export default {
             this.clearKtvInfo();
             if (this.isUpdateKtvInfo) {
                 this.isUpdateKtvInfo = false;
+                this.getStoreInfo();
+                setTimeout(() => {
+                    this.showBannerVideo();
+                }, 500);
             }
         },
 
         //提交保存ktv包间信息
         ktvSureSub() {
-            if (this.isUpdateKtvInfo) {
-                this.$message.success('修改成功');
-                this.isUpdateKtvInfo = false;
+            if (!this.presentKtvInfo.roomTypeId) {
+                this.$message.error('请选择包间类型');
+            } else if (this.presentKtvInfo.roomTimeIntervalList.length == 0) {
+                this.$message.error('请添加时间段分布');
+            } else if (this.presentKtvInfo.sketchMap.length == 0) {
+                this.$message.error('至少上传一张包间示意图');
             } else {
-                if (!this.ktvRoomList) {
-                    this.ktvRoomList = [];
+                if (this.isUpdateKtvInfo) {
+                    this.$message.success('修改成功');
+                    this.isUpdateKtvInfo = false;
+                } else {
+                    if (!this.ktvRoomList) {
+                        this.ktvRoomList = [];
+                    }
+                    this.ktvRoomList.push(this.presentKtvInfo);
+                    this.$message.success('新增成功');
                 }
-                this.ktvRoomList.push(this.presentKtvInfo);
-                this.$message.success('新增成功');
+                this.clearKtvInfo();
             }
-            this.clearKtvInfo();
         },
 
         //回显店铺数据
@@ -2253,9 +2310,11 @@ export default {
 
         //座位行数/列数改变
         changeSeatNum() {
-            if (!this.isReadonly) {
+            if (!this.isReadonly && this.x % 1 == 0 && this.y % 1 == 0) {
                 this.isClickSeat = false;
                 this.createSeatFn(); //创建座位
+            } else {
+                this.$message.error('请输入整数的列数和行数');
             }
         },
 
