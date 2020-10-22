@@ -100,6 +100,13 @@ export default new Router({
                         title: '财务审核'
                     }
                 },
+                {
+                    path: '/setting',
+                    component: () => import('../pages/Setting/Setting.vue'),
+                    meta: {
+                        title: '设置'
+                    }
+                },
 
                 {
                     path: '/dashboard',
