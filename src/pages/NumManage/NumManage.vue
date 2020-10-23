@@ -1,27 +1,30 @@
 <template>
     <div id="numeral">
         <div class="container">
-            <div class="crumbs">
-                <el-breadcrumb separator="/">
-                    <el-breadcrumb-item>
-                        <i class="el-icon-lx-cascades"></i> 排号管理
-                    </el-breadcrumb-item>
-                </el-breadcrumb>
-            </div>
-            <div class="tit_top">
-                <span class="li_text">今日排号总数<span>{{todayData.todayTotalLy}}</span></span>
-                <span class="li_text">今日成功排号数<span>{{todayData.totalSuccessLy}}</span></span>
-                <span class="li_text">今日当前排号总数<span>{{todayData.nowTotalLy}}</span></span>
-                <span class="li_text">今日取消排号数<span>{{todayData.todayCancelTotalLy}}</span></span>
-                <br>
-                <span class="li_text">今日当前抢座总数<span>{{todayData.nowTotalVie}}</span></span>
-                <span class="li_text">今日成功抢座数<span>{{todayData.todaySuccessTotalVie}}</span></span>
-                <span class="li_text">今日抢座总数<span>{{todayData.todayTotalVie}}</span></span>
-            </div>
+            <div class="position">
+                <div class="crumbs">
+                    <el-breadcrumb separator="/">
+                        <el-breadcrumb-item>
+                            <i class="el-icon-lx-cascades"></i> 排号管理
+                        </el-breadcrumb-item>
+                    </el-breadcrumb>
+                </div>
             
-            <div>
-                <el-button @click="call()" type="primary" icon="el-icon-dish">呼叫下一位</el-button>
-                <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button>
+                <div class="tit_top">
+                    <span class="li_text">今日排号总数<span>{{todayData.todayTotalLy}}</span></span>
+                    <span class="li_text">今日成功排号数<span>{{todayData.totalSuccessLy}}</span></span>
+                    <span class="li_text">今日当前排号总数<span>{{todayData.nowTotalLy}}</span></span>
+                    <span class="li_text">今日取消排号数<span>{{todayData.todayCancelTotalLy}}</span></span>
+                    <br>
+                    <span class="li_text">今日当前抢座总数<span>{{todayData.nowTotalVie}}</span></span>
+                    <span class="li_text">今日成功抢座数<span>{{todayData.todaySuccessTotalVie}}</span></span>
+                    <span class="li_text">今日抢座总数<span>{{todayData.todayTotalVie}}</span></span>
+                </div>
+                
+                <div>
+                    <el-button @click="call()" type="primary" icon="el-icon-dish">呼叫下一位</el-button>
+                    <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button>
+                </div>
             </div>
 
             <div class="numeral_list">
@@ -115,9 +118,10 @@
                             <el-date-picker
                                 v-model="time_now"
                                 :clearable="false"
-                                format='yyyy-MM-dd HH:mm'
+                                format='yyyy-MM-dd'
+                                @change='scsVal'
                                 :editable="false"
-                                type="datetime"
+                                type="date"
                                 placeholder="选择日期时间"
                                 @focus="focSta=true"
                                 @blur="focSta=false"
@@ -165,10 +169,11 @@
                             <el-date-picker
                                 v-model="time_now_no"
                                 :clearable="false"
-                                type="datetime"
+                                type="date"
+                                @change="cancelVal"
                                 @focus="focSta=true"
                                 :editable="false"
-                                format='yyyy-MM-dd HH:mm'
+                                format='yyyy-MM-dd'
                                 @blur="focSta=false"
                                 placeholder="请选择时间">
                             </el-date-picker>
@@ -334,9 +339,35 @@ export default {
             }
         },
 
+        // 成功/取消  列表查询
+        scsVal(val){
+            this.searchList(this.$regular.timeData(val,2),1)
+        },
+        cancelVal(val){
+            this.searchList(this.$regular.timeData(val,2),2)
+        },
+        searchList(val,type){
+            let data = {
+                queryTime:val,
+                type:type==1?1:2
+            }
+            this.$post(`/merchant/store/ly/storeLyListBySuccessOrOff`,data).then(res=>{
+                if(res.code == 0){
+                    if(type == 1){
+                        this.successList = res.data.lyList
+                        this.successVieList = res.data.vieList
+                        this.suc_type == 1?this.showSuccess = this.successList : this.showSuccess = this.successVieList
+                    }else{
+                        this.cancelList = res.data.lyList
+                    }
+                }else{
+                    this.$message.error(res.data);
+                }
+            })        
+        },
+
         // 确定
         ensure(val,type){
-            // this.callNext = false
             this.$get(`/merchant/store/ly/calling/${val.id}/${type}`).then(res=>{
                 if(res.code == 0){
                     this.getData()
@@ -344,7 +375,7 @@ export default {
                     this.$message.error(res.data);
                 }
             })
-
+            // this.callNext = false
             // for(let i=0;i<this.nowNumList.length;i++){
             //     if(val.id == this.nowNumList[i].id){
             //         this.nowNumList.splice(i,1)
@@ -361,7 +392,8 @@ export default {
                     nextId = this.robList[1].id
                     nextType = 2
                 }else{
-                    if(rowList[0]){
+                    
+                    if(this.rowList[0]){
                         nextId = this.rowList[0].id
                         nextType = 1
                     }else{
@@ -371,7 +403,11 @@ export default {
                 }
             }else{
                 // 当前时排号
-                if(rowList[1]){
+                if(this.robList[0]){
+                    // 如果抢座还有订单
+                    nextId = this.robList[0].id
+                    nextType = 2
+                }else if(this.rowList[1]){
                     nextId = this.rowList[1].id
                     nextType = 1
                 }else{
@@ -398,18 +434,20 @@ export default {
             // this.nowNumList[0] = this.nowNumList.splice(1,1,this.nowNumList[0])[0]
         },
         // 取消
-        fail(val){
-            // this.callNext = false
-            for(let i=0;i<this.nowNumList.length;i++){
-                // if(val.id == this.nowNumList[i].id){
-                //     this.nowNumList.splice(i,1)
-                // }
+        fail(val,type){
+            this.$get(`/merchant/store/ly/cancelCalling/${val.id}/${type}`).then(res=>{
                 if(res.code == 0){
                     this.getData()
                 }else{
                     this.$message.error(res.data);
                 }
-            }
+            })  
+            // this.callNext = false
+            // for(let i=0;i<this.nowNumList.length;i++){
+                // if(val.id == this.nowNumList[i].id){
+                //     this.nowNumList.splice(i,1)
+                // }
+            // }
         },
         // 根据时间排序
         sortArr(a,b){
@@ -465,10 +503,18 @@ export default {
                         status = paihao[0].callStatus
                     }
                 }else if(qiangzuo.length > 1 && qiangzuo[0].continuationStatus == 1){
+
                     // 抢座长度>1且 第一条处于续牌状态  再次点击下一位时  传抢座的第2条
-                    id = qiangzuo[1].id
-                    type = 2
-                    status = qiangzuo[1].callStatus
+
+                    if(qiangzuo[1].continuationStatus == 1){
+                        id = qiangzuo[1].id
+                        type = 2
+                        status = qiangzuo[1].callStatus
+                    }else{
+                        id = qiangzuo[0].id
+                        type = 2
+                        status = qiangzuo[0].callStatus
+                    }
                 }
                 else{
                     id = qiangzuo[0].id
@@ -535,6 +581,10 @@ export default {
 @font-size:12px;
 @bor-color:rgb(97, 97, 97);
 #numeral{
+    .container{
+        padding: 0;
+        padding-top: 0;
+    }
     font-size: @font-size;
     .tit_top{
         border-radius: 5px;
@@ -552,8 +602,19 @@ export default {
             }
         }
     }
+    .position{
+        position: fixed;
+        width: 84%;
+        background: white;
+        z-index: 2222;
+        padding: 20px 0;
+        padding-left: 15px;
+        box-shadow: 0 1px 3px #ececec;
+    }
     .numeral_list{
-        margin-top: 20px;
+        margin-top: 220px;
+        // margin-top: 20px;
+        padding: 15px;
         display: flex;
         .fl_box{
             flex: 1;
@@ -742,7 +803,7 @@ ul,li{
     padding-right: 0;
 }
 /deep/ .el-date-editor{
-    width: 160px;
+    width: 115px;
 }
 /deep/ .el-input__prefix{
     display: none;
