@@ -55,7 +55,7 @@
         <div class="right-box vip-card">
             <!-- 缩略图 -->
             <div class="thum">
-                <span>商品缩略图：</span>
+                <!-- <span>商品缩略图：</span>
                 <div class="image-box" v-if="thumImageBox">
                     <img
                         ref="thumImg"
@@ -64,7 +64,7 @@
                         v-for="(item, index) in thumImageBox"
                         :key="index"
                     />
-                </div>
+                </div> -->
                 <!-- <el-upload
                     class="avatar-uploader"
                     action="1"

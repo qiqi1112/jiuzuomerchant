@@ -153,7 +153,7 @@
                                 ></el-time-select>
                             </div>
                         </div>
-                        <!-- 店铺人均消费  type="number"-->
+                        <!-- 店铺人均消费 -->
                         <div class="per-con">
                             <p>店铺人均消费</p>
                             <el-input
