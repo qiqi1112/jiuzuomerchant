@@ -210,6 +210,7 @@ export default {
                 this.$post('/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
                     if (res.code == 0) {
                         this.options = res.data;
+                        console.log('xxs', res);
                     } else {
                         this.$message.error(res.msg);
                     }
