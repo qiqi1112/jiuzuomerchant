@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <p>
-                    <span>商品包含：</span>
+                    <span>商品简介：</span>
                     <el-input type="textarea" v-model="otherForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p class="drinks-spec">

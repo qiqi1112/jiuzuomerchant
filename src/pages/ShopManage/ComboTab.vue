@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <p>
-                    <span>套餐包含：</span>
+                    <span>套餐简介：</span>
                     <el-input type="textarea" v-model="comboForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p>
@@ -40,7 +40,12 @@
                         <!-- <el-table-column prop="presentPrice" label="现价" width="100"></el-table-column> -->
                         <el-table-column label="数量" width="160">
                             <template slot-scope="scope">
-                                <el-input-number v-model="scope.row.number" :min="1" label="商品数量"></el-input-number>
+                                <el-input-number
+                                    @change="goodsPriceSum"
+                                    v-model="scope.row.number"
+                                    :min="1"
+                                    label="商品数量"
+                                ></el-input-number>
                             </template>
                         </el-table-column>
                         <el-table-column label="操作">
@@ -52,9 +57,9 @@
                 </p>
                 <p>
                     <span>套餐原单价：</span>
-                    <el-input v-model="comboForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
-                    <!-- <span>套餐现单价：</span>
-                    <el-input v-model="comboForm.nowPrice" style="width: 120px"></el-input> -->
+                    <el-input v-model="comboForm.originPrice" style="width: 120px; margin-right: 20px" readonly></el-input>
+                    <span>套餐现单价：</span>
+                    <el-input v-model="comboForm.nowPrice" style="width: 120px"></el-input>
                 </p>
                 <p class="combo-spec">
                     <span>套餐规格：</span>
@@ -132,7 +137,7 @@ export default {
                 name: '',
                 weight: 0,
                 desc: '',
-                originPrice: '',
+                originPrice: '0.00',
                 nowPrice: '',
                 checkedBanner: false,
                 bannerImageUrl: '', //广告图
@@ -179,6 +184,8 @@ export default {
             }
         },
 
+        //
+
         //处理当前选中的商品信息
         selectGoodInfo() {
             let goodInfoArr = this.goodName.split('+'); //将字符串拆分成数组
@@ -194,9 +201,28 @@ export default {
             };
 
             this.comboForm.goodsIdList.push(goodInfoArr[0]); //存入当前选择的商品id
+
             this.comboForm.tableData.push(obj); //存入当前选择的商品所有信息，用于表格回显
+
+            this.goodsPriceSum();
+
             this.goodName = ''; //清空选择的选项
             this.selectGoodsList(); //重新请求商品列表
+        },
+
+        //套餐价格求和
+        goodsPriceSum() {
+            //计算套餐原价（所有单品原价之和）
+            this.comboForm.originPrice = this.comboForm.tableData
+                .map((item) => item.originalPrice * item.number)
+                .reduce((prev, item) => prev + item, 0)
+                .toFixed(2);
+
+            //计算套餐现价（所有单品现价之和）
+            this.comboForm.nowPrice = this.comboForm.tableData
+                .map((item) => item.presentPrice * item.number)
+                .reduce((prev, item) => prev + item, 0)
+                .toFixed(2);
         },
 
         //请求商品列表
@@ -207,6 +233,7 @@ export default {
                     goodsIdList: this.comboForm.goodsIdList,
                     name: this.goodName
                 };
+
                 this.$post('/merchant/store/goods/setMealSelectGoodsList', data).then((res) => {
                     if (res.code == 0) {
                         this.options = res.data;
@@ -230,6 +257,7 @@ export default {
                     this.comboForm.goodsIdList.forEach((item, i) => {
                         if (row.goodsId == item) {
                             this.comboForm.goodsIdList.splice(i, 1);
+                            this.goodsPriceSum();
                         }
                     });
                 }

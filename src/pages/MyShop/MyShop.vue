@@ -1475,7 +1475,9 @@ export default {
 
         //编辑商铺信息
         editShopInfo() {
-            this.storeRecommendType();
+            console.log(this.shopLoca);
+
+            this.storeRecommendType(); //获取申请商家推荐状态
             this.editShopInit(); //初始化操作
             this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
             this.getShopType(); //获取店铺类型
@@ -1893,7 +1895,6 @@ export default {
                     this.$refs.shopLoca.forEach((item) => {
                         item.classList.remove('shop-loca-span'); //清空所选店铺的样式
                     });
-
                     switch (this.shopLocaIndex) {
                         case 1:
                             this.$refs.shopLoca[0].classList.add('shop-loca-span');
@@ -2184,6 +2185,7 @@ export default {
                 filterModule: index
             };
             this.$post('/merchant/store/screening/apiList', data).then((res) => {
+                console.log('xxxx', res.data);
                 if (res.data) {
                     this.shopTypeOpt = res.data.storeScreeningDTOS;
                     //回显店铺类型

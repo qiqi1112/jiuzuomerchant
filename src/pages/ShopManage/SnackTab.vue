@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <p>
-                    <span>小吃包含：</span>
+                    <span>小吃简介：</span>
                     <el-input type="textarea" v-model="snackForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p class="drinks-spec">

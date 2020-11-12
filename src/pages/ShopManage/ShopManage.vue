@@ -205,7 +205,7 @@ export default {
                 name: '',
                 weight: 0,
                 desc: '',
-                originPrice: '',
+                originPrice: '0.00',
                 nowPrice: '',
                 checkedBanner: false,
                 bannerImageUrl: '', //广告图
@@ -395,6 +395,7 @@ export default {
                                 this.$message.error(res.msg);
                             }
                             this.cancelDelete();
+                            console.log(res);
                         });
                     })
                     .catch(() => {
@@ -440,7 +441,7 @@ export default {
             this.clearVipCardForm();
         },
 
-        //添加/修改套餐
+        //添加/修改商品
         setGoodsInfo(active) {
             //验证是否上传广告位图
             // if (this.comboForm.checkedBanner == 1) {
@@ -467,7 +468,7 @@ export default {
                     goodsSort: this.comboForm.weight,
                     synopsis: this.comboForm.desc,
                     originalPrice: this.comboForm.originPrice,
-                    presentPrice: this.comboForm.nowPrice,
+                    statisticalPrice: this.comboForm.nowPrice,
                     recommendAdStatus: this.comboForm.checkedBanner,
                     recommendStatus: 2,
                     recommendAdPicture: this.comboForm.bannerImageUrl,
@@ -546,8 +547,8 @@ export default {
                     name: this.vipCardForm.name,
                     goodsSort: this.vipCardForm.weight,
                     synopsis: this.vipCardForm.desc,
-                    originalPrice: this.vipCardForm.integral,
-                    presentPrice: this.vipCardForm.nowPrice,
+                    originalPrice: this.vipCardForm.nowPrice,
+                    presentPrice: this.vipCardForm.integral,
                     recommendAdStatus: this.vipCardForm.checkedBanner,
                     recommendStatus: 2,
                     recommendAdPicture: this.vipCardForm.bannerImageUrl,
@@ -659,19 +660,13 @@ export default {
             this.comboForm.weight = data.goodsSort;
             this.comboForm.desc = data.synopsis;
             this.comboForm.originPrice = data.originalPrice;
-            this.comboForm.nowPrice = data.presentPrice;
+            this.comboForm.nowPrice = data.statisticalPrice;
             this.comboForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
             this.comboForm.bannerImageUrl = data.recommendAdPicture;
             this.comboForm.thumImageUrl = data.listPicture;
             this.comboForm.detailImageUrl = data.infoPicture;
             this.comboForm.tableData = data.setMealGoodsList;
-
-            let goodsIdArr = [];
-            data.setMealGoodsList.forEach((item) => {
-                goodsIdArr.push(item.goodsId);
-            });
-
-            this.comboForm.goodsIdList = goodsIdArr;
+            this.comboForm.goodsIdList = data.setMealGoodsList.map((item) => item.goodsId);
         },
 
         //传值给酒水子组件
@@ -727,8 +722,8 @@ export default {
             this.vipCardForm.name = data.name;
             this.vipCardForm.weight = data.goodsSort;
             this.vipCardForm.desc = data.synopsis;
-            this.vipCardForm.integral = data.originalPrice;
-            this.vipCardForm.nowPrice = data.presentPrice;
+            this.vipCardForm.integral = data.presentPrice;
+            this.vipCardForm.nowPrice = data.originalPrice;
             this.vipCardForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
             this.vipCardForm.bannerImageUrl = data.recommendAdPicture;
             this.vipCardForm.thumImageUrl = data.listPicture;
@@ -775,7 +770,7 @@ export default {
             this.comboForm.name = '';
             this.comboForm.weight = 0;
             this.comboForm.desc = '';
-            this.comboForm.originPrice = '';
+            this.comboForm.originPrice = '0.00';
             this.comboForm.nowPrice = '';
             this.comboForm.checkedBanner = false;
             this.comboForm.bannerImageUrl = '';

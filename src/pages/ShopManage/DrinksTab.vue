@@ -16,7 +16,7 @@
                     <span>（*数值越小排序越靠前）</span>
                 </p>
                 <p>
-                    <span>酒水包含：</span>
+                    <span>酒水简介：</span>
                     <el-input type="textarea" v-model="drinksForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p class="drinks-spec">

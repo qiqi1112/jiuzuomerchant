@@ -4,21 +4,12 @@
             <div class="ms-title">后台管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input
-                        v-model="param.username"
-                        placeholder="username"
-                        @keyup.enter.native="submitForm()"
-                    >
+                    <el-input v-model="param.username" placeholder="username" @keyup.enter.native="submitForm()">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input
-                        type="password"
-                        placeholder="password"
-                        v-model="param.password"
-                        @keyup.enter.native="submitForm()"
-                    >
+                    <el-input type="password" placeholder="password" v-model="param.password" @keyup.enter.native="submitForm()">
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
@@ -36,7 +27,7 @@ export default {
     data: function () {
         return {
             param: {
-                username: '14781828227',
+                username: '14781828229',
                 password: '123456'
             },
             rules: {
@@ -47,44 +38,26 @@ export default {
     },
     methods: {
         submitForm() {
-            // this.$refs.login.validate((valid) => {
-            //     if (valid) {
-            //         let data = {
-            //             nameOrPhone: this.param.username,
-            //             password: this.param.password
-            //         };
-            //         this.$message.success('登录成功');
-            //         localStorage.setItem('userInfo', JSON.stringify(data));
-            //         this.$router.push('/');
-            //     } else {
-            //         this.$message.error('请输入账号和密码');
-            //         console.log('error submit!!');
-            //         return false;
-            //     }
-            // });
-
             let data = {
                 loginNameOrPhone: this.param.username,
                 loginPassword: this.param.password
             };
-            this.$post('/merchant/store/login', data).then(
-                (res) => {
-                    if (res.code == 0) {
-                        let obj = {
-                            id : res.data.id,
-                            loginName: res.data.loginName,
-                            token: res.data.token
-                        };
+            this.$post('/merchant/store/login', data).then((res) => {
+                if (res.code == 0) {
+                    let obj = {
+                        id: res.data.id,
+                        loginName: res.data.loginName,
+                        token: res.data.token
+                    };
 
-                        localStorage.setItem('userInfo', JSON.stringify(obj));
-                        this.$message.success('登录成功');
-                        this.$router.push('/index');
-                    } else {
-                        this.$message.error(res.msg);
-                        return false;
-                    }
+                    localStorage.setItem('userInfo', JSON.stringify(obj));
+                    this.$message.success('登录成功');
+                    this.$router.push('/index');
+                } else {
+                    this.$message.error(res.msg);
+                    return false;
                 }
-            );
+            });
         }
     }
 };
