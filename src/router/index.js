@@ -107,6 +107,27 @@ export default new Router({
                         title: '设置'
                     }
                 },
+                {
+                    path: '/entrepotManage',
+                    component: () => import('../pages/EntrepotManage/EntrepotManage.vue'),
+                    meta: {
+                        title: '仓库管理'
+                    }
+                },
+                {
+                    path: '/staffManage',
+                    component: () => import('../pages/StaffManage/StaffManage.vue'),
+                    meta: {
+                        title: '员工管理'
+                    }
+                },
+                {
+                    path: '/financeManage',
+                    component: () => import('../pages/FinanceManage/FinanceManage.vue'),
+                    meta: {
+                        title: '财务管理'
+                    }
+                },
 
                 
                 {

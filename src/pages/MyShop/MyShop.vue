@@ -2098,6 +2098,8 @@ export default {
 
         //回显店铺数据
         getStoreInfo() {
+            this.wrapLoading = true;
+
             this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     let result = res.data;
@@ -2152,6 +2154,8 @@ export default {
 
                     //座位属性回显
                     this.showSeatAtt();
+
+                    this.wrapLoading = false;
 
                     console.log('当前店铺数据', res.data);
                 } else if (res.code == 600) {

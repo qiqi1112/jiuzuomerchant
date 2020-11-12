@@ -110,6 +110,21 @@ export default {
                     icon: 'el-icon-lx-commentfill',
                     index: 'setting',
                     title: '设置'
+                },
+                {
+                    icon: 'el-icon-lx-commentfill',
+                    index: 'entrepotManage',
+                    title: '仓库管理'
+                },
+                {
+                    icon: 'el-icon-lx-commentfill',
+                    index: 'staffManage',
+                    title: '员工管理'
+                },
+                {
+                    icon: 'el-icon-lx-commentfill',
+                    index: 'financeManage',
+                    title: '财务管理'
                 }
                 // {
                 //     icon: 'el-icon-s-flag',
