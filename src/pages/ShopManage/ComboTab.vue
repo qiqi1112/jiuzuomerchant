@@ -28,7 +28,7 @@
                         ></el-option>
                     </el-select>
                 </p>
-                <p style="width: 82%" v-if="comboForm.tableData.length > 0">
+                <p style="width: 93%" v-if="comboForm.tableData.length > 0">
                     <el-table :data="comboForm.tableData" border>
                         <el-table-column prop="goodsName" label="商品名称" width="150"></el-table-column>
                         <el-table-column label="商品图片" width="126">
@@ -78,7 +78,7 @@
             <!-- 广告图 -->
             <el-upload
                 v-if="comboForm.checkedBanner && comboForm.checkedBanner !== 2"
-                class="avatar-uploader"
+                class="avatar-uploader banner-img-box"
                 action="1"
                 :show-file-list="false"
                 :http-request="uploadBannerFiles"
@@ -87,29 +87,32 @@
                 <img v-if="comboForm.bannerImageUrl" :src="showImgPrefix + comboForm.bannerImageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
-            <span>（*如需商店轮播推荐，请添加广告图片）</span>
+            <span v-if="comboForm.checkedBanner">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
         </div>
         <div class="right-box">
             <!-- 缩略图 -->
-            <p>
-                <span>套餐缩略图：</span>
-                <el-upload
-                    class="avatar-uploader"
-                    action="1"
-                    :show-file-list="false"
-                    :http-request="uploadThumFiles"
-                    :on-error="uploadError"
-                >
-                    <img v-if="comboForm.thumImageUrl" :src="showImgPrefix + comboForm.thumImageUrl" class="avatar" />
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                </el-upload>
-            </p>
+            <div class="thum-img-box">
+                <p>
+                    <span>套餐缩略图：</span>
+                    <el-upload
+                        class="avatar-uploader"
+                        action="1"
+                        :show-file-list="false"
+                        :http-request="uploadThumFiles"
+                        :on-error="uploadError"
+                    >
+                        <img v-if="comboForm.thumImageUrl" :src="showImgPrefix + comboForm.thumImageUrl" class="avatar" />
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                </p>
+                <!-- <span>（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span> -->
+            </div>
 
             <!-- 详情图 -->
             <p>
                 <span>套餐详情图：</span>
                 <el-upload
-                    class="avatar-uploader"
+                    class="avatar-uploader detail-img-box"
                     action="1"
                     :show-file-list="false"
                     :http-request="uploadDetailFiles"

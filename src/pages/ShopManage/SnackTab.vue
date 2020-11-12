@@ -63,7 +63,7 @@
             <!-- 广告图 -->
             <el-upload
                 v-if="snackForm.checkedBanner && snackForm.checkedBanner !== 2"
-                class="avatar-uploader"
+                class="avatar-uploader banner-img-box"
                 action="1"
                 :show-file-list="false"
                 :http-request="uploadBannerFiles"
@@ -72,7 +72,7 @@
                 <img v-if="snackForm.bannerImageUrl" :src="showImgPrefix + snackForm.bannerImageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
-            <span>（*如需商店轮播推荐，请添加广告图片）</span>
+            <span v-if="snackForm.checkedBanner">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
         </div>
         <div class="right-box">
             <!-- 缩略图 -->
@@ -93,7 +93,7 @@
             <p>
                 <span>小吃详情图：</span>
                 <el-upload
-                    class="avatar-uploader"
+                    class="avatar-uploader detail-img-box"
                     action="1"
                     :show-file-list="false"
                     :http-request="uploadDetailFiles"

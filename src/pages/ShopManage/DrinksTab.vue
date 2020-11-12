@@ -72,7 +72,7 @@
                     <div class="drinks-div">
                         <el-upload
                             v-if="drinksForm.checkedBanner && drinksForm.checkedBanner !== 2"
-                            class="avatar-uploader"
+                            class="avatar-uploader banner-img-box"
                             action="1"
                             :show-file-list="false"
                             :http-request="uploadBannerFiles"
@@ -82,27 +82,30 @@
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
 
-                        <span>（*如需商店轮播推荐，请添加广告图片）</span>
+                        <span v-if="drinksForm.checkedBanner">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
                     </div>
                 </div>
 
                 <!-- 商家推荐位 -->
                 <div class="reco-box">
-                    <el-checkbox
-                        @change="removeReco"
-                        v-model="drinksForm.checkedReco"
-                        label="放至商家推荐位"
-                        border
-                        style="width: 88%; margin-bottom: 20px"
-                    ></el-checkbox>
-                    <div v-if="drinksForm.checkedReco && drinksForm.checkedReco !== 2">
-                        <span>推荐位排序：</span>
-                        <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>
+                    <div class="reco-top-box">
+                        <el-checkbox
+                            @change="removeReco"
+                            v-model="drinksForm.checkedReco"
+                            label="放至商家推荐位"
+                            border
+                            style="margin-right: 20px"
+                        ></el-checkbox>
+                        <div v-if="drinksForm.checkedReco && drinksForm.checkedReco !== 2">
+                            <el-input-number v-model="drinksForm.recoWeight" :min="0" label="推荐位排序"></el-input-number>
+                            <span style="margin-left: 10px">推荐位排序</span>
+                        </div>
                     </div>
+
                     <div class="drinks-div">
                         <el-upload
                             v-if="drinksForm.checkedReco && drinksForm.checkedReco !== 2"
-                            class="avatar-uploader"
+                            class="avatar-uploader reco-img-box"
                             action="1"
                             :show-file-list="false"
                             :http-request="uploadRecoFiles"
@@ -111,7 +114,7 @@
                             <img v-if="drinksForm.recoImageUrl" :src="showImgPrefix + drinksForm.recoImageUrl" class="avatar" />
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
-                        <span>（*如需商家推荐，请添加推荐位图片）</span>
+                        <span v-if="drinksForm.checkedReco">（*如需商家推荐，请添加推荐位图片 120*160）</span>
                     </div>
                 </div>
             </div>
@@ -135,7 +138,7 @@
             <p>
                 <span>酒水详情图：</span>
                 <el-upload
-                    class="avatar-uploader"
+                    class="avatar-uploader detail-img-box"
                     action="1"
                     :show-file-list="false"
                     :http-request="uploadDetailFiles"

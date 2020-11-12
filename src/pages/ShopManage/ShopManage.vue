@@ -652,6 +652,7 @@ export default {
         //标签页切换事件
         handleClick(tab, event) {
             this.activeNum = Number(tab.index) + 1;
+            this.clearAllForm();
         },
 
         //传值给套餐子组件
@@ -997,22 +998,106 @@ export default {
             display: block;
         }
 
+        .right-box {
+            width: 30%;
+
+            .detail-img-box {
+                .el-upload--text {
+                    width: 300px !important;
+                }
+
+                .avatar-uploader-icon {
+                    font-size: 28px;
+                    color: #8c939d;
+                    width: 300px;
+                    line-height: 140px;
+                    text-align: center;
+                }
+
+                .avatar {
+                    width: 300px;
+                    display: block;
+                }
+            }
+
+            .thum-img-box {
+                margin-bottom: 30px;
+
+                > p {
+                    margin-bottom: 0;
+
+                    > span {
+                    }
+                }
+            }
+        }
+
         .left-box {
-            width: 70%;
+            width: 53%;
+
+            .banner-img-box {
+                .el-upload--text {
+                    width: 350px !important;
+                    height: 120px !important;
+                }
+
+                .avatar-uploader-icon {
+                    font-size: 28px;
+                    color: #8c939d;
+                    width: 350px;
+                    height: 120px;
+                    line-height: 120px;
+                    text-align: center;
+                }
+
+                .avatar {
+                    width: 350px;
+                    height: 120px;
+                    display: block;
+                }
+            }
         }
 
         .left-box.drinks {
-            width: 70%;
+            width: 58%;
 
             .drinks-update-box {
                 display: flex;
 
                 .banner-box {
-                    width: 60%;
+                    width: 50%;
                 }
 
                 .drinks-div {
                     margin-top: 20px;
+
+                    .reco-img-box {
+                        .el-upload--text {
+                            width: 120px !important;
+                            height: 160px !important;
+                        }
+
+                        .avatar-uploader-icon {
+                            font-size: 28px;
+                            color: #8c939d;
+                            width: 120px;
+                            height: 160px;
+                            line-height: 160px;
+                            text-align: center;
+                        }
+
+                        .avatar {
+                            width: 120px;
+                            height: 160px;
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            .reco-box {
+                .reco-top-box {
+                    display: flex;
                 }
             }
         }

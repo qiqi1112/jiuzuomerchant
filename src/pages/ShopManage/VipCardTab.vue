@@ -41,7 +41,7 @@
             <!-- 广告图 -->
             <el-upload
                 v-if="vipCardForm.checkedBanner && vipCardForm.checkedBanner !== 2"
-                class="avatar-uploader"
+                class="avatar-uploader banner-img-box"
                 action="1"
                 :show-file-list="false"
                 :http-request="uploadBannerFiles"
@@ -50,7 +50,7 @@
                 <img v-if="vipCardForm.bannerImageUrl" :src="showImgPrefix + vipCardForm.bannerImageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
-            <span>（*如需商店轮播推荐，请添加广告图片）</span>
+            <span v-if="vipCardForm.checkedBanner">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
         </div>
         <div class="right-box vip-card">
             <!-- 缩略图 -->
@@ -81,7 +81,7 @@
             <!-- <p>
                 <span>商品详情图：</span>
                 <el-upload
-                    class="avatar-uploader"
+                    class="avatar-uploader detail-img-box"
                     action="1"
                     :show-file-list="false"
                     :http-request="uploadDetailFiles"
