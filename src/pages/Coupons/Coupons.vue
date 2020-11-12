@@ -363,7 +363,7 @@ export default {
             from.forEach(i=>{
                 let str = ''
                 if(this.form.region == 1){
-                    str = `直接抵扣${i.minus}`
+                    str = `直接抵扣${i.minus}元`
                 }else if(this.form.region == 2){
                     str = `满${i.full}元减${i.minus}元`
                 }else{
