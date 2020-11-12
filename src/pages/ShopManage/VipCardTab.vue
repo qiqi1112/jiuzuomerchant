@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <p>
-                    <span>商品包含：</span>
+                    <span>商品简介：</span>
                     <el-input type="textarea" v-model="vipCardForm.desc" style="width: 300px"></el-input>
                 </p>
                 <p>
@@ -76,8 +76,9 @@
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload> -->
             </div>
+
             <!-- 详情图 -->
-            <p>
+            <!-- <p>
                 <span>商品详情图：</span>
                 <el-upload
                     class="avatar-uploader"
@@ -89,7 +90,7 @@
                     <img v-if="vipCardForm.detailImageUrl" :src="showImgPrefix + vipCardForm.detailImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-            </p>
+            </p> -->
         </div>
     </div>
 </template>
