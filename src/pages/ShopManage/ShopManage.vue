@@ -11,8 +11,8 @@
             <div class="head-handle clearfix">
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
-                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd">添加商品</el-button>
-                    <el-button type="danger" icon="el-icon-delete" @click="handleDelAll">批量删除</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort">添加商品</el-button>
+                    <el-button type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
@@ -23,93 +23,44 @@
                     <el-tabs v-if="isUpdate" v-model="editActiveName">
                         <!-- 套餐标签页 -->
                         <el-tab-pane v-if="editActiveName == 'editCombo'" label="套餐" name="editCombo">
-                            <span class="add-classify-title goods-info">商品信息</span>
                             <combo-tab :comboFormParent="comboForm" @comboFormChild="getChildComboForm"></combo-tab>
                         </el-tab-pane>
 
                         <!-- 酒水标签页 -->
                         <el-tab-pane v-if="editActiveName == 'editDrinks'" label="酒水" name="editDrinks">
-                            <span class="add-classify-title goods-info">商品信息</span>
                             <drinks-tab :drinksFormParent="drinksForm" @drinksFormChild="getChildDrinksForm"></drinks-tab>
                         </el-tab-pane>
 
                         <!-- 小吃标签页 -->
                         <el-tab-pane v-if="editActiveName == 'editSnack'" label="小吃" name="editSnack">
-                            <span class="add-classify-title goods-info">商品信息</span>
                             <snack-tab :snackFormParent="snackForm" @snackFormChild="getChildSnackForm"></snack-tab>
                         </el-tab-pane>
 
                         <!-- 其他标签页 -->
                         <el-tab-pane v-if="editActiveName == 'editOther'" label="其他" name="editOther">
-                            <span class="add-classify-title goods-info">商品信息</span>
-                            <div>
-                                <other-tab :otherFormParent="otherForm" @otherFormChild="getChildOtherForm"></other-tab>
-                            </div>
+                            <other-tab :otherFormParent="otherForm" @otherFormChild="getChildOtherForm"></other-tab>
                         </el-tab-pane>
 
                         <!-- 会员卡标签页 -->
                         <el-tab-pane v-if="editActiveName == 'editVipCard'" label="会员卡" name="editVipCard">
-                            <span class="add-classify-title goods-info">商品信息</span>
                             <vip-card-tab :vipCardFormParent="vipCardForm" @vipCardFormChild="getChildVipCardForm"></vip-card-tab>
                         </el-tab-pane>
                     </el-tabs>
 
-                    <!-- 点击添加商品时 -->
+                    <!-- 添加商品时 -->
                     <el-tabs v-else v-model="activeName" @tab-click="handleClick">
-                        <!-- 套餐标签页 -->
-                        <el-tab-pane label="套餐" name="combo">
-                            <span class="add-classify-title goods-info">商品信息</span>
-                            <combo-tab
-                                v-if="activeName == 'combo'"
-                                :comboFormParent="comboForm"
-                                @comboFormChild="getChildComboForm"
-                            ></combo-tab>
-                        </el-tab-pane>
-
-                        <!-- 酒水标签页 -->
-                        <el-tab-pane label="酒水" name="drinks">
-                            <span class="add-classify-title goods-info">商品信息</span>
-                            <drinks-tab
-                                v-if="activeName == 'drinks'"
-                                :drinksFormParent="drinksForm"
-                                @drinksFormChild="getChildDrinksForm"
-                            ></drinks-tab>
-                        </el-tab-pane>
-
-                        <!-- 小吃标签页 -->
-                        <el-tab-pane label="小吃" name="snack">
-                            <span class="add-classify-title goods-info">商品信息</span>
-                            <snack-tab
-                                v-if="activeName == 'snack'"
-                                :snackFormParent="snackForm"
-                                @snackFormChild="getChildSnackForm"
-                            ></snack-tab>
-                        </el-tab-pane>
-
-                        <!-- 其他标签页 -->
-                        <el-tab-pane label="其他" name="other">
-                            <span class="add-classify-title goods-info">商品信息</span>
-                            <other-tab
-                                v-if="activeName == 'other'"
-                                :otherFormParent="otherForm"
-                                @otherFormChild="getChildOtherForm"
-                            ></other-tab>
-                        </el-tab-pane>
-
-                        <!-- 会员卡标签页 -->
-                        <el-tab-pane label="会员卡" name="vipCard">
-                            <span class="add-classify-title goods-info">商品信息</span>
-                            <vip-card-tab
-                                v-if="activeName == 'vipCard'"
-                                :vipCardFormParent="vipCardForm"
-                                @vipCardFormChild="getChildVipCardForm"
-                            ></vip-card-tab>
+                        <el-tab-pane :label="item.typeName" :name="item.typeName" v-for="(item, index) in titleArrList" :key="index">
                         </el-tab-pane>
                     </el-tabs>
 
+                    <!-- 标签页组件信息 -->
+                    <template>
+                        <handleShop :goodsForm="goodsForm" :activeNum="activeNum"></handleShop>
+                    </template>
+
                     <span slot="footer" class="dialog-footer">
                         <el-button @click="handleCancel">取 消</el-button>
-                        <el-button type="primary" @click="handleSure">确 定</el-button>
+                        <el-button type="primary" @click="setGoodsInfo">确 定</el-button>
                     </span>
                 </el-dialog>
 
@@ -167,30 +118,21 @@
 </template>
 
 <script>
-import comboTab from './ComboTab';
-import drinksTab from './DrinksTab';
-import snackTab from './SnackTab';
-import otherTab from './OtherTab';
-import vipCardTab from './VipCardTab';
+import handleShop from './handleShop';
 
 export default {
     components: {
-        comboTab,
-        drinksTab,
-        snackTab,
-        otherTab,
-        vipCardTab
+        handleShop
     },
+
     data() {
         return {
-            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
-
+            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片前缀
             searchName: '', //商品名称输入框
-            value: '', //商品酒水分类下拉框
+            value: '', //商品分类下拉框
 
-            dialogVisible: false, //添加商品的对话框
+            dialogVisible: false, //操作商品的对话框开关
             activeName: '', //默认展示的标签页
-            activeNum: '', //标签页对应的下标
             editActiveName: '', //编辑时展示的标签页
 
             // 表格数据分页相关属性
@@ -200,70 +142,30 @@ export default {
 
             goodsData: [], //请求到的商品信息数组
 
-            //套餐标签页表单
-            comboForm: {
-                name: '',
-                weight: 0,
-                desc: '',
-                originPrice: '0.00',
-                nowPrice: '',
-                checkedBanner: false,
-                bannerImageUrl: '', //广告图
-                thumImageUrl: '', //缩略图
-                detailImageUrl: '', //详情图
-                tableData: [], //渲染表格时的所有商品数据
-                goodsIdList: [] //所有已选择的商品对应的id
-            },
+            goodId: '', //当前编辑的商品id
 
-            //酒水标签页表单
-            drinksForm: {
-                name: '',
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                checkedBanner: false,
-                checkedReco: false,
+            activeNum: '', //标签页对应的下标（种类 1-套餐 2-威士忌 3-白兰地 4-伏特加 5-香槟 6-红酒 7-啤酒 8-鸡尾酒 9-小吃 10-其它 11-会员卡）
 
+            //商品信息
+            goodsForm: {
+                name: '', //名称
+                desc: '', //简介
+                originPrice: '', //原价
+                nowPrice: '', //现价
+                comboNowPrice: '', //套餐现价
+                checkedBanner: false, //商家广告banner位开关
+                checkedReco: false, //商家推荐位开关
                 area: '', //产地
                 year: '', //年份
-
                 goodWeight: 0, //商品排序
                 recoWeight: 0, //商家推荐位排序
-                classify: '', //酒水分类
-
                 bannerImageUrl: '', //广告图
                 recoImageUrl: '', //推荐位图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
+                tableData: [], //套餐中渲染单品数据
 
-                //酒水新增规格
-                dynamicValidateForm: {
-                    domains: [
-                        {
-                            spec: '', //规格
-                            originPrice: '', //规格原价
-                            nowPrice: '', //规格现价
-                            skuCode: '' //sku码
-                        }
-                    ]
-                },
-                skuCodeArr: [] //sku码数组
-            },
-
-            //小吃标签页表单
-            snackForm: {
-                name: '',
-                desc: '',
-                weight: 0,
-                originPrice: '',
-                nowPrice: '',
-                checkedBanner: false,
-
-                bannerImageUrl: '', //广告图
-                thumImageUrl: '', //缩略图
-                detailImageUrl: '', //详情图
-
-                //小吃新增规格
+                //新增商品规格
                 dynamicValidateForm: {
                     domains: [
                         {
@@ -274,46 +176,7 @@ export default {
                         }
                     ]
                 },
-                skuCodeArr: [] //sku码数组
-            },
-
-            //其他标签页表单
-            otherForm: {
-                name: '',
-                weight: 0,
-                desc: '',
-                originPrice: '',
-                nowPrice: '',
-                checkedBanner: false,
-                bannerImageUrl: '', //广告图
-                thumImageUrl: '', //缩略图
-                detailImageUrl: '', //详情图
-
-                //其他新增规格
-                dynamicValidateForm: {
-                    domains: [
-                        {
-                            specName: '', //规格
-                            originalPrice: '', //规格原价
-                            presentPrice: '', //规格现价
-                            skuCode: '' //sku码
-                        }
-                    ]
-                },
-                skuCodeArr: [] //sku码数组
-            },
-
-            //会员卡标签页表单
-            vipCardForm: {
-                name: '',
-                weight: 0,
-                desc: '',
-                integral: '', //积分
-                nowPrice: '',
-                checkedBanner: false,
-                bannerImageUrl: '', //广告图
-                thumImageUrl: '', //缩略图
-                detailImageUrl: '' //详情图
+                skuCodeArr: [] //要删除的规格id数组
             },
 
             //商品分类下拉框
@@ -323,28 +186,53 @@ export default {
                     value: 1
                 },
                 {
-                    label: '酒水',
+                    label: '威士忌',
                     value: 2
                 },
                 {
-                    label: '小吃',
+                    label: '白兰地',
                     value: 3
                 },
                 {
-                    label: '其它',
+                    label: '伏特加',
                     value: 4
                 },
                 {
-                    label: '会员卡',
+                    label: '香槟',
                     value: 5
+                },
+                {
+                    label: '红酒',
+                    value: 6
+                },
+                {
+                    label: '啤酒',
+                    value: 7
+                },
+                {
+                    label: '鸡尾酒',
+                    value: 8
+                },
+                {
+                    label: '小吃',
+                    value: 9
+                },
+                {
+                    label: '其它',
+                    value: 10
+                },
+                {
+                    label: '会员卡',
+                    value: 11
                 }
             ],
 
             isUpdate: false, //是否为修改操作
-            goodId: '', //当前编辑的商品id
             isSelect: false, //是否要批量删除
             deleteSelect: [], //批量删除的数组
-            requestStatus: true //请求时的防抖标杆
+            requestStatus: true, //请求时的防抖标杆
+
+            titleArrList: [] //标签页标题信息
         };
     },
 
@@ -375,11 +263,6 @@ export default {
             }
         },
 
-        //批量删除按钮
-        handleDelAll() {
-            this.isSelect = true;
-        },
-
         //确认删除选择的商品
         sureDelAll() {
             if (this.deleteSelect.length > 0) {
@@ -388,7 +271,7 @@ export default {
                 })
                     .then(() => {
                         this.$post('/merchant/store/goods/batchDeleteGoods', this.deleteSelect).then((res) => {
-                            if (res.code == 0) {
+                            if (res.code === 0) {
                                 this.getGoodsInfo();
                                 this.$message.success('删除成功');
                             } else {
@@ -406,15 +289,23 @@ export default {
             }
         },
 
-        //添加商品
-        handleAdd() {
-            this.activeName = 'combo';
-            this.activeNum = 1;
-            this.dialogVisible = true;
-            this.isUpdate = false;
+        //添加商品时的操作
+        getAddGoodsTitleSort() {
+            // 获取添加商品标题排序
+            this.$get('/merchant/store/goods/goodsStoreCount').then((res) => {
+                if (res.code === 0) {
+                    this.titleArrList = res.data;
+                    this.activeName = this.titleArrList[0].typeName;
+                    this.activeNum = this.titleArrList[0].type;
+
+                    this.isUpdate = false;
+                    this.dialogVisible = true;
+                }
+                console.log('标题排序', this.titleArrList);
+            });
         },
 
-        //初始化操作（删除商品相关操作）
+        //删除商品的初始化操作
         cancelDelete() {
             this.deleteSelect = [];
             this.isSelect = false;
@@ -426,7 +317,9 @@ export default {
             this.dialogVisible = false;
             this.activeName = '';
             this.activeNum = '';
+
             this.editActiveName = '';
+
             this.isUpdate = false;
             this.cancelDelete(); //初始化删除商品相关的操作
             this.clearAllForm(); //清空所有表单
@@ -434,139 +327,129 @@ export default {
 
         //清空所有表单
         clearAllForm() {
-            this.clearComboForm();
-            this.clearDrinksForm();
-            this.clearSnackForm();
-            this.clearOtherForm();
-            this.clearVipCardForm();
+            this.goodsForm = {
+                name: '', //名称
+                desc: '', //简介
+                originPrice: '', //原价
+                nowPrice: '', //现价
+                comboNowPrice: '', //套餐现价
+                checkedBanner: false, //商家广告banner位开关
+                checkedReco: false, //商家推荐位开关
+                area: '', //产地
+                year: '', //年份
+                goodWeight: 0, //商品排序
+                recoWeight: 0, //商家推荐位排序
+                bannerImageUrl: '', //广告图
+                recoImageUrl: '', //推荐位图
+                thumImageUrl: '', //缩略图
+                detailImageUrl: '', //详情图
+                tableData: [], //套餐中渲染单品数据
+                goodsIdList: [], //所有已选择的商品对应的id
+
+                //新增商品规格
+                dynamicValidateForm: {
+                    domains: [
+                        {
+                            specName: '', //规格
+                            originalPrice: '', //规格原价
+                            presentPrice: '', //规格现价
+                            skuCode: '' //sku码
+                        }
+                    ]
+                },
+                skuCodeArr: [] //要删除的规格id数组
+            };
+        },
+
+        //标签页切换事件
+        handleClick(tab, event) {
+            //获取当前点击的标签页所对应的接口里的种类下标
+            this.titleArrList.forEach((item) => {
+                if (item.typeName == tab.name) {
+                    this.activeNum = item.type;
+                }
+            });
+
+            console.log('切换标签页操作', this.activeNum, this.activeName);
+            this.clearAllForm();
+        },
+
+        //单个商品删除
+        handleDelete(id) {
+            this.$confirm('确认要删除此商品吗?', '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
+                        if (res.code === 0) {
+                            this.getGoodsInfo(); //重新请求数据
+                            this.$message.success('删除成功');
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    });
+                })
+                .catch(() => {});
+        },
+
+        //获取所有商品信息
+        getGoodsInfo() {
+            let data = {
+                pageNo: this.currentPage,
+                pageSize: this.pagesize,
+                type: this.value,
+                name: this.searchName
+            };
+            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
+                if (res.code === 0) {
+                    this.dataListCount = res.data.total; //总数据条数
+                    this.goodsData = res.data.list; //所有数据
+                    this.requestStatus = true; //防抖开关
+                }
+            });
+        },
+
+        //添加/修改商品时对部分属性的修改
+        updateProp() {
+            if (this.activeNum != 1 && this.activeNum != 11) {
+                this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
+            }
+            this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2); //广告位
+            this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2); //推荐位
         },
 
         //添加/修改商品
         setGoodsInfo(active) {
-            //验证是否上传广告位图
-            // if (this.comboForm.checkedBanner == 1) {
-            //     if (!this.comboForm.bannerImageUrl) {
-            //         this.$message.error('请上传广告图片');
-            //         return;
-            //     }
-            // }
+            this.updateProp(); //修改部分属性
 
-            // //验证是否上传推荐位图
-            // if (this.drinksForm.checkedReco == 1) {
-            //     if (!this.drinksForm.recoImageUrl) {
-            //         this.$message.error('请上传推荐图片');
-            //         return;
-            //     }
-            // }
+            let data = {
+                listPicture: this.goodsForm.thumImageUrl,
+                name: this.goodsForm.name,
+                originalPrice: this.goodsForm.originPrice,
+                recommendAdStatus: this.goodsForm.checkedBanner,
+                recommendStatus: this.goodsForm.checkedReco,
+                synopsis: this.goodsForm.desc,
+                type: this.activeNum,
+                area: this.goodsForm.area,
+                deleteSkuList: this.goodsForm.skuCodeArr,
+                goodsSort: this.goodsForm.goodWeight,
+                id: this.goodId,
+                infoPicture: this.goodsForm.detailImageUrl,
+                presentPrice: this.goodsForm.nowPrice,
+                recommendAdPicture: this.goodsForm.bannerImageUrl,
+                recommendPicture: this.goodsForm.recoImageUrl,
+                recommendPictureSort: this.goodsForm.recoWeight,
+                setMealGoodsList: this.goodsForm.tableData,
+                skuList: this.goodsForm.dynamicValidateForm.domains,
+                statisticalPrice: this.goodsForm.comboNowPrice,
+                year: this.goodsForm.year
+            };
 
-            let data = {};
-
-            if (active === 'combo') {
-                data = {
-                    type: this.activeNum,
-                    name: this.comboForm.name,
-                    goodsSort: this.comboForm.weight,
-                    synopsis: this.comboForm.desc,
-                    originalPrice: this.comboForm.originPrice,
-                    statisticalPrice: this.comboForm.nowPrice,
-                    recommendAdStatus: this.comboForm.checkedBanner,
-                    recommendStatus: 2,
-                    recommendAdPicture: this.comboForm.bannerImageUrl,
-                    listPicture: this.comboForm.thumImageUrl,
-                    infoPicture: this.comboForm.detailImageUrl,
-                    setMealGoodsList: this.comboForm.tableData,
-                    id: this.goodId
-                };
-            }
-
-            if (active === 'drinks') {
-                data = {
-                    area: this.drinksForm.area,
-                    year: this.drinksForm.year,
-                    infoPicture: this.drinksForm.detailImageUrl,
-                    listPicture: this.drinksForm.thumImageUrl,
-                    name: this.drinksForm.name,
-                    originalPrice: this.drinksForm.originPrice,
-                    presentPrice: this.drinksForm.nowPrice,
-                    recommendAdStatus: this.drinksForm.checkedBanner,
-                    recommendStatus: this.drinksForm.checkedReco,
-                    synopsis: this.drinksForm.desc,
-                    type: this.activeNum,
-                    category: this.drinksForm.classify,
-                    goodsSort: this.drinksForm.goodWeight,
-                    recommendAdPicture: this.drinksForm.bannerImageUrl,
-                    recommendPicture: this.drinksForm.recoImageUrl,
-                    recommendPictureSort: this.drinksForm.recoWeight,
-                    skuList: this.drinksForm.dynamicValidateForm.domains,
-                    deleteSkuList: this.drinksForm.skuCodeArr,
-                    id: this.goodId
-                };
-            }
-
-            if (active === 'snack') {
-                data = {
-                    type: this.activeNum,
-                    name: this.snackForm.name,
-                    goodsSort: this.snackForm.weight,
-                    synopsis: this.snackForm.desc,
-                    originalPrice: this.snackForm.originPrice,
-                    presentPrice: this.snackForm.nowPrice,
-                    recommendAdStatus: this.snackForm.checkedBanner,
-                    recommendStatus: 2,
-                    recommendAdPicture: this.snackForm.bannerImageUrl,
-                    listPicture: this.snackForm.thumImageUrl,
-                    infoPicture: this.snackForm.detailImageUrl,
-                    skuList: this.snackForm.dynamicValidateForm.domains,
-                    deleteSkuList: this.snackForm.skuCodeArr,
-                    id: this.goodId
-                };
-            }
-
-            if (active === 'other') {
-                data = {
-                    type: this.activeNum,
-                    name: this.otherForm.name,
-                    goodsSort: this.otherForm.weight,
-                    synopsis: this.otherForm.desc,
-                    originalPrice: this.otherForm.originPrice,
-                    presentPrice: this.otherForm.nowPrice,
-                    recommendAdStatus: this.otherForm.checkedBanner,
-                    recommendStatus: 2,
-                    recommendAdPicture: this.otherForm.bannerImageUrl,
-                    listPicture: this.otherForm.thumImageUrl,
-                    infoPicture: this.otherForm.detailImageUrl,
-                    skuList: this.otherForm.dynamicValidateForm.domains,
-                    deleteSkuList: this.otherForm.skuCodeArr,
-                    id: this.goodId
-                };
-            }
-
-            if (active === 'vipCard') {
-                data = {
-                    type: this.activeNum,
-                    name: this.vipCardForm.name,
-                    goodsSort: this.vipCardForm.weight,
-                    synopsis: this.vipCardForm.desc,
-                    originalPrice: this.vipCardForm.nowPrice,
-                    presentPrice: this.vipCardForm.integral,
-                    recommendAdStatus: this.vipCardForm.checkedBanner,
-                    recommendStatus: 2,
-                    recommendAdPicture: this.vipCardForm.bannerImageUrl,
-                    listPicture: this.vipCardForm.thumImageUrl,
-                    infoPicture: this.vipCardForm.detailImageUrl,
-                    id: this.goodId
-                };
-            }
-
-            this.goodsAjaxRequest(data); //添加/修改商品请求
-        },
-
-        //添加/修改商品请求
-        goodsAjaxRequest(data) {
+            console.log('请求时传的值', data);
             (async () => {
                 if (this.isUpdate) {
                     const res = await this.$put('/merchant/store/goods/update', data);
-                    if (res.code == 0) {
+                    if (res.code === 0) {
                         this.getGoodsInfo();
                         this.handleCancel();
                         this.$message.success('修改成功');
@@ -575,7 +458,9 @@ export default {
                     }
                 } else {
                     const res = await this.$post('/merchant/store/goods/save', data);
-                    if (res.code == 0) {
+
+                    console.log(res);
+                    if (res.code === 0) {
                         this.getGoodsInfo();
                         this.handleCancel();
                         this.$message.success('添加成功');
@@ -626,293 +511,10 @@ export default {
             });
         },
 
-        //对话框里的确定按钮
-        handleSure() {
-            if (this.activeName) {
-                switch (this.activeName) {
-                    case 'combo':
-                        this.setGoodsInfo('combo');
-                        break;
-                    case 'drinks':
-                        this.setGoodsInfo('drinks');
-                        break;
-                    case 'snack':
-                        this.setGoodsInfo('snack');
-                        break;
-                    case 'other':
-                        this.setGoodsInfo('other');
-                        break;
-                    case 'vipCard':
-                        this.setGoodsInfo('vipCard');
-                        break;
-                }
-            }
-        },
-
-        //标签页切换事件
-        handleClick(tab, event) {
-            this.activeNum = Number(tab.index) + 1;
-            this.clearAllForm();
-        },
-
-        //传值给套餐子组件
-        sendComoboForm(data) {
-            this.comboForm.name = data.name;
-            this.comboForm.weight = data.goodsSort;
-            this.comboForm.desc = data.synopsis;
-            this.comboForm.originPrice = data.originalPrice;
-            this.comboForm.nowPrice = data.statisticalPrice;
-            this.comboForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
-            this.comboForm.bannerImageUrl = data.recommendAdPicture;
-            this.comboForm.thumImageUrl = data.listPicture;
-            this.comboForm.detailImageUrl = data.infoPicture;
-            this.comboForm.tableData = data.setMealGoodsList;
-            this.comboForm.goodsIdList = data.setMealGoodsList.map((item) => item.goodsId);
-        },
-
-        //传值给酒水子组件
-        sendDrinksForm(data) {
-            this.drinksForm.area = data.area;
-            this.drinksForm.year = data.year;
-            this.drinksForm.name = data.name;
-            this.drinksForm.goodWeight = data.goodsSort;
-            this.drinksForm.desc = data.synopsis;
-            this.drinksForm.originPrice = data.originalPrice;
-            this.drinksForm.nowPrice = data.presentPrice;
-            this.drinksForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
-            this.drinksForm.checkedReco = data.recommendStatus == 1 ? true : false;
-            this.drinksForm.classify = data.category;
-            this.drinksForm.recoWeight = data.recommendPictureSort;
-            this.drinksForm.bannerImageUrl = data.recommendAdPicture;
-            this.drinksForm.recoImageUrl = data.recommendPicture;
-            this.drinksForm.thumImageUrl = data.listPicture;
-            this.drinksForm.detailImageUrl = data.infoPicture;
-            this.drinksForm.dynamicValidateForm.domains = data.skuList;
-        },
-
-        //传值给小吃子组件
-        sendSnacksForm(data) {
-            this.snackForm.name = data.name;
-            this.snackForm.weight = data.goodsSort;
-            this.snackForm.desc = data.synopsis;
-            this.snackForm.originPrice = data.originalPrice;
-            this.snackForm.nowPrice = data.presentPrice;
-            this.snackForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
-            this.snackForm.bannerImageUrl = data.recommendAdPicture;
-            this.snackForm.thumImageUrl = data.listPicture;
-            this.snackForm.detailImageUrl = data.infoPicture;
-            this.snackForm.dynamicValidateForm.domains = data.skuList;
-        },
-
-        //传值给其他子组件
-        sendOtherForm(data) {
-            this.otherForm.name = data.name;
-            this.otherForm.weight = data.goodsSort;
-            this.otherForm.desc = data.synopsis;
-            this.otherForm.originPrice = data.originalPrice;
-            this.otherForm.nowPrice = data.presentPrice;
-            this.otherForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
-            this.otherForm.bannerImageUrl = data.recommendAdPicture;
-            this.otherForm.thumImageUrl = data.listPicture;
-            this.otherForm.detailImageUrl = data.infoPicture;
-            this.otherForm.dynamicValidateForm.domains = data.skuList;
-        },
-
-        //传值给会员卡子组件
-        sendVipCardForm(data) {
-            this.vipCardForm.name = data.name;
-            this.vipCardForm.weight = data.goodsSort;
-            this.vipCardForm.desc = data.synopsis;
-            this.vipCardForm.integral = data.presentPrice;
-            this.vipCardForm.nowPrice = data.originalPrice;
-            this.vipCardForm.checkedBanner = data.recommendAdStatus == 1 ? true : false;
-            this.vipCardForm.bannerImageUrl = data.recommendAdPicture;
-            this.vipCardForm.thumImageUrl = data.listPicture;
-            this.vipCardForm.detailImageUrl = data.infoPicture;
-        },
-
-        //单个商品删除
-        handleDelete(id) {
-            this.$confirm('确认要删除此商品吗?', '提示', {
-                type: 'warning'
-            })
-                .then(() => {
-                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
-                        if (res.code == 0) {
-                            this.getGoodsInfo(); //重新请求数据
-                            this.$message.success('删除成功');
-                        } else {
-                            this.$message.error(res.msg);
-                        }
-                    });
-                })
-                .catch(() => {});
-        },
-
-        //获取所有商品信息
-        getGoodsInfo() {
-            let data = {
-                pageNo: this.currentPage,
-                pageSize: this.pagesize,
-                type: this.value,
-                name: this.searchName
-            };
-            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
-                if (res.code == 0) {
-                    this.dataListCount = res.data.total; //总数据条数
-                    this.goodsData = res.data.list; //所有数据
-                    this.requestStatus = true;
-                }
-            });
-        },
-
-        //清空套餐表单
-        clearComboForm() {
-            this.comboForm.name = '';
-            this.comboForm.weight = 0;
-            this.comboForm.desc = '';
-            this.comboForm.originPrice = '0.00';
-            this.comboForm.nowPrice = '';
-            this.comboForm.checkedBanner = false;
-            this.comboForm.bannerImageUrl = '';
-            this.comboForm.thumImageUrl = '';
-            this.comboForm.detailImageUrl = '';
-            this.comboForm.tableData = [];
-            this.comboForm.goodsIdList = [];
-        },
-
-        //清空酒水表单
-        clearDrinksForm() {
-            this.drinksForm.area = '';
-            this.drinksForm.year = '';
-            this.drinksForm.name = '';
-            this.drinksForm.desc = '';
-            this.drinksForm.originPrice = '';
-            this.drinksForm.nowPrice = '';
-            this.drinksForm.checkedBanner = false;
-            this.drinksForm.checkedReco = false;
-            this.drinksForm.goodWeight = 0;
-            this.drinksForm.recoWeight = 0;
-            this.drinksForm.classify = 1;
-            this.drinksForm.bannerImageUrl = '';
-            this.drinksForm.recoImageUrl = '';
-            this.drinksForm.thumImageUrl = '';
-            this.drinksForm.detailImageUrl = '';
-            this.drinksForm.dynamicValidateForm.domains = [
-                {
-                    spec: '', //规格
-                    originPrice: '', //规格原价
-                    nowPrice: '' //规格现价
-                }
-            ];
-            this.drinksForm.skuCodeArr = [];
-        },
-
-        //清空小吃表单
-        clearSnackForm() {
-            this.snackForm.name = '';
-            this.snackForm.weight = 0;
-            this.snackForm.desc = '';
-            this.snackForm.originPrice = '';
-            this.snackForm.nowPrice = '';
-            this.snackForm.checkedBanner = false;
-            this.snackForm.bannerImageUrl = '';
-            this.snackForm.thumImageUrl = '';
-            this.snackForm.detailImageUrl = '';
-            this.snackForm.dynamicValidateForm.domains = [
-                {
-                    spec: '', //规格
-                    originPrice: '', //规格原价
-                    nowPrice: '' //规格现价
-                }
-            ];
-            this.snackForm.skuCodeArr = [];
-        },
-
-        //清空其他表单
-        clearOtherForm() {
-            this.otherForm.name = '';
-            this.otherForm.weight = 0;
-            this.otherForm.desc = '';
-            this.otherForm.originPrice = '';
-            this.otherForm.nowPrice = '';
-            this.otherForm.checkedBanner = false;
-            this.otherForm.bannerImageUrl = '';
-            this.otherForm.thumImageUrl = '';
-            this.otherForm.detailImageUrl = '';
-            this.otherForm.dynamicValidateForm.domains = [
-                {
-                    spec: '', //规格
-                    originPrice: '', //规格原价
-                    nowPrice: '' //规格现价
-                }
-            ];
-            this.otherForm.skuCodeArr = [];
-        },
-
-        //清空会员卡表单
-        clearVipCardForm() {
-            this.vipCardForm.name = '';
-            this.vipCardForm.weight = 0;
-            this.vipCardForm.desc = '';
-            this.vipCardForm.integral = '';
-            this.vipCardForm.nowPrice = '';
-            this.vipCardForm.checkedBanner = false;
-            this.vipCardForm.bannerImageUrl = '';
-            this.vipCardForm.thumImageUrl = '';
-            this.vipCardForm.detailImageUrl = '';
-        },
-
-        //接收套餐传值
-        getChildComboForm(data) {
-            this.comboForm = Object.assign({}, data);
-            this.comboForm.checkedBanner == true ? (this.comboForm.checkedBanner = 1) : (this.comboForm.checkedBanner = 2);
-        },
-
-        //接收酒水传值
-        getChildDrinksForm(data) {
-            this.drinksForm = Object.assign({}, data);
-            this.drinksForm.checkedBanner == true ? (this.drinksForm.checkedBanner = 1) : (this.drinksForm.checkedBanner = 2);
-            this.drinksForm.checkedReco == true ? (this.drinksForm.checkedReco = 1) : (this.drinksForm.checkedReco = 2);
-
-            let minOriginPrice = this.getMinVal(data, 'originalPrice'); //获取规格中的最低原价
-            let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
-            this.drinksForm.originPrice = minOriginPrice;
-            this.drinksForm.nowPrice = minNowPrice;
-        },
-
-        //接收小吃传值
-        getChildSnackForm(data) {
-            this.snackForm = Object.assign({}, data);
-            this.snackForm.checkedBanner == true ? (this.snackForm.checkedBanner = 1) : (this.snackForm.checkedBanner = 2);
-
-            let minOriginPrice = this.getMinVal(data, 'originalPrice'); //获取规格中的最低原价
-            let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
-            this.snackForm.originPrice = minOriginPrice;
-            this.snackForm.nowPrice = minNowPrice;
-        },
-
-        //接收其他传值
-        getChildOtherForm(data) {
-            this.otherForm = Object.assign({}, data);
-            this.otherForm.checkedBanner == true ? (this.otherForm.checkedBanner = 1) : (this.otherForm.checkedBanner = 2);
-
-            let minOriginPrice = this.getMinVal(data, 'originalPrice'); //获取规格中的最低原价
-            let minNowPrice = this.getMinVal(data, 'presentPrice'); //获取规格中的最低现价
-            this.otherForm.originPrice = minOriginPrice;
-            this.otherForm.nowPrice = minNowPrice;
-        },
-
-        //接收会员卡传值
-        getChildVipCardForm(data) {
-            this.vipCardForm = Object.assign({}, data);
-            this.vipCardForm.checkedBanner == true ? (this.vipCardForm.checkedBanner = 1) : (this.vipCardForm.checkedBanner = 2);
-        },
-
-        //获取规格中的原价和现价最小值
-        getMinVal(data, key) {
-            let newArr = data.dynamicValidateForm.domains.map((item) => {
-                return item[key];
+        //获取规格中的原价最小值
+        getMinVal() {
+            let newArr = this.goodsForm.dynamicValidateForm.domains.map((item) => {
+                return item.originalPrice;
             });
 
             return Math.min(...newArr); //返回最小值
@@ -933,233 +535,18 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+.clearfix::after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
 .head-handle {
     margin-bottom: 30px;
 
     .left-handle {
         float: left;
-    }
-
-    .add-classify-title {
-        display: flex;
-        align-items: center;
-    }
-
-    .add-classify-title::before {
-        display: inline-block;
-        content: '';
-        width: 4px;
-        height: 20px;
-        margin-right: 10px;
-        background-color: #999;
-    }
-
-    .add-classify-title.goods-info {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .goods-info-box {
-        display: flex;
-
-        .avatar-uploader {
-            .el-upload {
-                border: 1px dashed #d9d9d9;
-                border-radius: 6px;
-                cursor: pointer;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .el-upload:hover {
-                border-color: #409eff;
-            }
-        }
-
-        .avatar-uploader-icon {
-            font-size: 28px;
-            color: #8c939d;
-            width: 140px;
-            height: 140px;
-            line-height: 140px;
-            text-align: center;
-        }
-
-        .el-upload--text {
-            width: 140px !important;
-            height: 140px !important;
-        }
-
-        .avatar {
-            width: 140px;
-            height: 140px;
-            display: block;
-        }
-
-        .right-box {
-            width: 30%;
-
-            .detail-img-box {
-                .el-upload--text {
-                    width: 300px !important;
-                }
-
-                .avatar-uploader-icon {
-                    font-size: 28px;
-                    color: #8c939d;
-                    width: 300px;
-                    line-height: 140px;
-                    text-align: center;
-                }
-
-                .avatar {
-                    width: 300px;
-                    display: block;
-                }
-            }
-
-            .thum-img-box {
-                margin-bottom: 30px;
-
-                > p {
-                    margin-bottom: 0;
-
-                    > span {
-                    }
-                }
-            }
-        }
-
-        .left-box {
-            width: 53%;
-
-            .banner-img-box {
-                .el-upload--text {
-                    width: 350px !important;
-                    height: 120px !important;
-                }
-
-                .avatar-uploader-icon {
-                    font-size: 28px;
-                    color: #8c939d;
-                    width: 350px;
-                    height: 120px;
-                    line-height: 120px;
-                    text-align: center;
-                }
-
-                .avatar {
-                    width: 350px;
-                    height: 120px;
-                    display: block;
-                }
-            }
-        }
-
-        .left-box.drinks {
-            width: 58%;
-
-            .drinks-update-box {
-                display: flex;
-
-                .banner-box {
-                    width: 50%;
-                }
-
-                .drinks-div {
-                    margin-top: 20px;
-
-                    .reco-img-box {
-                        .el-upload--text {
-                            width: 120px !important;
-                            height: 160px !important;
-                        }
-
-                        .avatar-uploader-icon {
-                            font-size: 28px;
-                            color: #8c939d;
-                            width: 120px;
-                            height: 160px;
-                            line-height: 160px;
-                            text-align: center;
-                        }
-
-                        .avatar {
-                            width: 120px;
-                            height: 160px;
-                            display: block;
-                        }
-                    }
-                }
-            }
-
-            .reco-box {
-                .reco-top-box {
-                    display: flex;
-                }
-            }
-        }
-
-        .left-box.vip-card {
-            width: 55%;
-        }
-
-        .right-box.vip-card {
-            width: 45%;
-        }
-
-        p {
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-
-            > i {
-                display: inline-block;
-                font-style: normal;
-                text-align: center;
-                line-height: 30px;
-                width: 60px;
-                height: 30px;
-                border-radius: 5px;
-                margin-right: 10px;
-                background-color: #999;
-                color: #fff;
-            }
-        }
-
-        p.drinks-spec {
-            align-items: flex-start;
-
-            > span {
-                margin-right: 10px;
-                margin-top: 6px;
-            }
-
-            .el-form-item {
-                margin-bottom: 10px;
-            }
-        }
-
-        .good-name-box {
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-
-            > div:first-child {
-                margin-right: 20px;
-            }
-        }
-
-        .el-textarea__inner {
-            resize: none !important;
-            height: 84px;
-        }
-
-        .combo-spec {
-            width: 90%;
-        }
     }
 
     .right-handle {
@@ -1242,30 +629,24 @@ export default {
     margin-top: 20px;
 }
 
-.el-input-group__append,
+/deep/.el-input-group__append,
 .el-input-group__prepend {
     padding: 0 10px;
 }
 
-.clearfix::after {
-    content: '';
-    display: block;
-    clear: both;
-}
-
-.el-upload--picture-card {
+/deep/.el-upload--picture-card {
     background-color: #fff;
 }
 
-.el-dialog {
+/deep/.el-dialog {
     width: 70%;
 }
 
-.el-form-item__content {
+/deep/.el-form-item__content {
     margin-left: 0 !important;
 }
 
-.el-dialog__header {
-    padding: 0 !important;
+/deep/.el-dialog__header {
+    padding: 0;
 }
 </style>

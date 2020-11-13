@@ -202,8 +202,6 @@ export default {
                 this.otherForm.dynamicValidateForm.domains.splice(index, 1);
             }
 
-            console.log(item);
-
             //删除一个规格就添加到这个删除规格数组里
             if (item.skuCode !== '') {
                 this.otherForm.skuCodeArr.push(item.skuCode);

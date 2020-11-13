@@ -165,7 +165,6 @@ export default {
 
     mounted() {
         this.assignParentToChild(); //回显商品信息
-        console.log('小吃组件');
     },
 
     methods: {

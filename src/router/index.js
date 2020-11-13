@@ -37,6 +37,15 @@ export default new Router({
                         title: '商品管理'
                     }
                 },
+
+                {
+                    path: '/shopmanage1',
+                    component: () => import('../pages/ShopManage/ShopManage1.vue'),
+                    meta: {
+                        title: '商品管理'
+                    }
+                },
+
                 {
                     path: '/clientmanage',
                     component: () => import('../pages/ClientManage/ClientManage.vue'),
@@ -129,7 +138,7 @@ export default new Router({
                     }
                 },
 
-                
+
                 {
                     path: '/404',
                     component: () => import( /* webpackChunkName: "404" */ '../components/page/404.vue'),

@@ -6,9 +6,9 @@
                     <span>酒水名称：</span>
                     <el-input v-model="drinksForm.name" style="width: 170px; margin-right: 20px"></el-input>
                     <!-- 酒水分类 -->
-                    <el-select v-model="drinksForm.classify" placeholder="酒水分类" style="width: 150px; margin-right: 20px">
+                    <!-- <el-select v-model="drinksForm.classify" placeholder="酒水分类" style="width: 150px; margin-right: 20px">
                         <el-option v-for="item in classifyOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                    </el-select>
+                    </el-select> -->
                 </p>
                 <p>
                     <span>商品排序：</span>
@@ -171,7 +171,6 @@ export default {
                 checkedReco: false,
                 area: '', //产地
                 year: '', //年份
-                classify: '', //酒水分类
                 goodWeight: 0, //商品排序
                 recoWeight: 0, //商家推荐位排序
                 bannerImageUrl: '', //广告图
@@ -245,7 +244,6 @@ export default {
 
     mounted() {
         this.assignParentToChild(); //回显商品信息
-        console.log('酒水组件');
     },
 
     methods: {
