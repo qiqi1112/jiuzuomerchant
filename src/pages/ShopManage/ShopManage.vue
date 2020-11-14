@@ -6,7 +6,7 @@
             </el-breadcrumb>
         </div>
 
-        <div class="container clearfix">
+        <div class="container clearfix" v-loading="wrapLoading">
             <!-- 顶部操作模块 -->
             <div class="head-handle clearfix">
                 <!-- 左边操作区域 -->
@@ -17,40 +17,19 @@
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
 
-                <!-- 添加商品的对话框 -->
+                <!-- 操作商品的对话框 -->
                 <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
-                    <!-- 编辑当前商品时 -->
-                    <el-tabs v-if="isUpdate" v-model="editActiveName">
-                        <!-- 套餐标签页 -->
-                        <el-tab-pane v-if="editActiveName == 'editCombo'" label="套餐" name="editCombo">
-                            <combo-tab :comboFormParent="comboForm" @comboFormChild="getChildComboForm"></combo-tab>
-                        </el-tab-pane>
-
-                        <!-- 酒水标签页 -->
-                        <el-tab-pane v-if="editActiveName == 'editDrinks'" label="酒水" name="editDrinks">
-                            <drinks-tab :drinksFormParent="drinksForm" @drinksFormChild="getChildDrinksForm"></drinks-tab>
-                        </el-tab-pane>
-
-                        <!-- 小吃标签页 -->
-                        <el-tab-pane v-if="editActiveName == 'editSnack'" label="小吃" name="editSnack">
-                            <snack-tab :snackFormParent="snackForm" @snackFormChild="getChildSnackForm"></snack-tab>
-                        </el-tab-pane>
-
-                        <!-- 其他标签页 -->
-                        <el-tab-pane v-if="editActiveName == 'editOther'" label="其他" name="editOther">
-                            <other-tab :otherFormParent="otherForm" @otherFormChild="getChildOtherForm"></other-tab>
-                        </el-tab-pane>
-
-                        <!-- 会员卡标签页 -->
-                        <el-tab-pane v-if="editActiveName == 'editVipCard'" label="会员卡" name="editVipCard">
-                            <vip-card-tab :vipCardFormParent="vipCardForm" @vipCardFormChild="getChildVipCardForm"></vip-card-tab>
-                        </el-tab-pane>
-                    </el-tabs>
-
-                    <!-- 添加商品时 -->
-                    <el-tabs v-else v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane :label="item.typeName" :name="item.typeName" v-for="(item, index) in titleArrList" :key="index">
-                        </el-tab-pane>
+                    <el-tabs v-model="activeName" @tab-click="handleClick">
+                        <!-- 编辑商品时 -->
+                        <el-tab-pane v-if="isUpdate" :label="activeName" :name="activeName"></el-tab-pane>
+                        <!-- 新增商品时 -->
+                        <el-tab-pane
+                            v-else
+                            :label="item.typeName"
+                            :name="item.typeName"
+                            v-for="(item, index) in titleArrList"
+                            :key="index"
+                        ></el-tab-pane>
                     </el-tabs>
 
                     <!-- 标签页组件信息 -->
@@ -132,7 +111,7 @@ export default {
             value: '', //商品分类下拉框
 
             dialogVisible: false, //操作商品的对话框开关
-            activeName: '', //默认展示的标签页
+            activeName: '', //默认展示的标签页名称
             editActiveName: '', //编辑时展示的标签页
 
             // 表格数据分页相关属性
@@ -176,7 +155,8 @@ export default {
                         }
                     ]
                 },
-                skuCodeArr: [] //要删除的规格id数组
+                skuCodeArr: [], //要删除的规格id数组
+                goodsIdList: [] //所有已选择的商品对应的id
             },
 
             //商品分类下拉框
@@ -231,6 +211,8 @@ export default {
             isSelect: false, //是否要批量删除
             deleteSelect: [], //批量删除的数组
             requestStatus: true, //请求时的防抖标杆
+
+            wrapLoading: false, //加载开关
 
             titleArrList: [] //标签页标题信息
         };
@@ -394,6 +376,7 @@ export default {
 
         //获取所有商品信息
         getGoodsInfo() {
+            this.wrapLoading = true;
             let data = {
                 pageNo: this.currentPage,
                 pageSize: this.pagesize,
@@ -405,6 +388,7 @@ export default {
                     this.dataListCount = res.data.total; //总数据条数
                     this.goodsData = res.data.list; //所有数据
                     this.requestStatus = true; //防抖开关
+                    this.wrapLoading = false;
                 }
             });
         },
@@ -473,40 +457,49 @@ export default {
 
         //商品编辑
         handleEdit(id) {
-            this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((res) => {
-                if (res.code == 0) {
-                    this.isUpdate = true;
-                    this.dialogVisible = true;
-                    this.goodId = id;
-                    this.activeNum = res.data.type;
+            this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((result) => {
+                if (result.code === 0) {
+                    let res = result.data;
 
-                    switch (this.activeNum) {
-                        case 1:
-                            this.editActiveName = 'editCombo';
-                            this.activeName = 'combo';
-                            this.sendComoboForm(res.data);
-                            break;
-                        case 2:
-                            this.editActiveName = 'editDrinks';
-                            this.activeName = 'drinks';
-                            this.sendDrinksForm(res.data);
-                            break;
-                        case 3:
-                            this.editActiveName = 'editSnack';
-                            this.activeName = 'snack';
-                            this.sendSnacksForm(res.data);
-                            break;
-                        case 4:
-                            this.editActiveName = 'editOther';
-                            this.activeName = 'other';
-                            this.sendOtherForm(res.data);
-                            break;
-                        case 5:
-                            this.editActiveName = 'editVipCard';
-                            this.activeName = 'vipCard';
-                            this.sendVipCardForm(res.data);
-                            break;
-                    }
+                    this.isUpdate = true; //启用编辑模式
+                    this.dialogVisible = true; //对话框打开
+                    this.goodId = id; //获取商品操作的ID
+                    this.activeNum = res.type; //获取操作的分类下标
+
+                    //根据返回的商品分类下标展示其对应的分类名称
+                    this.options.forEach((item) => {
+                        if (item.value === res.type) {
+                            this.activeName = item.label;
+                        }
+                    });
+
+                    //商品信息
+                    this.goodsForm = {
+                        name: res.name, //名称
+                        desc: res.synopsis, //简介
+                        originPrice: res.originalPrice, //原价
+                        nowPrice: res.presentPrice, //现价
+                        comboNowPrice: res.statisticalPrice, //套餐现价
+                        checkedBanner: res.recommendAdStatus === 1 ? true : false, //商家广告banner位开关
+                        checkedReco: res.recommendStatus === 1 ? true : false, //商家推荐位开关
+                        area: res.area, //产地
+                        year: res.year, //年份
+                        goodWeight: res.goodsSort, //商品排序
+                        recoWeight: res.recommendPictureSort, //商家推荐位排序
+                        bannerImageUrl: res.recommendAdPicture, //广告图
+                        recoImageUrl: res.recommendPicture, //推荐位图
+                        thumImageUrl: res.listPicture, //缩略图
+                        detailImageUrl: res.infoPicture, //详情图
+                        tableData: res.setMealGoodsList, //套餐中渲染单品数据
+
+                        //新增商品规格
+                        dynamicValidateForm: {
+                            domains: res.skuList
+                        },
+                        skuCodeArr: res.deleteSkuList, //要删除的规格id数组
+
+                        goodsIdList: res.setMealGoodsList.map((item) => item.goodsId) //套餐的已选择单品ID
+                    };
                 }
             });
         },
