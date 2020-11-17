@@ -947,6 +947,7 @@ export default {
             isClickSeat: false, //展示当前座位的详细信息开关
 
             ktvRoomList: [], //ktv包间集合
+            deleteKtvRoomList: [], //要删除的ktv包间id数组
             ktvTypeOpt: [], //ktv包间类型
             isLookKtvInfo: false, //查看或编辑当前ktv包间属性信息的标杆
             isUpdateKtvInfo: false, //当前确认按钮是否为修改包间属性信息
@@ -1490,8 +1491,9 @@ export default {
         //请求成功后，处理的操作
         requestSuccessInit(txt) {
             this.getStoreInfo();
-            this.$message.success('添加成功');
+            this.$message.success(txt);
             this.submitShopType = [];
+            this.deleteKtvRoomList = []; //初始化要删除的ktv包间id
             this.isReadonly = true;
             this.allRegRight = false;
             this.wrapLoading = false;
@@ -1539,7 +1541,8 @@ export default {
                 trustAddress: this.trustAddress,
                 type: this.submitShopType.join(','),
                 layoutList: this.allSeatDetailInfo,
-                ktvRoomList: ktvRoomList
+                ktvRoomList: ktvRoomList,
+                deleteKtvRoomList: this.deleteKtvRoomList
             };
 
             if (this.isUpdate) {
@@ -1831,21 +1834,25 @@ export default {
                         if (item.id) {
                             if (ele.id == item.id) {
                                 this.ktvRoomList.splice(i, 1);
+                                this.deleteKtvRoomList.push(item.id);
                             }
                         } else {
-                            if (
-                                ele.capacity == item.capacity &&
-                                ele.haveToilet == item.haveToilet &&
-                                ele.mahjong == item.mahjong &&
-                                ele.roomAttribute == item.roomAttribute &&
-                                ele.roomNumber == item.roomNumber &&
-                                ele.roomTimeIntervalList.length == item.roomTimeIntervalList.length &&
-                                ele.roomTypeId == item.roomTypeId &&
-                                ele.sketchMap.length == item.sketchMap.length &&
-                                ele.snacks.length == item.snacks.length
-                            ) {
+                            if (ele == item) {
                                 this.ktvRoomList.splice(i, 1);
                             }
+                            // if (
+                            //     ele.capacity == item.capacity &&
+                            //     ele.haveToilet == item.haveToilet &&
+                            //     ele.mahjong == item.mahjong &&
+                            //     ele.roomAttribute == item.roomAttribute &&
+                            //     ele.roomNumber == item.roomNumber &&
+                            //     ele.roomTimeIntervalList.length == item.roomTimeIntervalList.length &&
+                            //     ele.roomTypeId == item.roomTypeId &&
+                            //     ele.sketchMap.length == item.sketchMap.length &&
+                            //     ele.snacks.length == item.snacks.length
+                            // ) {
+                            //     this.ktvRoomList.splice(i, 1);
+                            // }
                         }
                     });
                     this.clearKtvInfo();
@@ -1929,49 +1936,49 @@ export default {
                         weekPriceList: [
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 1
                             },
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 2
                             },
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 3
                             },
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 4
                             },
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 5
                             },
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 6
                             },
                             {
                                 id: '',
-                                price: 0,
+                                price: 0.1,
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 7
@@ -2099,7 +2106,6 @@ export default {
         //回显店铺数据
         getStoreInfo() {
             this.wrapLoading = true;
-
             this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
                     let result = res.data;
@@ -2175,6 +2181,7 @@ export default {
                             } else {
                                 this.createSeatFn(); //创建座位
                             }
+                            this.wrapLoading = false;
                         })
                         .catch(() => {
                             this.$router.push('/index');
