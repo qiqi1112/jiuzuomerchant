@@ -39,14 +39,6 @@ export default new Router({
                 },
 
                 {
-                    path: '/shopmanage1',
-                    component: () => import('../pages/ShopManage/ShopManage1.vue'),
-                    meta: {
-                        title: '商品管理'
-                    }
-                },
-
-                {
                     path: '/clientmanage',
                     component: () => import('../pages/ClientManage/ClientManage.vue'),
                     meta: {

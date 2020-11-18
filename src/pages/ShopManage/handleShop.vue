@@ -15,7 +15,7 @@
                 </div>
                 <p>
                     <span>商品简介：</span>
-                    <el-input type="textarea" v-model="goodsForm.desc" style="width: 300px"></el-input>
+                    <el-input type="textarea" v-model="goodsForm.desc" maxlength="60" show-word-limit style="width: 300px"></el-input>
                 </p>
 
                 <!-- 商品规格 -->

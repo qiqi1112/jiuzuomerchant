@@ -247,3 +247,44 @@ Vue.filter("recoType", function (oldVal) {
     }
     return newVal;
 })
+
+//APP要展示的商品分类
+Vue.filter("showAppGoodsType", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 1:
+            newVal = '套餐';
+            break;
+        case 2:
+            newVal = '威士忌';
+            break;
+        case 3:
+            newVal = '白兰地';
+            break;
+        case 4:
+            newVal = '伏特加';
+            break;
+        case 5:
+            newVal = '香槟';
+            break;
+        case 6:
+            newVal = '红酒';
+            break;
+        case 7:
+            newVal = '啤酒';
+            break;
+        case 8:
+            newVal = '鸡尾酒';
+            break;
+        case 9:
+            newVal = '小吃';
+            break;
+        case 10:
+            newVal = '其它';
+            break;
+        case 11:
+            newVal = '会员卡';
+            break;
+    }
+    return newVal;
+})

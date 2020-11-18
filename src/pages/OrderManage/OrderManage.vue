@@ -52,7 +52,7 @@
                         <span v-else>{{ scope.row.seatCode }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="contactTel" label="预定手机"></el-table-column>
+                <el-table-column prop="contactTel" label="预定手机" min-width="100"></el-table-column>
                 <el-table-column prop="orderType" label="订单类型"></el-table-column>
                 <el-table-column prop="orderNo" label="总订单号" min-width="160"></el-table-column>
                 <el-table-column prop="orderId" label="订单号"></el-table-column>
@@ -70,54 +70,36 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="smsCode" label="验证码"></el-table-column>
-                <el-table-column label="操作" fixed="right" min-width="350">
+                <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
                         <el-button
-                            :disabled="
-                                scope.row.status == 2 ||
-                                scope.row.status == 3 ||
-                                scope.row.status == 4 ||
-                                scope.row.status == 5 ||
-                                scope.row.status == 6
-                            "
-                            :type="scope.row.status == 0 ? 'primary' : scope.row.status == 1 ? 'success' : 'info'"
-                            @click="handleOper(scope.row, 1)"
-                            >{{ scope.row.status == 1 ? '已接单' : '接单' }}</el-button
+                            v-if="scope.row.status != 2"
+                            :disabled="(scope.row.status != 0 && scope.row.status != 1) || scope.row.status == 1"
+                            :type="scope.row.status == 0 ? 'primary' : scope.row.status != 2 ? 'success' : 'info'"
+                            @click="handleOper(scope.row, 0)"
+                            >{{ scope.row.status != 0 && scope.row.status != 2 ? '已接单' : '接单' }}</el-button
                         >
                         <el-button
-                            :disabled="
-                                scope.row.status == 1 ||
-                                scope.row.status == 3 ||
-                                scope.row.status == 4 ||
-                                scope.row.status == 5 ||
-                                scope.row.status == 6
-                            "
+                            v-if="scope.row.status == 2 || scope.row.status == 0"
+                            :disabled="scope.row.status == 2"
                             :type="scope.row.status == 0 ? 'primary' : scope.row.status == 2 ? 'danger' : 'info'"
-                            @click="handleOper(scope.row, 2)"
+                            @click="handleOper(scope.row, 1)"
                             >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
                         >
                         <el-button
-                            :disabled="
-                                scope.row.status == 2 ||
-                                scope.row.status == 3 ||
-                                scope.row.status == 4 ||
-                                scope.row.status == 5 ||
-                                scope.row.status == 6
-                            "
+                            v-if="scope.row.status != 2 && scope.row.status != 0"
                             :type="
-                                scope.row.status == 6
+                                scope.row.status == 3
                                     ? 'info'
-                                    : scope.row.status == 5
-                                    ? 'info'
-                                    : scope.row.status == 2
-                                    ? 'info'
-                                    : scope.row.status == 3
-                                    ? 'danger'
                                     : scope.row.status == 4
+                                    ? 'success'
+                                    : scope.row.status == 5
+                                    ? 'success'
+                                    : scope.row.status == 6
                                     ? 'success'
                                     : 'primary'
                             "
-                            @click="handleOperDialogShow(scope.row, 3)"
+                            @click="isReachStore(scope.row)"
                             >{{
                                 scope.row.status == 2
                                     ? '未到店'
@@ -133,19 +115,17 @@
                             }}
                         </el-button>
                         <el-button
-                            :disabled="scope.row.status == 2 || scope.row.status == 3 || scope.row.status == 5 || scope.row.status == 6"
+                            v-if="scope.row.status != 2 && scope.row.status != 0"
                             :type="
-                                scope.row.status == 2
+                                scope.row.status == 5
                                     ? 'info'
-                                    : scope.row.status == 3
-                                    ? 'info'
-                                    : scope.row.status == 5
-                                    ? 'danger'
                                     : scope.row.status == 6
                                     ? 'success'
+                                    : scope.row.status == 3
+                                    ? 'info'
                                     : 'primary'
                             "
-                            @click="handleOperDialogShow(scope.row, 4)"
+                            @click="isConComplete(scope.row)"
                             >{{
                                 scope.row.status == 2
                                     ? '未消费'
@@ -168,26 +148,6 @@
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancel">取 消</el-button>
                     <el-button type="primary" @click="handleEditSeat">确 定</el-button>
-                </div>
-            </el-dialog>
-
-            <!-- 是否到店与是否消费对话框 -->
-            <el-dialog :visible.sync="perDialog">
-                <div v-if="dialogStatus == 3">
-                    <el-radio v-model="radio1" label="3">未到店</el-radio>
-                    <el-radio v-model="radio1" label="4">已到店</el-radio>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button @click="perDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="handleSurePer(1)">确 定</el-button>
-                    </div>
-                </div>
-                <div v-if="dialogStatus == 4">
-                    <el-radio v-model="radio2" label="5">未消费</el-radio>
-                    <el-radio v-model="radio2" label="6">已离开</el-radio>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button @click="perDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="handleSurePer(2)">确 定</el-button>
-                    </div>
                 </div>
             </el-dialog>
 
@@ -401,7 +361,7 @@
                                 <span class="min-con">最低消费：</span>
                                 <div class="day-mincom">
                                     <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                        <span>星期{{ item.weekIndex | weekIdxToWord }}</span>
+                                        <span>{{ item.weekIndex | dayOfWeek }}</span>
                                         <el-input
                                             v-model="item.price"
                                             placeholder="最低消费"
@@ -453,21 +413,11 @@ export default {
                 pagesize: 10 //默认每页要显示多少条数据
             },
 
-            dialog: false,
-            perDialog: false,
-            seatDia: false,
-
-            tableData: [],
-
-            form: {},
-
-            dialogStatus: 1,
-
-            radio1: '',
-            radio2: '',
-
-            statusId: '',
-
+            dialog: false, //查看订单详情弹窗开关
+            seatDia: false, //修改座位号弹窗开关
+            tableData: [], //订单表格列表
+            form: {}, //订单详情表单
+            dialogStatus: 1, //根据操作显示不同的弹窗
             upSeatId: '', //当前要修改的id
             seatNum: '', //当前要修改的座位号
 
@@ -567,8 +517,6 @@ export default {
                     } else {
                         this.$message.error('修改失败');
                     }
-
-                    console.log('zzz', res);
                 })();
             } else {
                 this.$message.error('请输入要修改的座位号/包间号');
@@ -584,13 +532,14 @@ export default {
         //查看座位信息
         seeSeatInfo() {
             this.dialogStatus = 2;
-            this.dialog = true;
 
             (async () => {
                 try {
                     let result = await this.$get('/merchant/store/order/layoutList');
 
                     if (result.code == 0) {
+                        this.dialog = true;
+
                         let res = result.data;
 
                         let cassette = res.cassette;
@@ -726,13 +675,11 @@ export default {
                     if (res.code == 0) {
                         this.tableData = res.data.list;
                         this.searchObj.dataListCount = res.data.total;
+
+                        console.log(this.tableData);
                     } else {
                         this.$message.error(res.msg);
                     }
-
-                    console.log(res.data);
-
-                    console.log(res.data.list[0].status);
                 } catch (err) {
                     this.$message.error(err.msg);
                 }
@@ -753,7 +700,7 @@ export default {
 
         //接单/拒单操作
         handleOper(row, status) {
-            if (row.status !== 1 && row.status !== 2) {
+            if (row.status == 0) {
                 this.$confirm('确定要执行此操作吗？', '提示', {
                     type: 'warning'
                 })
@@ -766,38 +713,72 @@ export default {
 
                             let res = await this.$put('/merchant/store/order/status', data);
 
-                            res.code == 0 && this.getOrderInfo();
+                            if (res.code === 0) {
+                                this.$message.success('操作成功');
+                                this.getOrderInfo();
+                            } else {
+                                this.$message.error(res.msg);
+                            }
                         })();
                     })
                     .catch(() => {});
             }
         },
 
-        //操作里的对话框的确认按钮
-        handleSurePer(index) {
-            (async () => {
-                let data = {
-                    id: this.statusId,
-                    status: index === 1 ? this.radio1 : this.radio2
-                };
+        //是否到店与是否消费请求
+        isHandleRequest(id, status) {
+            let data = {
+                id,
+                status
+            };
 
-                let res = await this.$put('/merchant/store/order/status', data);
-
-                if (res.code == 0) {
-                    this.perDialog = false;
+            this.$put('/merchant/store/order/status', data).then((res) => {
+                if (res.code === 0) {
+                    this.$message.success('操作成功');
                     this.getOrderInfo();
+                } else {
+                    this.$message.error(res.msg);
                 }
-            })();
+            });
         },
 
-        //操作显示对话框
-        handleOperDialogShow(row, status) {
+        //是否到店确认
+        isReachStore(row) {
             if (row.status == 0) {
                 this.$message.error('请先选择是否接单');
             } else {
-                this.statusId = row.id;
-                this.dialogStatus = status;
-                this.perDialog = true;
+                this.$confirm('是否确认到店?', '提示', {
+                    distinguishCancelAndClose: true,
+                    confirmButtonText: '已到店',
+                    cancelButtonText: '未到店',
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.isHandleRequest(row.id, 3); //已到店
+                    })
+                    .catch((action) => {
+                        action === 'cancel' && this.isHandleRequest(row.id, 2); //未到店
+                    });
+            }
+        },
+
+        //是否消费确认
+        isConComplete(row) {
+            if (row.status == 0) {
+                this.$message.error('请先选择是否接单');
+            } else {
+                this.$confirm('是否确认消费?', '提示', {
+                    distinguishCancelAndClose: true,
+                    confirmButtonText: '已离开',
+                    cancelButtonText: '未消费',
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.isHandleRequest(row.id, 5); //已离开
+                    })
+                    .catch((action) => {
+                        action === 'cancel' && this.isHandleRequest(row.id, 4); //未消费
+                    });
             }
         }
     },
