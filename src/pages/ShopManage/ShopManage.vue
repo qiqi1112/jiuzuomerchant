@@ -45,7 +45,7 @@
 
                 <!-- APP展示商品分类弹窗 -->
                 <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
-                    <span class="add-classify-title">请选择给用户展示的商品种类</span>
+                    <span class="add-classify-title">请选择给用户隐藏的商品种类</span>
 
                     <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
                         item.type | showAppGoodsType
