@@ -12,7 +12,7 @@
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
                     <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort">添加商品</el-button>
-                    <el-button type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
+                    <el-button v-if="goodsData.length > 0" type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
@@ -43,8 +43,23 @@
                     </span>
                 </el-dialog>
 
+                <!-- APP展示商品分类弹窗 -->
+                <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
+                    <span class="add-classify-title">请选择给用户显示的商品种类</span>
+
+                    <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
+                        item.type | showAppGoodsType
+                    }}</el-checkbox>
+
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="showTypeDialog = false">取 消</el-button>
+                        <el-button type="primary" @click="handleSureShowType">确 定</el-button>
+                    </span>
+                </el-dialog>
+
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
+                    <el-button type="primary" @click="handleSelGoodsType" class="mr10" v-if="goodsData.length > 0">APP展示选择</el-button>
                     <el-input
                         v-model="searchName"
                         @keydown.13.native="getGoodsInfo"
@@ -106,13 +121,17 @@ export default {
 
     data() {
         return {
-            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片前缀
+            showImgPrefix: this.$imgHead, //回显图片前缀
             searchName: '', //商品名称输入框
             value: '', //商品分类下拉框
 
             dialogVisible: false, //操作商品的对话框开关
             activeName: '', //默认展示的标签页名称
             editActiveName: '', //编辑时展示的标签页
+
+            showTypeDialog: false, //APP展示商品分类开关
+            goodsTypeList: [], //该商家已有的商品种类列表
+            showTypeList: [], //要展示的商品种类列表
 
             // 表格数据分页相关属性
             dataListCount: 0, //默认当前要显示的数据条数
@@ -219,6 +238,30 @@ export default {
     },
 
     methods: {
+        //APP展示选择按钮
+        handleSelGoodsType() {
+            this.$get('/merchant/store/goods/hiddenList').then((res) => {
+                if (res.code === 0) {
+                    this.showTypeDialog = true;
+                    this.goodsTypeList = res.data;
+                }
+            });
+        },
+
+        //要展示的商品分类弹窗中的确认按钮
+        handleSureShowType() {
+            let data = {
+                hiddenDTOS: this.goodsTypeList
+            };
+
+            this.$post('/merchant/store/goods/updateHidden', data).then((res) => {
+                if (res.code === 0) {
+                    this.$message.success('修改成功');
+                    this.showTypeDialog = false;
+                }
+            });
+        },
+
         //翻页操作
         handleCurrentChange(val) {
             this.currentPage = val; //将当前跳转的页码赋给显在页面上的页码
@@ -516,7 +559,7 @@ export default {
 
     created() {
         if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+            this.showImgPrefix = this.$imgHead;
         } else {
             this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
         }
@@ -613,6 +656,31 @@ export default {
                     padding: 9px 24px;
                 }
             }
+        }
+    }
+}
+
+/deep/.show-type-dialog {
+    .el-dialog {
+        width: 55%;
+
+        .add-classify-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .add-classify-title::before {
+            display: inline-block;
+            content: '';
+            width: 4px;
+            height: 20px;
+            margin-right: 10px;
+            background-color: #999;
+        }
+
+        .el-checkbox {
+            margin-bottom: 20px;
         }
     }
 }

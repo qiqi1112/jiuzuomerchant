@@ -10,17 +10,13 @@
             <div class="header-user-con">
                 <!-- 全屏显示 -->
                 <div class="btn-fullscreen" @click="handleFullScreen">
-                    <el-tooltip effect="dark" :content="fullscreen?`取消全屏`:`全屏`" placement="bottom">
+                    <el-tooltip effect="dark" :content="fullscreen ? `取消全屏` : `全屏`" placement="bottom">
                         <i class="el-icon-rank"></i>
                     </el-tooltip>
                 </div>
                 <!-- 消息中心 -->
                 <div class="btn-bell">
-                    <el-tooltip
-                        effect="dark"
-                        :content="message?`有${message}条未读消息`:`消息中心`"
-                        placement="bottom"
-                    >
+                    <el-tooltip effect="dark" :content="message ? `有${message}条未读消息` : `消息中心`" placement="bottom">
                         <router-link to="/tabs">
                             <i class="el-icon-bell"></i>
                         </router-link>
@@ -29,21 +25,38 @@
                 </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
-                    <img src="../../assets/img/img.jpg" />
+                    <img :src="logo" />
                 </div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}}
+                        {{ username }}
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                            <el-dropdown-item>项目仓库</el-dropdown-item>
-                        </a>
+                        <el-dropdown-item command="setPassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
+
+                <!-- 修改密码对话框 -->
+                <el-dialog title="修改密码" :visible.sync="dialogVisible" width="30%" @close="handleCloseDialog">
+                    <el-form :model="form">
+                        <el-form-item label="原密码" label-width="100px">
+                            <el-input v-model="form.oldPass"></el-input>
+                        </el-form-item>
+                        <el-form-item label="新密码" label-width="100px">
+                            <el-input v-model="form.newPass" type="password"></el-input>
+                        </el-form-item>
+                        <el-form-item label="重复新密码" label-width="100px">
+                            <el-input v-model="form.sureNewPass" type="password"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="handleCloseDialog">取 消</el-button>
+                        <el-button type="primary" @click="handleConfrim">确 定</el-button>
+                    </span>
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -54,25 +67,72 @@ import bus from '../common/bus';
 export default {
     data() {
         return {
+            imgHead: this.$imgHead,
             collapse: false,
             fullscreen: false,
-            name: 'linxin',
-            message: 2
+            name: 'admin',
+            message: 2,
+            dialogVisible: false,
+            form: {
+                oldPass: '',
+                newPass: '',
+                sureNewPass: ''
+            }
         };
     },
     computed: {
+        //商家名称
         username() {
             let username = JSON.parse(localStorage.getItem('userInfo')).loginName;
             return username ? username : this.name;
+        },
+
+        //商家logo
+        logo() {
+            let logo = JSON.parse(localStorage.getItem('userInfo')).logo;
+            return logo ? this.$imgHead + logo : require('../../assets/favicon.png');
         }
     },
     methods: {
+        //对话框里的确认操作
+        handleConfrim() {
+            let data = {
+                oldPassword: this.form.oldPass,
+                newPassword: this.form.newPass
+            };
+
+            if (this.form.newPass !== this.form.sureNewPass) {
+                this.$message.error('两次输入密码不一致，请重新输入！');
+                return;
+            } else {
+                this.$post('/merchant/store/updatePassword', data).then((res) => {
+                    console.log(res);
+                    if (res.code === 0) {
+                        localStorage.removeItem('userInfo');
+                        this.$message.success('修改成功');
+                        this.$router.push('/login');
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                });
+            }
+        },
+
+        //关闭对话框操作
+        handleCloseDialog() {
+            this.form = {
+                oldPass: '',
+                newPass: '',
+                sureNewPass: ''
+            };
+            this.dialogVisible = false;
+        },
+
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
                 this.$get('/merchant/store/logout').then(
                     (res) => {
-                        console.log(res);
                         localStorage.removeItem('userInfo');
                         this.$message.success('退出成功');
                         this.$router.push('/login');
@@ -81,6 +141,10 @@ export default {
                         console.log(err);
                     }
                 );
+            }
+
+            if (command == 'setPassword') {
+                this.dialogVisible = true;
             }
         },
         // 侧边栏折叠

@@ -15,7 +15,7 @@
                 </div>
                 <p>
                     <span>商品简介：</span>
-                    <el-input type="textarea" v-model="goodsForm.desc" style="width: 300px"></el-input>
+                    <el-input type="textarea" v-model="goodsForm.desc" maxlength="60" show-word-limit style="width: 300px"></el-input>
                 </p>
 
                 <!-- 商品规格 -->
@@ -290,7 +290,7 @@ export default {
     data() {
         return {
             fileUploadUrl: '/admin/system/upload/create', //单文件上传
-            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片前缀
+            showImgPrefix: this.$imgHead, //回显图片前缀
 
             thumImageBox: [], //会员卡卡片列表
 
@@ -303,7 +303,7 @@ export default {
 
     created() {
         if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+            this.showImgPrefix = this.$imgHead;
         } else {
             this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
         }

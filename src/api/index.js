@@ -2,7 +2,11 @@ import request from '../utils/request';
 import axios from 'axios'
 
 import router from "../router";
-import {api_request,map_request,file_request} from "./ip";
+import {
+    api_request,
+    map_request,
+    file_request
+} from "./ip";
 import Message from "element-ui/packages/message/index.js";
 
 // axios.defaults.timeout = 10000; //请求超时时间 单位(毫秒)
@@ -11,9 +15,9 @@ import Message from "element-ui/packages/message/index.js";
 
 axios.interceptors.response.use(
     function (response) {
-        if(response.status ==200){
+        if (response.status == 200) {
             return response;
-        }else if (response.data.code == 0) {
+        } else if (response.data.code == 0) {
             return response;
         } else if (response.data.code == 700) {
             //未登录 登录失效
@@ -45,6 +49,8 @@ axios.interceptors.response.use(
 //         params: query
 //     });
 // };
+
+const imgHead = '/file/admin/system/upload/down?keyName=';
 
 function post(url, data = {}) {
     return new Promise((resolve, reject) => {
@@ -127,4 +133,5 @@ export {
     map_get,
     file_get,
     file_post,
+    imgHead
 }

@@ -8,22 +8,25 @@
         <div class="container">
             <!-- 头部模块 -->
             <div class="handle-box">
-                <el-button :type="activeName == 'reserveSetting' ? 'primary' : ''" @click="activeChange('reserveSetting')"
+                <el-button :type="activeName === 'reserveSetting' ? 'primary' : ''" @click="activeChange('reserveSetting')"
                     >预定权限</el-button
                 >
-                <!-- <el-button :type="activeName == 'tradeRecord' ? 'primary' : ''" @click="activeChange('tradeRecord')">我要售票</el-button> -->
-                <el-input
-                    clearable
-                    @keydown.13.native="handleSearch"
-                    v-model="searchName"
-                    placeholder="请输入关键词"
-                    class="handle-input mr10"
-                ></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary">Excel导出</el-button>
+                <el-button :type="activeName === 'tradeRecord' ? 'primary' : ''" @click="activeChange('tradeRecord')">我要售票</el-button>
+
+                <template v-if="activeName === 'tradeRecord'">
+                    <el-input
+                        clearable
+                        @keydown.13.native="handleSearch"
+                        v-model="searchName"
+                        placeholder="请输入关键词"
+                        class="handle-input mr10"
+                    ></el-input>
+                    <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                    <el-button type="primary">Excel导出</el-button>
+                </template>
             </div>
 
-            <reserve-setting v-if="activeName == 'reserveSetting'"></reserve-setting>
+            <reserve-setting v-if="activeName === 'reserveSetting'"></reserve-setting>
         </div>
     </div>
 </template>
@@ -67,9 +70,9 @@ export default {
                 case 'reserveSetting':
                     this.activeName = 'reserveSetting';
                     break;
-                // case 'tradeRecord':
-                //     this.activeName = 'tradeRecord';
-                //     break;
+                case 'tradeRecord':
+                    this.activeName = 'tradeRecord';
+                    break;
             }
         }
     }
