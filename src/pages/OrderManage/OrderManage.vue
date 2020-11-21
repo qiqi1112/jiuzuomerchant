@@ -152,7 +152,7 @@
             </el-dialog>
 
             <!-- 查看订单与查看座位对话框 -->
-            <el-dialog :visible.sync="dialog">
+            <el-dialog :visible.sync="dialog" class="search-seat">
                 <!-- 订单详情 -->
                 <span class="add-classify-title">{{ dialogStatus == 1 ? '订单信息' : '座位信息' }} </span>
                 <div class="basic-info">
@@ -887,7 +887,7 @@ export default {
     display: flex;
 
     .left-box {
-        margin-right: 30px;
+        margin-right: 50px;
 
         .seat-title {
             display: flex;
@@ -1125,6 +1125,12 @@ export default {
 
     .el-dialog__header {
         padding: 20px 20px 40px;
+    }
+}
+
+/deep/ .search-seat {
+    .el-dialog {
+        width: 70%;
     }
 }
 

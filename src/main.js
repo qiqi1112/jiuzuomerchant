@@ -21,6 +21,7 @@ import {
     map_get,
     file_get,
     file_post,
+    imgHead
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
@@ -36,6 +37,9 @@ Vue.prototype.$Delete = Delete;
 Vue.prototype.$put = put;
 Vue.prototype.$file_get = file_get;
 Vue.prototype.$file_post = file_post;
+Vue.prototype.$imgHead = imgHead;
+
+
 
 Vue.config.productionTip = false;
 Vue.use(VueI18n);

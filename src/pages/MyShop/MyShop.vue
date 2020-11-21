@@ -867,7 +867,7 @@ export default {
 
             fileUploadUrl: '/admin/system/upload/create', //单文件上传
             filesUploadUrl: '/admin/system/upload/createBatch', //批量上传文件
-            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片/视频的前缀
+            showImgPrefix: this.$imgHead, //回显图片/视频的前缀
 
             isReadonly: true, //编辑信息开关
             isUpdate: true, //判断当前操作为修改还是新增店铺
@@ -2373,7 +2373,7 @@ export default {
         this.getKtvType(); //获取ktv包间类型
 
         if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+            this.showImgPrefix = this.$imgHead;
         } else {
             this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
         }

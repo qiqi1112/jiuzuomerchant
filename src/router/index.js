@@ -14,25 +14,23 @@ export default new Router({
             meta: {
                 title: '自述文件'
             },
-            children: [
-                //--------------自己添加的组件-----------------------
-                {
+            children: [{
                     path: '/index',
-                    component: () => import('../pages/Index/Index.vue'),
+                    component: () => import( /* webpackChunkName: "index" */ '../pages/Index/Index.vue'),
                     meta: {
                         title: '系统首页'
                     }
                 },
                 {
                     path: '/myshop',
-                    component: () => import('../pages/MyShop/MyShop.vue'),
+                    component: () => import( /* webpackChunkName: "myshop" */ '../pages/MyShop/MyShop.vue'),
                     meta: {
                         title: '我的店铺'
                     }
                 },
                 {
                     path: '/shopmanage',
-                    component: () => import('../pages/ShopManage/ShopManage.vue'),
+                    component: () => import( /* webpackChunkName: "shopmanage" */ '../pages/ShopManage/ShopManage.vue'),
                     meta: {
                         title: '商品管理'
                     }
@@ -40,97 +38,95 @@ export default new Router({
 
                 {
                     path: '/clientmanage',
-                    component: () => import('../pages/ClientManage/ClientManage.vue'),
+                    component: () => import( /* webpackChunkName: "clientmanage" */ '../pages/ClientManage/ClientManage.vue'),
                     meta: {
                         title: '客户管理'
                     }
                 },
                 {
                     path: '/ordermanage',
-                    component: () => import('../pages/OrderManage/OrderManage.vue'),
+                    component: () => import( /* webpackChunkName: "ordermanage" */ '../pages/OrderManage/OrderManage.vue'),
                     meta: {
                         title: '订单管理'
                     }
                 },
                 {
                     path: '/nummanage',
-                    component: () => import('../pages/NumManage/NumManage.vue'),
+                    component: () => import( /* webpackChunkName: "nummanage" */ '../pages/NumManage/NumManage.vue'),
                     meta: {
                         title: '排号管理'
                     }
                 },
                 {
                     path: '/adveractivity',
-                    component: () => import('../pages/AdverActivity/AdverActivity.vue'),
+                    component: () => import( /* webpackChunkName: "adveractivity" */ '../pages/AdverActivity/AdverActivity.vue'),
                     meta: {
                         title: '广告活动'
                     }
                 },
                 {
                     path: '/comments',
-                    component: () => import('../pages/Comments/Comments.vue'),
+                    component: () => import( /* webpackChunkName: "comments" */ '../pages/Comments/Comments.vue'),
                     meta: {
                         title: '评论管理'
                     }
                 },
                 // {
                 //     path: '/service',
-                //     component: () => import('../pages/Service/Service.vue'),
+                //     component: () => import( /* webpackChunkName: "service" */ '../pages/Service/Service.vue'),
                 //     meta: {
                 //         title: '客服管理'
                 //     }
                 // },
                 {
                     path: '/log',
-                    component: () => import('../pages/Log/Log.vue'),
+                    component: () => import( /* webpackChunkName: "log" */ '../pages/Log/Log.vue'),
                     meta: {
                         title: '操作日志'
                     }
                 },
                 {
                     path: '/coupons',
-                    component: () => import('../pages/Coupons/Coupons.vue'),
+                    component: () => import( /* webpackChunkName: "coupons" */ '../pages/Coupons/Coupons.vue'),
                     meta: {
                         title: '优惠券'
                     }
                 },
                 {
                     path: '/financialAudit',
-                    component: () => import('../pages/FinancialAudit/FinancialAudit.vue'),
+                    component: () => import( /* webpackChunkName: "financialAudit" */ '../pages/FinancialAudit/FinancialAudit.vue'),
                     meta: {
                         title: '财务审核'
                     }
                 },
                 {
                     path: '/setting',
-                    component: () => import('../pages/Setting/Setting.vue'),
+                    component: () => import( /* webpackChunkName: "setting" */ '../pages/Setting/Setting.vue'),
                     meta: {
                         title: '设置'
                     }
                 },
                 {
                     path: '/entrepotManage',
-                    component: () => import('../pages/EntrepotManage/EntrepotManage.vue'),
+                    component: () => import( /* webpackChunkName: "entrepotManage" */ '../pages/EntrepotManage/EntrepotManage.vue'),
                     meta: {
                         title: '仓库管理'
                     }
                 },
                 {
                     path: '/staffManage',
-                    component: () => import('../pages/StaffManage/StaffManage.vue'),
+                    component: () => import( /* webpackChunkName: "staffManage" */ '../pages/StaffManage/StaffManage.vue'),
                     meta: {
                         title: '员工管理'
                     }
                 },
                 {
                     path: '/financeManage',
-                    component: () => import('../pages/FinanceManage/FinanceManage.vue'),
+                    component: () => import( /* webpackChunkName: "financeManage" */ '../pages/FinanceManage/FinanceManage.vue'),
                     meta: {
                         title: '财务管理'
                     }
                 },
-
-
                 {
                     path: '/404',
                     component: () => import( /* webpackChunkName: "404" */ '../components/page/404.vue'),

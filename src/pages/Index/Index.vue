@@ -325,7 +325,7 @@ export default {
                 }
             ],
 
-            addUrl: '/file/admin/system/upload/down?keyName=',
+            addUrl: this.$imgHead,
 
             topData: {},
             storeDate: [],

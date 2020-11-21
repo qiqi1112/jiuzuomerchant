@@ -12,7 +12,7 @@
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
                     <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort">添加商品</el-button>
-                    <el-button type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
+                    <el-button v-if="goodsData.length > 0" type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
@@ -45,7 +45,7 @@
 
                 <!-- APP展示商品分类弹窗 -->
                 <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
-                    <span class="add-classify-title">请选择给用户隐藏的商品种类</span>
+                    <span class="add-classify-title">请选择给用户显示的商品种类</span>
 
                     <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
                         item.type | showAppGoodsType
@@ -59,7 +59,7 @@
 
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
-                    <el-button type="primary" @click="handleSelGoodsType" class="mr10">APP展示选择</el-button>
+                    <el-button type="primary" @click="handleSelGoodsType" class="mr10" v-if="goodsData.length > 0">APP展示选择</el-button>
                     <el-input
                         v-model="searchName"
                         @keydown.13.native="getGoodsInfo"
@@ -121,7 +121,7 @@ export default {
 
     data() {
         return {
-            showImgPrefix: '/file/admin/system/upload/down?keyName=', //回显图片前缀
+            showImgPrefix: this.$imgHead, //回显图片前缀
             searchName: '', //商品名称输入框
             value: '', //商品分类下拉框
 
@@ -559,7 +559,7 @@ export default {
 
     created() {
         if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = '/file/admin/system/upload/down?keyName=';
+            this.showImgPrefix = this.$imgHead;
         } else {
             this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
         }

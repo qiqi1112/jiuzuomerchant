@@ -42,11 +42,11 @@ export default {
                 loginPassword: this.param.password
             };
             this.$post('/merchant/store/login', data).then((res) => {
-                if (res.code == 0) {
+                if (res.code === 0) {
                     let obj = {
-                        id: res.data.id,
                         loginName: res.data.loginName,
-                        token: res.data.token
+                        token: res.data.token,
+                        logo: res.data.logo
                     };
 
                     localStorage.setItem('userInfo', JSON.stringify(obj));

@@ -9,24 +9,26 @@
         <div class="container">
             <!-- 头部模块 -->
             <div class="handle-box">
-                <el-button :type="activeName == 'tradeOrder' ? 'primary' : ''" @click="activeChange('tradeOrder')">交易订单</el-button>
-                <el-button :type="activeName == 'tradeRecord' ? 'primary' : ''" @click="activeChange('tradeRecord')">交易记录</el-button>
-                <el-button :type="activeName == 'myAccount' ? 'primary' : ''" @click="activeChange('myAccount')">我的账户</el-button>
-                <el-input
-                    clearable
-                    @keydown.13.native="handleSearch"
-                    v-model="searchName"
-                    placeholder="请输入关键词"
-                    class="handle-input mr10"
-                ></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary">Excel导出</el-button>
-                <el-button v-if="activeName == 'tradeOrder'" type="primary" class="audit-all">一键审核</el-button>
+                <el-button :type="activeName === 'tradeOrder' ? 'primary' : ''" @click="activeChange('tradeOrder')">交易订单</el-button>
+                <el-button :type="activeName === 'tradeRecord' ? 'primary' : ''" @click="activeChange('tradeRecord')">交易记录</el-button>
+                <el-button :type="activeName === 'myAccount' ? 'primary' : ''" @click="activeChange('myAccount')">我的账户</el-button>
+                <template v-if="activeName !== 'myAccount'">
+                    <el-input
+                        clearable
+                        @keydown.13.native="handleSearch"
+                        v-model="searchName"
+                        placeholder="请输入关键词"
+                        class="handle-input mr10"
+                    ></el-input>
+                    <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                    <el-button type="primary">Excel导出</el-button>
+                    <el-button v-if="activeName === 'tradeOrder'" type="primary" class="audit-all">一键审核</el-button>
+                </template>
             </div>
 
-            <trade-order v-if="activeName == 'tradeOrder'"></trade-order>
-            <trade-record v-if="activeName == 'tradeRecord'"></trade-record>
-            <my-account v-if="activeName == 'myAccount'"></my-account>
+            <trade-order v-if="activeName === 'tradeOrder'"></trade-order>
+            <trade-record v-if="activeName === 'tradeRecord'"></trade-record>
+            <my-account v-if="activeName === 'myAccount'"></my-account>
 
             <!-- 表格数据分页 -->
             <el-pagination
