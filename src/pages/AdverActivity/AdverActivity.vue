@@ -39,14 +39,14 @@
                 </el-table-column>
                 <el-table-column prop="startTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
                 <el-table-column prop="endTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
-                <el-table-column label="标签" prop="labelsList" min-width="250" align="center">
+                <!-- <el-table-column label="标签" prop="labelsList" min-width="250" align="center">
                     <template slot-scope="scope">
                         <span class="lab_span" v-for="(item, index) in scope.row.labelsList" :key="index">{{ item }}</span>
                     </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column label="活动缩略图" align="center" min-width="180">
                     <template slot-scope="scope">
-                        <el-image class="table-td-thumb" :src="imgHead + scope.row.banner"></el-image>
+                        <el-image class="table-td-thumb" :src="imgHead + scope.row.thumb"></el-image>
                     </template>
                 </el-table-column>
                 <el-table-column prop="act_content" class-name="beyond" min-width="320" label="活动内容">
@@ -87,7 +87,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog :title="doing" :visible.sync="editVisible" width="54%">
+        <el-dialog :title="doing" :visible.sync="editVisible" width="62%">
             <el-form ref="form" :model="form" label-width="70px">
                 <div class="column">
                     <span class="line lw2"></span>
@@ -113,7 +113,7 @@
                                 >
                                 </el-date-picker>
                             </el-form-item>
-                            <div class="lab_box">
+                            <!-- <div class="lab_box">
                                 <label class="label">活动标签</label>
                                 <div class="iptList">
                                     <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" class="demo-dynamic">
@@ -130,7 +130,7 @@
                                         </el-form-item>
                                     </el-form>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div class="banner" v-loading="loading">
@@ -149,6 +149,26 @@
                             </el-upload>
                             <el-dialog :visible.sync="dialogVisible">
                                 <img width="100%" :src="dialogImageUrl" alt="" />
+                            </el-dialog>
+                        </div>
+                    </div>
+
+                    <div class="breviary" v-loading="loading1">
+                        <div class="imgs">
+                            <p>活动缩略图:</p>
+                            <el-upload
+                                class="avatar-uploader1"
+                                action="fakeaction"
+                                :show-file-list="false"
+                                :on-remove="handleRemove1"
+                                :on-change="handleChange1"
+                                :http-request="uploadSectionFile1"
+                            >
+                                <img v-if="dynamicValidateForm.thumb" :src="imgHead + dynamicValidateForm.thumb" class="avatar" />
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible1">
+                                <img width="100%" :src="dialogImageUrl1" alt="" />
                             </el-dialog>
                         </div>
                     </div>
@@ -191,8 +211,11 @@ export default {
             idx: -1,
             id: -1,
             formData: [],
+            formData1: [],
             dialogImageUrl: '',
+            dialogImageUrl1: '',
             dialogVisible: false,
+            dialogVisible1: false,
             doing: '',
             dynamicValidateForm: {
                 domains: [
@@ -203,12 +226,14 @@ export default {
                 dio_name: '', //名字
                 dio_introduce: '', //简介
                 fromdata: '', //图片
+                thumb:'',//缩略图
                 editor_text: '', //富文本
                 times: [],
                 id: '',
                 examine: 0
             },
             loading: false,
+            loading1: false,
             buttons: [
                 {
                     type: 0,
@@ -360,6 +385,8 @@ export default {
             this.$set(this.dynamicValidateForm, 'editor_text', row.content);
             this.$set(this.dynamicValidateForm, 'times', [row.startTime, row.endTime]);
             this.$set(this.dynamicValidateForm, 'fromdata', row.banner);
+            this.$set(this.dynamicValidateForm, 'thumb', row.thumb);
+
             for (let j = 0; j < row.labelsList.length; j++) {
                 this.$set(this.dynamicValidateForm.domains, j, { value: row.labelsList[j] });
             }
@@ -375,12 +402,13 @@ export default {
             let data = {
                 content: this.dynamicValidateForm.editor_text,
                 id: this.dynamicValidateForm.id,
-                labels: str,
+                // labels: str,
                 name: this.dynamicValidateForm.dio_name,
                 startTime: this.$regular.timeData(this.dynamicValidateForm.times[0], 3) + ':00',
                 endTime: this.$regular.timeData(this.dynamicValidateForm.times[1], 3) + ':00',
                 synopsis: this.dynamicValidateForm.dio_introduce,
                 banner: this.dynamicValidateForm.fromdata,
+                thumb: this.dynamicValidateForm.thumb,
                 examine: this.dynamicValidateForm.examine
             };
             if (!data.name) {
@@ -391,12 +419,16 @@ export default {
                 this.$message.warning(`请输入活动简介`);
                 return;
             }
-            if (!data.labels) {
-                this.$message.warning(`请输入活动标签`);
-                return;
-            }
+            // if (!data.labels) {
+            //     this.$message.warning(`请输入活动标签`);
+            //     return;
+            // }
             if (!data.banner) {
                 this.$message.warning(`请添加活动图片`);
+                return;
+            }
+            if (!data.thumb) {
+                this.$message.warning(`请添加活动缩略图`);
                 return;
             }
             if (!data.startTime) {
@@ -460,6 +492,39 @@ export default {
         uploadSectionFile(file) {
             this.loading = true;
             this.uploadImg();
+        },
+
+
+
+        // 图片上传 缩略
+        uploadImg1() {
+            let config = {
+                'Content-Type': 'multipart/form-data'
+            };
+            let fromdata = new FormData();
+            fromdata.append('file', this.formData1);
+            this.$file_post('/admin/system/upload/create', fromdata, config).then((res) => {
+                if (res.code == 0) {
+                    this.dynamicValidateForm.thumb = res.data;
+                } else {
+                    this.$message.error(`图片上传失败，请刷新后再试`);
+                }
+                this.loading1 = false;
+            });
+        },
+        handleRemove1(file, fileList) {
+            this.formData1.forEach((i, index) => {
+                if (file.name == i.name) {
+                    this.formData1.splice(index, 1);
+                }
+            });
+        },
+        handleChange1(file, fileList) {
+            this.formData1 = file.raw;
+        },
+        uploadSectionFile1(file) {
+            this.loading1 = true;
+            this.uploadImg1();
         }
     }
 };
@@ -477,7 +542,7 @@ export default {
 .top_info {
     display: flex;
     .activity {
-        flex: 1;
+        flex: .4;
         .in_act {
             width: 85%;
         }
@@ -515,18 +580,37 @@ export default {
             cursor: pointer;
         }
     }
-    .banner {
-        flex: 1;
+    .banner,.breviary {
+        flex: .3;
         padding-left: 10px;
         .imgs {
             p {
                 margin-bottom: 15px;
             }
         }
+        
     }
-    /deep/.el-upload--text {
-        width: 300px;
+    .banner{
+        /deep/.el-upload--text {
+            width: 300px;
+        }
+        .avatar {
+            width: 298px;
+            height: 178px;
+            display: block;
+        }
     }
+    .breviary{
+        /deep/.el-upload--text {
+            width: 180px;
+        }
+        .avatar {
+            width: 180px;
+            height: 178px;
+            display: block;
+        }
+    }
+    
     /deep/.avatar-uploader .el-upload {
         border: 1px dashed #d9d9d9;
         border-radius: 6px;
@@ -545,11 +629,7 @@ export default {
         line-height: 178px;
         text-align: center;
     }
-    .avatar {
-        width: 298px;
-        height: 178px;
-        display: block;
-    }
+    
 }
 .handle-box {
     margin-bottom: 20px;
@@ -597,8 +677,8 @@ export default {
 }
 // element
 /deep/ .el-dialog {
-    width: 55%;
-    min-width: 850px;
+    width: 75%;
+    min-width: 1150px;
 }
 /deep/.el-dialog__header {
     padding: 0;
