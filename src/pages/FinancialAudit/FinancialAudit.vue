@@ -11,7 +11,7 @@
             <div class="handle-box">
                 <el-button :type="activeName === 'tradeOrder' ? 'primary' : ''" @click="activeChange('tradeOrder')">交易订单</el-button>
                 <el-button :type="activeName === 'tradeRecord' ? 'primary' : ''" @click="activeChange('tradeRecord')">交易记录</el-button>
-                <el-button :type="activeName === 'myAccount' ? 'primary' : ''" @click="activeChange('myAccount')">我的账户</el-button>
+                <!-- <el-button :type="activeName === 'myAccount' ? 'primary' : ''" @click="activeChange('myAccount')">我的账户</el-button> -->
                 <template v-if="activeName !== 'myAccount'">
                     <el-input
                         clearable
@@ -28,7 +28,7 @@
 
             <trade-order v-if="activeName === 'tradeOrder'"></trade-order>
             <trade-record v-if="activeName === 'tradeRecord'"></trade-record>
-            <my-account v-if="activeName === 'myAccount'"></my-account>
+            <!-- <my-account v-if="activeName === 'myAccount'"></my-account> -->
 
             <!-- 表格数据分页 -->
             <el-pagination

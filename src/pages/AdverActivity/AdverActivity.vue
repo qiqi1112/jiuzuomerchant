@@ -39,11 +39,11 @@
                 </el-table-column>
                 <el-table-column prop="startTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
                 <el-table-column prop="endTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
-                <el-table-column label="标签" prop="labelsList" min-width="250" align="center">
+                <!-- <el-table-column label="标签" prop="labelsList" min-width="250" align="center">
                     <template slot-scope="scope">
                         <span class="lab_span" v-for="(item, index) in scope.row.labelsList" :key="index">{{ item }}</span>
                     </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column label="活动缩略图" align="center" min-width="180">
                     <template slot-scope="scope">
                         <el-image class="table-td-thumb" :src="imgHead + scope.row.banner"></el-image>
@@ -113,7 +113,7 @@
                                 >
                                 </el-date-picker>
                             </el-form-item>
-                            <div class="lab_box">
+                            <!-- <div class="lab_box">
                                 <label class="label">活动标签</label>
                                 <div class="iptList">
                                     <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" class="demo-dynamic">
@@ -130,7 +130,7 @@
                                         </el-form-item>
                                     </el-form>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div class="banner" v-loading="loading">
@@ -391,10 +391,10 @@ export default {
                 this.$message.warning(`请输入活动简介`);
                 return;
             }
-            if (!data.labels) {
-                this.$message.warning(`请输入活动标签`);
-                return;
-            }
+            // if (!data.labels) {
+            //     this.$message.warning(`请输入活动标签`);
+            //     return;
+            // }
             if (!data.banner) {
                 this.$message.warning(`请添加活动图片`);
                 return;
@@ -587,7 +587,7 @@ export default {
 .table-td-thumb {
     display: inline-block;
     margin: auto;
-    width: 80px;
+    width: 140px;
     height: 80px;
     margin-right: 10px;
 }

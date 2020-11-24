@@ -6,10 +6,7 @@ if (process.env.NODE_ENV === "development") {
   tengxun = "/map";
 } else {
   api = 'http://47.108.204.66:8077'
-<<<<<<< HEAD
-=======
   // api = 'http://192.168.31.100:8077'
->>>>>>> 7de512862d9b89c0bbe02bf045b2d373fd70b010
   file = 'http://47.108.204.66:8078'
   tengxun = 'http://apis.map.qq.com'
 }

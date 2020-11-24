@@ -76,14 +76,14 @@
                             v-if="scope.row.status != 2"
                             :disabled="(scope.row.status != 0 && scope.row.status != 1) || scope.row.status == 1"
                             :type="scope.row.status == 0 ? 'primary' : scope.row.status != 2 ? 'success' : 'info'"
-                            @click="handleOper(scope.row, 0)"
+                            @click="handleOper(scope.row, 1)"
                             >{{ scope.row.status != 0 && scope.row.status != 2 ? '已接单' : '接单' }}</el-button
                         >
                         <el-button
                             v-if="scope.row.status == 2 || scope.row.status == 0"
                             :disabled="scope.row.status == 2"
                             :type="scope.row.status == 0 ? 'primary' : scope.row.status == 2 ? 'danger' : 'info'"
-                            @click="handleOper(scope.row, 1)"
+                            @click="handleOper(scope.row, 2)"
                             >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
                         >
                         <el-button
@@ -754,10 +754,10 @@ export default {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.isHandleRequest(row.id, 3); //已到店
+                        this.isHandleRequest(row.id, 4); //已到店
                     })
                     .catch((action) => {
-                        action === 'cancel' && this.isHandleRequest(row.id, 2); //未到店
+                        action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
                     });
             }
         },
@@ -774,10 +774,10 @@ export default {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.isHandleRequest(row.id, 5); //已离开
+                        this.isHandleRequest(row.id, 6); //已离开
                     })
                     .catch((action) => {
-                        action === 'cancel' && this.isHandleRequest(row.id, 4); //未消费
+                        action === 'cancel' && this.isHandleRequest(row.id, 5); //未消费
                     });
             }
         }
