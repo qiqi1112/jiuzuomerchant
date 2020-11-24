@@ -806,9 +806,7 @@ export default {
 
 <style scoped lang='less'>
 @font-size: 14px;
-@media screen and (max-width: 1300px) {
-    @font-size: 12px;
-}
+
 @def-color: #000;
 @line-bg-color:rgb (138, 143, 134);
 .container{
@@ -882,7 +880,6 @@ export default {
         }
     }
 }
-
 
 .main_box {
     font-size: @font-size;
@@ -1062,6 +1059,17 @@ export default {
         font-size: 1.8rem;
         font-weight: bold;
         color: #000 !important;
+    }
+}
+@media screen and (max-width: 1300px) {
+    .top_box{
+        font-size: 12px;
+    }
+    /deep/.el-rate .el-rate__text{
+        font-size: 1.4rem;
+    }
+    /deep/.el-rate .el-rate__icon{
+        font-size: 1.2rem;
     }
 }
 
