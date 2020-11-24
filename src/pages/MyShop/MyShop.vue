@@ -381,6 +381,19 @@
                                         ></span>
                                     </div>
                                 </div>
+
+                                <!-- <div v-for="(itemX, indexX) in Number(y)" :key="indexX">
+                                    <div v-for="(itemY, indexY) in Number(x)" :key="indexY">
+                                        <span
+                                            ref="seatSpan"
+                                            :data-indexX="indexX + 1"
+                                            :data-indexY="indexY + 1"
+                                            class="seat"
+                                            @click="changeStauts($event, seatStyle)"
+                                            @contextmenu.prevent="changeStauts($event, 'canBook')"
+                                        ></span>
+                                    </div>
+                                </div> -->
                             </div>
                         </div>
                         <!-- 座位属性 -->
@@ -559,18 +572,12 @@
                             <!-- 机麻 -->
                             <div>
                                 <span>配套设施：</span>
-                                <!-- <el-checkbox-group v-model="presentKtvInfo.ktvCheckBoxArr">
-                                    <el-checkbox
-                                        :disabled="isReadonly"
-                                        :label="item.label"
-                                        v-for="(item, index) in checkBoxList"
-                                        :key="index"
-                                    ></el-checkbox>
-                                </el-checkbox-group> -->
-
-                                <el-checkbox v-model="item.hidden" v-for="(item, index) in presentKtvInfo.ktvCheckBoxArr" :key="index">{{
-                                    item.type | showAppGoodsType
-                                }}</el-checkbox>
+                                <template>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveDiningTable">餐桌</el-checkbox>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveMahjong">机麻</el-checkbox>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveSwimming">泳池</el-checkbox>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveTableTennis">桌球</el-checkbox>
+                                </template>
                             </div>
                             <!-- 时间段分布 -->
                             <div class="time-quan">
@@ -959,31 +966,17 @@ export default {
                 minConsumption: 0 //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
-            checkBoxList: [
-                {
-                    label: '泳池',
-                    value: 1
-                },
-                {
-                    label: '餐桌',
-                    value: 2
-                },
-                {
-                    label: '桌球',
-                    value: 3
-                },
-                {
-                    label: '机麻',
-                    value: 4
-                }
-            ],
+
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
                 roomTypeId: '', //包间类型
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
-                ktvCheckBoxArr: [], //ktv配套设施
+                haveDiningTable: false, //餐桌
+                haveMahjong: false, //麻将
+                haveSwimming: false, //泳池
+                haveTableTennis: false, //桌球
                 minConsumption: '', //最低消费（时间段集合里的最低消费）
                 snacks: [], //赠品
                 sketchMap: [], //包间示意图
@@ -1517,7 +1510,11 @@ export default {
                 ktvRoomList = this.cloneSnacks(); //数组转json形式（赠品）
                 //数组转字符串（ktv示意图）
                 ktvRoomList.forEach((item) => {
-                    item.sketchMap = item.sketchMap.join(',');
+                    item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
+                    item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
+                    item.haveMahjong = item.haveMahjong === false ? 2 : 1;
+                    item.haveSwimming = item.haveSwimming === false ? 2 : 1;
+                    item.haveTableTennis = item.haveTableTennis === false ? 2 : 1;
                 });
             }
 
@@ -2021,6 +2018,14 @@ export default {
                 if (item.haveToilet) {
                     item.haveToilet = item.haveToilet.toString();
                 }
+
+                //将配套设施转为布尔类型
+                if (item.haveDiningTable || item.haveMahjong || item.haveSwimming || item.haveTableTennis) {
+                    item.haveDiningTable = item.haveDiningTable === 1 ? true : false;
+                    item.haveMahjong = item.haveMahjong === 1 ? true : false;
+                    item.haveSwimming = item.haveSwimming === 1 ? true : false;
+                    item.haveTableTennis = item.haveTableTennis === 1 ? true : false;
+                }
             });
         },
 
@@ -2028,10 +2033,13 @@ export default {
         clearKtvInfo() {
             this.presentKtvInfo = {
                 roomTypeId: '', //包间类型
-                ktvCheckBoxArr: [], //ktv配套设施
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
+                haveDiningTable: false, //餐桌
+                haveMahjong: false, //麻将
+                haveSwimming: false, //泳池
+                haveTableTennis: false, //桌球
                 minConsumption: '', //最低消费（时间段集合里的最低消费）
                 snacks: [], //赠品
                 sketchMap: [], //包间示意图
@@ -2078,6 +2086,7 @@ export default {
                     if (!this.ktvRoomList) {
                         this.ktvRoomList = [];
                     }
+                    //将当前用户添加的KTV信息存到上传数组中
                     this.ktvRoomList.push(this.presentKtvInfo);
                     this.$message.success('新增成功');
                 }

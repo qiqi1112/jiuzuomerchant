@@ -115,7 +115,7 @@
                             }}
                         </el-button>
                         <el-button
-                            v-if="scope.row.status != 2 && scope.row.status != 0"
+                            v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 3 && scope.row.status != 1"
                             :type="
                                 scope.row.status == 5
                                     ? 'info'
@@ -744,42 +744,36 @@ export default {
 
         //是否到店确认
         isReachStore(row) {
-            if (row.status == 0) {
-                this.$message.error('请先选择是否接单');
-            } else {
-                this.$confirm('是否确认到店?', '提示', {
-                    distinguishCancelAndClose: true,
-                    confirmButtonText: '已到店',
-                    cancelButtonText: '未到店',
-                    type: 'warning'
+            this.$confirm('是否确认到店?', '提示', {
+                distinguishCancelAndClose: true,
+                confirmButtonText: '已到店',
+                cancelButtonText: '未到店',
+                type: 'warning'
+            })
+                .then(() => {
+                    this.isHandleRequest(row.id, 4); //已到店
                 })
-                    .then(() => {
-                        this.isHandleRequest(row.id, 4); //已到店
-                    })
-                    .catch((action) => {
-                        action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
-                    });
-            }
+                .catch((action) => {
+                    action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
+                });
         },
 
         //是否消费确认
         isConComplete(row) {
-            if (row.status == 0) {
-                this.$message.error('请先选择是否接单');
-            } else {
-                this.$confirm('是否确认消费?', '提示', {
-                    distinguishCancelAndClose: true,
-                    confirmButtonText: '已离开',
-                    cancelButtonText: '未消费',
-                    type: 'warning'
+            console.log('xxx', row);
+
+            this.$confirm('是否确认消费?', '提示', {
+                distinguishCancelAndClose: true,
+                confirmButtonText: '已消费',
+                // cancelButtonText: '未消费',
+                type: 'warning'
+            })
+                .then(() => {
+                    this.isHandleRequest(row.id, 6); //已消费
                 })
-                    .then(() => {
-                        this.isHandleRequest(row.id, 6); //已离开
-                    })
-                    .catch((action) => {
-                        action === 'cancel' && this.isHandleRequest(row.id, 5); //未消费
-                    });
-            }
+                .catch((action) => {
+                    // action === 'cancel' && this.isHandleRequest(row.id, 5); //未消费
+                });
         }
     },
 
