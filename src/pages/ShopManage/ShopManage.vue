@@ -601,19 +601,17 @@ export default {
 
 .goodsList {
     display: flex;
-    justify-content: start;
     flex-wrap: wrap;
-
     .goods-box {
         box-sizing: border-box;
-        width: 12.5%;
+        width: 180px;
         margin-bottom: 30px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         position: relative;
-
+        margin-right: 10px;
         .checkbox {
             position: absolute;
             top: -1px;

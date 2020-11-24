@@ -609,8 +609,8 @@ export default {
     }
     .position{
         position: fixed;
-        width: 84%;
-        background: white;
+        width: 90%;
+        background: #f7f7f7;
         z-index: 2222;
         padding: 20px 0;
         padding-left: 15px;
