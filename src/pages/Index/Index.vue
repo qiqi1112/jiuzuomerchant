@@ -65,16 +65,16 @@
             </div>
             <div class="main_box">
                 <div class="m_l">
-                    <div class="broken_box">
-                        <div class="column">
+                    <div class="broken_box box_css">
+                        <div class="column col_spe">
                             <span class="line lw2"></span>
                             <span>营业额</span>
                         </div>
                         <div ref="broken" id="brokenline" style="width: 98%; height: 500px"></div>
                     </div>
 
-                    <div class="columnar_box">
-                        <div class="column">
+                    <div class="columnar_box box_css">
+                        <div class="column col_spe">
                             <span class="line lw2"></span>
                             <span>开台数据统计</span>
                         </div>
@@ -175,42 +175,42 @@
                     </div>
                 </div>
                 <div class="m_m">
-                    <div class="bread_box">
-                        <div class="column">
+                    <div class="bread_box box_css">
+                        <div class="column col_spe">
                             <span class="line lw2"></span>
                             <span>排号统计 ({{ format_time }})</span>
                         </div>
                         <div ref="bread" id="breadLine" style="width: 98%; height: 500px"></div>
                     </div>
 
-                    <div class="Top_goods">
-                        <div class="column">
+                    <div class="Top_goods box_css">
+                        <div class="column col_spe">
                             <span class="line lw2"></span>
                             <span>热销TOP榜 ({{ format_time }})</span>
                         </div>
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
-                                <el-tab-pane v-for="(item, i) in topList" :key="i" :label="item.label" :name="item.name">
-                                    <ul>
-                                        <li class="top_li" v-for="(item, index) in good_list" :key="index">
+                                <el-tab-pane v-for="(item, i) in topList" :key="i" :label="item.typeName" :name="item.type">
+                                    <ul v-if="item.list != ''">
+                                        <li class="top_li" v-for="(val, index) in item.list" :key="index">
                                             <div class="tl">
-                                                <img :src="addUrl + item.listPicture" />
+                                                <img :src="addUrl + val.listPicture" />
                                             </div>
                                             <div class="tr">
-                                                <p class="tit">{{ item.name }}</p>
-                                                <!-- <p class="good_ifo">{{item.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{item.sold}}瓶</p> -->
-                                                <p class="good_ifo">今日已售{{ item.sellNum }}瓶</p>
-                                                <div class="pro" :style="{ width: item.sellNum / 100 + 'px' }"></div>
+                                                <p class="tit">{{ val.name }}</p>
+                                                <!-- <p class="good_ifo">{{val.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{val.sold}}瓶</p> -->
+                                                <p class="good_ifo">今日已售{{ val.sellNum }}瓶</p>
+                                                <div class="pro" :style="{ width: val.sellNum / 100 + 'px' }"></div>
                                             </div>
                                         </li>
-                                        <div v-if="good_list == ''">该类型今日暂无销量</div>
                                     </ul>
+                                    <div v-else>该类型今日暂无销量</div>
                                 </el-tab-pane>
                             </el-tabs>
                         </div>
                     </div>
                 </div>
-                <div class="m_r">
+                <div class="m_r box_css">
                     <div class="timeData">
                         <div class="block">
                             <el-date-picker
@@ -297,7 +297,7 @@ export default {
                 radio_type: '1',
                 excel_time: ''
             },
-            activeName: '1',
+            activeName: '',
             value2: '',
             time_now: '',
             days: '',
@@ -409,7 +409,7 @@ export default {
         }
     },
     mounted() {
-        this.topThree();
+        // this.topThree();
         this.storeInfo();
         this.seeSeatInfo();
         this.$refs.day_li.addEventListener('wheel', this.myFunction, true);
@@ -419,19 +419,22 @@ export default {
         topThree() {
             let data = {
                 localDate: this.time_now + '-' + this.dayInit(this.active + 1),
-                storeId: '',
-                type: +this.activeName,
-                timeType: this.day_mon
+                timeType: this.day_mon,
+                // type: +this.activeName
             };
             this.$post('/merchant/store/getSell', data).then((res) => {
                 if (res.code == 0) {
-                    let effective = [];
+                    // let effective = [];
                     res.data.forEach((i) => {
-                        if (i.sellNum > 0) {
-                            effective.push(i);
-                        }
+                        // if (i.sellNum > 0) {
+                        //     effective.push(i);
+                        // }
+                        i.type = i.type.toString()
                     });
-                    this.good_list = effective;
+                    this.activeName = res.data[0].type.toString()
+                    this.topList = res.data
+
+                    // this.good_list = effective;
                 }
             });
         },
@@ -443,6 +446,7 @@ export default {
                 type: this.day_mon
             };
             this.$post('/merchant/store/getHomePage', data).then((res) => {
+                this.topThree();
                 if (res.code == 0) {
                     this.topData = res.data[0];
                     this.allGraph = res.data;
@@ -517,7 +521,7 @@ export default {
                 this.scrollY += 1;
                 this.active -= 1;
             }
-            this.debounce(this.topThree, 800);
+            this.debounce(this.storeInfo, 800);
         },
         // 年月切换
         DaysChange(val) {
@@ -530,11 +534,13 @@ export default {
                 this.scrollY = this.scrollY + poor;
                 this.active = this.days - 1;
             }
+            this.storeInfo()
             this.topThree();
         },
         // top类型切换
         handleClick(tab, event) {
-            this.topThree();
+            // this.topThree();
+            this.activeName = tab.name.toString()
         },
 
         // 导出
@@ -567,8 +573,7 @@ export default {
                 },
                 grid: {
                     left: '3%',
-                    right: '4%',
-                    bottom: '3%',
+                    bottom: '5%',
                     containLabel: true
                 },
                 toolbox: {
@@ -614,7 +619,7 @@ export default {
                 },
                 grid: {
                     right: '4%',
-                    bottom: '6%'
+                    bottom: '8%'
                 },
                 dataset: {
                     source: numeral
@@ -667,7 +672,7 @@ export default {
                         name: ' ',
                         type: 'pie',
                         radius: '55%',
-                        center: ['50%', '60%'],
+                        center: ['50%', '55%'],
                         data: numeral,
                         emphasis: {
                             itemStyle: {
@@ -806,11 +811,16 @@ export default {
 }
 @def-color: #000;
 @line-bg-color:rgb (138, 143, 134);
+.container{
+    padding: 0;
+}
 .top_box {
     font-size: @font-size;
     height: 120px;
     border-bottom: 1px solid #000;
     display: flex;
+    padding-left: 30px;
+    padding-top: 15px;
     .evaluation {
         flex: 0.45;
         .title {
@@ -873,9 +883,30 @@ export default {
     }
 }
 
+
 .main_box {
     font-size: @font-size;
     display: flex;
+    background: #ececec;
+    padding: 15px;
+    .box_css{
+        width: 98%;
+        margin-bottom: 15px;
+        background: #fff;
+        -webkit-box-shadow: 0 0 4px #b5b5b5;
+        box-shadow: 0 0 4px #b5b5b5;
+        border-radius: 8px;
+        .col_spe{
+            margin: 0 0 20px 0;
+            padding-left: 15px;
+            padding-top: 15px;
+        }
+        .goods_list{
+            padding-left: 15px;
+            padding-top: 15px;
+            height: 485px;
+        }
+    }
     .m_l {
         flex: 0.45;
     }
@@ -913,6 +944,7 @@ export default {
     .m_r {
         flex: 0.2;
         position: relative;
+        background: #fff;
         .excel {
             text-align: center;
             margin-top: 80px;

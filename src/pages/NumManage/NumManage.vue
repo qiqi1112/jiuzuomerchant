@@ -196,7 +196,7 @@
 
                                 <div class="atl">
                                     <span class="tex">等待时常</span>
-                                    <span class="tim">{{item.createTime | timeFormat}}</span>
+                                    <span class="tim">{{item.createTime | timeFormat(item.offTime)}}</span>
                                 </div>
                             </div>
                             <div class="su_l">
@@ -282,8 +282,13 @@ export default {
         // }
     },
     filters:{
-        timeFormat(time){
-            let diff = new Date().getTime() - new Date(time).getTime()
+        timeFormat(time,timeTwo){
+            let diff;
+            if(timeTwo){
+                diff = new Date(timeTwo).getTime() - new Date(time).getTime()
+            }else{
+                diff = new Date().getTime() - new Date(time).getTime()
+            }
             let getHours,minutes,seconds,leve1,leve2,leve3
             leve1 =  diff%(24*3600*1000) 
             getHours = Math.floor(leve1/(3600*1000))
