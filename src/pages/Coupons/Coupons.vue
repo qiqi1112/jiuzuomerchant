@@ -470,7 +470,7 @@ export default {
                     break;
                 }
             }
-            this.save();
+            // this.save();
             if (!this.editRead) {
                 // 新增
             } else {
