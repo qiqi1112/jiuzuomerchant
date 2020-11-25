@@ -690,16 +690,16 @@ export default {
         //搜索操作
         handleSearch() {
             console.log(this.searchObj.searchOrderType);
-            if (
-                !this.searchObj.searchNickName &&
-                !this.searchObj.searchPhone &&
-                !this.searchObj.searchOrderNum &&
-                !this.searchObj.searchOrderType &&
-                !this.searchObj.searchPayStatus
-            ) {
-                this.$message.error('请输入或选择条件查询');
-                return;
-            }
+            // if (
+            //     !this.searchObj.searchNickName &&
+            //     !this.searchObj.searchPhone &&
+            //     !this.searchObj.searchOrderNum &&
+            //     !this.searchObj.searchOrderType &&
+            //     !this.searchObj.searchPayStatus
+            // ) {
+            //     this.$message.error('请输入或选择条件查询');
+            //     return;
+            // }
             if (this.searchObj.searchPhone) {
                 if (!regular.phone(this.searchObj.searchPhone)) {
                     this.$message.error('请输入正确手机号');

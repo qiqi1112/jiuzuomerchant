@@ -254,10 +254,10 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
-            if (!this.query.text) {
-                this.$message.error('请输入关键字');
-                return;
-            }
+            // if (!this.query.text) {
+            //     this.$message.error('请输入关键字');
+            //     return;
+            // }
             this.$set(this.query, 'pageIndex', 1);
             this.getData();
         },
@@ -425,7 +425,11 @@ export default {
                     this.getData();
                     this.editVisible = false;
                 } else {
-                    this.$message({ message: res.mesg, type: 'warning' });
+                       if (id) {
+                        this.$message({ message: '修改失败', type: 'error' });
+                    } else {
+                        this.$message({ message: '新增失败', type: 'error' });
+                    }
                 }
             });
         },
@@ -437,40 +441,51 @@ export default {
                 return;
             }
             let arr = this.dynamicValidateForm.domains;
+            let addModificationFlag = true
             for (let i in arr) {
                 if (this.form.region == 1) {
                     if (!arr[i].minus) {
                         this.$message({ message: '请输入抵扣金额', type: 'warning' });
+                        addModificationFlag = false
                         break;
                     }
                     if (!arr[i].give) {
                         this.$message({ message: '请输入优惠券张数', type: 'warning' });
+                        addModificationFlag = false
                         break;
                     }
                 } else {
                     if (!arr[i].full) {
                         this.$message({ message: '请输入满减金额', type: 'warning' });
+                        addModificationFlag = false
                         break;
                     }
                     if (!arr[i].minus) {
                         this.$message({ message: '请输入抵扣金额', type: 'warning' });
+                        addModificationFlag = false
                         break;
                     }
                     if (!arr[i].give) {
                         this.$message({ message: '请输入优惠券张数', type: 'warning' });
+                        addModificationFlag = false
                         break;
                     }
                 }
                 if (!arr[i].start_end) {
                     this.$message({ message: '请选择时间', type: 'warning' });
+                    addModificationFlag = false
                     break;
                 }
                 if (!arr[i].offTime) {
                     this.$message({ message: '请选择截止发放时间', type: 'warning' });
+                    addModificationFlag = false
                     break;
                 }
             }
-            // this.save();
+            if(addModificationFlag){
+                this.save();
+            }
+            
             if (!this.editRead) {
                 // 新增
             } else {

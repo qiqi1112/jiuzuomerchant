@@ -160,10 +160,10 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
-            if(!this.query.text){
-                this.$message.error('请输入关键字');
-                return
-            }
+            // if(!this.query.text){
+            //     this.$message.error('请输入关键字');
+            //     return
+            // }
             this.$set(this.query, 'pageIndex', 1);
             this.getData();
         },
