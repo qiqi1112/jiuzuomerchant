@@ -419,7 +419,7 @@ export default {
         topThree() {
             let data = {
                 localDate: this.time_now + '-' + this.dayInit(this.active + 1),
-                timeType: this.day_mon,
+                timeType: this.day_mon
                 // type: +this.activeName
             };
             this.$post('/merchant/store/getSell', data).then((res) => {
@@ -429,10 +429,10 @@ export default {
                         // if (i.sellNum > 0) {
                         //     effective.push(i);
                         // }
-                        i.type = i.type.toString()
+                        i.type = i.type.toString();
                     });
-                    this.activeName = res.data[0].type.toString()
-                    this.topList = res.data
+                    this.activeName = res.data[0].type.toString();
+                    this.topList = res.data;
 
                     // this.good_list = effective;
                 }
@@ -477,6 +477,10 @@ export default {
                     this.$router.push('/myshop');
 
                     // this.$message.warning('yyy');
+                } else if (res.code === 660 || res.code === 700) {
+                    localStorage.removeItem('userInfo');
+                    this.$message.error(res.msg);
+                    this.$router.push('/login');
                 }
             });
         },
@@ -534,13 +538,13 @@ export default {
                 this.scrollY = this.scrollY + poor;
                 this.active = this.days - 1;
             }
-            this.storeInfo()
+            this.storeInfo();
             this.topThree();
         },
         // top类型切换
         handleClick(tab, event) {
             // this.topThree();
-            this.activeName = tab.name.toString()
+            this.activeName = tab.name.toString();
         },
 
         // 导出
@@ -809,7 +813,7 @@ export default {
 
 @def-color: #000;
 @line-bg-color:rgb (138, 143, 134);
-.container{
+.container {
     padding: 0;
 }
 .top_box {
@@ -886,19 +890,19 @@ export default {
     display: flex;
     background: #ececec;
     padding: 15px;
-    .box_css{
+    .box_css {
         width: 98%;
         margin-bottom: 15px;
         background: #fff;
         -webkit-box-shadow: 0 0 4px #b5b5b5;
         box-shadow: 0 0 4px #b5b5b5;
         border-radius: 8px;
-        .col_spe{
+        .col_spe {
             margin: 0 0 20px 0;
             padding-left: 15px;
             padding-top: 15px;
         }
-        .goods_list{
+        .goods_list {
             padding-left: 15px;
             padding-top: 15px;
             height: 485px;
@@ -1062,13 +1066,13 @@ export default {
     }
 }
 @media screen and (max-width: 1300px) {
-    .top_box{
+    .top_box {
         font-size: 12px;
     }
-    /deep/.el-rate .el-rate__text{
+    /deep/.el-rate .el-rate__text {
         font-size: 1.4rem;
     }
-    /deep/.el-rate .el-rate__icon{
+    /deep/.el-rate .el-rate__icon {
         font-size: 1.2rem;
     }
 }

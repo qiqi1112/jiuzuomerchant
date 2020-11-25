@@ -53,11 +53,23 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="contactTel" label="预定手机" min-width="100"></el-table-column>
-                <el-table-column prop="orderType" label="订单类型"></el-table-column>
+                <el-table-column prop="orderType" label="订单类型">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.orderType == 0 ? '预定桌' : 'AA拼单' }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="orderNo" label="总订单号" min-width="160"></el-table-column>
                 <el-table-column prop="orderId" label="订单号"></el-table-column>
-                <el-table-column prop="payStatus" label="支付状态"></el-table-column>
-                <el-table-column prop="payWay" label="支付类型"></el-table-column>
+                <el-table-column prop="payStatus" label="支付状态">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.payStatus | payStatus }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="payWay" label="支付类型">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.payWay | payWay }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="orderAmount" label="实付金额"></el-table-column>
                 <el-table-column prop="payableAmount" label="商品原价"></el-table-column>
                 <el-table-column prop="details" label="优惠券"></el-table-column>
@@ -689,20 +701,9 @@ export default {
 
         //搜索操作
         handleSearch() {
-            console.log(this.searchObj.searchOrderType);
-            // if (
-            //     !this.searchObj.searchNickName &&
-            //     !this.searchObj.searchPhone &&
-            //     !this.searchObj.searchOrderNum &&
-            //     !this.searchObj.searchOrderType &&
-            //     !this.searchObj.searchPayStatus
-            // ) {
-            //     this.$message.error('请输入或选择条件查询');
-            //     return;
-            // }
             if (this.searchObj.searchPhone) {
                 if (!regular.pureNumber(this.searchObj.searchPhone)) {
-                    this.$message.error('请输入纯数字手机号');
+                    this.$message.error('手机号格式不正确');
                     return;
                 }
             }

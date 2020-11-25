@@ -2141,7 +2141,7 @@ export default {
                     this.wrapLoading = false;
 
                     console.log('当前店铺数据', res.data);
-                } else if (res.code == 600) {
+                } else if (res.code === 600) {
                     this.$confirm(res.msg, '提示', {
                         confirmButtonText: '添加门店',
                         cancelButtonText: '取消',
@@ -2163,6 +2163,11 @@ export default {
                         .catch(() => {
                             this.$router.push('/index');
                         });
+                } else if (res.code === 660 || res.code === 700) {
+                    this.wrapLoading = false;
+                    localStorage.removeItem('userInfo');
+                    this.$message.error(res.msg);
+                    this.$router.push('/login');
                 }
             });
         },
