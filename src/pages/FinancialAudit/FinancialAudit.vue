@@ -78,6 +78,10 @@ export default {
 
         //搜索操作
         handleSearch() {
+             if (!this.searchName) {
+                this.$message.error('请输入关键字');
+                return;
+            }
             this.currentPage = 1;
         },
 

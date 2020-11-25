@@ -399,6 +399,7 @@
 </template>
 
 <script>
+import regular from '../../utils/regular'
 export default {
     data() {
         return {
@@ -676,7 +677,6 @@ export default {
                     if (res.code == 0) {
                         this.tableData = res.data.list;
                         this.searchObj.dataListCount = res.data.total;
-
                         console.log(this.tableData);
                     } else {
                         this.$message.error(res.msg);
@@ -689,6 +689,35 @@ export default {
 
         //搜索操作
         handleSearch() {
+            console.log(this.searchObj.searchOrderType)
+            if(!this.searchObj.searchNickName){
+                this.$message.error('请输入预定用户');
+                return
+            }
+            if(!this.searchObj.searchPhone){
+               this.$message.error('请输入预定手机');
+               return 
+            }
+            else if(!regular.phone(this.searchObj.searchPhone)){
+                this.$message.error('请输入正确手机号');
+               return 
+            }
+            if(!this.searchObj.searchOrderNum){
+                this.$message.error('请输入订单号');
+                return
+            }
+            else if(!regular.pureNumber(this.searchObj.searchOrderNum)){
+                this.$message.error('订单号格式不正确');
+               return 
+            }
+            if(!this.searchObj.searchOrderType){
+                this.$message.error('请选择订单类型');
+                return
+            }
+             if(!this.searchObj.searchPayStatus){
+                this.$message.error('请选择支付状态');
+                return
+            }
             this.searchObj.currentPage = 1;
             this.getOrderInfo();
         },

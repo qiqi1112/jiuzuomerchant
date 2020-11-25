@@ -316,6 +316,14 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
+            if(!this.query.text){
+                this.$message.error('请填写活动主题');
+                return
+            }
+             if(this.query.times.length==0){
+                this.$message.error('请选择时间段');
+                return
+            }
             this.$set(this.query, 'pageIndex', 1);
             this.getData();
         },
