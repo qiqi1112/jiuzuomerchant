@@ -87,7 +87,7 @@
                             >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
                         >
                         <el-button
-                            v-if="scope.row.status != 2 && scope.row.status != 0"
+                            v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 6"
                             :type="
                                 scope.row.status == 3
                                     ? 'info'
@@ -116,6 +116,7 @@
                         </el-button>
                         <el-button
                             v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 3 && scope.row.status != 1"
+                            :disabled="scope.row.status == 6"
                             :type="
                                 scope.row.status == 5
                                     ? 'info'
@@ -134,7 +135,7 @@
                                     : scope.row.status == 5
                                     ? '未消费'
                                     : scope.row.status == 6
-                                    ? '已离开'
+                                    ? '已离店'
                                     : '确认消费'
                             }}</el-button
                         >
@@ -764,12 +765,12 @@ export default {
 
             this.$confirm('是否确认消费?', '提示', {
                 distinguishCancelAndClose: true,
-                confirmButtonText: '已消费',
+                confirmButtonText: '已离店',
                 // cancelButtonText: '未消费',
                 type: 'warning'
             })
                 .then(() => {
-                    this.isHandleRequest(row.id, 6); //已消费
+                    this.isHandleRequest(row.id, 6); //已离店
                 })
                 .catch((action) => {
                     // action === 'cancel' && this.isHandleRequest(row.id, 5); //未消费

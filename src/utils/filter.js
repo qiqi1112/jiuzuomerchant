@@ -225,7 +225,7 @@ Vue.filter("orderStatus", function (oldVal) {
             newVal = '未消费';
             break;
         case 6:
-            newVal = '已离开';
+            newVal = '已离店';
             break;
     }
     return newVal;

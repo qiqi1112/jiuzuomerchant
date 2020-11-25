@@ -381,19 +381,6 @@
                                         ></span>
                                     </div>
                                 </div>
-
-                                <!-- <div v-for="(itemX, indexX) in Number(y)" :key="indexX">
-                                    <div v-for="(itemY, indexY) in Number(x)" :key="indexY">
-                                        <span
-                                            ref="seatSpan"
-                                            :data-indexX="indexX + 1"
-                                            :data-indexY="indexY + 1"
-                                            class="seat"
-                                            @click="changeStauts($event, seatStyle)"
-                                            @contextmenu.prevent="changeStauts($event, 'canBook')"
-                                        ></span>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                         <!-- 座位属性 -->
@@ -2776,10 +2763,19 @@ export default {
 
             .seat-box {
                 padding: 20px;
-                padding-bottom: 10px;
                 box-sizing: border-box;
                 background-color: #ddd;
                 display: flex;
+
+                > div {
+                    > div {
+                        &:last-child {
+                            > span {
+                                margin-bottom: 0;
+                            }
+                        }
+                    }
+                }
             }
 
             .input-seat {
