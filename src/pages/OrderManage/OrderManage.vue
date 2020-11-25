@@ -701,8 +701,8 @@ export default {
             //     return;
             // }
             if (this.searchObj.searchPhone) {
-                if (!regular.phone(this.searchObj.searchPhone)) {
-                    this.$message.error('请输入正确手机号');
+                if (!regular.pureNumber(this.searchObj.searchPhone)) {
+                    this.$message.error('请输入纯数字手机号');
                     return;
                 }
             }
