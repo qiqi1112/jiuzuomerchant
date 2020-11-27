@@ -21,7 +21,8 @@ import {
     map_get,
     file_get,
     file_post,
-    imgHead
+    imgHead,
+    fileUploadUrl
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
@@ -38,6 +39,8 @@ Vue.prototype.$put = put;
 Vue.prototype.$file_get = file_get;
 Vue.prototype.$file_post = file_post;
 Vue.prototype.$imgHead = imgHead;
+Vue.prototype.$fileUploadUrl = fileUploadUrl;
+
 
 
 

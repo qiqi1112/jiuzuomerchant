@@ -58,6 +58,8 @@ axios.interceptors.response.use(
 // };
 
 const imgHead = '/file/merchant/store/system/upload/down?keyName=';
+const fileUploadUrl = '/merchant/store/system/upload/create';
+
 
 function post(url, data = {}) {
     return new Promise((resolve, reject) => {
@@ -140,5 +142,6 @@ export {
     map_get,
     file_get,
     file_post,
-    imgHead
+    imgHead,
+    fileUploadUrl
 }

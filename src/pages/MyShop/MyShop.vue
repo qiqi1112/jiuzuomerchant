@@ -854,8 +854,6 @@ export default {
                 trustAddress: ''
             },
 
-            fileUploadUrl: '/admin/system/upload/create', //单文件上传
-            filesUploadUrl: '/admin/system/upload/createBatch', //批量上传文件
             showImgPrefix: this.$imgHead, //回显图片/视频的前缀
 
             isReadonly: true, //编辑信息开关
@@ -1177,7 +1175,7 @@ export default {
             this.imgLoading.loading2 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.logoImageUrl = res.data;
                     this.imgLoading.loading2 = false;
@@ -1190,15 +1188,15 @@ export default {
         uploadBannerFiles(file) {
             this.imgLoading.loading = true;
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$file_post(this.filesUploadUrl, formData).then((res) => {
+            formData.append('file', file.file);
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     //将url添加到上传容器中
-                    this.bannerShowBox.push(res.data[0]);
+                    this.bannerShowBox.push(res.data);
 
                     //将url添加到视图容器里
                     let obj = {
-                        url: this.showImgPrefix + res.data[0]
+                        url: this.showImgPrefix + res.data
                     };
                     this.bannerImgBox.push(obj);
 
@@ -1252,18 +1250,18 @@ export default {
         uploadktvBannerFiles(file) {
             this.imgLoading.loading6 = true;
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$file_post(this.filesUploadUrl, formData).then((res) => {
+            formData.append('file', file.file);
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     //将url添加到上传容器中
                     if (!this.presentKtvInfo.sketchMap) {
                         this.presentKtvInfo.sketchMap = [];
                     }
-                    this.presentKtvInfo.sketchMap.push(res.data[0]);
+                    this.presentKtvInfo.sketchMap.push(res.data);
 
                     //将url添加到视图容器中
                     let obj = {
-                        url: this.showImgPrefix + res.data[0]
+                        url: this.showImgPrefix + res.data
                     };
                     this.ktvBannerImgBox.push(obj);
 
@@ -1306,7 +1304,7 @@ export default {
             this.imgLoading.loading5 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.overallImageUrl = res.data;
                     this.imgLoading.loading5 = false;
@@ -1320,7 +1318,7 @@ export default {
             this.imgLoading.loading3 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.rowNumImageUrl = res.data;
                     this.imgLoading.loading3 = false;
@@ -1334,7 +1332,7 @@ export default {
             this.imgLoading.loading4 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.appShopImageUrl = res.data;
                     this.imgLoading.loading4 = false;

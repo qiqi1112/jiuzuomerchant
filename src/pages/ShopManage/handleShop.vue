@@ -289,7 +289,6 @@ export default {
 
     data() {
         return {
-            fileUploadUrl: '/admin/system/upload/create', //单文件上传
             showImgPrefix: this.$imgHead, //回显图片前缀
 
             thumImageBox: [], //会员卡卡片列表
@@ -469,7 +468,7 @@ export default {
         uploadBannerFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 this.goodsForm.bannerImageUrl = res.data;
             });
         },
@@ -478,7 +477,7 @@ export default {
         uploadRecoFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 this.goodsForm.recoImageUrl = res.data;
             });
         },
@@ -487,7 +486,7 @@ export default {
         uploadThumFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 this.goodsForm.thumImageUrl = res.data;
             });
         },
@@ -496,7 +495,7 @@ export default {
         uploadDetailFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 this.goodsForm.detailImageUrl = res.data;
             });
         },
