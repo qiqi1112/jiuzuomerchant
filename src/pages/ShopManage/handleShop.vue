@@ -163,7 +163,7 @@
                     <img v-if="goodsForm.bannerImageUrl" :src="showImgPrefix + goodsForm.bannerImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-                <span v-if="goodsForm.checkedBanner">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
+                <span v-if="goodsForm.checkedBanner == 1">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
             </template>
 
             <!-- 酒水上传广告图与推荐位图 -->
@@ -191,7 +191,7 @@
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
 
-                            <span v-if="goodsForm.checkedBanner">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
+                            <span v-if="goodsForm.checkedBanner == 1">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
                         </div>
                     </div>
 
@@ -223,7 +223,7 @@
                                 <img v-if="goodsForm.recoImageUrl" :src="showImgPrefix + goodsForm.recoImageUrl" class="avatar" />
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
-                            <span v-if="goodsForm.checkedReco">（*如需商家推荐，请添加推荐位图片 120*160）</span>
+                            <span v-if="goodsForm.checkedReco == 1">（*如需商家推荐，请添加推荐位图片 120*160）</span>
                         </div>
                     </div>
                 </div>

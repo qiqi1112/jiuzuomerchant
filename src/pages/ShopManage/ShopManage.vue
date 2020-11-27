@@ -443,20 +443,23 @@ export default {
             if (this.activeNum != 1 && this.activeNum != 11) {
                 this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
             }
-            this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2); //广告位
-            this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2); //推荐位
+            // this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2); //广告位
+            // this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2); //推荐位
         },
 
         //添加/修改商品
         setGoodsInfo(active) {
-            this.updateProp(); //修改部分属性
+            if (this.activeNum != 1 && this.activeNum != 11) {
+                this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
+            }
 
             let data = {
                 listPicture: this.goodsForm.thumImageUrl,
                 name: this.goodsForm.name,
                 originalPrice: this.goodsForm.originPrice,
-                recommendAdStatus: this.goodsForm.checkedBanner,
-                recommendStatus: this.goodsForm.checkedReco,
+                recommendAdStatus:
+                    this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
+                recommendStatus: this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2),
                 synopsis: this.goodsForm.desc,
                 type: this.activeNum,
                 area: this.goodsForm.area,
@@ -473,61 +476,64 @@ export default {
                 statisticalPrice: this.goodsForm.comboNowPrice,
                 year: this.goodsForm.year
             };
-            
-            if(!data.name){
+
+            if (!data.name) {
                 this.$message.warning('请输入商品名称');
                 return;
             }
-            if(!data.listPicture){
+            if (!data.listPicture) {
                 this.$message.warning('请添加商品缩略图');
                 return;
             }
-            if(!data.infoPicture){
+            if (!data.infoPicture) {
                 this.$message.warning('请添加商品详情图');
                 return;
             }
-            data.skuList.map(item=>{
-                if(!item.specName){
-                    this.$message.warning('请输入商品规格');
-                return;
-                }
-                  if(!item.originalPrice){
-                    this.$message.warning('请输入商品规格');
-                return;
-                }
-            })
-            if(this.goodsForm.checkedBanner==1 && !data.recommendAdPicture){
+
+            if (this.goodsForm.checkedBanner == 1 && !data.recommendAdPicture) {
                 this.$message.warning('请添加广告图片');
                 return;
             }
-            if(this.goodsForm.checkedReco==1 && !data.recommendPicture){
+            if (this.goodsForm.checkedReco == 1 && !data.recommendPicture) {
                 this.$message.warning('请添加推荐位图片');
                 return;
             }
-            console.log('请求时传的值', data,this.goodsForm.checkedReco);
-            (async () => {
-                if (this.isUpdate) {
-                    const res = await this.$put('/merchant/store/goods/update', data);
-                    if (res.code === 0) {
-                        this.getGoodsInfo();
-                        this.handleCancel();
-                        this.$message.success('修改成功');
-                    } else {
-                        this.$message.error(res.msg);
-                    }
-                } else {
-                    const res = await this.$post('/merchant/store/goods/save', data);
 
-                    console.log(res);
-                    if (res.code === 0) {
-                        this.getGoodsInfo();
-                        this.handleCancel();
-                        this.$message.success('添加成功');
-                    } else {
-                        this.$message.error(res.msg);
-                    }
+            //判断传没传商品规格的开关
+            let skuSwitch = true;
+            data.skuList.map((item) => {
+                if (!item.specName || !item.originalPrice) {
+                    this.$message.warning('请输入商品规格');
+                    skuSwitch = false;
                 }
-            })();
+            });
+
+            if (skuSwitch) {
+                console.log('请求时传的值', data, this.goodsForm.checkedReco);
+                (async () => {
+                    if (this.isUpdate) {
+                        const res = await this.$put('/merchant/store/goods/update', data);
+                        if (res.code === 0) {
+                            this.getGoodsInfo();
+                            this.handleCancel();
+                            this.$message.success('修改成功');
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    } else {
+                        const res = await this.$post('/merchant/store/goods/save', data);
+
+                        console.log(res);
+                        if (res.code === 0) {
+                            this.getGoodsInfo();
+                            this.handleCancel();
+                            this.$message.success('添加成功');
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    }
+                })();
+            }
         },
 
         //商品编辑
