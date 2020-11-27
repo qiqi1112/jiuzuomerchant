@@ -250,6 +250,7 @@ export default {
 
         //要展示的商品分类弹窗中的确认按钮
         handleSureShowType() {
+
             let data = {
                 hiddenDTOS: this.goodsTypeList
             };
@@ -487,11 +488,11 @@ export default {
             data.skuList.map(item=>{
                 if(!item.specName){
                     this.$message.warning('请输入商品规格');
-                return;
+                    return;
                 }
                   if(!item.originalPrice){
                     this.$message.warning('请输入商品规格');
-                return;
+                    return;
                 }
             })
             if(this.goodsForm.checkedBanner==1 && !data.recommendAdPicture){
