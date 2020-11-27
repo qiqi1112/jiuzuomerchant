@@ -39,7 +39,7 @@ a {
     padding: 10px;
     overflow-y: scroll;
     box-sizing: border-box;
-    min-width: 1100px;
+    /* min-width: 1100px; */
 }
 
 .content-collapse {
