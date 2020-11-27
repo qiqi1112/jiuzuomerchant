@@ -11,51 +11,13 @@
             <div class="head-handle clearfix">
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
-                    <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort">添加商品</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort" style="margin-right: 10px"
+                        >添加商品</el-button
+                    >
                     <el-button v-if="goodsData.length > 0" type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
-
-                <!-- 操作商品的对话框 -->
-                <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
-                    <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <!-- 编辑商品时 -->
-                        <el-tab-pane v-if="isUpdate" :label="activeName" :name="activeName"></el-tab-pane>
-                        <!-- 新增商品时 -->
-                        <el-tab-pane
-                            v-else
-                            :label="item.typeName"
-                            :name="item.typeName"
-                            v-for="(item, index) in titleArrList"
-                            :key="index"
-                        ></el-tab-pane>
-                    </el-tabs>
-
-                    <!-- 标签页组件信息 -->
-                    <template>
-                        <handleShop :goodsForm="goodsForm" :activeNum="activeNum"></handleShop>
-                    </template>
-
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="handleCancel">取 消</el-button>
-                        <el-button type="primary" @click="setGoodsInfo">确 定</el-button>
-                    </span>
-                </el-dialog>
-
-                <!-- APP展示商品分类弹窗 -->
-                <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
-                    <span class="add-classify-title">请选择给用户展示的商品种类 <span style="color: #f00">（选中为展示分类）</span></span>
-
-                    <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
-                        item.type | showAppGoodsType
-                    }}</el-checkbox>
-
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="showTypeDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="handleSureShowType">确 定</el-button>
-                    </span>
-                </el-dialog>
 
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
@@ -73,6 +35,46 @@
                     <el-button type="primary" icon="el-icon-search" @click="getGoodsInfo">搜索</el-button>
                 </div>
             </div>
+
+            <!-- 操作商品的对话框 -->
+            <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <!-- 编辑商品时 -->
+                    <el-tab-pane v-if="isUpdate" :label="activeName" :name="activeName"></el-tab-pane>
+                    <!-- 新增商品时 -->
+                    <el-tab-pane
+                        v-else
+                        :label="item.typeName"
+                        :name="item.typeName"
+                        v-for="(item, index) in titleArrList"
+                        :key="index"
+                    ></el-tab-pane>
+                </el-tabs>
+
+                <!-- 标签页组件信息 -->
+                <template>
+                    <handleShop :goodsForm="goodsForm" :activeNum="activeNum"></handleShop>
+                </template>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="handleCancel">取 消</el-button>
+                    <el-button type="primary" @click="setGoodsInfo">确 定</el-button>
+                </span>
+            </el-dialog>
+
+            <!-- APP展示商品分类弹窗 -->
+            <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
+                <span class="add-classify-title">请选择给用户展示的商品种类 <span style="color: #f00">（选中为展示分类）</span></span>
+
+                <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
+                    item.type | showAppGoodsType
+                }}</el-checkbox>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="showTypeDialog = false">取 消</el-button>
+                    <el-button type="primary" @click="handleSureShowType">确 定</el-button>
+                </span>
+            </el-dialog>
 
             <!-- 商品列表 -->
             <div class="goodsList">
@@ -572,21 +574,27 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.clearfix::after {
-    content: '';
-    display: block;
-    clear: both;
-}
+// .clearfix::after {
+//     content: '';
+//     display: block;
+//     clear: both;
+// }
 
 .head-handle {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 30px;
 
     .left-handle {
-        float: left;
+        // float: left;
+
+        /deep/.el-button + .el-button {
+            margin-left: 0;
+        }
     }
 
     .right-handle {
-        float: right;
+        // float: right;
 
         .handle-input {
             width: 170px;

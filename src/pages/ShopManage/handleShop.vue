@@ -94,7 +94,7 @@
                     </p>
 
                     <!-- 套餐单品表格数据 -->
-                    <p style="width: 93%" v-if="goodsForm.tableData.length > 0">
+                    <p v-if="goodsForm.tableData.length > 0" style="width: 90%">
                         <el-table :data="goodsForm.tableData" border>
                             <el-table-column prop="goodsName" label="商品名称" width="150"></el-table-column>
                             <el-table-column label="商品图片" width="126">
@@ -517,7 +517,7 @@ export default {
     display: flex;
 
     /deep/.avatar-uploader {
-        /deep/.el-upload {
+        .el-upload {
             border: 1px dashed #d9d9d9;
             border-radius: 6px;
             cursor: pointer;
@@ -525,7 +525,7 @@ export default {
             overflow: hidden;
         }
 
-        /deep/.el-upload:hover {
+        .el-upload:hover {
             border-color: #409eff;
         }
     }
@@ -550,25 +550,76 @@ export default {
         display: block;
     }
 
-    .right-box {
-        width: 35%;
+    .left-box {
+        width: 70%;
 
-        .detail-img-box {
-            /deep/ .el-upload--text {
-                width: 300px;
+        .banner-img-box {
+            /deep/.el-upload--text {
+                // width: 350px;
             }
 
             /deep/.avatar-uploader-icon {
-                font-size: 28px;
-                color: #8c939d;
-                width: 300px;
-                line-height: 140px;
-                text-align: center;
+                // width: 350px;
+                // line-height: 350px;
             }
 
             /deep/.avatar {
-                width: 300px;
-                display: block;
+                // width: 350px;
+            }
+        }
+
+        .drinks-update-box {
+            display: flex;
+
+            .banner-box {
+                width: 50%;
+            }
+
+            .drinks-div {
+                margin-top: 20px;
+
+                .reco-img-box {
+                    /deep/.el-upload--text {
+                        // width: 120px;
+                        // height: 160px;
+                    }
+
+                    /deep/.avatar-uploader-icon {
+                        // width: 120px;
+                        // height: 160px;
+                        // line-height: 160px;
+                    }
+
+                    /deep/.avatar {
+                        // width: 120px;
+                        // height: 160px;
+                    }
+                }
+            }
+        }
+
+        .reco-box {
+            .reco-top-box {
+                display: flex;
+            }
+        }
+    }
+
+    .right-box {
+        width: 30%;
+
+        .detail-img-box {
+            /deep/.avatar-uploader-icon {
+                // width: 300px;
+                // line-height: 300px;
+            }
+
+            /deep/ .el-upload--text {
+                // width: 300px;
+            }
+
+            /deep/.avatar {
+                // width: 300px;
             }
         }
 
@@ -604,72 +655,6 @@ export default {
             .border {
                 box-sizing: border-box;
                 border: 2px solid #f56c6c;
-            }
-        }
-    }
-
-    .left-box {
-        width: 65%;
-
-        .banner-img-box {
-            /deep/.el-upload--text {
-                width: 350px;
-                height: 120px;
-            }
-
-            /deep/.avatar-uploader-icon {
-                font-size: 28px;
-                color: #8c939d;
-                width: 350px;
-                height: 120px;
-                line-height: 120px;
-                text-align: center;
-            }
-
-            /deep/.avatar {
-                width: 350px;
-                height: 120px;
-                display: block;
-            }
-        }
-
-        .drinks-update-box {
-            display: flex;
-
-            .banner-box {
-                width: 50%;
-            }
-
-            .drinks-div {
-                margin-top: 20px;
-
-                .reco-img-box {
-                    /deep/.el-upload--text {
-                        width: 120px;
-                        height: 160px;
-                    }
-
-                    /deep/.avatar-uploader-icon {
-                        font-size: 28px;
-                        color: #8c939d;
-                        width: 120px;
-                        height: 160px;
-                        line-height: 160px;
-                        text-align: center;
-                    }
-
-                    /deep/.avatar {
-                        width: 120px;
-                        height: 160px;
-                        display: block;
-                    }
-                }
-            }
-        }
-
-        .reco-box {
-            .reco-top-box {
-                display: flex;
             }
         }
     }
