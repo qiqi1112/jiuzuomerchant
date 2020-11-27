@@ -57,7 +57,7 @@ axios.interceptors.response.use(
 //     });
 // };
 
-const imgHead = '/file/admin/system/upload/down?keyName=';
+const imgHead = '/file/merchant/store/system/upload/down?keyName=';
 
 function post(url, data = {}) {
     return new Promise((resolve, reject) => {

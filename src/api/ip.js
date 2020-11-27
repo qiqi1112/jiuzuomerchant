@@ -5,8 +5,8 @@ if (process.env.NODE_ENV === "development") {
   file = "/file"
   tengxun = "/map";
 } else {
-  api = 'http://47.108.204.66:8077'
-  file = 'http://47.108.204.66:8078'
+  api = 'https://store.cdhqht.com'
+  file = 'https://store.cdhqht.com'
   tengxun = 'http://apis.map.qq.com'
 }
 

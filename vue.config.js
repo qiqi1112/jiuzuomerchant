@@ -9,9 +9,9 @@ module.exports = {
         open: true,
         proxy: {
             '/api': {
-                target: 'http://47.108.204.66:8077',
                 // target: "http://192.168.31.100:8077",
                 // target: "http://192.168.31.194:8077",
+                target: 'https://store.cdhqht.com',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''
@@ -26,7 +26,8 @@ module.exports = {
             },
 
             '/file': {
-                target: 'http://47.108.204.66:8078',
+                // target: 'http://47.108.204.66:8078',
+                target: 'https://store.cdhqht.com',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/file': ''
