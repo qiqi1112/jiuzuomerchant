@@ -2364,23 +2364,51 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@media screen and (min-width: 992px) {
+    .container {
+        box-sizing: border-box;
+        display: flex;
+        padding: 20px;
+    }
+
+    .left-wrap {
+        width: 35%;
+        height: 100%;
+        margin-right: 50px;
+    }
+
+    .right-wrap {
+        height: 100%;
+        width: 65%;
+    }
+}
+
+// @media screen and (min-width: 768px) and (max-width: 991px) {
+// }
+
+@media screen and (max-width: 1200px) {
+    .left-wrap {
+        width: 100%;
+    }
+
+    .right-wrap {
+        width: 100%;
+
+        .shop-info {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+    }
+}
+
 .clearfix::after {
     display: block;
     content: '';
     clear: both;
 }
 
-.container {
-    box-sizing: border-box;
-    display: flex;
-    padding: 20px;
-}
-
 .left-wrap {
-    width: 35%;
-    height: 100%;
-    margin-right: 50px;
-
     h4 {
         font-weight: normal;
         display: flex;
@@ -2616,9 +2644,6 @@ export default {
 }
 
 .right-wrap {
-    height: 100%;
-    width: 65%;
-
     h4 {
         font-weight: normal;
         display: flex;

@@ -28,6 +28,8 @@ function pureNumber(val) {
 function money(val) {
     if (!/^\d+(\.\d{1,2})?$/.test(val)) {
         return false;
+    }else{
+        return true
     }
 }
 
