@@ -439,15 +439,6 @@ export default {
             });
         },
 
-        //添加/修改商品时对部分属性的修改
-        updateProp() {
-            if (this.activeNum != 1 && this.activeNum != 11) {
-                this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
-            }
-            // this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2); //广告位
-            // this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2); //推荐位
-        },
-
         //添加/修改商品
         setGoodsInfo(active) {
             if (this.activeNum != 1 && this.activeNum != 11) {

@@ -109,7 +109,7 @@
                         <el-input
                             v-model="servicePhoneArr[index]"
                             placeholder="客服电话"
-                            style="width: 26%; margin-right: 10px"
+                            style="width: 30%; margin-right: 10px"
                             :readonly="isReadonly"
                             clearable
                         ></el-input>
@@ -2364,7 +2364,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 1300px) {
     .container {
         box-sizing: border-box;
         display: flex;
@@ -2380,25 +2380,6 @@ export default {
     .right-wrap {
         height: 100%;
         width: 65%;
-    }
-}
-
-// @media screen and (min-width: 768px) and (max-width: 991px) {
-// }
-
-@media screen and (max-width: 1200px) {
-    .left-wrap {
-        width: 100%;
-    }
-
-    .right-wrap {
-        width: 100%;
-
-        .shop-info {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
     }
 }
 
@@ -2524,6 +2505,10 @@ export default {
 
             .bussiness-hours {
                 margin-bottom: 30px;
+
+                /deep/.el-input--suffix .el-input__inner {
+                    padding-right: 0;
+                }
 
                 > p {
                     margin-bottom: 10px;
