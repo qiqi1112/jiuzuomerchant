@@ -471,8 +471,38 @@ export default {
                 statisticalPrice: this.goodsForm.comboNowPrice,
                 year: this.goodsForm.year
             };
-
-            console.log('请求时传的值', data);
+            
+            if(!data.name){
+                this.$message.warning('请输入商品名称');
+                return;
+            }
+            if(!data.listPicture){
+                this.$message.warning('请添加商品缩略图');
+                return;
+            }
+            if(!data.infoPicture){
+                this.$message.warning('请添加商品详情图');
+                return;
+            }
+            data.skuList.map(item=>{
+                if(!item.specName){
+                    this.$message.warning('请输入商品规格');
+                return;
+                }
+                  if(!item.originalPrice){
+                    this.$message.warning('请输入商品规格');
+                return;
+                }
+            })
+            if(this.goodsForm.checkedBanner==1 && !data.recommendAdPicture){
+                this.$message.warning('请添加广告图片');
+                return;
+            }
+            if(this.goodsForm.checkedReco==1 && !data.recommendPicture){
+                this.$message.warning('请添加推荐位图片');
+                return;
+            }
+            console.log('请求时传的值', data,this.goodsForm.checkedReco);
             (async () => {
                 if (this.isUpdate) {
                     const res = await this.$put('/merchant/store/goods/update', data);
