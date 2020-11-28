@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
+import {VueJsonp} from 'vue-jsonp'
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import store from './store/store'
@@ -30,6 +31,7 @@ import less from 'less'
 import filter from './utils/filter'
 
 Vue.use(less)
+Vue.use(VueJsonp)
 Vue.prototype.$regular = regular
 Vue.prototype.$post = post;
 Vue.prototype.$map_get = map_get;
