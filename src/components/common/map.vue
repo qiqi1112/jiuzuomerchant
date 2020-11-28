@@ -238,7 +238,7 @@ export default {
                 };
                 var script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'http://map.qq.com/api/js?v=2.exp&callback=init&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ';
+                script.src = 'https://map.qq.com/api/js?v=2.exp&callback=init&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ';
                 script.onerror = reject;
                 document.head.appendChild(script);
             });

@@ -118,7 +118,7 @@
 
                     <!-- 新增 -->
                     <div v-if="!isReadonly">
-                        <el-input v-model="servicePhone" placeholder="客服电话" style="width: 26%; margin-right: 10px" clearable></el-input>
+                        <el-input v-model="servicePhone" placeholder="客服电话" style="width: 30%; margin-right: 10px" clearable></el-input>
                         <el-button type="primary" @click="addServicePhone">添加</el-button>
                     </div>
                 </div>
@@ -1400,6 +1400,8 @@ export default {
 
         //选择店铺类型
         checkType(e, item) {
+            console.log('xxxx', this.submitShopType);
+
             // 多选情况下
             if (this.shopLocaIndex == 1 || this.shopLocaIndex == 2) {
                 if (!e.target.className) {
@@ -1417,6 +1419,8 @@ export default {
                         }
                     });
                 }
+
+                console.log('yyyy', this.submitShopType);
             }
             // 单选情况下
             if (this.shopLocaIndex == 3) {
@@ -2213,10 +2217,10 @@ export default {
                 longitude: this.longitude,
                 latitude: this.latitude,
                 servicePhoneArr: this.servicePhoneArr,
-                shopType: this.shopType,
+                // shopType: this.shopType,
                 shopTypeOpt: this.shopTypeOpt,
-                shopTypeOptStrArr: this.shopTypeOptStrArr,
-                submitShopType: this.submitShopType,
+                // shopTypeOptStrArr: this.shopTypeOptStrArr,
+                // submitShopType: this.submitShopType,
                 perCon: this.perCon,
                 goodsBrief: this.goodsBrief,
                 shopMatter: this.shopMatter,
@@ -2258,10 +2262,10 @@ export default {
                 this.longitude = storageInfo.longitude;
                 this.latitude = storageInfo.latitude;
                 this.servicePhoneArr = storageInfo.servicePhoneArr;
-                this.shopType = storageInfo.shopType;
+                // this.shopType = storageInfo.shopType;
                 this.shopTypeOpt = storageInfo.shopTypeOpt;
-                this.shopTypeOptStrArr = storageInfo.shopTypeOptStrArr;
-                this.submitShopType = storageInfo.submitShopType;
+                // this.shopTypeOptStrArr = storageInfo.shopTypeOptStrArr;
+                // this.submitShopType = storageInfo.submitShopType;
                 this.perCon = storageInfo.perCon;
                 this.goodsBrief = storageInfo.goodsBrief;
                 this.shopMatter = storageInfo.shopMatter;
@@ -2288,14 +2292,14 @@ export default {
                 //店铺定位初始化
                 this.initShopLocaStyle();
 
-                //获取已经选择的店铺类型
-                this.showShopType(this.submitShopType);
-
-                //回显已经选择的店铺类型
-                this.showCheckType();
-
                 // //座位属性回显
                 this.showSeatAtt();
+
+                // //获取已经选择的店铺类型
+                // this.showShopType(this.submitShopType);
+
+                // //回显已经选择的店铺类型
+                // this.showCheckType();
             }
         },
 

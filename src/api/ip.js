@@ -2,20 +2,17 @@ let api, tengxun, file, token
 import axios from 'axios'
 
 if (process.env.NODE_ENV === "development") {
-  console.log(111)
   api = "/api";
   file = "/file"
   tengxun = "/map";
 } else if (process.env.NODE_ENV === "testing") {
-  console.log(222)
   api = 'https://storetest.cdhqht.com'
   file = 'https://storetest.cdhqht.com'
-  tengxun = 'http://apis.map.qq.com'
+  tengxun = 'https://apis.map.qq.com'
 } else {
-  console.log(333)
   api = 'https://store.cdhqht.com'
   file = 'https://store.cdhqht.com'
-  tengxun = 'http://apis.map.qq.com'
+  tengxun = 'https://apis.map.qq.com'
 }
 
 console.log(api)
