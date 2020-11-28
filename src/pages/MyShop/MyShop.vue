@@ -39,13 +39,7 @@
                     <div class="right-info">
                         <p class="shop-name">
                             <span>店名：</span>
-                            <el-input
-                                v-model="shopName"
-                                placeholder="请输入店名"
-                                style="width: 76%"
-                                :readonly="isReadonly"
-                                clearable
-                            ></el-input>
+                            <el-input v-model="shopName" placeholder="请输入店名" :readonly="isReadonly" clearable></el-input>
                         </p>
                         <p class="shop-brief">
                             <span>店铺简介：</span>
@@ -54,7 +48,6 @@
                                 :rows="3"
                                 placeholder="请输入店铺简介"
                                 v-model="shopBrief"
-                                style="width: 76%"
                                 :readonly="isReadonly"
                                 maxlength="120"
                                 show-word-limit
@@ -200,6 +193,7 @@
                             <span>{{ province }}</span>
                             <span>{{ city }}</span>
                             <span>{{ district }}</span>
+                            <span>{{ searchAddress }}</span>
                             <span>{{ trustAddress }}</span>
                         </div>
                     </div>
@@ -218,7 +212,6 @@
                             :rows="3"
                             placeholder="请输入商品店面简介"
                             v-model="goodsBrief"
-                            style="width: 76%"
                             :readonly="isReadonly"
                             maxlength="60"
                             show-word-limit
@@ -2379,11 +2372,35 @@ export default {
         width: 35%;
         height: 100%;
         margin-right: 50px;
+
+        .shop-info {
+            .left-info {
+                width: 30%;
+            }
+
+            .right-info {
+                width: 70%;
+            }
+        }
     }
 
     .right-wrap {
         height: 100%;
         width: 65%;
+    }
+}
+
+@media screen and (max-width: 1300px) {
+    .left-wrap {
+        .shop-info {
+            .left-info {
+                width: 20%;
+            }
+
+            .right-info {
+                width: 80%;
+            }
+        }
     }
 }
 
@@ -2420,9 +2437,6 @@ export default {
         margin-bottom: 30px;
 
         .left-info {
-            width: 30%;
-            // float: left;
-
             > span {
                 font-size: 12px;
             }
@@ -2433,23 +2447,24 @@ export default {
         }
 
         .right-info {
-            width: 70%;
             display: flex;
             flex-direction: column;
             justify-content: center;
 
             .shop-name {
-                float: left;
                 margin-bottom: 40px;
 
                 > span {
-                    margin-right: 30px;
+                    min-width: 80px;
                 }
+
+                display: flex;
+                align-items: center;
             }
 
             .shop-brief {
                 > span {
-                    // min-width: 100px;
+                    min-width: 80px;
                 }
 
                 display: flex;
@@ -2458,10 +2473,16 @@ export default {
         }
     }
 
-    .shop-desc > div {
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
+    .shop-desc {
+        .goods-brief {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+
+            > span {
+                min-width: 120px;
+            }
+        }
     }
 
     .shop-loca {
@@ -2691,10 +2712,6 @@ export default {
             > p {
                 margin-bottom: 10px;
             }
-        }
-
-        .rowNum-box {
-            // margin-right: 100px;
         }
 
         .overall-box {
