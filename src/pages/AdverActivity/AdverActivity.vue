@@ -478,7 +478,7 @@ export default {
             };
             let fromdata = new FormData();
             fromdata.append('file', this.formData);
-            this.$file_post('/admin/system/upload/create', fromdata, config).then((res) => {
+            this.$file_post('/merchant/store/system/upload/create', fromdata, config).then((res) => {
                 if (res.code == 0) {
                     this.dynamicValidateForm.fromdata = res.data;
                 } else {
@@ -509,7 +509,7 @@ export default {
             };
             let fromdata = new FormData();
             fromdata.append('file', this.formData1);
-            this.$file_post('/admin/system/upload/create', fromdata, config).then((res) => {
+            this.$file_post('/merchant/store/system/upload/create', fromdata, config).then((res) => {
                 if (res.code == 0) {
                     this.dynamicValidateForm.thumb = res.data;
                 } else {
