@@ -66,7 +66,7 @@
                 <!-- 店铺定位 -->
                 <div class="shop-loca">
                     <p>店铺定位</p>
-                    <!-- <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、零嘴”）</p> -->
+                    <!-- <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、赠品”）</p> -->
                     <div v-if="!isUpdate">
                         <span v-for="(item, index) in shopLoca" :key="index" ref="shopLoca" @click="changeShopLoca">{{ item }}</span>
                     </div>
@@ -109,7 +109,7 @@
                         <el-input
                             v-model="servicePhoneArr[index]"
                             placeholder="客服电话"
-                            style="width: 26%; margin-right: 10px"
+                            style="width: 30%; margin-right: 10px"
                             :readonly="isReadonly"
                             clearable
                         ></el-input>
@@ -503,11 +503,11 @@
                                 </el-select>
                             </div>
                             <!-- 包间所属 -->
-                            <div>
+                            <!-- <div>
                                 <span>包间所属：</span>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.roomAttribute" label="1">预定桌</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.roomAttribute" label="2">AA拼单桌</el-radio>
-                            </div>
+                            </div> -->
                             <!-- 包间数量 -->
                             <div>
                                 <span>包间数量：</span>
@@ -558,24 +558,13 @@
                             </div>
                             <!-- 机麻 -->
                             <div>
-                                <span>机麻数量：</span>
-                                <el-input-number
-                                    @blur="checkNull(presentKtvInfo.mahjong, '机麻')"
-                                    :step="1"
-                                    step-strictly
-                                    controls-position="right"
-                                    :min="0"
-                                    v-model="presentKtvInfo.mahjong"
-                                    placeholder="机麻数量"
-                                    style="width: 50%"
-                                    :disabled="isReadonly"
-                                ></el-input-number>
-                                <!-- <el-input
-                                    v-model="presentKtvInfo.mahjong"
-                                    placeholder="机麻数量"
-                                    style="width: 50%"
-                                    :readonly="isReadonly"
-                                ></el-input> -->
+                                <span>配套设施：</span>
+                                <template>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveDiningTable">餐桌</el-checkbox>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveMahjong">机麻</el-checkbox>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveSwimming">泳池</el-checkbox>
+                                    <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveTableTennis">桌球</el-checkbox>
+                                </template>
                             </div>
                             <!-- 时间段分布 -->
                             <div class="time-quan">
@@ -713,10 +702,10 @@
                                     <el-button v-if="!isReadonly" @click="addTimeQuan" type="primary" style="float: right">添加</el-button>
                                 </div>
                             </div>
-                            <!-- 零嘴 -->
+                            <!-- 赠品 -->
                             <div class="snacks">
                                 <p>
-                                    零嘴：
+                                    赠品：
                                     <span v-if="isReadonly && presentKtvInfo.snacks.length == 0">无</span>
                                 </p>
                                 <div class="snacks-detail">
@@ -806,18 +795,18 @@
                                                 <span>{{ item.roomTypeId | roomType(ktvTypeOpt) }}</span>
                                             </p>
                                             <p>
-                                                <span>包间属性：</span>
-                                                <span>{{ item.roomAttribute | roomAttr }}</span>
+                                                <span>容纳人数：</span>
+                                                <span>{{ item.capacity }}人</span>
                                             </p>
                                         </div>
                                         <div>
                                             <p>
                                                 <span>包间数量：</span>
-                                                <span>{{ item.roomNumber }}</span>
+                                                <span>{{ item.roomNumber }}个</span>
                                             </p>
                                             <p>
                                                 <span>最低消费：</span>
-                                                <span>{{ item.minConsumption }}</span>
+                                                <span>{{ item.minConsumption }}元</span>
                                             </p>
                                         </div>
                                     </div>
@@ -865,8 +854,6 @@ export default {
                 trustAddress: ''
             },
 
-            fileUploadUrl: '/admin/system/upload/create', //单文件上传
-            filesUploadUrl: '/admin/system/upload/createBatch', //批量上传文件
             showImgPrefix: this.$imgHead, //回显图片/视频的前缀
 
             isReadonly: true, //编辑信息开关
@@ -951,7 +938,7 @@ export default {
             ktvTypeOpt: [], //ktv包间类型
             isLookKtvInfo: false, //查看或编辑当前ktv包间属性信息的标杆
             isUpdateKtvInfo: false, //当前确认按钮是否为修改包间属性信息
-            //当前ktv包间配置的零嘴
+            //当前ktv包间配置的赠品
             snacksObj: {
                 name: '',
                 num: ''
@@ -964,16 +951,19 @@ export default {
                 minConsumption: 0 //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
+
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
                 roomTypeId: '', //包间类型
-                roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
-                mahjong: 0, //机麻
+                haveDiningTable: false, //餐桌
+                haveMahjong: false, //麻将
+                haveSwimming: false, //泳池
+                haveTableTennis: false, //桌球
                 minConsumption: '', //最低消费（时间段集合里的最低消费）
-                snacks: [], //零嘴
+                snacks: [], //赠品
                 sketchMap: [], //包间示意图
                 roomTimeIntervalList: [] //时间段集合
             },
@@ -1050,7 +1040,6 @@ export default {
 
         //非空验证
         checkNull(item, txt) {
-            console.log('xxx', item);
             if (item === '' || item === undefined || item === null) {
                 this.$message.error(`${txt}不能为空`);
             }
@@ -1186,7 +1175,7 @@ export default {
             this.imgLoading.loading2 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.logoImageUrl = res.data;
                     this.imgLoading.loading2 = false;
@@ -1199,15 +1188,15 @@ export default {
         uploadBannerFiles(file) {
             this.imgLoading.loading = true;
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$file_post(this.filesUploadUrl, formData).then((res) => {
+            formData.append('file', file.file);
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     //将url添加到上传容器中
-                    this.bannerShowBox.push(res.data[0]);
+                    this.bannerShowBox.push(res.data);
 
                     //将url添加到视图容器里
                     let obj = {
-                        url: this.showImgPrefix + res.data[0]
+                        url: this.showImgPrefix + res.data
                     };
                     this.bannerImgBox.push(obj);
 
@@ -1261,18 +1250,18 @@ export default {
         uploadktvBannerFiles(file) {
             this.imgLoading.loading6 = true;
             let formData = new FormData();
-            formData.append('files', file.file);
-            this.$file_post(this.filesUploadUrl, formData).then((res) => {
+            formData.append('file', file.file);
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     //将url添加到上传容器中
                     if (!this.presentKtvInfo.sketchMap) {
                         this.presentKtvInfo.sketchMap = [];
                     }
-                    this.presentKtvInfo.sketchMap.push(res.data[0]);
+                    this.presentKtvInfo.sketchMap.push(res.data);
 
                     //将url添加到视图容器中
                     let obj = {
-                        url: this.showImgPrefix + res.data[0]
+                        url: this.showImgPrefix + res.data
                     };
                     this.ktvBannerImgBox.push(obj);
 
@@ -1315,7 +1304,7 @@ export default {
             this.imgLoading.loading5 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.overallImageUrl = res.data;
                     this.imgLoading.loading5 = false;
@@ -1329,7 +1318,7 @@ export default {
             this.imgLoading.loading3 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.rowNumImageUrl = res.data;
                     this.imgLoading.loading3 = false;
@@ -1343,7 +1332,7 @@ export default {
             this.imgLoading.loading4 = true;
             let formData = new FormData();
             formData.append('file', file.file);
-            this.$file_post(this.fileUploadUrl, formData).then((res) => {
+            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
                 if (res.code == 0) {
                     this.appShopImageUrl = res.data;
                     this.imgLoading.loading4 = false;
@@ -1438,8 +1427,6 @@ export default {
                 e.target.classList.add('shop-type-span');
                 this.submitShopType.push(item);
             }
-
-            console.log(this.submitShopType);
         },
 
         //回显店铺类型样式（编辑时）
@@ -1505,10 +1492,14 @@ export default {
 
             let ktvRoomList = [];
             if (this.shopLocaIndex == 3) {
-                ktvRoomList = this.cloneSnacks(); //数组转json形式（零嘴）
+                ktvRoomList = this.cloneSnacks(); //数组转json形式（赠品）
                 //数组转字符串（ktv示意图）
                 ktvRoomList.forEach((item) => {
-                    item.sketchMap = item.sketchMap.join(',');
+                    item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
+                    item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
+                    item.haveMahjong = item.haveMahjong === false ? 2 : 1;
+                    item.haveSwimming = item.haveSwimming === false ? 2 : 1;
+                    item.haveTableTennis = item.haveTableTennis === false ? 2 : 1;
                 });
             }
 
@@ -1517,7 +1508,6 @@ export default {
                 appListBigPicture: this.appShopImageUrl,
                 cassette: `${this.x}x${this.y}`,
                 city: this.city,
-                // customerServicePhone: this.servicePhone,
                 customerServicePhoneList: this.servicePhoneArr,
                 district: this.district,
                 districtCode: this.districtCode,
@@ -1749,16 +1739,10 @@ export default {
 
         //删除时间段
         delTimeQuan(item) {
-            this.presentKtvInfo.roomTimeIntervalList.forEach((ele, i) => {
-                if (
-                    ele.startTime == item.startTime &&
-                    ele.endTime == item.endTime &&
-                    ele.latestTime == item.latestTime &&
-                    ele.minConsumption == item.minConsumption
-                ) {
-                    this.presentKtvInfo.roomTimeIntervalList.splice(i, 1);
-                }
-            });
+            const index = this.presentKtvInfo.roomTimeIntervalList.indexOf(item);
+            if (index !== -1) {
+                this.presentKtvInfo.roomTimeIntervalList.splice(index, 1);
+            }
         },
 
         //添加客服电话
@@ -1773,19 +1757,18 @@ export default {
 
         //删除客服电话
         deleteServicePhone(item) {
-            this.servicePhoneArr.forEach((ele, i) => {
-                if (ele == item) {
-                    this.servicePhoneArr.splice(i, 1);
-                }
-            });
+            const index = this.servicePhoneArr.indexOf(item);
+            if (index !== -1) {
+                this.servicePhoneArr.splice(index, 1);
+            }
         },
 
-        //添加零嘴
+        //添加赠品
         addSnacks() {
             if (!this.snacksObj.name) {
-                this.$message.error('请输入零嘴名称');
+                this.$message.error('请输入赠品名称');
             } else if (!this.snacksObj.num) {
-                this.$message.error('请输入零嘴数量');
+                this.$message.error('请输入赠品数量');
             } else {
                 let snacksObj = Object.assign({}, this.snacksObj);
                 this.presentKtvInfo.snacks.push(snacksObj);
@@ -1796,18 +1779,17 @@ export default {
             }
         },
 
-        //删除零嘴
+        //删除赠品
         deleteSnacks(item) {
-            this.presentKtvInfo.snacks.forEach((ele, i) => {
-                if (ele.name == item.name && ele.num == item.num) {
-                    this.presentKtvInfo.snacks.splice(i, 1);
-                }
-            });
+            const index = this.presentKtvInfo.snacks.indexOf(item);
+            if (index !== -1) {
+                this.presentKtvInfo.snacks.splice(index, 1);
+            }
         },
 
-        //克隆零嘴数组方法
+        //克隆赠品数组方法
         cloneSnacks() {
-            let newSeatArr = this.ktvRoomList.map((item) => {
+            const newSeatArr = this.ktvRoomList.map((item) => {
                 let cloneItem = Object.assign({}, item);
                 cloneItem.snacks = JSON.stringify(item.snacks);
                 return cloneItem;
@@ -1820,7 +1802,6 @@ export default {
             this.isLookKtvInfo = true;
             this.isUpdateKtvInfo = true;
             this.presentKtvInfo = item;
-            // this.presentKtvInfo = Object.assign({}, item);
             this.showKtvBannerImg();
         },
 
@@ -1830,31 +1811,16 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    this.ktvRoomList.forEach((ele, i) => {
+                    const index = this.ktvRoomList.indexOf(item);
+                    if (index !== -1) {
                         if (item.id) {
-                            if (ele.id == item.id) {
-                                this.ktvRoomList.splice(i, 1);
-                                this.deleteKtvRoomList.push(item.id);
-                            }
+                            this.ktvRoomList.splice(index, 1);
+                            this.deleteKtvRoomList.push(item.id);
                         } else {
-                            if (ele == item) {
-                                this.ktvRoomList.splice(i, 1);
-                            }
-                            // if (
-                            //     ele.capacity == item.capacity &&
-                            //     ele.haveToilet == item.haveToilet &&
-                            //     ele.mahjong == item.mahjong &&
-                            //     ele.roomAttribute == item.roomAttribute &&
-                            //     ele.roomNumber == item.roomNumber &&
-                            //     ele.roomTimeIntervalList.length == item.roomTimeIntervalList.length &&
-                            //     ele.roomTypeId == item.roomTypeId &&
-                            //     ele.sketchMap.length == item.sketchMap.length &&
-                            //     ele.snacks.length == item.snacks.length
-                            // ) {
-                            //     this.ktvRoomList.splice(i, 1);
-                            // }
+                            this.ktvRoomList.splice(index, 1);
                         }
-                    });
+                    }
+
                     this.clearKtvInfo();
                     this.isUpdateKtvInfo = false;
                 })
@@ -2019,7 +1985,7 @@ export default {
         //对ktv信息进行相关转换
         changeKtvList(arr) {
             arr.forEach((item) => {
-                //零嘴json字符串转为数组对象
+                //赠品json字符串转为数组对象
                 if (item.snacks) {
                     item.snacks = JSON.parse(item.snacks);
                 } else {
@@ -2034,9 +2000,16 @@ export default {
                 }
 
                 //将数值型转为字符型
-                if (item.roomAttribute || item.haveToilet) {
-                    item.roomAttribute = item.roomAttribute.toString();
+                if (item.haveToilet) {
                     item.haveToilet = item.haveToilet.toString();
+                }
+
+                //将配套设施转为布尔类型
+                if (item.haveDiningTable || item.haveMahjong || item.haveSwimming || item.haveTableTennis) {
+                    item.haveDiningTable = item.haveDiningTable === 1 ? true : false;
+                    item.haveMahjong = item.haveMahjong === 1 ? true : false;
+                    item.haveSwimming = item.haveSwimming === 1 ? true : false;
+                    item.haveTableTennis = item.haveTableTennis === 1 ? true : false;
                 }
             });
         },
@@ -2045,13 +2018,15 @@ export default {
         clearKtvInfo() {
             this.presentKtvInfo = {
                 roomTypeId: '', //包间类型
-                roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
-                mahjong: 0, //机麻
+                haveDiningTable: false, //餐桌
+                haveMahjong: false, //麻将
+                haveSwimming: false, //泳池
+                haveTableTennis: false, //桌球
                 minConsumption: '', //最低消费（时间段集合里的最低消费）
-                snacks: [], //零嘴
+                snacks: [], //赠品
                 sketchMap: [], //包间示意图
                 roomTimeIntervalList: [] //时间段集合
             };
@@ -2096,6 +2071,7 @@ export default {
                     if (!this.ktvRoomList) {
                         this.ktvRoomList = [];
                     }
+                    //将当前用户添加的KTV信息存到上传数组中
                     this.ktvRoomList.push(this.presentKtvInfo);
                     this.$message.success('新增成功');
                 }
@@ -2113,7 +2089,6 @@ export default {
                     this.appShopImageUrl = result.appListBigPicture;
                     let cassette = result.cassette;
                     this.city = result.city;
-                    // this.servicePhone = result.customerServicePhone;
                     this.servicePhoneArr = result.customerServicePhoneList;
                     this.district = result.district;
                     this.districtCode = result.districtCode;
@@ -2164,7 +2139,7 @@ export default {
                     this.wrapLoading = false;
 
                     console.log('当前店铺数据', res.data);
-                } else if (res.code == 600) {
+                } else if (res.code === 600) {
                     this.$confirm(res.msg, '提示', {
                         confirmButtonText: '添加门店',
                         cancelButtonText: '取消',
@@ -2186,6 +2161,11 @@ export default {
                         .catch(() => {
                             this.$router.push('/index');
                         });
+                } else if (res.code === 660 || res.code === 700) {
+                    this.wrapLoading = false;
+                    localStorage.removeItem('userInfo');
+                    this.$message.error(res.msg);
+                    this.$router.push('/login');
                 }
             });
         },
@@ -2208,7 +2188,7 @@ export default {
         //获取ktv包间类型
         getKtvType() {
             this.$get('/merchant/store/ktvDeploy/deployList').then((res) => {
-                if (res.code == 0) {
+                if (res.code === 0) {
                     this.ktvTypeOpt = res.data;
                 }
             });
@@ -2232,7 +2212,6 @@ export default {
                 trustAddress: this.trustAddress,
                 longitude: this.longitude,
                 latitude: this.latitude,
-                // servicePhone: this.servicePhone,
                 servicePhoneArr: this.servicePhoneArr,
                 shopType: this.shopType,
                 shopTypeOpt: this.shopTypeOpt,
@@ -2278,7 +2257,6 @@ export default {
                 this.trustAddress = storageInfo.trustAddress;
                 this.longitude = storageInfo.longitude;
                 this.latitude = storageInfo.latitude;
-                // this.servicePhone = storageInfo.servicePhone;
                 this.servicePhoneArr = storageInfo.servicePhoneArr;
                 this.shopType = storageInfo.shopType;
                 this.shopTypeOpt = storageInfo.shopTypeOpt;
@@ -2375,7 +2353,7 @@ export default {
         if (process.env.NODE_ENV === 'development') {
             this.showImgPrefix = this.$imgHead;
         } else {
-            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
+            this.showImgPrefix = 'https://store.cdhqht.com/merchant/store/system/upload/down?keyName=';
         }
     },
 
@@ -2386,23 +2364,32 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@media screen and (min-width: 1300px) {
+    .container {
+        box-sizing: border-box;
+        display: flex;
+        padding: 20px;
+    }
+
+    .left-wrap {
+        width: 35%;
+        height: 100%;
+        margin-right: 50px;
+    }
+
+    .right-wrap {
+        height: 100%;
+        width: 65%;
+    }
+}
+
 .clearfix::after {
     display: block;
     content: '';
     clear: both;
 }
 
-.container {
-    box-sizing: border-box;
-    display: flex;
-    padding: 20px;
-}
-
 .left-wrap {
-    width: 35%;
-    height: 100%;
-    margin-right: 50px;
-
     h4 {
         font-weight: normal;
         display: flex;
@@ -2518,6 +2505,10 @@ export default {
 
             .bussiness-hours {
                 margin-bottom: 30px;
+
+                /deep/.el-input--suffix .el-input__inner {
+                    padding-right: 0;
+                }
 
                 > p {
                     margin-bottom: 10px;
@@ -2638,9 +2629,6 @@ export default {
 }
 
 .right-wrap {
-    height: 100%;
-    width: 65%;
-
     h4 {
         font-weight: normal;
         display: flex;
@@ -2788,10 +2776,19 @@ export default {
 
             .seat-box {
                 padding: 20px;
-                padding-bottom: 10px;
                 box-sizing: border-box;
                 background-color: #ddd;
                 display: flex;
+
+                > div {
+                    > div {
+                        &:last-child {
+                            > span {
+                                margin-bottom: 0;
+                            }
+                        }
+                    }
+                }
             }
 
             .input-seat {

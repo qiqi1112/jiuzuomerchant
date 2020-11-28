@@ -11,51 +11,13 @@
             <div class="head-handle clearfix">
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
-                    <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort">添加商品</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort" style="margin-right: 10px"
+                        >添加商品</el-button
+                    >
                     <el-button v-if="goodsData.length > 0" type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
-
-                <!-- 操作商品的对话框 -->
-                <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
-                    <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <!-- 编辑商品时 -->
-                        <el-tab-pane v-if="isUpdate" :label="activeName" :name="activeName"></el-tab-pane>
-                        <!-- 新增商品时 -->
-                        <el-tab-pane
-                            v-else
-                            :label="item.typeName"
-                            :name="item.typeName"
-                            v-for="(item, index) in titleArrList"
-                            :key="index"
-                        ></el-tab-pane>
-                    </el-tabs>
-
-                    <!-- 标签页组件信息 -->
-                    <template>
-                        <handleShop :goodsForm="goodsForm" :activeNum="activeNum"></handleShop>
-                    </template>
-
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="handleCancel">取 消</el-button>
-                        <el-button type="primary" @click="setGoodsInfo">确 定</el-button>
-                    </span>
-                </el-dialog>
-
-                <!-- APP展示商品分类弹窗 -->
-                <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
-                    <span class="add-classify-title">请选择给用户显示的商品种类</span>
-
-                    <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
-                        item.type | showAppGoodsType
-                    }}</el-checkbox>
-
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="showTypeDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="handleSureShowType">确 定</el-button>
-                    </span>
-                </el-dialog>
 
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
@@ -73,6 +35,46 @@
                     <el-button type="primary" icon="el-icon-search" @click="getGoodsInfo">搜索</el-button>
                 </div>
             </div>
+
+            <!-- 操作商品的对话框 -->
+            <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <!-- 编辑商品时 -->
+                    <el-tab-pane v-if="isUpdate" :label="activeName" :name="activeName"></el-tab-pane>
+                    <!-- 新增商品时 -->
+                    <el-tab-pane
+                        v-else
+                        :label="item.typeName"
+                        :name="item.typeName"
+                        v-for="(item, index) in titleArrList"
+                        :key="index"
+                    ></el-tab-pane>
+                </el-tabs>
+
+                <!-- 标签页组件信息 -->
+                <template>
+                    <handleShop :goodsForm="goodsForm" :activeNum="activeNum"></handleShop>
+                </template>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="handleCancel">取 消</el-button>
+                    <el-button type="primary" @click="setGoodsInfo">确 定</el-button>
+                </span>
+            </el-dialog>
+
+            <!-- APP展示商品分类弹窗 -->
+            <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
+                <span class="add-classify-title">请选择给用户展示的商品种类 <span style="color: #f00">（选中为展示分类）</span></span>
+
+                <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
+                    item.type | showAppGoodsType
+                }}</el-checkbox>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="showTypeDialog = false">取 消</el-button>
+                    <el-button type="primary" @click="handleSureShowType">确 定</el-button>
+                </span>
+            </el-dialog>
 
             <!-- 商品列表 -->
             <div class="goodsList">
@@ -396,6 +398,7 @@ export default {
             });
 
             console.log('切换标签页操作', this.activeNum, this.activeName);
+
             this.clearAllForm();
         },
 
@@ -436,25 +439,19 @@ export default {
             });
         },
 
-        //添加/修改商品时对部分属性的修改
-        updateProp() {
+        //添加/修改商品
+        setGoodsInfo(active) {
             if (this.activeNum != 1 && this.activeNum != 11) {
                 this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
             }
-            this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2); //广告位
-            this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2); //推荐位
-        },
-
-        //添加/修改商品
-        setGoodsInfo(active) {
-            this.updateProp(); //修改部分属性
 
             let data = {
                 listPicture: this.goodsForm.thumImageUrl,
                 name: this.goodsForm.name,
                 originalPrice: this.goodsForm.originPrice,
-                recommendAdStatus: this.goodsForm.checkedBanner,
-                recommendStatus: this.goodsForm.checkedReco,
+                recommendAdStatus:
+                    this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
+                recommendStatus: this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2),
                 synopsis: this.goodsForm.desc,
                 type: this.activeNum,
                 area: this.goodsForm.area,
@@ -471,11 +468,95 @@ export default {
                 statisticalPrice: this.goodsForm.comboNowPrice,
                 year: this.goodsForm.year
             };
+            console.log(data);
+            // 判断传商品价格开关
+            let commodityPrice = true;
+            let commodityPicture = true;
+            let skuSwitch = true;
+            // console.log(data)
+            if (!data.name) {
+                this.$message.warning('请输入商品名称');
+                return;
+            }
 
-            console.log('请求时传的值', data);
+            if (this.goodsForm.checkedBanner == 1 && !data.recommendAdPicture) {
+                this.$message.warning('请添加广告图片');
+                return;
+            }
+            if (this.goodsForm.checkedReco == 1 && !data.recommendPicture) {
+                this.$message.warning('请添加推荐位图片');
+                return;
+            }
+            if (this.activeNum == 1) {
+                if (!data.listPicture) {
+                    this.$message.warning('请添加商品缩略图');
+                    return;
+                }
+                if (!data.infoPicture) {
+                    this.$message.warning('请添加商品详情图');
+                    return;
+                }
+                if (data.setMealGoodsList.length == 0) {
+                    this.$message.warning('请至少选择一件商品');
+                    commodityPrice = false;
+                }
+                if (!this.$regular.money(data.statisticalPrice)) {
+                    this.$message.warning('请输入保留两位的数字的价格');
+                    return;
+                }
+                if (Number(data.statisticalPrice) > Number(data.originalPrice)) {
+                    this.$message.warning('商品现价大于原价');
+                    commodityPrice = false;
+                }
+                if (commodityPrice) {
+                    this.upCommodity(data);
+                }
+            } else if (this.activeNum == 11) {
+                if (!this.$regular.money(data.originalPrice)) {
+                    this.$message.warning('请输入纯数字积分');
+                    return;
+                }
+                if (!this.$regular.money(data.presentPrice)) {
+                    this.$message.warning('请输入保留两位的数字的价格');
+                    return;
+                }
+                if (!data.listPicture) {
+                    this.$message.warning('请至少选择一张商品缩略图');
+                    commodityPicture = false;
+                }
+                if (commodityPicture) {
+                    this.upCommodity(data);
+                }
+            } else {
+                // 判断传没传商品规格的开关;
+                if (!data.listPicture) {
+                    this.$message.warning('请添加商品缩略图');
+                    return;
+                }
+                if (!data.infoPicture) {
+                    this.$message.warning('请添加商品详情图');
+                    return;
+                }
+                if (!this.$regular.money(data.originalPrice)) {
+                    this.$message.warning('请输入保留两位的数字的价格');
+                    return;
+                }
+                data.skuList.map((item) => {
+                    if (!item.specName || !item.originalPrice) {
+                        this.$message.warning('请输入商品规格');
+                        skuSwitch = false;
+                    }
+                });
+                if (skuSwitch) {
+                    this.upCommodity(data);
+                }
+            }
+        },
+        upCommodity(result) {
+            // console.log(12121)
             (async () => {
                 if (this.isUpdate) {
-                    const res = await this.$put('/merchant/store/goods/update', data);
+                    const res = await this.$put('/merchant/store/goods/update', result);
                     if (res.code === 0) {
                         this.getGoodsInfo();
                         this.handleCancel();
@@ -484,8 +565,7 @@ export default {
                         this.$message.error(res.msg);
                     }
                 } else {
-                    const res = await this.$post('/merchant/store/goods/save', data);
-
+                    const res = await this.$post('/merchant/store/goods/save', result);
                     console.log(res);
                     if (res.code === 0) {
                         this.getGoodsInfo();
@@ -572,21 +652,27 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.clearfix::after {
-    content: '';
-    display: block;
-    clear: both;
-}
+// .clearfix::after {
+//     content: '';
+//     display: block;
+//     clear: both;
+// }
 
 .head-handle {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 30px;
 
     .left-handle {
-        float: left;
+        // float: left;
+
+        /deep/.el-button + .el-button {
+            margin-left: 0;
+        }
     }
 
     .right-handle {
-        float: right;
+        // float: right;
 
         .handle-input {
             width: 170px;

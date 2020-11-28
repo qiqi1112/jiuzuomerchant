@@ -226,7 +226,7 @@ export default {
                 dio_name: '', //名字
                 dio_introduce: '', //简介
                 fromdata: '', //图片
-                thumb:'',//缩略图
+                thumb: '', //缩略图
                 editor_text: '', //富文本
                 times: [],
                 id: '',
@@ -316,6 +316,14 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
+            // if(!this.query.text){
+            //     this.$message.error('请填写活动主题');
+            //     return
+            // }
+            //  if(this.query.times.length==0){
+            //     this.$message.error('请选择时间段');
+            //     return
+            // }
             this.$set(this.query, 'pageIndex', 1);
             this.getData();
         },
@@ -494,8 +502,6 @@ export default {
             this.uploadImg();
         },
 
-
-
         // 图片上传 缩略
         uploadImg1() {
             let config = {
@@ -542,7 +548,7 @@ export default {
 .top_info {
     display: flex;
     .activity {
-        flex: .4;
+        flex: 0.4;
         .in_act {
             width: 85%;
         }
@@ -580,17 +586,17 @@ export default {
             cursor: pointer;
         }
     }
-    .banner,.breviary {
-        flex: .3;
+    .banner,
+    .breviary {
+        flex: 0.3;
         padding-left: 10px;
         .imgs {
             p {
                 margin-bottom: 15px;
             }
         }
-        
     }
-    .banner{
+    .banner {
         /deep/.el-upload--text {
             width: 300px;
         }
@@ -600,7 +606,7 @@ export default {
             display: block;
         }
     }
-    .breviary{
+    .breviary {
         /deep/.el-upload--text {
             width: 180px;
         }
@@ -610,7 +616,7 @@ export default {
             display: block;
         }
     }
-    
+
     /deep/.avatar-uploader .el-upload {
         border: 1px dashed #d9d9d9;
         border-radius: 6px;
@@ -629,7 +635,6 @@ export default {
         line-height: 178px;
         text-align: center;
     }
-    
 }
 .handle-box {
     margin-bottom: 20px;
@@ -667,7 +672,7 @@ export default {
 .table-td-thumb {
     display: inline-block;
     margin: auto;
-    width: 80px;
+    width: 140px;
     height: 80px;
     margin-right: 10px;
 }

@@ -11,6 +11,16 @@ import Message from "element-ui/packages/message/index.js";
 function phone(val) {
     if (!(/(^0\d{2,3}\-\d{7,8}$)|(^1[3|4|5|6|7|8][0-9]{9}$)/.test(val))) {
         return false;
+    }else{
+        return true
+    }
+}
+// 纯数字
+function pureNumber(val) {
+    if (!(/^\d{1,}$/.test(val))) {
+        return false;
+    }else{
+        return true
     }
 }
 
@@ -18,6 +28,8 @@ function phone(val) {
 function money(val) {
     if (!/^\d+(\.\d{1,2})?$/.test(val)) {
         return false;
+    }else{
+        return true
     }
 }
 
@@ -114,5 +126,6 @@ export default {
     timeData,
     inputText,
     timestampToTime,
-    deep
+    deep,
+    pureNumber
 }

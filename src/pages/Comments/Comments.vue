@@ -145,7 +145,7 @@ export default {
             };
             this.$post('/merchant/store/appraise/appraiseListByStoreId', data).then((res) => {
                 if (res.code == 0) {
-                    // console.log(res);
+                    console.log(res);
                     let lab = '';
                     res.data.forEach((i) => {
                         lab = i.labels.split(',');
@@ -160,6 +160,10 @@ export default {
         },
         // 触发搜索按钮
         handleSearch() {
+            // if(!this.query.text){
+            //     this.$message.error('请输入关键字');
+            //     return
+            // }
             this.$set(this.query, 'pageIndex', 1);
             this.getData();
         },

@@ -146,7 +146,7 @@ Vue.filter("shopLocaShow", function (oldVal) {
     return newVal;
 })
 
-//包间属性
+//包间所属
 Vue.filter("roomAttr", function (oldVal) {
     let newVal = '';
     switch (oldVal) {
@@ -225,7 +225,7 @@ Vue.filter("orderStatus", function (oldVal) {
             newVal = '未消费';
             break;
         case 6:
-            newVal = '已离开';
+            newVal = '已离店';
             break;
     }
     return newVal;
