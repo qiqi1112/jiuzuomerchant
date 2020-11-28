@@ -1,13 +1,18 @@
 let api, tengxun, file, token
 import axios from 'axios'
+
 if (process.env.NODE_ENV === "development") {
   api = "/api";
   file = "/file"
   tengxun = "/map";
-} else {
-  api = 'http://47.108.204.66:8077'
-  file = 'http://47.108.204.66:8078'
+} else if(process.env.NODE_ENV === "testing"){
+  api = 'https://systemtest.cdhqht.com'
+  file = 'https://systemtest.cdhqht.com'
   tengxun = 'http://apis.map.qq.com'
+}else{
+  api = 'https://system.cdhqht.com'
+  file = 'https://system.cdhqht.com'
+  tengxun = 'http://apis.map.qq.com'  
 }
 
 
