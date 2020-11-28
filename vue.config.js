@@ -12,6 +12,7 @@ module.exports = {
                 // target: "http://192.168.31.100:8077",
                 // target: "http://192.168.31.194:8077",
                 target: 'https://store.cdhqht.com',
+                // target: 'http://47.96.26.80:8077',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''
@@ -28,6 +29,7 @@ module.exports = {
             '/file': {
                 // target: 'http://47.108.204.66:8078',
                 target: 'https://store.cdhqht.com',
+                // target: 'http://47.96.26.80:8077',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/file': ''
