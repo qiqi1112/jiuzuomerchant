@@ -652,12 +652,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-// .clearfix::after {
-//     content: '';
-//     display: block;
-//     clear: both;
-// }
-
 .head-handle {
     display: flex;
     justify-content: space-between;
