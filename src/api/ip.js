@@ -2,18 +2,23 @@ let api, tengxun, file, token
 import axios from 'axios'
 
 if (process.env.NODE_ENV === "development") {
+  console.log(111)
   api = "/api";
   file = "/file"
   tengxun = "/map";
 } else if (process.env.NODE_ENV === "testing") {
+  console.log(222)
   api = 'https://storetest.cdhqht.com'
   file = 'https://storetest.cdhqht.com'
   tengxun = 'http://apis.map.qq.com'
 } else {
+  console.log(333)
   api = 'https://store.cdhqht.com'
   file = 'https://store.cdhqht.com'
   tengxun = 'http://apis.map.qq.com'
 }
+
+console.log(api)
 
 
 const api_request = axios.create({
@@ -33,7 +38,6 @@ const map_request = axios.create({
 
 api_request.interceptors.request.use(config => {
   token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''
-  // axios.defaults.headers.common["X-Store-Token"] = token;
   config.headers.common['X-Store-Token'] = token
   return config;
 });
@@ -44,7 +48,6 @@ map_request.interceptors.request.use(config => {
 
 file_request.interceptors.request.use(config => {
   token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''
-  // axios.defaults.headers.common["X-Store-Token"] = token;
   config.headers.common['X-Store-Token'] = token
   return config;
 });

@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "npm run serve",
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --mode prod"
+    "serve": "vue-cli-service --open --mode development serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "axios": "^0.18.1",
