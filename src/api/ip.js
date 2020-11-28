@@ -6,13 +6,13 @@ if (process.env.NODE_ENV === "development") {
   file = "/file"
   tengxun = "/map";
 } else if(process.env.NODE_ENV === "testing"){
-  api = 'https://systemtest.cdhqht.com'
-  file = 'https://systemtest.cdhqht.com'
-  tengxun = 'http://apis.map.qq.com'
+  api = 'https://storetest.cdhqht.com'
+  file = 'https://storetest.cdhqht.com'
+  tengxun = 'https://apis.map.qq.com'
 }else{
-  api = 'https://system.cdhqht.com'
-  file = 'https://system.cdhqht.com'
-  tengxun = 'http://apis.map.qq.com'  
+  api = 'https://store.cdhqht.com'
+  file = 'https://store.cdhqht.com'
+  tengxun = 'https://apis.map.qq.com'  
 }
 
 
