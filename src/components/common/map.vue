@@ -185,25 +185,51 @@ export default {
         },
         changeStr(data) {
             let address = encodeURI(this.fristForm.address);
-            this.$map_get(`/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ`)
-                .then((res) => {
-                    if (res.status == 0) {
-                        this.addressLists = res.data;
-                        this.add_info = res.data[0];
+            const KEY ='UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ';
+	        let url = 'https://apis.map.qq.com/ws/place/v1/search';
+            this.$jsonp(url,{
+                key:KEY,
+                boundary:`region(${this.value},0)`,
+                keyword:address,
+                output: "jsonp",
+            },).then(res=>{
+                if (res.status == 0) {
+                    this.addressLists = res.data;
+                    this.add_info = res.data[0];
+                } else if (res.status == 330) {
+                    this.addressLists = [];
+                } else {
+                    this.$message({
+                        message: '遇到一点问题~，请刷新后再试',
+                        type: 'warning'
+                    });
+                }
+            }).catch(err => {
+                console.log(err)
+            })
 
-                        // console.log(res.data);
-                    } else if (res.status == 330) {
-                        this.addressLists = [];
-                    } else {
-                        this.$message({
-                            message: '遇到一点问题~，请刷新后再试',
-                            type: 'warning'
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+            // return
+            // this.$map_get(`/ws/place/v1/search?keyword=${address}&boundary=region(${this.value},0)&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ&output=jsonp`)
+            //     .then((res) => {
+            //         // this.addressLists = res.data;
+            //         // console.log(JSON.parse(res))
+            //         console.log(res)
+            //         // this.add_info = res.data[0];
+            //         // if (res.status == 0) {
+
+            //         //     // console.log(res.data);
+            //         // } else if (res.status == 330) {
+            //         //     this.addressLists = [];
+            //         // } else {
+            //         //     this.$message({
+            //         //         message: '遇到一点问题~，请刷新后再试',
+            //         //         type: 'warning'
+            //         //     });
+            //         // }
+            //     })
+            //     .catch((err) => {
+            //         console.log(err);
+            //     })
             // this.searchService.search(this.fristForm.address);
             // this.searchService.setLocation(this.value);
         },

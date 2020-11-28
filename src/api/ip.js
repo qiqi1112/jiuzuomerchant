@@ -22,7 +22,7 @@ const api_request = axios.create({
   baseURL: api,
   timeout: 20000
 })
-
+console.log(tengxun)
 const file_request = axios.create({
   baseURL: file,
   timeout: 20000
