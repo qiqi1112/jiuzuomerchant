@@ -481,6 +481,7 @@ export default {
 
             if (this.goodsForm.checkedBanner == 1 && !data.recommendAdPicture) {
                 this.$message.warning('请添加广告图片');
+                this.goodsForm.checkedBanner = false;
                 return;
             }
             if (this.goodsForm.checkedReco == 1 && !data.recommendPicture) {
@@ -553,7 +554,6 @@ export default {
             }
         },
         upCommodity(result) {
-            // console.log(12121)
             (async () => {
                 if (this.isUpdate) {
                     const res = await this.$put('/merchant/store/goods/update', result);
@@ -638,11 +638,11 @@ export default {
     },
 
     created() {
-        if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = this.$imgHead;
-        } else {
-            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
-        }
+        // if (process.env.NODE_ENV === 'development') {
+        //     this.showImgPrefix = this.$imgHead;
+        // } else {
+        //     this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
+        // }
     },
 
     mounted() {

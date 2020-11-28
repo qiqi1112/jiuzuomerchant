@@ -2347,11 +2347,11 @@ export default {
         this.getShopType(); //获取店铺类型
         this.getKtvType(); //获取ktv包间类型
 
-        if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = this.$imgHead;
-        } else {
-            this.showImgPrefix = 'https://store.cdhqht.com/merchant/store/system/upload/down?keyName=';
-        }
+        // if (process.env.NODE_ENV === 'development') {
+        //     this.showImgPrefix = this.$imgHead;
+        // } else {
+        //     this.showImgPrefix = 'https://store.cdhqht.com/merchant/store/system/upload/down?keyName=';
+        // }
     },
 
     mounted() {

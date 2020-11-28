@@ -301,11 +301,7 @@ export default {
     },
 
     created() {
-        if (process.env.NODE_ENV === 'development') {
-            this.showImgPrefix = this.$imgHead;
-        } else {
-            this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
-        }
+       
     },
 
     watch: {

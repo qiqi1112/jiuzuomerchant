@@ -129,7 +129,7 @@ export default {
                     }
                 }
             },
-            serverUrl: '/file/admin/system/upload/createBatch',
+            serverUrl: '',
             downUrl: this.$imgHead
         };
     },
@@ -155,12 +155,13 @@ export default {
     created() {
         if (process.env.NODE_ENV === 'development') {
             // 开发环境
-            this.serverUrl = '/file/admin/system/upload/createBatch';
-            this.downUrl = this.$imgHead;
-        } else {
-            this.serverUrl = 'http://47.108.204.66:8078/admin/system/upload/createBatch';
-            this.downUrl = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
+            this.serverUrl = '/file/merchant/store/system/upload/createBatch';
+        } else if(process.env.NODE_ENV === "testing"){
+            this.serverUrl = 'https://storetest.cdhqht.com/merchant/store/system/upload/createBatch';
+        }else{
+            this.serverUrl = 'https://store.cdhqht.com/merchant/store/system/upload/createBatch';
         }
+
         // console.log(this.formData)
         this.content = this.formData.editor_text;
         let Size = Quill.import('attributors/style/size');

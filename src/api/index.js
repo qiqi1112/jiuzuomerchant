@@ -5,7 +5,8 @@ import router from "../router";
 import {
     api_request,
     map_request,
-    file_request
+    file_request,
+    imgHead
 } from "./ip";
 import Message from "element-ui/packages/message/index.js";
 
@@ -57,7 +58,6 @@ axios.interceptors.response.use(
 //     });
 // };
 
-const imgHead = '/file/merchant/store/system/upload/down?keyName=';
 const fileUploadUrl = '/merchant/store/system/upload/create';
 
 
