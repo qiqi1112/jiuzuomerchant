@@ -176,13 +176,10 @@ Vue.filter("payStatus", function (oldVal) {
     let newVal = '';
     switch (oldVal) {
         case 0:
-            newVal = '已支付';
+            newVal = '未支付';
             break;
         case 1:
-            newVal = '待支付';
-            break;
-        case 2:
-            newVal = '未支付';
+            newVal = '已支付';
             break;
     }
     return newVal;
