@@ -18,14 +18,12 @@ if (process.env.NODE_ENV === "development") {
   imgHead = 'https://store.cdhqht.com/merchant/store/system/upload/down?keyName=';
 }
 
-console.log(api)
 
 
 const api_request = axios.create({
   baseURL: api,
   timeout: 20000
 })
-console.log(imgHead)
 const file_request = axios.create({
   baseURL: file,
   timeout: 20000

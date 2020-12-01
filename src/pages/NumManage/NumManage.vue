@@ -23,7 +23,7 @@
                 
                 <div>
                     <el-button @click="call()" type="primary" icon="el-icon-dish">呼叫下一位</el-button>
-                    <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button>
+                    <!-- <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button> -->
                 </div>
             </div>
 

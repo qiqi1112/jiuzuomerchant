@@ -10,7 +10,7 @@
         <div class="container">
             <div class="top_box">
                 <div class="evaluation">
-                    <h2 class="title"><span class="line lw1"></span><span>PlayHouse</span></h2>
+                    <h2 class="title"><span class="line lw1"></span><span>{{storeName}}</span></h2>
                     <div class="store_eva">
                         <div class="st">
                             <div>{{ topData.collectionTotal }}</div>
@@ -242,11 +242,11 @@
                         </div>
                     </div>
 
-                    <div class="excel">
+                    <!-- <div class="excel">
                         <el-button type="primary" icon="el-icon-download" class="handle-del" @click="dialogVisible = true"
                             >一件生成Excel</el-button
                         >
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -366,10 +366,12 @@ export default {
             allSeatDetailInfo: [], //所有座位详细信息
             presentSeatInfo: {}, //当前座位对应的详细信息
             isClickSeat: false, //展示当前座位的详细信息开关
-            allGraph: [] //图形统计数据 全部
+            allGraph: [], //图形统计数据 全部
+            storeName:'',
         };
     },
     created() {
+        this.storeName = JSON.parse(localStorage.getItem('userInfo')).loginName 
         this.time_now = this.$regular.timeData(new Date().getTime(), 5);
         this.scrollY = -(new Date().getDate() - 8);
         this.active = new Date().getDate() - 1;
@@ -564,6 +566,9 @@ export default {
                 time.unshift(i.time);
             });
             let brokenline = echarts.init(this.$refs.broken);
+            window.addEventListener("resize", function () {
+                brokenline.resize();
+            });
             let option = {
                 dataZoom: {
                     type: 'inside'
@@ -614,6 +619,9 @@ export default {
             numeral.unshift(['product', '开台数', '预定桌数', '访问记录']);
 
             let columnarLine = echarts.init(this.$refs.columnar);
+            window.addEventListener("resize", function () {
+                columnarLine.resize();
+            });
             let option = {
                 color: ['#f0d264', '#82c8a0', '#7fccde', '#6698cb', '#cb99c5'],
                 legend: {},
@@ -654,6 +662,9 @@ export default {
             }
 
             let breadLine = echarts.init(this.$refs.bread);
+            window.addEventListener("resize", function () {
+                breadLine.resize();
+            });
             let option = {
                 title: {
                     // text: '排号',
@@ -836,7 +847,7 @@ export default {
             display: flex;
             height: 50%;
             .star {
-                width: 60%;
+                width: 70%;
                 height: auto;
                 margin-top: 24px;
                 position: relative;
@@ -847,7 +858,7 @@ export default {
             }
         }
         .st {
-            width: 20%;
+            width: 15%;
             display: inline-block;
             text-align: center;
             height: 100%;
@@ -1065,9 +1076,22 @@ export default {
         color: #000 !important;
     }
 }
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1400px) {
     .top_box {
         font-size: 12px;
+        display: inherit;
+        height: auto;
+        padding-bottom: 15px;
+        .star{
+            margin-top: 14px;
+        }
+        .visitors{
+            display: inline-block;
+        }
+        .to_view{
+            display: inline-block;
+            margin-left: 15%;
+        }
     }
     /deep/.el-rate .el-rate__text {
         font-size: 1.4rem;
