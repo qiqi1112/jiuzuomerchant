@@ -71,6 +71,7 @@
     </div>
 </template>
 <script>
+import init from "../../assets/js/init";
 export default {
     data() {
         return {
@@ -107,7 +108,11 @@ export default {
                     }
                 },
                 userList: [ //用户信息
-                    //{userId,name,onlineTime,offlineTime}
+                    {userId:1,name:'亮总'},
+                    {userId:2,name:'亮总2号'},
+                    {userId:3,name:'亮总3号'},
+
+
                 ],
                 oneList: [
                     '你好，请问有什么问题呢？', '阿发发士大夫胜多负少', '手动阀手动阀手动阀'
@@ -115,135 +120,17 @@ export default {
         };
     },
     created(){
-        // this.$socket.disconnect();
+        // console.log(init)
     },
-    sockets: {
-        connect() {
-            console.log('连接成功');
-        },
-        error(reason) {
-            console.error('连接错误', reason);
-            try {
-                reason = JSON.parse(reason);
-            } catch (e) {}
-            //TODO 重连？ this.$socket.reconnect();
-        },
-        reconnect() {
-            console.log('重新连接');
-        },
-        disconnect(reason) {
-            console.log('断开连接:', reason);
-        },
-        //当前延迟（毫秒）
-        pong(delay) {},
-        //登陆结果
-        hall_connection_push(result) {
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
-            let {user,history} = data;
-            //若为JSON对象数据
-            this.mySelf = user;
-            for(let msgObj of history){
-                if(!!msgObj && msgObj.body){
-                    msgObj.body = JSON.parse(msgObj.body);
-                }
-                this.msgArr.push(msgObj);
-            }
-        },
-        //新用户加入
-        hall_new_user_push(result) {
-            console.log('新用户加入', result);
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
-            let {user} = data;
-            this.userList.push(user);
-        },
-        //收到消息
-        hall_single_push(result) {
-            console.log('收到消息', result);
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
-            //放入历史消息
-            //TODO 可以在消息内容加入未读字段 例如data.isRead = false
-            if(!!data && data.body){
-                data.body = JSON.parse(data.body);
-            }
-            this.msgArr.push(data);
-        },
-        //用户离线
-        hall_offline_push(result) {
-            console.log('用户下线', result);
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
-            //TODO 处理用户数据
-        },
-        //加入房间
-        hall_join_push(result) {
-            console.log('加入房间', result);
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
 
-            //TODO 处理用户数据
-        },
-        //离开房间
-        hall_leave_push(result) {
-            console.log('离开房间', result);
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
-
-            //TODO 处理用户数据
-        },
-        //错误消息
-        hall_error_push(result) {
-            console.log('操作异常', result);
-            let {
-                code,
-                msg,
-                data,
-            } = result;
-            if(code!==200){
-                return console.error(msg);
-            }
-        }
-
-    },
     methods: {
+        // init(){
+        //     let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
+        //     var userInfo = {
+        //         appKey: "82hegw5u8vgdx",
+        //         token: rToken
+        //     };
+        // },
         getChat(val, i) {
             this.now_user = val;
             this.active = i;
@@ -265,8 +152,6 @@ export default {
                 // address:"四川省成都市锦江区",
                 // url:"test.png"
             };
-
-            this.$socket.emit('hall_single', data);
             this.sendText = '';
         },
         handleClick(tab, event) {
@@ -278,20 +163,51 @@ export default {
         }
     },
     mounted() {
-        // this.$socket.connect();
+        let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
+        var userInfo = {
+            appKey: "82hegw5u8mqwx",
+            token:rToken
+        };
+        console.log(rToken)
+        var callbacks = {
+            CONNECTED: function(instance) {
+                //传入实例参数
+                //获取历史消息
+                var conversationType = RongIMLib.ConversationType.PRIVATE;
+                var targetId = "user2";
+                instance.getHistoryMessages(
+                    conversationType,
+                    targetId,
+                    null,
+                    20,
+                    {
+                        onSuccess(list, hasMsg) {
+                            console.log(list);
+                            //渲染会话列表
+                            // this.stat.messageList = list;
+                            // return (this.instance = instance);
+                        }
+                    },
+                    null
+                );
+            },
+            Success: function(id) {},
+            Received: function(message) {}
+        };
+        init(userInfo, callbacks);
+        // this.scrollEnd();
     },
-    beforeDestroy(){
-        this.$socket.disconnect();
-    },
+
 };
 </script>
 <style scoped lang='less'>
 .chat_room{
     .floating{
-        height: 50px;
-        width: 50px;
+        height: 65px;
+        width: 65px;
         border-radius: 50%;
-        background: blueviolet;
+        background: url('../../assets/img/kefu.jpg');
+        background-size: 100% 100%;
         position: fixed;
         right: 100px;
         top: 80%;

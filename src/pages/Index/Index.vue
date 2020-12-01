@@ -371,7 +371,7 @@ export default {
         };
     },
     created() {
-        this.storeName = JSON.parse(localStorage.getItem('userInfo')).loginName 
+        this.storeName = JSON.parse(localStorage.getItem('userInfo')).storeName 
         this.time_now = this.$regular.timeData(new Date().getTime(), 5);
         this.scrollY = -(new Date().getDate() - 8);
         this.active = new Date().getDate() - 1;

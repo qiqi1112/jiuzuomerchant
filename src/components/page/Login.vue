@@ -46,7 +46,9 @@ export default {
                     let obj = {
                         loginName: res.data.loginName,
                         token: res.data.token,
-                        logo: res.data.logo
+                        logo: res.data.logo,
+                        rToken:res.data.rongToken,
+                        storeName:res.data.storeName
                     };
 
                     localStorage.setItem('userInfo', JSON.stringify(obj));
