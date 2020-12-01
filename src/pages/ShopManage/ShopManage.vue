@@ -14,8 +14,17 @@
                     <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort" style="margin-right: 10px"
                         >添加商品</el-button
                     >
-                    <el-button v-if="goodsData.length > 0" type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
-                    <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
+                    <el-button
+                        v-if="goodsData.length > 0"
+                        type="danger"
+                        icon="el-icon-delete"
+                        @click="isSelect = true"
+                        style="margin-right: 10px"
+                        >批量删除</el-button
+                    >
+                    <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll" style="margin-right: 10px"
+                        >确定</el-button
+                    >
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
 
@@ -153,6 +162,7 @@ export default {
                 originPrice: '', //原价
                 nowPrice: '', //现价
                 comboNowPrice: '', //套餐现价
+                statisticalPrice: '', //会员卡原价
                 checkedBanner: false, //商家广告banner位开关
                 checkedReco: false, //商家推荐位开关
                 area: '', //产地
@@ -172,6 +182,7 @@ export default {
                             specName: '', //规格
                             originalPrice: '', //规格原价
                             presentPrice: '', //规格现价
+                            statisticalPrice: '', //新增的现价
                             skuCode: '' //sku码
                         }
                     ]
@@ -360,6 +371,7 @@ export default {
                 originPrice: '', //原价
                 nowPrice: '', //现价
                 comboNowPrice: '', //套餐现价
+                statisticalPrice: '', //会员卡原价
                 checkedBanner: false, //商家广告banner位开关
                 checkedReco: false, //商家推荐位开关
                 area: '', //产地
@@ -380,6 +392,7 @@ export default {
                             specName: '', //规格
                             originalPrice: '', //规格原价
                             presentPrice: '', //规格现价
+                            statisticalPrice: '', //新增的现价
                             skuCode: '' //sku码
                         }
                     ]
@@ -460,12 +473,14 @@ export default {
                 id: this.goodId,
                 infoPicture: this.goodsForm.detailImageUrl,
                 presentPrice: this.goodsForm.nowPrice,
+                // statisticalPrice: this.goodsForm.statisticalPrice,
                 recommendAdPicture: this.goodsForm.bannerImageUrl,
                 recommendPicture: this.goodsForm.recoImageUrl,
                 recommendPictureSort: this.goodsForm.recoWeight,
                 setMealGoodsList: this.goodsForm.tableData,
                 skuList: this.goodsForm.dynamicValidateForm.domains,
-                statisticalPrice: this.goodsForm.comboNowPrice,
+                statisticalPrice:
+                    this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
                 year: this.goodsForm.year
             };
             console.log(data);
@@ -603,6 +618,7 @@ export default {
                         originPrice: res.originalPrice, //原价
                         nowPrice: res.presentPrice, //现价
                         comboNowPrice: res.statisticalPrice, //套餐现价
+                        statisticalPrice: res.statisticalPrice, //会员卡现价
                         checkedBanner: res.recommendAdStatus === 1 ? true : false, //商家广告banner位开关
                         checkedReco: res.recommendStatus === 1 ? true : false, //商家推荐位开关
                         area: res.area, //产地

@@ -36,14 +36,18 @@
                                 ></el-input>
                                 <el-input
                                     v-model="item.originalPrice"
-                                    placeholder="如：9.99"
+                                    placeholder="原价（如：9.99）"
                                     style="width: 170px; margin-right: 10px"
                                 >
                                     <template slot="append">￥</template>
                                 </el-input>
-                                <!-- <el-input v-model="item.presentPrice" placeholder="现价（如：9.99）" style="width: 170px; margin-right: 10px">
-                                <template slot="append">￥</template>
-                            </el-input> -->
+                                <el-input
+                                    v-model="item.statisticalPrice"
+                                    placeholder="现价（如：9.99）"
+                                    style="width: 170px; margin-right: 10px"
+                                >
+                                    <template slot="append">￥</template>
+                                </el-input>
                                 <el-button @click="addDomain">
                                     <i class="el-icon-plus"></i>
                                 </el-button>
@@ -135,7 +139,10 @@
                         <span>会员卡积分：</span>
                         <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
 
-                        <span>商品单价：</span>
+                        <span>会员卡原价：</span>
+                        <el-input v-model="goodsForm.statisticalPrice" style="width: 120px; margin-right: 20px"></el-input>
+
+                        <span>会员卡现价：</span>
                         <el-input v-model="goodsForm.nowPrice" style="width: 120px"></el-input>
                     </p>
                 </template>
@@ -267,7 +274,7 @@
             <!-- 会员卡卡片列表 -->
             <template>
                 <div class="vip-card-wrap" v-if="activeNum == 11">
-                    <span>商品缩略图：</span>
+                    <span>会员卡缩略图：</span>
                     <div class="image-box" v-if="thumImageBox">
                         <img
                             ref="thumImg"
@@ -300,9 +307,7 @@ export default {
         };
     },
 
-    created() {
-       
-    },
+    created() {},
 
     watch: {
         //如果切换到会员卡页面就加载会员卡卡片列表
@@ -443,6 +448,7 @@ export default {
                 specName: '', //规格
                 originalPrice: '', //规格原价
                 presentPrice: '', //规格现价
+                statisticalPrice: '', //新增的现价
                 skuCode: '' //sku码
             });
         },
@@ -547,7 +553,7 @@ export default {
     }
 
     .left-box {
-        width: 70%;
+        width: 68%;
 
         .banner-img-box {
             /deep/.el-upload--text {
@@ -602,7 +608,7 @@ export default {
     }
 
     .right-box {
-        width: 30%;
+        width: 32%;
 
         .detail-img-box {
             /deep/.avatar-uploader-icon {
@@ -629,7 +635,7 @@ export default {
 
         .vip-card-wrap {
             > span {
-                min-width: 84px;
+                min-width: 100px;
             }
 
             display: flex;

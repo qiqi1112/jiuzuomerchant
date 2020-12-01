@@ -38,7 +38,9 @@
                 </el-select>
 
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-search" @click="seeSeatInfo">查看座位</el-button>
+                <el-button type="success" icon="el-icon-search" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
+                    >查看座位</el-button
+                >
             </div>
 
             <!-- 表格部分 -->
@@ -148,7 +150,7 @@
                                     ? '未消费'
                                     : scope.row.status == 6
                                     ? '已离店'
-                                    : '确认消费'
+                                    : '确认离店'
                             }}</el-button
                         >
                     </template>
@@ -427,6 +429,8 @@ export default {
                 pagesize: 10 //默认每页要显示多少条数据
             },
 
+            storeLocation: -1, //店铺类型（如果是KTV就不展示查看座位按钮）
+
             dialog: false, //查看订单详情弹窗开关
             seatDia: false, //修改座位号弹窗开关
             tableData: [], //订单表格列表
@@ -686,10 +690,10 @@ export default {
 
                 try {
                     let res = await this.$post('/merchant/store/order/list', data);
-                    if (res.code == 0) {
-                        this.tableData = res.data.list;
-                        this.searchObj.dataListCount = res.data.total;
-                        // console.log(this.tableData);
+                    if (res.code === 0) {
+                        this.storeLocation = res.data.storeLocation;
+                        this.tableData = res.data.merchantOrderList.list;
+                        this.searchObj.dataListCount = res.data.merchantOrderList.total;
                     } else {
                         this.$message.error(res.msg);
                     }
@@ -783,11 +787,11 @@ export default {
                 });
         },
 
-        //是否消费确认
+        //是否离店确认
         isConComplete(row) {
             console.log('xxx', row);
 
-            this.$confirm('是否确认消费?', '提示', {
+            this.$confirm('是否确认离店?', '提示', {
                 distinguishCancelAndClose: true,
                 confirmButtonText: '已离店',
                 // cancelButtonText: '未消费',

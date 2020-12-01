@@ -1,15 +1,15 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">后台管理系统</div>
+            <div class="ms-title">玖座商家后台管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username" @keyup.enter.native="submitForm()">
+                    <el-input v-model="param.username" placeholder="用户名" @keyup.enter.native="submitForm()">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" placeholder="password" v-model="param.password" @keyup.enter.native="submitForm()">
+                    <el-input type="password" placeholder="密码" v-model="param.password" @keyup.enter.native="submitForm()">
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
