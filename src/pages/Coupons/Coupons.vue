@@ -148,7 +148,7 @@
                                                     <template slot="append">￥</template>
                                                 </el-input>
                                                 <span class="tt">赠</span>
-                                                <el-input v-model="domain.minus" class="num" :disabled="readOnly"> </el-input>
+                                                <el-input v-model="domain.minus" class="num" placeholder="自定义商品" :disabled="readOnly"> </el-input>
                                                 <span class="tt">送</span>
                                                 <el-input v-model="domain.give" class="num" :disabled="readOnly">
                                                     <template slot="append">张</template>
