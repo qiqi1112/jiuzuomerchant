@@ -278,6 +278,11 @@ export default {
         // 查看/编辑操作
         handleEdit(index = '', row = '', type) {
             this.form = {};
+            if(row.category == 3){
+                // 当前类型为消费礼券时
+                let arr = row.details.split('赠')
+                row.discountMoney = arr[1]
+            }
             if (row) {
                 this.couId = row.id;
                 if (type == 1) {
