@@ -6,6 +6,7 @@ import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import store from './store/store'
 import rongyun from '@/assets/js/rongyun'
+import './assets/css/icon/iconfont.css';
 import {
     messages
 } from './components/common/i18n';

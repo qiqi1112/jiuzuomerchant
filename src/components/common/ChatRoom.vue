@@ -1,38 +1,51 @@
 <template>
     <div class="chat_room">
-        <div class="floating" v-if="$store.state.showChatRoom" @click="showRoom = !showRoom"></div>
+        <div class="floating" v-if="$store.state.showChatRoom" @click="showChat"></div>
 
 
         <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%">
+
+            
             <div id="service" v-if="showRoom">
                 <div class="box">
                     <div class="people_list">
                         <ul>
-                            <li :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">
-                                {{item.name}}
+                            <li class="userList" :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">
+                                <template v-if="item.latestMessage.content.user">
+                                    {{item.latestMessage.content.user.name}}
+                                </template>
                             </li>
                         </ul>
                     </div>
-                    <div class="chat" v-if="now_user.userId">
+                    
+                    <div class="chat" v-if="now_user != {}">
                         <div class="record">
-                            <div class="username">{{now_user.name}}</div>
+                            <div class="username" v-if="now_user_name">{{now_user_name}}</div>
                             <div class="chat_list">
                                 <div class="cli">
                                     <div class="cmsg" v-for="(item,i) in msgArr" :key="i">
-                                        <div class="msg_list" v-if="item.sender == now_user.userId">
+                                        <div class="msg_list" v-if="item.messageDirection==2">
                                             <div class="headImg">
-                                                <img src="img/4.jpg" alt="">
+                                                <img v-if="item.content.user" :src="item.content.user.portrait" alt="">
                                             </div>
-                                            <div class="msg">
-                                                <div>{{item.body.txt}}</div>
+                                            <!-- 文本消息 -->
+                                            <div class="msg" v-if="item.messageType == 'TextMessage'">
+                                                <div>{{item.content.content}}</div>
+                                            </div>
+                                            <!-- 图片 -->
+                                            <div class="msg" v-if="item.messageType == 'ImageMessage'">
+                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
                                             </div>
                                         </div>
                                         <div class="msg_list self" v-else>
-                                            <div class="msg self_msg">
-                                                <div>{{item.body.txt}}</div>
+                                            <div class="msg self_msg"  v-if="item.messageType == 'TextMessage'">
+                                                <div>{{item.content.content}}</div>
+                                            </div>
+                                            <div class="msg self_msg"  v-if="item.messageType == 'ImageMessage'">
+                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
                                             </div>
                                             <div class="headImg self_img">
-                                                <img src="img/3.jpg" alt="">
+                                                <img v-if="item.content.user" :src="imgHead + item.content.user.portrait" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -52,13 +65,13 @@
 
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
-                                <el-tab-pane label="套餐" name="first">
+                                <el-tab-pane label="快捷回答" name="first">
                                     <ul class="one">
                                         <li @click="quickRrep(item)" v-for="(item,i) in oneList" :key="i">{{item}}</li>
                                     </ul>
                                 </el-tab-pane>
-                                <el-tab-pane label="香槟" name="second">清吧</el-tab-pane>
-                                <el-tab-pane label="啤酒" name="third">KTV</el-tab-pane>
+                                <!-- <el-tab-pane label="香槟" name="second">清吧</el-tab-pane>
+                                <el-tab-pane label="啤酒" name="third">KTV</el-tab-pane> -->
                             </el-tabs>
                         </div>
 
@@ -75,84 +88,152 @@ import init from "../../assets/js/init";
 export default {
     data() {
         return {
+            imgHead: this.$imgHead,
             showRoom:false,
             activeName: 'first',
-                now_user: {
-                    // 当前对话框内用户
-                    // {userId,name,onlineTime,offlineTime}
-                },
-                mySelf: { //我的信息
-                    // {userId,name,onlineTime,offlineTime}
-                },
-                // active:null,//默认需要点击
-                active: null,
-                sendText: null,//发送的消息
-                msgArr: [ //历史消息
-                    // { userId, msgType, sender, receiver,bodyType,body{txt,imgIndex,jsonObj,url,lng,lat,address} }
-                ],
-                msgConf: { //消息配置
-                    "MSG_TYPE": {
-                        "ADMIN": {"VALUE": 0, "NAME": "系统消息"},
-                        "USER": {"VALUE": 1, "NAME": "个人消息"},
-                        "GROUP": {"VALUE": 2, "NAME": "群消息"}
-                    },
-                    "BODY_TYPE": {
-                        "TXT": {"VALUE": 0, "NAME": "文本"},
-                        "IMG_INDEX": {"VALUE": 1, "NAME": "表情索引"},
-                        "JSON_OBJ": {"VALUE": 2, "NAME": "JSON"},
-                        "URL_IMG": {"VALUE": 3, "NAME": "图片地址"},
-                        "LNG_LAT": {"VALUE": 4, "NAME": "经纬度"},
-                        "URL_AUDIO": {"VALUE": 5, "NAME": "音频地址"},
-                        "URL_VIDEO": {"VALUE": 6, "NAME": "视频地址"},
-                        "URL_FILE": {"VALUE": 7, "NAME": "文件地址"}
-                    }
-                },
-                userList: [ //用户信息
-                    {userId:1,name:'亮总'},
-                    {userId:2,name:'亮总2号'},
-                    {userId:3,name:'亮总3号'},
+            now_user: {
+                // 当前对话框内用户
+                // {userId,name,onlineTime,offlineTime}
+            },
+            now_user_name:'',
+            mySelf: { //我的信息
+                // {userId,name,onlineTime,offlineTime}
+            },
+            // active:null,//默认需要点击
+            active: null,
+            sendText: null,//发送的消息
+            msgArr: [ //历史消息
+                // { userId, msgType, sender, receiver,bodyType,body{txt,imgIndex,jsonObj,url,lng,lat,address} }
+            ],
+            moreHistory:true,
+            userList: [],
+            oneList: [
+                '你好，请问有什么问题呢？', 'yuo can do this', '好的，亲'
+            ],
+            selfInfo:'',
 
-
-                ],
-                oneList: [
-                    '你好，请问有什么问题呢？', '阿发发士大夫胜多负少', '手动阀手动阀手动阀'
-                ]
+            num:this.$store.state.newMsgNum,
+            // {{$store.state.newMsgArr}}
+            
         };
     },
     created(){
-        // console.log(init)
+        this.selfInfo = JSON.parse(localStorage.getItem('userInfo')) 
+    },
+    watch: {
+        num: {
+            handler(newValue, oldValue) {
+                console.log(this.$store.state.newMsg)
+            }
+        }
     },
 
     methods: {
-        // init(){
-        //     let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
-        //     var userInfo = {
-        //         appKey: "82hegw5u8vgdx",
-        //         token: rToken
-        //     };
-        // },
-        getChat(val, i) {
-            this.now_user = val;
-            this.active = i;
+        showChat(){
+            this.showRoom = !this.showRoom
+            this.conversation()
         },
+        getChat(val, i) {
+            this.now_user = val.latestMessage;
+            this.now_user_name = val.latestMessage.content.user.name
+            this.active = i;
+            this.getAssignHis()
+        },
+
+        // 获取指定用户的 会话历史
+        getAssignHis(){
+            let that = this
+            // if(!this.moreHistory)return
+            var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
+            var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
+            var timestrap = null; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;
+            var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
+            RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
+                onSuccess: function(list, hasMsg) {
+                    console.log(list)
+                    that.moreHistory = hasMsg
+                    list.forEach(v=>{
+                        that.msgArr.push(v)
+                    })
+
+                    that.$nextTick(that.scrollEnd);
+                    // console.log(that.msgArr)
+                   
+                    // list => Message 数组。
+                    // hasMsg => 是否还有历史消息可以获取。
+                },
+                onError: function(error) {
+                    console.log('GetHistoryMessages, errorcode:' + error);
+                }
+            });
+        },
+
         send() {
+            let that = this
             if (!this.sendText) {
                 this.$message('发送消息不能为空');
                 return;
             }
-            let data = {
-                //消息体,先看类型后取值
-                receiver: this.now_user.userId,
-                bodyType: this.msgConf.BODY_TYPE.TXT.VALUE,
-                txt: this.sendText
-                // imgIndex:null,
-                // jsonObj:null,
-                // lng:"104.069751",
-                // lat:"30.652326",
-                // address:"四川省成都市锦江区",
-                // url:"test.png"
-            };
-            this.sendText = '';
+            // var msg = new RongIMLib.TextMessage({
+            //     content: this.sendText,
+            //     extra: "附加信息"
+            // });
+            // 自定义消息
+            var messageName = 'PersonMessage'; // 消息名称
+            var objectName = 'RC:TxtMsg'; // 消息内置名称，请按照此格式命名
+            var isCounted = true; // 消息计数
+            var isPersited = true; // 消息保存
+            var mesasgeTag = new RongIMLib.MessageTag(isCounted, isPersited); // 消息是否保存是否计数，true true 计数且保存，false false 不计数不保存
+            var prototypes = ['content', 'extra', 'messageName','user']; // 消息类中的属性名
+            RongIMClient.registerMessageType(messageName, objectName, mesasgeTag, prototypes);
+
+
+            var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
+            var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
+            var msg = new RongIMClient.RegisterMessage.PersonMessage(
+                { 
+                    content: this.sendText, 
+                    extra: '',
+                    messageName:'TextMessage',
+                    user:{
+                        id:this.selfInfo.storeId || 123456,
+                        name:this.selfInfo.storeName,
+                        portrait:this.selfInfo.logo,
+                    }
+                }
+            );
+            RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
+                onSuccess: function (message) {
+                    that.sendText = '';
+                    that.msgArr.push(message);
+                    that.$nextTick(that.scrollEnd);
+                },
+                onError: function (errorCode) {
+                    console.log('发送自定义消息失败');
+                }
+            });
+            // 自定义消息 end
+            return
+            // var conversationType = RongIMLib.ConversationType.PRIVATE;
+            // var targetId = this.now_user.userId;
+            // RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
+            //     // 发送消息成功
+            //     onSuccess: function(message) {
+            //         that.sendText = '';
+            //         that.msgArr.push(message);
+            //         that.$nextTick(that.scrollEnd);
+            //     },
+            //     onError: function (errorCode,message) {
+            //         showResult("发送文字消息 失败",message,start);
+            //     }
+            // });
+        },
+        scrollEnd: function() {
+            var list = document.querySelectorAll(".cmsg");
+            if (list.length > 1) {
+                var last = list[list.length - 1];
+                last.scrollIntoView();
+            }
         },
         handleClick(tab, event) {
             // console.log(tab, event);
@@ -160,41 +241,39 @@ export default {
         // 点击快捷回复
         quickRrep(val) {
             this.sendText = val;
-        }
+        },
+        // 会话列表
+        conversation(){
+            let that = this
+            RongIMClient.getInstance().getConversationList({
+                onSuccess: function(list) {
+                    that.userList = list 
+                    console.log(that.userList)
+                },
+                onError: function(error) {
+                    // do something
+                }
+            }, null);
+        },
     },
     mounted() {
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
         var userInfo = {
-            appKey: "82hegw5u8mqwx",
+            appKey: "82hegw5u8vgdx",
             token:rToken
         };
-        console.log(rToken)
-        var callbacks = {
-            CONNECTED: function(instance) {
-                //传入实例参数
-                //获取历史消息
-                var conversationType = RongIMLib.ConversationType.PRIVATE;
-                var targetId = "user2";
-                instance.getHistoryMessages(
-                    conversationType,
-                    targetId,
-                    null,
-                    20,
-                    {
-                        onSuccess(list, hasMsg) {
-                            console.log(list);
-                            //渲染会话列表
-                            // this.stat.messageList = list;
-                            // return (this.instance = instance);
-                        }
-                    },
-                    null
-                );
-            },
-            Success: function(id) {},
-            Received: function(message) {}
-        };
+        // // 获取会话列表
+        var callbacks = {};
         init(userInfo, callbacks);
+
+//         RongIMClient.getInstance().clearConversations({
+//     onSuccess: function() {
+//       // 清除会话成功
+//     },
+//     onError: function(error) {
+//       // error => 清除会话错误码
+//     }
+// });
         // this.scrollEnd();
     },
 
@@ -214,9 +293,18 @@ export default {
         z-index: 20;
         cursor: pointer;
     }
+    .msg_picture{
+        width: 200px;
+        height: auto;
+    }
 }
 @border-color: #e2e2e2;
 #service {
+    .userList{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
     .box {
         height: 700px;
         display: flex;
@@ -286,6 +374,7 @@ export default {
                         }
                         .headImg {
                             flex: .08;
+                            min-width: 50px;
                             img {
                                 height: 35px;
                                 width: 35px;

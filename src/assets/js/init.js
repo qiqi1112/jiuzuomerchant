@@ -1,8 +1,8 @@
+import store from '../../store/store'
 export default function init(userInfo,callbacks) {
     if (!userInfo.appKey || !userInfo.token){
         return false;
     }
-
     //公有云初始化
     RongIMLib.RongIMClient.init(userInfo.appKey);
     var instance = RongIMClient.getInstance();
@@ -34,52 +34,78 @@ export default function init(userInfo,callbacks) {
         }
     });
 
+    var num = 1
     // 消息监听器
     RongIMClient.setOnReceiveMessageListener({
         // 接收到的消息
         onReceived: function (message) {
+            
             // 判断消息类型
             switch(message.messageType){
                 case RongIMClient.MessageType.TextMessage:
+                    num +1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
+                    console.log(message)
+                    console.log(num)
                     // message.content.content => 文字内容
                     break;
                 case RongIMClient.MessageType.VoiceMessage:
+                    num +1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
                     // message.content.content => 格式为 AMR 的音频 base64
                     break;
                 case RongIMClient.MessageType.ImageMessage:
+                    num +1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
                     // message.content.content => 图片缩略图 base64
                     // message.content.imageUri => 原图 URL
                     break;
                 case RongIMClient.MessageType.LocationMessage:
+                    num +1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
                     // message.content.latiude => 纬度
                     // message.content.longitude => 经度
                     // message.content.content => 位置图片 base64
                     break;
                 case RongIMClient.MessageType.RichContentMessage:
+                    num +1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
                     // message.content.content => 文本消息内容
                     // message.content.imageUri => 图片 base64
                     // message.content.url => 原图 URL
                     break;
-                case RongIMClient.MessageType.InformationNotificationMessage:
-                    // do something
-                    break;
-                case RongIMClient.MessageType.ContactNotificationMessage:
-                    // do something
-                    break;
-                case RongIMClient.MessageType.ProfileNotificationMessage:
-                    // do something
-                    break;
-                case RongIMClient.MessageType.CommandNotificationMessage:
-                    // do something
-                    break;
-                case RongIMClient.MessageType.CommandMessage:
-                    // do something
-                    break;
-                case RongIMClient.MessageType.UnknownMessage:
-                    // do something
-                    break;
+                // case RongIMClient.MessageType.InformationNotificationMessage:
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
+                // case RongIMClient.MessageType.ContactNotificationMessage:
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
+                // case RongIMClient.MessageType.ProfileNotificationMessage:
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
+                // case RongIMClient.MessageType.CommandNotificationMessage:
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
+                // case RongIMClient.MessageType.CommandMessage:
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
+                // case RongIMClient.MessageType.UnknownMessage:
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
                 default:
-                    // do something
+                    // console.log(14)
+                    // store.commit('newMsg', message);
             }
         }
     });
@@ -88,8 +114,7 @@ export default function init(userInfo,callbacks) {
     //开始链接
     RongIMClient.connect(userInfo.token, {
         onSuccess: function (id) {
-
-            console.log('Connect successfully. ' + userId);
+            // console.log('Connect successfully. ' + userId);
             callbacks.Success && callbacks.Success(id);
         },
         onTokenIncorrect: function () {
@@ -117,6 +142,11 @@ export default function init(userInfo,callbacks) {
             console.log(info);
         }
     });
+
+    // // 表情初始化
+    // RongIMLib.RongIMEmoji.init();
+    // var list = RongIMLib.RongIMEmoji.list;
+    // initBiaoqing(list);
 
     //重连
     var callback = {
