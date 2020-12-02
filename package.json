@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "npm run serve",
     "serve": "vue-cli-service --open --mode development serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "build-test": "vue-cli-service build --mode test"
   },
   "dependencies": {
     "axios": "^0.18.1",

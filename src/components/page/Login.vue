@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">玖座商家后台管理系统</div>
+            <div class="ms-title">玖座商家管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
                     <el-input v-model="param.username" placeholder="用户名" @keyup.enter.native="submitForm()">
@@ -47,8 +47,8 @@ export default {
                         loginName: res.data.loginName,
                         token: res.data.token,
                         logo: res.data.logo,
-                        rToken:res.data.rongToken,
-                        storeName:res.data.storeName
+                        rToken: res.data.rongToken,
+                        storeName: res.data.storeName
                     };
 
                     localStorage.setItem('userInfo', JSON.stringify(obj));

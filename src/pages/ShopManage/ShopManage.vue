@@ -33,7 +33,7 @@
                     <el-button type="primary" @click="handleSelGoodsType" class="mr10" v-if="goodsData.length > 0">APP展示选择</el-button>
                     <el-input
                         v-model="searchName"
-                        @keydown.13.native="getGoodsInfo"
+                        @keydown.13.native="searchGoodsInfo"
                         placeholder="商品名称"
                         class="handle-input mr10"
                         clearable
@@ -41,7 +41,7 @@
                     <el-select v-model="value" placeholder="选择分类" class="mr10" style="width: 100px" clearable>
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
-                    <el-button type="primary" icon="el-icon-search" @click="getGoodsInfo">搜索</el-button>
+                    <el-button type="primary" icon="el-icon-search" @click="searchGoodsInfo">搜索</el-button>
                 </div>
             </div>
 
@@ -251,6 +251,12 @@ export default {
     },
 
     methods: {
+        //搜索操作
+        searchGoodsInfo() {
+            this.currentPage = 1;
+            this.getGoodsInfo(); //请求数据
+        },
+
         //APP展示选择按钮
         handleSelGoodsType() {
             this.$get('/merchant/store/goods/hiddenList').then((res) => {
