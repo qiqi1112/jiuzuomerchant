@@ -344,6 +344,8 @@ export default {
 
                     this.isUpdate = false;
                     this.dialogVisible = true;
+                } else {
+                    this.$message.error(res.msg);
                 }
                 console.log('标题排序', this.titleArrList);
             });

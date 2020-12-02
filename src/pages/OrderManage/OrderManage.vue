@@ -54,7 +54,13 @@
                         <span v-else>{{ scope.row.seatCode }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="contactTel" label="预定手机" min-width="100"></el-table-column>
+                <el-table-column label="预定手机" min-width="140">
+                    <template slot-scope="scope">
+                        <el-link @click="getPhone(scope.row.orderNo)" type="primary"
+                            >{{ scope.row.contactTel | phoneNum }}<i class="el-icon-phone el-icon--right" style="margin-left: 10px"></i>
+                        </el-link>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="orderType" label="订单类型">
                     <template slot-scope="scope">
                         <span>{{ scope.row.orderType == 0 ? '预定桌' : 'AA拼单' }}</span>
@@ -156,6 +162,16 @@
                     </template>
                 </el-table-column>
             </el-table>
+
+            <!-- 获取用户隐私号码 -->
+            <el-dialog :visible.sync="priNumberDialog" class="priNumber-dialog">
+                <span class="add-classify-title">隐私号码</span>
+                <h2 style="margin-bottom: 10px">用户隐私号码请在2分钟内使用</h2>
+                <h2>{{ priNumber }}</h2>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="priNumberDialog = false">确 定</el-button>
+                </div>
+            </el-dialog>
 
             <!-- 修改座位/包间号对话框 -->
             <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog" @close="handleCancel">
@@ -439,6 +455,9 @@ export default {
             upSeatId: '', //当前要修改的id
             seatNum: '', //当前要修改的座位号
 
+            priNumber: '', //用户隐私号码
+            priNumberDialog: false, //用户隐私号码弹窗开关
+
             //订单类型
             orderTypeArr: [
                 {
@@ -511,6 +530,18 @@ export default {
     },
 
     methods: {
+        //获取用户隐私号码
+        getPhone(orderNo) {
+            this.$post(`/merchant/store/order/customer/${orderNo}`).then((res) => {
+                if (res.code === 0) {
+                    this.priNumber = res.data;
+                    this.priNumberDialog = true;
+                } else {
+                    this.$message.error(res.msg);
+                }
+            });
+        },
+
         //修改座位号/包间号
         editSeat(row) {
             this.seatDia = true;
@@ -838,7 +869,7 @@ export default {
 }
 
 .aisle-book {
-    background-color: #ddd !important;
+    background-color: #999 !important;
     border: 1px solid transparent !important;
 }
 
@@ -902,7 +933,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     border: 1px solid transparent;
-    background-color: #ddd !important;
+    background-color: #999 !important;
     cursor: pointer;
 }
 

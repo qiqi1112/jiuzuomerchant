@@ -170,7 +170,7 @@
                     <img v-if="goodsForm.bannerImageUrl" :src="showImgPrefix + goodsForm.bannerImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-                <span v-if="goodsForm.checkedBanner == 1">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
+                <span v-if="goodsForm.checkedBanner == 1">（*选填，请上传尺寸为351*140，格式为jpg/jpeg/png的图片）</span>
             </template>
 
             <!-- 酒水上传广告图与推荐位图 -->
@@ -198,7 +198,7 @@
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
 
-                            <span v-if="goodsForm.checkedBanner == 1">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
+                            <span v-if="goodsForm.checkedBanner == 1">（*选填，请上传尺寸为351*140，格式为jpg/jpeg/png的图片）</span>
                         </div>
                     </div>
 
@@ -230,7 +230,7 @@
                                 <img v-if="goodsForm.recoImageUrl" :src="showImgPrefix + goodsForm.recoImageUrl" class="avatar" />
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
-                            <span v-if="goodsForm.checkedReco == 1">（*如需商家推荐，请添加推荐位图片 120*160）</span>
+                            <span v-if="goodsForm.checkedReco == 1">（*选填，请上传尺寸为120*160，格式为jpg/jpeg/png的图片）</span>
                         </div>
                     </div>
                 </div>
@@ -253,22 +253,26 @@
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </p>
+                    <span>（*请上传尺寸为80*80，格式为jpg/jpeg/png的图片）</span>
                 </div>
 
                 <!-- 详情图 -->
-                <p>
-                    <span>商品详情图：</span>
-                    <el-upload
-                        class="avatar-uploader detail-img-box"
-                        action="1"
-                        :show-file-list="false"
-                        :http-request="uploadDetailFiles"
-                        :on-error="uploadError"
-                    >
-                        <img v-if="goodsForm.detailImageUrl" :src="showImgPrefix + goodsForm.detailImageUrl" class="avatar" />
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </p>
+                <div class="details-img-box">
+                    <p>
+                        <span>商品详情图：</span>
+                        <el-upload
+                            class="avatar-uploader detail-img-box"
+                            action="1"
+                            :show-file-list="false"
+                            :http-request="uploadDetailFiles"
+                            :on-error="uploadError"
+                        >
+                            <img v-if="goodsForm.detailImageUrl" :src="showImgPrefix + goodsForm.detailImageUrl" class="avatar" />
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                    </p>
+                    <span>（*请上传尺寸为351*181，格式为jpg/jpeg/png的图片）</span>
+                </div>
             </template>
 
             <!-- 会员卡卡片列表 -->
@@ -625,7 +629,8 @@ export default {
             }
         }
 
-        .thum-img-box {
+        .thum-img-box,
+        .details-img-box {
             margin-bottom: 30px;
 
             > p {

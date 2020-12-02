@@ -261,6 +261,9 @@
                         >
                             <i class="el-icon-plus"></i>
                         </el-upload>
+                        <span style="word-break: break-all; display: block; width: 76%; font-size: 12px"
+                            >（*请上传尺寸大小为351*181，格式为jpg/jpeg/png/mp4的图片或视频，最多一个视频）</span
+                        >
                     </div>
 
                     <div class="rowNum-box">
@@ -280,6 +283,9 @@
                                 <img v-if="rowNumImageUrl" :src="showImgPrefix + rowNumImageUrl" class="avatar" />
                                 <i class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
+                            <span style="word-break: break-all; display: block; width: 76%; margin-top: 10px; font-size: 12px"
+                                >(*请上传尺寸大小为351*181，格式为jpg/jpeg/png的图片）</span
+                            >
                         </div>
                         <!-- 店铺长图 -->
                         <div class="botm" v-loading="imgLoading.loading4">
@@ -297,6 +303,9 @@
                                 <img v-if="appShopImageUrl" :src="showImgPrefix + appShopImageUrl" class="avatar" />
                                 <i class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
+                            <span style="word-break: break-all; display: block; width: 76%; margin-top: 10px; font-size: 12px">
+                                (*请上传尺寸大小为351*154，格式为jpg/jpeg/png的图片，用于展示位置变化）</span
+                            >
                         </div>
                     </div>
 
@@ -316,6 +325,7 @@
                             <img v-if="!!overallImageUrl" :src="showImgPrefix + overallImageUrl" class="avatar" />
                             <i class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
+                        <span></span>
                     </div>
                 </div>
                 <!-- 店铺卡座 -->
@@ -1487,8 +1497,6 @@ export default {
 
         //编辑商铺信息
         editShopInfo() {
-            console.log(this.shopLoca);
-
             this.storeRecommendType(); //获取申请商家推荐状态
             this.editShopInit(); //初始化操作
             this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
@@ -1497,6 +1505,7 @@ export default {
             this.showBannerVideo(); //回显banner图集里的视频
             this.clearKtvInfo(); //清空ktv包间属性数据
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            this.imgUploadWatch('.banner-show-box', this.bannerShowBox, 5); //根据上传的banner图个数，来显示与隐藏上传图标
         },
 
         //请求成功后，处理的操作
@@ -2716,7 +2725,7 @@ export default {
         }
 
         .banner-box {
-            width: 38%;
+            width: 50%;
             /deep/ .el-upload-list--picture-card .el-upload-list__item {
                 transition: none;
             }
@@ -2745,6 +2754,8 @@ export default {
         }
 
         .overall-box {
+            width: 20%;
+
             > p {
                 margin-bottom: 10px;
             }
@@ -2767,6 +2778,8 @@ export default {
         }
 
         .rowNum-box {
+            width: 30%;
+
             div {
                 > p {
                     margin-bottom: 10px;
@@ -2779,7 +2792,7 @@ export default {
             }
 
             div.top {
-                margin-bottom: 30px;
+                margin-bottom: 50px;
             }
 
             /deep/ .el-upload--text {
