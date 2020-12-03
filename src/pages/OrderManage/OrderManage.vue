@@ -92,81 +92,85 @@
                 <el-table-column prop="smsCode" label="验证码"></el-table-column>
                 <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
-                        <el-button
-                            v-if="scope.row.status != 2"
-                            :disabled="(scope.row.status != 0 && scope.row.status != 1) || scope.row.status == 1"
-                            :type="scope.row.status == 0 ? 'primary' : scope.row.status != 2 ? 'success' : 'info'"
-                            @click="handleOper(scope.row, 1)"
-                            >{{ scope.row.status != 0 && scope.row.status != 2 ? '已接单' : '接单' }}</el-button
-                        >
-                        <el-button
-                            v-if="scope.row.status == 2 || scope.row.status == 0"
-                            :disabled="scope.row.status == 2"
-                            :type="scope.row.status == 0 ? 'primary' : scope.row.status == 2 ? 'danger' : 'info'"
-                            @click="handleOper(scope.row, 2)"
-                            >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
-                        >
-                        <el-button
-                            v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 6"
-                            :type="
-                                scope.row.status == 3
-                                    ? 'info'
-                                    : scope.row.status == 4
-                                    ? 'success'
-                                    : scope.row.status == 5
-                                    ? 'success'
-                                    : scope.row.status == 6
-                                    ? 'success'
-                                    : 'primary'
-                            "
-                            @click="isReachStore(scope.row)"
-                            >{{
-                                scope.row.status == 2
-                                    ? '未到店'
-                                    : scope.row.status == 5
-                                    ? '已到店'
-                                    : scope.row.status == 6
-                                    ? '已到店'
-                                    : scope.row.status == 3
-                                    ? '未到店'
-                                    : scope.row.status == 4
-                                    ? '已到店'
-                                    : '确认到店'
-                            }}
-                        </el-button>
-                        <el-button
-                            v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 3 && scope.row.status != 1"
-                            :disabled="scope.row.status == 6"
-                            :type="
-                                scope.row.status == 5
-                                    ? 'info'
-                                    : scope.row.status == 6
-                                    ? 'success'
-                                    : scope.row.status == 3
-                                    ? 'info'
-                                    : 'primary'
-                            "
-                            @click="isConComplete(scope.row)"
-                            >{{
-                                scope.row.status == 2
-                                    ? '未消费'
-                                    : scope.row.status == 3
-                                    ? '未消费'
-                                    : scope.row.status == 5
-                                    ? '未消费'
-                                    : scope.row.status == 6
-                                    ? '已离店'
-                                    : '确认离店'
-                            }}</el-button
-                        >
+                        <template v-if="scope.row.closedStatus === 0">
+                            <el-button
+                                v-if="scope.row.status != 2"
+                                :disabled="(scope.row.status != 0 && scope.row.status != 1) || scope.row.status == 1"
+                                :type="scope.row.status == 0 ? 'primary' : scope.row.status != 2 ? 'success' : 'info'"
+                                @click="handleOper(scope.row, 1)"
+                                >{{ scope.row.status != 0 && scope.row.status != 2 ? '已接单' : '接单' }}</el-button
+                            >
+                            <el-button
+                                v-if="scope.row.status == 2 || scope.row.status == 0"
+                                :disabled="scope.row.status == 2"
+                                :type="scope.row.status == 0 ? 'primary' : scope.row.status == 2 ? 'danger' : 'info'"
+                                @click="handleOper(scope.row, 2)"
+                                >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
+                            >
+                            <el-button
+                                v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 6"
+                                :type="
+                                    scope.row.status == 3
+                                        ? 'info'
+                                        : scope.row.status == 4
+                                        ? 'success'
+                                        : scope.row.status == 5
+                                        ? 'success'
+                                        : scope.row.status == 6
+                                        ? 'success'
+                                        : 'primary'
+                                "
+                                @click="isReachStore(scope.row)"
+                                >{{
+                                    scope.row.status == 2
+                                        ? '未到店'
+                                        : scope.row.status == 5
+                                        ? '已到店'
+                                        : scope.row.status == 6
+                                        ? '已到店'
+                                        : scope.row.status == 3
+                                        ? '未到店'
+                                        : scope.row.status == 4
+                                        ? '已到店'
+                                        : '确认到店'
+                                }}
+                            </el-button>
+                            <el-button
+                                v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 3 && scope.row.status != 1"
+                                :disabled="scope.row.status == 6"
+                                :type="
+                                    scope.row.status == 5
+                                        ? 'info'
+                                        : scope.row.status == 6
+                                        ? 'success'
+                                        : scope.row.status == 3
+                                        ? 'info'
+                                        : 'primary'
+                                "
+                                @click="isConComplete(scope.row)"
+                                >{{
+                                    scope.row.status == 2
+                                        ? '未消费'
+                                        : scope.row.status == 3
+                                        ? '未消费'
+                                        : scope.row.status == 5
+                                        ? '未消费'
+                                        : scope.row.status == 6
+                                        ? '已离店'
+                                        : '确认离店'
+                                }}</el-button
+                            >
+                        </template>
+
+                        <template v-if="scope.row.closedStatus === 1">{{ scope.row.closedReason }}</template>
                     </template>
                 </el-table-column>
             </el-table>
 
             <!-- 获取用户隐私号码 -->
             <el-dialog :visible.sync="priNumberDialog" class="priNumber-dialog">
-                <span class="add-classify-title">隐私号码</span>
-                <h2 style="margin-bottom: 10px">用户隐私号码请在2分钟内使用</h2>
+                <span class="add-classify-title">动态号码</span>
+                <h2 style="margin-bottom: 10px">用户动态号码请在2分钟内使用</h2>
                 <h2>{{ priNumber }}</h2>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="priNumberDialog = false">确 定</el-button>
@@ -1202,5 +1206,12 @@ export default {
 
 /deep/.handle-input {
     width: 150px;
+}
+
+/deep/.priNumber-dialog {
+    .el-dialog {
+        text-align: center;
+        width: 30%;
+    }
 }
 </style>

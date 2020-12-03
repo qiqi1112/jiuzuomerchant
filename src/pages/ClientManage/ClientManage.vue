@@ -65,8 +65,8 @@
 
             <!-- 获取用户隐私号码 -->
             <el-dialog :visible.sync="priNumberDialog" class="priNumber-dialog">
-                <span class="add-classify-title">隐私号码</span>
-                <h2 style="margin-bottom: 10px">用户隐私号码请在2分钟内使用</h2>
+                <span class="add-classify-title">动态号码</span>
+                <h2 style="margin-bottom: 10px">用户动态号码请在2分钟内使用</h2>
                 <h2>{{ priNumber }}</h2>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="priNumberDialog = false">确 定</el-button>
