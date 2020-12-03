@@ -1,32 +1,28 @@
 <template>
-    <div class="chat_room">
-        <div class="floating" v-if="$store.state.showChatRoom" @click="showChat"></div>
+    <div class="chat_room" id="chat_room">
+        <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat"></div>
 
 
-        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%">
-
-            
+        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" >
             <div id="service" v-if="showRoom">
                 <div class="box">
                     <div class="people_list">
                         <ul>
                             <li class="userList" :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">
-                                <template v-if="item.latestMessage.content.user">
-                                    {{item.latestMessage.content.user.name}}
-                                </template>
+                                {{item.name}}
                             </li>
                         </ul>
                     </div>
                     
-                    <div class="chat" v-if="now_user != {}">
+                    <div class="chat" v-if="now_user">
                         <div class="record">
-                            <div class="username" v-if="now_user_name">{{now_user_name}}</div>
+                            <div class="username">{{now_user.name}}</div>
                             <div class="chat_list">
                                 <div class="cli">
                                     <div class="cmsg" v-for="(item,i) in msgArr" :key="i">
                                         <div class="msg_list" v-if="item.messageDirection==2">
                                             <div class="headImg">
-                                                <img v-if="item.content.user" :src="item.content.user.portrait" alt="">
+                                                <img v-if="item.content" :src="imgHead+item.content.portrait" alt="">
                                             </div>
                                             <!-- 文本消息 -->
                                             <div class="msg" v-if="item.messageType == 'TextMessage'">
@@ -45,7 +41,7 @@
                                                 <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
                                             </div>
                                             <div class="headImg self_img">
-                                                <img v-if="item.content.user" :src="imgHead + item.content.user.portrait" alt="">
+                                                <img v-if="item.content" :src="imgHead + item.content.portrait" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -54,7 +50,18 @@
                         </div>
                         <div class="text_box">
                             <!-- @keyup.enter='send()' -->
-                            <textarea class="textarea" v-model="sendText" name="" id=""></textarea>
+                            <div class="icons">
+                                <div class="flexo">
+                                    <img class="send_icon" @click="showEmoji" style="height:20px" src="../../assets/img/emoji.png" alt="">
+                                    <div class="emoji_box" v-show="emojiShow">
+                                        <div class="emojiItem" v-for="emList in emoji" :key="emList.unicode" v-html="emList.node.outerHTML" @click="selectEmoji(emList)"></div>
+                                    </div>
+                                </div>
+                                <div class="flexo">
+                                    <img class="send_icon" style="height:20px" src="../../assets/img/tupian.png" alt="">
+                                </div>
+                            </div>
+                            <textarea class="textarea" @keyup.enter='send()' v-html="selectEmojiHtml" v-model="sendText" id=""></textarea>
                             <div class="btn_oper">
                                 <el-button type="primary" @click="send()">发送</el-button>
                             </div>
@@ -80,7 +87,6 @@
             </div>
         </el-dialog>
 
-
     </div>
 </template>
 <script>
@@ -91,11 +97,11 @@ export default {
             imgHead: this.$imgHead,
             showRoom:false,
             activeName: 'first',
+            selectEmojiHtml: "",
             now_user: {
                 // 当前对话框内用户
                 // {userId,name,onlineTime,offlineTime}
             },
-            now_user_name:'',
             mySelf: { //我的信息
                 // {userId,name,onlineTime,offlineTime}
             },
@@ -111,60 +117,159 @@ export default {
                 '你好，请问有什么问题呢？', 'yuo can do this', '好的，亲'
             ],
             selfInfo:'',
-
-            num:this.$store.state.newMsgNum,
-            // {{$store.state.newMsgArr}}
-            
+            emoji:[],
+            emojiShow: false,
+            hasHistoryMsg:true,
         };
+    },
+
+
+    directives:{
+        drag(el,bindings){
+            let firstTime = ''
+            let lastTime = ''
+            el.onmousedown = function(e){
+                document.querySelector('.chat_room').setAttribute('drag-flag', false)
+                firstTime = new Date().getTime()
+                var disx = e.pageX - el.offsetLeft;
+                var disy = e.pageY - el.offsetTop;
+                document.onmousemove = function (e){
+                    el.style.left = e.pageX - disx+'px';
+                    el.style.top = e.pageY - disx+'px';
+                    lastTime = new Date().getTime()
+                    if (lastTime - firstTime > 200) {
+                        // console.log('拖拽')
+                        document.querySelector('.chat_room').setAttribute('drag-flag', true)
+                    }else{
+                    }
+                }
+                document.onmouseup = function(){
+                    document.onmousemove = document.onmouseup = null;
+                }
+            }
+        }
     },
     created(){
         this.selfInfo = JSON.parse(localStorage.getItem('userInfo')) 
     },
+
+    computed:{
+        watchMsgNum(){
+            return this.$store.state.newMsgNum
+        }
+    },
     watch: {
-        num: {
+        watchMsgNum: {
             handler(newValue, oldValue) {
-                console.log(this.$store.state.newMsg)
-            }
+                let arr = [],lastObj=''
+                arr = this.$store.state.newMsgArr
+                lastObj = arr[arr.length-1]
+
+                console.log(lastObj)
+                this.$get(`/merchant/store/im/getUserById/${lastObj.senderUserId}`).then((res) => {
+                    if(res.code == 0){
+                        lastObj.content['id'] = res.data.userId
+                        lastObj.content['name'] = res.data.nickname
+                        lastObj.content['portrait'] = res.data.headPortrait
+                        this.msgArr.push(lastObj)
+                        this.$nextTick(this.scrollEnd);
+                    }else{
+                        this.$message({ message: res.mesg, type: 'warning' });
+                    }
+                   
+                });
+            },
+            deep:true
         }
     },
 
     methods: {
         showChat(){
+            let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
+            if(isClick == 'true') {
+                return 
+            }       
             this.showRoom = !this.showRoom
-            this.conversation()
+            // this.conversation()
         },
         getChat(val, i) {
-            this.now_user = val.latestMessage;
-            this.now_user_name = val.latestMessage.content.user.name
+            this.now_user = val;
             this.active = i;
             this.getAssignHis()
+        },
+        // 会话列表
+        conversation(){
+            let that = this
+            RongIMClient.getInstance().getConversationList({
+                onSuccess: function(list) {
+                    let userId = ''
+                    list.forEach(v=>{
+                        userId = v.targetId 
+                        that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
+                            if(res.code == 0){
+                                v['id'] = res.data.userId
+                                v['name'] = res.data.nickname
+                                v['portrait'] = that.imgHead + res.data.headPortrait
+                                that.userList.push(v)
+                            }else{
+                                that.$message({ message: res.mesg, type: 'warning' });
+                            }
+                        });
+                    })
+                },
+                onError: function(error) {
+                    // do something
+                }
+            }, null);
         },
 
         // 获取指定用户的 会话历史
         getAssignHis(){
             let that = this
-            // if(!this.moreHistory)return
+            // that.msgArr = []
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
-            var timestrap = null; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;
+            // RongIMClient.getInstance().resetGetHistoryMessages(RongIMLib.ConversationType.PRIVATE,targetId);
+            var timestrap = null; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
                 onSuccess: function(list, hasMsg) {
-                    console.log(list)
-                    that.moreHistory = hasMsg
-                    list.forEach(v=>{
-                        that.msgArr.push(v)
-                    })
-
-                    that.$nextTick(that.scrollEnd);
-                    // console.log(that.msgArr)
-                   
+                    that.hasHistoryMsg = hasMsg;
+                    let html = "";
+                    that.getAssignInfo(targetId,list)
                     // list => Message 数组。
                     // hasMsg => 是否还有历史消息可以获取。
                 },
                 onError: function(error) {
                     console.log('GetHistoryMessages, errorcode:' + error);
                 }
+            });
+        },
+
+
+        // 获取指定用户信息
+        getAssignInfo(userId,list){
+            this.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
+                if(res.code == 0){
+                    let userInfo = res.data
+                    console.log(list)
+                    list.forEach(v=>{
+                        if(v.messageDirection == 2){
+                            v.content['id'] = userInfo.id
+                            v.content['name'] = userInfo.nickname
+                            v.content['portrait'] = userInfo.headPortrait
+                        }else if(v.messageDirection == 1){
+                            v.content['id'] = this.selfInfo.storeId
+                            v.content['name'] = this.selfInfo.storeName
+                            v.content['portrait'] = this.selfInfo.logo
+                        }
+                        this.msgArr.push(v)
+                    })
+                    this.$nextTick(this.scrollEnd);
+                }else{
+                    this.$message({ message: res.mesg, type: 'warning' });
+                }
+                
             });
         },
 
@@ -187,7 +292,6 @@ export default {
             var prototypes = ['content', 'extra', 'messageName','user']; // 消息类中的属性名
             RongIMClient.registerMessageType(messageName, objectName, mesasgeTag, prototypes);
 
-
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
             var msg = new RongIMClient.RegisterMessage.PersonMessage(
@@ -196,7 +300,7 @@ export default {
                     extra: '',
                     messageName:'TextMessage',
                     user:{
-                        id:this.selfInfo.storeId || 123456,
+                        id:this.selfInfo.storeId,
                         name:this.selfInfo.storeName,
                         portrait:this.selfInfo.logo,
                     }
@@ -204,12 +308,40 @@ export default {
             );
             RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
                 onSuccess: function (message) {
+                    console.log(message)
                     that.sendText = '';
+                    message.content['id'] = message.content.user.id
+                    message.content['name'] = message.content.user.name
+                    message.content['portrait'] = message.content.user.portrait
                     that.msgArr.push(message);
                     that.$nextTick(that.scrollEnd);
                 },
                 onError: function (errorCode) {
-                    console.log('发送自定义消息失败');
+                    var info = '';
+                    switch (errorCode) {
+                        case RongIMLib.ErrorCode.TIMEOUT:
+                            info = '超时';
+                            break;
+                        case RongIMLib.ErrorCode.UNKNOWN_ERROR:
+                            info = '未知错误';
+                            break;
+                        case RongIMLib.ErrorCode.REJECTED_BY_BLACKLIST:
+                            info = '在黑名单中，无法向对方发送消息';
+                            break;
+                        case RongIMLib.ErrorCode.NOT_IN_DISCUSSION:
+                            info = '不在讨论组中';
+                            break;
+                        case RongIMLib.ErrorCode.NOT_IN_GROUP:
+                            info = '不在群组中';
+                            break;
+                        case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
+                            info = '不在聊天室中';
+                            break;
+                        default :
+                            info = x;
+                            break;
+                    }
+                    console.log('发送失败:' + info);
                 }
             });
             // 自定义消息 end
@@ -228,6 +360,16 @@ export default {
             //     }
             // });
         },
+
+        // 选择表情
+        selectEmoji(emoji){
+            this.sendText += emoji.emoji;
+            this.emojiShow = false;
+        },
+        // 展示表情
+        showEmoji(){
+            this.emojiShow = !this.emojiShow
+        },
         scrollEnd: function() {
             var list = document.querySelectorAll(".cmsg");
             if (list.length > 1) {
@@ -242,19 +384,6 @@ export default {
         quickRrep(val) {
             this.sendText = val;
         },
-        // 会话列表
-        conversation(){
-            let that = this
-            RongIMClient.getInstance().getConversationList({
-                onSuccess: function(list) {
-                    that.userList = list 
-                    console.log(that.userList)
-                },
-                onError: function(error) {
-                    // do something
-                }
-            }, null);
-        },
     },
     mounted() {
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
@@ -265,6 +394,13 @@ export default {
         // // 获取会话列表
         var callbacks = {};
         init(userInfo, callbacks);
+
+        setTimeout(()=>{
+            this.conversation()
+            this.emoji = RongIMLib.RongIMEmoji.list
+            console.log(RongIMLib.RongIMEmoji.list)
+        },1000)
+        
 
 //         RongIMClient.getInstance().clearConversations({
 //     onSuccess: function() {
@@ -306,7 +442,7 @@ export default {
         white-space: nowrap;
     }
     .box {
-        height: 700px;
+        height: 730px;
         display: flex;
         background: white;
         .people_list {
@@ -339,7 +475,7 @@ export default {
         .chat {
             flex: .6;
             .record {
-                height: 75%;
+                height: 72%;
                 border-bottom: 1px solid @border-color;
                 box-sizing: border-box;
 
@@ -409,12 +545,55 @@ export default {
             }
 
             .text_box {
-                height: 25%;
+                height: 28%;
                 padding: 0 10px;
+                .icons{
+                    padding-top: 10px;
+                    font-size: 0;
+                    .flexo{
+                        display: inline-block;
+                        margin-right: 10px;
+                        position: relative;
+                        .emoji_box{
+                            background: #fff;
+                            z-index: 20;
+                            border-radius: 4px;
+                            box-shadow: 0 0 2px #bbbbbb;
+                            width: 310px;
+                            height: 100px;
+                            position: absolute;
+                            left: 0;
+                            top: -132px;
+                            overflow-y: scroll;
+                            font-size: 14px;
+                            padding: 12px;
+                            .emojiItem{
+                                display: inline-block;
+                                cursor: pointer;
+                                margin: 0 2px;
+                            }
+                        }
+                        .emoji_box::-webkit-scrollbar {
+                            display: none;
+                        }
+                        .emoji_box {
+                            scrollbar-width: none;
+                        }
+                        .emoji_box {
+                            -ms-overflow-style: none;
+                        }
+                    }
+                }
+                .send_icon{
+                    height: 20px;
+                    width: 20px;
+                    object-fit: cover;
+                    cursor: pointer;
+                }
                 .textarea {
                     width: 100%;
                     padding-top: 10px;
-                    height: calc(75% - 10px);
+                    height: calc(75% - 30px);
                     border: none;
                     resize: none;
                     outline: none;

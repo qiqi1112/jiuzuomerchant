@@ -1,8 +1,13 @@
 import store from '../../store/store'
 export default function init(userInfo,callbacks) {
     if (!userInfo.appKey || !userInfo.token){
-        return false;
+        return false; 
     }
+    // var config = {
+    //     appkey: userInfo.appKey ,
+    // };
+    // var im = RongIMLib.init(config);
+
     //公有云初始化
     RongIMLib.RongIMClient.init(userInfo.appKey);
     var instance = RongIMClient.getInstance();
@@ -39,32 +44,29 @@ export default function init(userInfo,callbacks) {
     RongIMClient.setOnReceiveMessageListener({
         // 接收到的消息
         onReceived: function (message) {
-            
             // 判断消息类型
             switch(message.messageType){
                 case RongIMClient.MessageType.TextMessage:
-                    num +1
+                    num += 1
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
-                    console.log(message)
-                    console.log(num)
                     // message.content.content => 文字内容
                     break;
                 case RongIMClient.MessageType.VoiceMessage:
-                    num +1
+                    num += 1
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 格式为 AMR 的音频 base64
                     break;
                 case RongIMClient.MessageType.ImageMessage:
-                    num +1
+                    num += 1
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 图片缩略图 base64
                     // message.content.imageUri => 原图 URL
                     break;
                 case RongIMClient.MessageType.LocationMessage:
-                    num +1
+                    num += 1
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.latiude => 纬度
@@ -72,12 +74,18 @@ export default function init(userInfo,callbacks) {
                     // message.content.content => 位置图片 base64
                     break;
                 case RongIMClient.MessageType.RichContentMessage:
-                    num +1
+                    num += 1
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 文本消息内容
                     // message.content.imageUri => 图片 base64
                     // message.content.url => 原图 URL
+                    break;
+                case RongIMClient.MessageType.TypingStatusMessage:
+                    num +=1
+                    console.log(message)
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
                     break;
                 // case RongIMClient.MessageType.InformationNotificationMessage:
                 //     store.commit('newMsg', message);
@@ -142,12 +150,7 @@ export default function init(userInfo,callbacks) {
             console.log(info);
         }
     });
-
-    // // 表情初始化
-    // RongIMLib.RongIMEmoji.init();
-    // var list = RongIMLib.RongIMEmoji.list;
     // initBiaoqing(list);
-
     //重连
     var callback = {
         onSuccess: function(userId) {
@@ -170,4 +173,27 @@ export default function init(userInfo,callbacks) {
     };
     RongIMClient.reconnect(callback, config);
 
+
+
+    // // 表情初始化
+    // RongIMLib.RongIMEmoji.init();
+    // console.log(RongIMLib.RongIMEmoji)
+    var config = {
+        size: 24, // 大小, 默认 24, 建议18 - 58
+        url: '//f2e.cn.ronghub.com/sdk/emoji-48.png', // Emoji 背景图片
+        lang: 'zh', // Emoji 对应名称语言, 默认 zh
+        // 扩展表情
+        extension: {
+            dataSource: {
+                u1F914: {
+                    en: 'thinking face', // 英文名称
+                    zh: '思考', // 中文名称
+                    tag: '🤔', // 原生 Emoji
+                    position: '0 0' // 所在背景图位置坐标
+                }
+            },
+            url: '//cdn.ronghub.com/thinking-face.png' // 新增 Emoji 背景图 url
+        }
+    };
+    RongIMLib.RongIMEmoji.init(config);
 }

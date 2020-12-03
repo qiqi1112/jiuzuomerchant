@@ -6,6 +6,8 @@ import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import store from './store/store'
 import rongyun from '@/assets/js/rongyun'
+import emoji from '@/assets/js/emoji'
+
 import './assets/css/icon/iconfont.css';
 import {
     messages
@@ -43,7 +45,9 @@ Vue.prototype.$file_get = file_get;
 Vue.prototype.$file_post = file_post;
 Vue.prototype.$imgHead = imgHead;
 Vue.prototype.$fileUploadUrl = fileUploadUrl;
-Vue.prototype.$ry = rongyun
+// Vue.prototype.$ry = rongyun
+// Vue.prototype.$emoji = emoji
+
 
 Vue.config.productionTip = false;
 Vue.use(VueI18n);
