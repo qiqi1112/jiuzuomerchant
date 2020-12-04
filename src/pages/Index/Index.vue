@@ -10,7 +10,9 @@
         <div class="container">
             <div class="top_box">
                 <div class="evaluation">
-                    <h2 class="title"><span class="line lw1"></span><span>{{storeName}}</span></h2>
+                    <h2 class="title">
+                        <span class="line lw1"></span><span>{{ storeName }}</span>
+                    </h2>
                     <div class="store_eva">
                         <div class="st">
                             <div>{{ topData.collectionTotal }}</div>
@@ -367,11 +369,11 @@ export default {
             presentSeatInfo: {}, //当前座位对应的详细信息
             isClickSeat: false, //展示当前座位的详细信息开关
             allGraph: [], //图形统计数据 全部
-            storeName:'',
+            storeName: ''
         };
     },
     created() {
-        this.storeName = JSON.parse(localStorage.getItem('userInfo')).storeName 
+        this.storeName = JSON.parse(localStorage.getItem('userInfo')).storeName;
         this.time_now = this.$regular.timeData(new Date().getTime(), 5);
         this.scrollY = -(new Date().getDate() - 8);
         this.active = new Date().getDate() - 1;
@@ -477,12 +479,6 @@ export default {
                     this.columnarChart();
                 } else if (res.code === 600) {
                     this.$router.push('/myshop');
-
-                    // this.$message.warning('yyy');
-                } else if (res.code === 660 || res.code === 700) {
-                    localStorage.removeItem('userInfo');
-                    this.$message.error(res.msg);
-                    this.$router.push('/login');
                 }
             });
         },
@@ -566,7 +562,7 @@ export default {
                 time.unshift(i.time);
             });
             let brokenline = echarts.init(this.$refs.broken);
-            window.addEventListener("resize", function () {
+            window.addEventListener('resize', function () {
                 brokenline.resize();
             });
             let option = {
@@ -619,7 +615,7 @@ export default {
             numeral.unshift(['product', '开台数', '预定桌数', '访问记录']);
 
             let columnarLine = echarts.init(this.$refs.columnar);
-            window.addEventListener("resize", function () {
+            window.addEventListener('resize', function () {
                 columnarLine.resize();
             });
             let option = {
@@ -662,7 +658,7 @@ export default {
             }
 
             let breadLine = echarts.init(this.$refs.bread);
-            window.addEventListener("resize", function () {
+            window.addEventListener('resize', function () {
                 breadLine.resize();
             });
             let option = {
@@ -1082,13 +1078,13 @@ export default {
         display: inherit;
         height: auto;
         padding-bottom: 15px;
-        .star{
+        .star {
             margin-top: 14px;
         }
-        .visitors{
+        .visitors {
             display: inline-block;
         }
-        .to_view{
+        .to_view {
             display: inline-block;
             margin-left: 15%;
         }

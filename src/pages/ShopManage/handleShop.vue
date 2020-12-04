@@ -4,7 +4,7 @@
             <el-form ref="goodsForm" :model="goodsForm" label-width="80px">
                 <div class="good-name-box">
                     <div>
-                        <span>商品名称：</span>
+                        <span>*商品名称：</span>
                         <el-input v-model="goodsForm.name" style="width: 160px"></el-input>
                     </div>
                     <div>
@@ -21,7 +21,7 @@
                 <!-- 商品规格 -->
                 <template v-if="activeNum != 1 && activeNum != 11">
                     <p class="drinks-spec">
-                        <span>商品规格：</span>
+                        <span>*商品规格：</span>
                         <el-form
                             :model="goodsForm.dynamicValidateForm"
                             ref="goodsForm.dynamicValidateForm"
@@ -77,7 +77,7 @@
                 <template v-if="activeNum == 1">
                     <!-- 套餐选择单品 -->
                     <p>
-                        <span>选择商品：</span>
+                        <span>*选择商品：</span>
                         <el-select
                             v-model="goodName"
                             filterable
@@ -126,9 +126,9 @@
                         </el-table>
                     </p>
                     <p>
-                        <span>套餐原单价：</span>
+                        <span>*套餐原单价：</span>
                         <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px" readonly></el-input>
-                        <span>套餐现单价：</span>
+                        <span>*套餐现单价：</span>
                         <el-input v-model="goodsForm.comboNowPrice" style="width: 120px"></el-input>
                     </p>
                 </template>
@@ -136,13 +136,13 @@
                 <!-- 会员卡 -->
                 <template v-if="activeNum == 11">
                     <p>
-                        <span>会员卡积分：</span>
+                        <span>*会员卡积分：</span>
                         <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
 
-                        <span>会员卡原价：</span>
+                        <span>*会员卡原价：</span>
                         <el-input v-model="goodsForm.statisticalPrice" style="width: 120px; margin-right: 20px"></el-input>
 
-                        <span>会员卡现价：</span>
+                        <span>*会员卡现价：</span>
                         <el-input v-model="goodsForm.nowPrice" style="width: 120px"></el-input>
                     </p>
                 </template>
@@ -241,7 +241,7 @@
                 <!-- 缩略图 -->
                 <div class="thum-img-box">
                     <p>
-                        <span>商品缩略图：</span>
+                        <span>*商品缩略图：</span>
                         <el-upload
                             class="avatar-uploader"
                             action="1"
@@ -259,7 +259,7 @@
                 <!-- 详情图 -->
                 <div class="details-img-box">
                     <p>
-                        <span>商品详情图：</span>
+                        <span>*商品详情图：</span>
                         <el-upload
                             class="avatar-uploader detail-img-box"
                             action="1"
@@ -278,7 +278,7 @@
             <!-- 会员卡卡片列表 -->
             <template>
                 <div class="vip-card-wrap" v-if="activeNum == 11">
-                    <span>会员卡缩略图：</span>
+                    <span>*会员卡缩略图：</span>
                     <div class="image-box" v-if="thumImageBox">
                         <img
                             ref="thumImg"

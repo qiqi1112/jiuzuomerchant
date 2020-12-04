@@ -5,13 +5,12 @@
     </div>
 </template>
 <script>
-import chatRoom from './components/common/ChatRoom'
+import chatRoom from './components/common/ChatRoom';
 export default {
     data() {
         return {};
     },
-    created() {
-    },
+    created() {},
     components: {
         chatRoom
     },

@@ -46,11 +46,11 @@
             <!-- 表格部分 -->
             <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
                 <el-table-column label="ID" fixed type="index"></el-table-column>
-                <el-table-column prop="createBy" label="订单发起人" min-width="150"></el-table-column>
-                <el-table-column prop="contactName" label="预订用户"></el-table-column>
-                <el-table-column label="座位号/包间号">
+                <el-table-column prop="createBy" label="订单发起人" min-width="120"></el-table-column>
+                <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
+                <el-table-column label="座位号/包间号" min-width="120">
                     <template slot-scope="scope">
-                        <el-link v-if="scope.row.status == 4" @click="editSeat(scope.row)">{{ scope.row.seatCode }}</el-link>
+                        <el-link v-if="scope.row.status == 4" @click="editSeat(scope.row)" type="primary">{{ scope.row.seatCode }}</el-link>
                         <span v-else>{{ scope.row.seatCode }}</span>
                     </template>
                 </el-table-column>
@@ -89,7 +89,7 @@
                         <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row)">查看订单</el-link>
                     </template>
                 </el-table-column>
-                <el-table-column prop="smsCode" label="验证码"></el-table-column>
+                <!-- <el-table-column prop="smsCode" label="验证码"></el-table-column> -->
                 <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
                         <template v-if="scope.row.closedStatus === 0">
@@ -108,32 +108,17 @@
                                 >{{ scope.row.status == 2 ? '已拒单' : '拒单' }}</el-button
                             >
                             <el-button
-                                v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 6"
-                                :type="
-                                    scope.row.status == 3
-                                        ? 'info'
-                                        : scope.row.status == 4
-                                        ? 'success'
-                                        : scope.row.status == 5
-                                        ? 'success'
-                                        : scope.row.status == 6
-                                        ? 'success'
-                                        : 'primary'
-                                "
-                                @click="isReachStore(scope.row)"
-                                >{{
-                                    scope.row.status == 2
-                                        ? '未到店'
-                                        : scope.row.status == 5
-                                        ? '已到店'
-                                        : scope.row.status == 6
-                                        ? '已到店'
-                                        : scope.row.status == 3
-                                        ? '未到店'
-                                        : scope.row.status == 4
-                                        ? '已到店'
-                                        : '确认到店'
-                                }}
+                                v-if="scope.row.status == 1 || scope.row.status == 3"
+                                :type="scope.row.status == 3 ? 'info' : 'primary'"
+                                @click="unReachStore(scope.row)"
+                                >未到店
+                            </el-button>
+                            <el-button
+                                :disabled="scope.row.status == 4 || scope.row.status == 5 || scope.row.status == 6"
+                                v-if="scope.row.status != 2 && scope.row.status != 3 && scope.row.status != 0"
+                                :type="scope.row.status == 1 ? 'primary' : 'success'"
+                                @click="openReachStoreDialog(scope.row.id)"
+                                >已到店
                             </el-button>
                             <el-button
                                 v-if="scope.row.status != 2 && scope.row.status != 0 && scope.row.status != 3 && scope.row.status != 1"
@@ -183,6 +168,15 @@
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancel">取 消</el-button>
                     <el-button type="primary" @click="handleEditSeat">确 定</el-button>
+                </div>
+            </el-dialog>
+
+            <!-- 到店输入验证码 -->
+            <el-dialog title="验证码" :visible.sync="reachStoreDialog" class="seat-dialog" @close="handleCancelCode">
+                <el-input v-model="reachStoreCode" placeholder="请输入验证码"></el-input>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="handleCancelCode">取 消</el-button>
+                    <el-button type="primary" @click="reachStore">确 定</el-button>
                 </div>
             </el-dialog>
 
@@ -461,6 +455,9 @@ export default {
 
             priNumber: '', //用户隐私号码
             priNumberDialog: false, //用户隐私号码弹窗开关
+
+            reachStoreCode: '', //到店验证码
+            reachStoreDialog: false, //输入到店验证码对话框
 
             //订单类型
             orderTypeArr: [
@@ -789,6 +786,36 @@ export default {
             }
         },
 
+        //未到店操作
+        unReachStore(row) {
+            //如果当前是未到店，那么久切换为接单状态
+            if (row.status == 3) {
+                this.isHandleRequest(row.id, 1);
+            }
+
+            //如果当前是接单状态，那么久切换为未到店
+            if (row.status == 1) {
+                this.isHandleRequest(row.id, 3);
+            }
+        },
+
+        //打开到店输入验证码对话框
+        openReachStoreDialog(id) {
+            this.upSeatId = id;
+            this.reachStoreDialog = true;
+        },
+
+        //到店操作
+        reachStore() {
+            this.isHandleRequest(this.upSeatId, 4);
+        },
+
+        //到店操作对话框中的取消按钮
+        handleCancelCode() {
+            this.reachStoreDialog = false;
+            this.reachStoreCode = '';
+        },
+
         //是否到店与是否消费请求
         isHandleRequest(id, status) {
             let data = {
@@ -800,6 +827,7 @@ export default {
                 if (res.code === 0) {
                     this.$message.success('操作成功');
                     this.getOrderInfo();
+                    this.reachStoreDialog = false;
                 } else {
                     this.$message.error(res.msg);
                 }

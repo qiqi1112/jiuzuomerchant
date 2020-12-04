@@ -1523,6 +1523,13 @@ export default {
         submitShopRequest() {
             this.wrapLoading = true;
 
+            //不让传过去的banner集合的第一个值为.mp4格式
+            const index = this.bannerShowBox[0].indexOf('mp4');
+            if (index !== -1) {
+                [this.bannerShowBox[0], this.bannerShowBox[1]] = [this.bannerShowBox[1], this.bannerShowBox[0]];
+            }
+
+            //转换ktv相关字段
             let ktvRoomList = [];
             if (this.shopLocaIndex == 3) {
                 ktvRoomList = this.cloneSnacks(); //数组转json形式（赠品）
@@ -2108,12 +2115,22 @@ export default {
                     if (!this.ktvRoomList) {
                         this.ktvRoomList = [];
                     }
+
+                    //获取时间段里的所有最低消费
+                    let minConArr = this.presentKtvInfo.roomTimeIntervalList.map((item) => {
+                        return item.minConsumption;
+                    });
+
+                    this.presentKtvInfo.minConsumption = Math.min(...minConArr); //返回ktv包间最小值
+
                     //将当前用户添加的KTV信息存到上传数组中
                     this.ktvRoomList.push(this.presentKtvInfo);
                     this.$message.success('新增成功');
                 }
                 this.clearKtvInfo();
             }
+
+            console.log(this.ktvRoomList);
         },
 
         //回显店铺数据
@@ -2199,11 +2216,6 @@ export default {
                         .catch(() => {
                             this.$router.push('/index');
                         });
-                } else if (res.code === 660 || res.code === 700) {
-                    this.wrapLoading = false;
-                    localStorage.removeItem('userInfo');
-                    this.$message.error(res.msg);
-                    this.$router.push('/login');
                 }
             });
         },
@@ -2341,6 +2353,14 @@ export default {
 
         //座位行数/列数改变
         changeSeatNum() {
+            // this.$confirm('修改行列将会清空之前配置的座位信息，确定要修改吗？', '警告', {
+            //         type: 'warning'
+            //     })
+            //         .then(() => {
+
+            //         })
+            //         .catch(() => {});
+
             if (!this.isReadonly && this.x % 1 == 0 && this.y % 1 == 0) {
                 this.isClickSeat = false;
                 this.createSeatFn(); //创建座位

@@ -14,41 +14,42 @@ import Message from "element-ui/packages/message/index.js";
 // axios.defaults.baseURL = 'http://47.108.204.66:8077'
 // axios.defaults.baseURL = './baseUrl'; //默认地址
 
-axios.interceptors.response.use(
-    function (response) {
-        console.log('xxxx', response)
+// axios.interceptors.response.use(
+//     function (response) {
+//         console.log(response.data.code)
 
-        if (response.status == 200) {
-            return response;
-        } else if (response.data.code == 0) {
-            return response;
-        } else if (response.data.code == 700) {
+//         debugger
 
 
-            //未登录 登录失效
-            Message.error(response.data.msg);
-            return
-            localStorage.removeItem('userInfo'); //清除token等保存在本地的参数
-            router.push("/login");
-            return Promise.reject(response.data);
-        } else if (response.data.code === 660) {
-            Message.error(response.data.msg);
-        } else {
-            // Message.error(response.data.msg);
-            return Promise.reject(response.data);
-        }
-    },
-    function (error) {
-        console.log(error)
-        if (error.message.includes("timeout")) {
-            // 判断请求异常信息中是否含有超时timeout字符串
-            Message.error("网络链接超时...");
-            return Promise.reject(error); // reject这个错误信息
-        }
-        // Do something with response error
-        return Promise.reject(error);
-    }
-);
+//         if (response.status == 200) {
+//             return response;
+//         } else if (response.data.code === 0) {
+//             return response;
+//         } else if (response.data.code === 660 || response.data.code == 700) {
+//             //如果未登录或者被禁用，就直接跳到登录页面
+//             localStorage.removeItem('userInfo');
+//             router.push("/login");
+//             Message.error(response.data.msg);
+//             return Promise.reject(response.data);
+//         } else {
+//             return Promise.reject(response.data);
+//         }
+//     },
+//     function (error) {
+//         console.log(error)
+
+//         debugger
+
+
+//         console.log(error)
+//         if (error.message.includes("timeout")) {
+//             // 判断请求异常信息中是否含有超时timeout字符串
+//             Message.error("网络链接超时...");
+//             return Promise.reject(error); // reject这个错误信息
+//         }
+//         return Promise.reject(error);
+//     }
+// );
 
 // export const fetchData = query => {
 //     return request({

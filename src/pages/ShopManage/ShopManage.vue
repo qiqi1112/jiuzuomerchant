@@ -491,6 +491,7 @@ export default {
                     this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
                 year: this.goodsForm.year
             };
+
             console.log(data);
             // 判断传商品价格开关
             let commodityPrice = true;
@@ -509,6 +510,7 @@ export default {
             }
             if (this.goodsForm.checkedReco == 1 && !data.recommendPicture) {
                 this.$message.warning('请添加推荐位图片');
+                this.goodsForm.checkedReco = false;
                 return;
             }
             if (this.activeNum == 1) {
@@ -566,7 +568,7 @@ export default {
                     return;
                 }
                 data.skuList.map((item) => {
-                    if (!item.specName || !item.originalPrice) {
+                    if (!item.specName || !item.originalPrice || !item.statisticalPrice) {
                         this.$message.warning('请输入商品规格');
                         skuSwitch = false;
                     }
@@ -659,14 +661,6 @@ export default {
 
             return Math.min(...newArr); //返回最小值
         }
-    },
-
-    created() {
-        // if (process.env.NODE_ENV === 'development') {
-        //     this.showImgPrefix = this.$imgHead;
-        // } else {
-        //     this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
-        // }
     },
 
     mounted() {

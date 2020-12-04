@@ -1,5 +1,8 @@
 let api, tengxun, file, imgHead, token
 import axios from 'axios'
+import router from "../router";
+import Message from "element-ui/packages/message/index.js";
+
 
 if (process.env.NODE_ENV === "development") {
   api = "/api";
@@ -39,6 +42,22 @@ api_request.interceptors.request.use(config => {
   config.headers.common['X-Store-Token'] = token
   return config;
 });
+
+api_request.interceptors.response.use(
+  function (response) {
+    if (response.data.code === 660 || response.data.code == 700) {
+      //如果未登录或者被禁用，就直接跳到登录页面
+      localStorage.removeItem('userInfo');
+      router.push("/login");
+      Message.error(response.data.msg);
+      return Promise.reject(response.data);
+    }
+
+    return Promise.resolve(response);
+  },
+  function (error) {
+    return Promise.reject(error);
+  })
 
 map_request.interceptors.request.use(config => {
   return config;

@@ -4,17 +4,17 @@
             <div class="ms-title">玖座商家管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="用户名" @keyup.enter.native="submitForm()">
+                    <el-input v-model="param.username" placeholder="用户名" @keyup.enter.native="submitForm">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" placeholder="密码" v-model="param.password" @keyup.enter.native="submitForm()">
+                    <el-input type="password" placeholder="密码" v-model="param.password" @keyup.enter.native="submitForm">
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm()">登录</el-button>
+                    <el-button type="primary" @click="submitForm">登录</el-button>
                 </div>
             </el-form>
         </div>
@@ -41,25 +41,28 @@ export default {
                 loginNameOrPhone: this.param.username,
                 loginPassword: this.param.password
             };
-            this.$post('/merchant/store/login', data).then((res) => {
-                if (res.code === 0) {
-                    let obj = {
-                        loginName: res.data.loginName,
-                        token: res.data.token,
-                        logo: res.data.logo,
-                        rToken: res.data.rongToken,
-                        storeName: res.data.storeName,
-                        storeId:res.data.storeId
-                    };
+            this.$post('/merchant/store/login', data)
+                .then((res) => {
+                    if (res.code === 0) {
+                        let obj = {
+                            loginName: res.data.loginName,
+                            token: res.data.token,
+                            logo: res.data.logo,
+                            rToken: res.data.rongToken,
+                            storeName: res.data.storeName,
+                            storeId: res.data.storeId
+                        };
 
-                    localStorage.setItem('userInfo', JSON.stringify(obj));
-                    this.$message.success('登录成功');
-                    this.$router.push('/index');
-                } else {
-                    this.$message.error(res.msg);
-                    return false;
-                }
-            });
+                        localStorage.setItem('userInfo', JSON.stringify(obj));
+                        this.$message.success('登录成功');
+                        this.$router.push('/index');
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                })
+                .catch((err) => {
+                    this.$message.error(err.msg);
+                });
         }
     }
 };
