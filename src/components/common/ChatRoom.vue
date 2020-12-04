@@ -18,9 +18,11 @@
                     <div class="chat" v-if="now_user">
                         <div class="record">
                             <div class="username">{{now_user.name}}</div>
-                            <div class="chat_list">
-                                <div class="cli">
-                                    <div class="cmsg" v-for="(item,i) in msgArr" :key="i">
+                            <div class="chat_list"  ref='parTopDistance' @scroll="scrollEvent">
+                                <div class="getMore" v-show="getMore">加载中...</div>
+                                <div class="getMore" v-show="!hasHistoryMsg">没有更多了</div>
+                                <div class="cli" ref='topDistance' >
+                                    <div class="cmsg" v-for="(item,i) in msgArr" :key="i" ref="cmsg">
                                         <div class="msg_list" v-if="item.messageDirection==2">
                                             <div class="headImg">
                                                 <img v-if="item.content" :src="imgHead+item.content.portrait" alt="">
@@ -101,6 +103,7 @@ import init from "../../assets/js/init";
 export default {
     data() {
         return {
+            getMore:true,
             imgHead: this.$imgHead,
             showRoom:false,
             activeName: 'first',
@@ -124,6 +127,9 @@ export default {
             emoji:[],
             emojiShow: false,
             hasHistoryMsg:true,
+            firstDomHeight:null,
+            twoDomHeight:null,
+
         };
     },
 
@@ -237,7 +243,8 @@ export default {
             this.now_user = val;
             this.active = i;
             this.emojiShow = false;
-            this.getAssignHis()
+            this.getMore = true
+            this.getAssignHis(1)
         },
         // 会话列表
         conversation(){
@@ -281,21 +288,41 @@ export default {
             });
         },
 
+        scrollEvent(event){
+            let parent_scroll = this.$refs.parTopDistance.getBoundingClientRect().top
+            let child_scroll = this.$refs.topDistance.getBoundingClientRect().top
+            if(parent_scroll<=child_scroll){
+                this.firstDomHeight = this.$refs.topDistance.getBoundingClientRect().height
+                console.log(this.firstDomHeight)
+                this.debounce(this.getAssignHis,500);
+            }
+        },
+        debounce:function(fn,wait){
+            if (this.fun!==null){
+                clearTimeout(this.fun)
+            }
+            this.fun = setTimeout(fn,wait)
+        },
+
         // 获取指定用户的 会话历史
-        getAssignHis(){
+        getAssignHis(type=''){
             let that = this
-            // that.msgArr = []
+            if(!that.hasHistoryMsg)return
+            this.getMore = true
+            if(type == 1){
+                that.msgArr = []
+            }
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
-            // RongIMClient.getInstance().resetGetHistoryMessages(RongIMLib.ConversationType.PRIVATE,targetId);
+            // RongIMClient.getInstance().resetGetHistoryMessages(RongIMLib.ConversationType.PRIVATE,this.now_user.targetId);
             var timestrap = null; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
+            console.log(timestrap)
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
                 onSuccess: function(list, hasMsg) {
-                    console.log(list)
                     that.hasHistoryMsg = hasMsg;
                     let html = "";
-                    that.getAssignInfo(that.now_user.targetId,list)
+                    that.getAssignInfo(that.now_user.targetId,list,type)
                     that.clearUnreadNum(that.now_user.targetId)
                     // list => Message 数组。
                     // hasMsg => 是否还有历史消息可以获取。
@@ -307,11 +334,13 @@ export default {
         },
 
         // 获取指定用户信息
-        getAssignInfo(userId,list){
+        getAssignInfo(userId,list,type){
             this.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
                 if(res.code == 0){
+                    let newArr = []
                     let userInfo = res.data
                     list.forEach(v=>{
+                        // 调用历史记录
                         if(v.messageDirection == 2){
                             v.content['id'] = userInfo.id
                             v.content['name'] = userInfo.nickname
@@ -321,19 +350,41 @@ export default {
                             v.content['name'] = this.selfInfo.storeName
                             v.content['portrait'] = this.selfInfo.logo
                         }
-                        this.msgArr.push(v)
+                        newArr.unshift(v)
                     })
-                    this.$nextTick(this.scrollEnd);
+                    newArr.forEach(v=>{
+                        this.msgArr.unshift(v)
+                    })
+                    if(type == 1){
+                        this.$nextTick(this.scrollEnd);
+                    }else{
+                        this.$nextTick( () => {    
+                            this.$refs.cmsg[list.length-1].scrollIntoView()
+                        })
+                    }
+
+                    // setTimeout(()=>{
+                    //     // this.twoDomHeight = this.$refs.topDistance.getBoundingClientRect().height
+                    //     // this.$nextTick(() => {
+                    //     //     this.$refs.topDistance.scrollTo(0,200);
+                    //     // })
+                        
+                    // },1)
+
+                    this.getMore = false
                 }else{
                     this.$message({ message: res.msg, type: 'warning' });
                 }
                 
             });
         },
-
         send() {
             this.emojiShow = false;
             let that = this
+            // let parent_scroll = this.$refs.parTopDistance.getBoundingClientRect().top
+            // let child_scroll = this.$refs.topDistance.getBoundingClientRect().top
+            // console.log(this.$refs.parTopDistance.getBoundingClientRect())
+            // console.log(this.$refs.topDistance.getBoundingClientRect())
             if (!this.sendText) {
                 this.$message('发送消息不能为空');
                 return;
@@ -481,7 +532,7 @@ export default {
     mounted() {
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
 
-        if(!JSON.parse(localStorage.getItem('userInfo'))){
+        if(!localStorage.getItem('userInfo')){
             return
         }
         var userInfo = {
@@ -595,16 +646,38 @@ export default {
                 }
                 .chat_list {
                     overflow-y: scroll;
-                    &::-webkit-scrollbar {
-                        display: none
+                    // &::-webkit-scrollbar {
+                    //     display: none
+                    // }
+                    // & {
+                    //     scrollbar-width: none;
+                    // }
+                    // & {
+                    //     -ms-overflow-style: none;
+                    // }
+                    &::-webkit-scrollbar{ 
+                        width:4px;
                     }
-                    & {
-                        scrollbar-width: none;
+                    &::-webkit-scrollbar-track{
+                        background: rgb(230, 230, 230);
+                        border-radius:2px;
                     }
-                    & {
-                        -ms-overflow-style: none;
+                    &::-webkit-scrollbar-thumb{
+                        background: #999;
+                        border-radius:10px;
+                    }
+                    &::-webkit-scrollbar-thumb:hover{
+                        background: rgb(187, 187, 187);
+                    }
+                    &::-webkit-scrollbar-corner{
+                        background: #179a16;
                     }
                     height: calc(100% - 50px);
+                    .getMore{
+                        text-align: center;
+                        font-size: 12px;
+                        padding: 10px 0px;
+                    }
                 }
                 .cli {
                     padding: 10px 20px;
