@@ -9,11 +9,12 @@
                     <div class="people_list">
                         <ul>
                             <li class="userList" :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">
-                                {{item.name}}
+                                <img class="head_portrait"  :src="item.portrait" alt="">
+                                <span>{{item.name}}</span>
+                                <span class="not_read" v-show="item.unreadMessageCount>0 && active != i">{{item.unreadMessageCount}}</span>
                             </li>
                         </ul>
                     </div>
-                    
                     <div class="chat" v-if="now_user">
                         <div class="record">
                             <div class="username">{{now_user.name}}</div>
@@ -61,7 +62,8 @@
                                     <img class="send_icon" style="height:20px" src="../../assets/img/tupian.png" alt="">
                                 </div>
                             </div>
-                            <textarea class="textarea" @keyup.enter='send()' v-html="selectEmojiHtml" v-model="sendText" id=""></textarea>
+                            <!-- @keyup.enter='send()' -->
+                            <textarea ref="focusTextarea" class="textarea"  v-html="selectEmojiHtml" v-model="sendText" id=""></textarea>
                             <div class="btn_oper">
                                 <el-button type="primary" @click="send()">发送</el-button>
                             </div>
@@ -80,6 +82,11 @@
                                 <!-- <el-tab-pane label="香槟" name="second">清吧</el-tab-pane>
                                 <el-tab-pane label="啤酒" name="third">KTV</el-tab-pane> -->
                             </el-tabs>
+
+                            <div class="operating_btn">
+                                <el-button type="primary" @click="clearConversation" class="btn">清空所有会话列表</el-button>
+                                <!-- <el-button type="primary" @click="clearConverHis" class="btn">清除所有会话历史</el-button> -->
+                            </div>
                         </div>
 
                     </div>
@@ -98,23 +105,20 @@ export default {
             showRoom:false,
             activeName: 'first',
             selectEmojiHtml: "",
-            now_user: {
-                // 当前对话框内用户
-                // {userId,name,onlineTime,offlineTime}
-            },
+            now_user: "",
             mySelf: { //我的信息
                 // {userId,name,onlineTime,offlineTime}
             },
             // active:null,//默认需要点击
             active: null,
-            sendText: null,//发送的消息
+            sendText: '',//发送的消息
             msgArr: [ //历史消息
                 // { userId, msgType, sender, receiver,bodyType,body{txt,imgIndex,jsonObj,url,lng,lat,address} }
             ],
             moreHistory:true,
             userList: [],
             oneList: [
-                '你好，请问有什么问题呢？', 'yuo can do this', '好的，亲'
+                '你好，请问有什么问题呢？', 'yuo can do this', 'OK'
             ],
             selfInfo:'',
             emoji:[],
@@ -161,11 +165,44 @@ export default {
     watch: {
         watchMsgNum: {
             handler(newValue, oldValue) {
+                let that = this
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
+                // 自定义 更新会话列表 
+                let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
+                for(let i=0;i<this.userList.length;i++){
+                    if(this.userList[i].targetId == lastObj.senderUserId){
+                        newUser = false   //找到一个相同  证明是已出现过
+                        break
+                    }
+                }
+               
+                if(newUser){
+                    this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
+                        if(res.code == 0){
+                            lastObj['id'] = res.data.userId
+                            lastObj['name'] = res.data.nickname
+                            lastObj['portrait'] = this.imgHead + res.data.headPortrait
+                            // 获取未读消息条数
+                            var conversationType = RongIMLib.ConversationType.PRIVATE;
+                            var targetId = lastObj.targetId;
+                            RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
+                                onSuccess: function(count){
+                                    lastObj['unreadMessageCount'] = count
+                                    that.userList.unshift(lastObj)    
+                                },
+                                onError: function(){
+                                    // that.$message({ message: res.msg, type: 'warning' });
+                                }
+                            });
+                        }else{
+                            this.$message({ message: res.msg, type: 'warning' });
+                        }
+                    });
+                    return
+                }
 
-                console.log(lastObj)
                 this.$get(`/merchant/store/im/getUserById/${lastObj.senderUserId}`).then((res) => {
                     if(res.code == 0){
                         lastObj.content['id'] = res.data.userId
@@ -173,8 +210,12 @@ export default {
                         lastObj.content['portrait'] = res.data.headPortrait
                         this.msgArr.push(lastObj)
                         this.$nextTick(this.scrollEnd);
+                        // 当前聊天等于消息发送人  清空未读
+                        if(lastObj.senderUserId == this.now_user.targetId){
+                            this.clearUnreadNum(lastObj.targetId)
+                        }
                     }else{
-                        this.$message({ message: res.mesg, type: 'warning' });
+                        this.$message({ message: res.msg, type: 'warning' });
                     }
                    
                 });
@@ -195,6 +236,7 @@ export default {
         getChat(val, i) {
             this.now_user = val;
             this.active = i;
+            this.emojiShow = false;
             this.getAssignHis()
         },
         // 会话列表
@@ -212,15 +254,31 @@ export default {
                                 v['portrait'] = that.imgHead + res.data.headPortrait
                                 that.userList.push(v)
                             }else{
-                                that.$message({ message: res.mesg, type: 'warning' });
+                                that.$message({ message: '获取会话列表失败，请刷新', type: 'warning' });
                             }
                         });
                     })
+                    
                 },
                 onError: function(error) {
                     // do something
                 }
             }, null);
+        },
+        // 清除 未读消息条数
+        clearUnreadNum(userId){
+            // 成功获取对话历史后 清空 未读条数
+            var conversationType = RongIMLib.ConversationType.PRIVATE;
+            var targetId = userId;
+            RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
+                onSuccess: function(){
+                    // 清除未读消息成功
+                },
+                onError: function(error){
+                    // that.$message({ message: res.msg, type: 'warning' });
+                    // error => 清除未读消息数错误码
+                }
+            });
         },
 
         // 获取指定用户的 会话历史
@@ -234,9 +292,11 @@ export default {
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
                 onSuccess: function(list, hasMsg) {
+                    console.log(list)
                     that.hasHistoryMsg = hasMsg;
                     let html = "";
-                    that.getAssignInfo(targetId,list)
+                    that.getAssignInfo(that.now_user.targetId,list)
+                    that.clearUnreadNum(that.now_user.targetId)
                     // list => Message 数组。
                     // hasMsg => 是否还有历史消息可以获取。
                 },
@@ -246,13 +306,11 @@ export default {
             });
         },
 
-
         // 获取指定用户信息
         getAssignInfo(userId,list){
             this.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
                 if(res.code == 0){
                     let userInfo = res.data
-                    console.log(list)
                     list.forEach(v=>{
                         if(v.messageDirection == 2){
                             v.content['id'] = userInfo.id
@@ -267,13 +325,14 @@ export default {
                     })
                     this.$nextTick(this.scrollEnd);
                 }else{
-                    this.$message({ message: res.mesg, type: 'warning' });
+                    this.$message({ message: res.msg, type: 'warning' });
                 }
                 
             });
         },
 
         send() {
+            this.emojiShow = false;
             let that = this
             if (!this.sendText) {
                 this.$message('发送消息不能为空');
@@ -308,7 +367,6 @@ export default {
             );
             RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
                 onSuccess: function (message) {
-                    console.log(message)
                     that.sendText = '';
                     message.content['id'] = message.content.user.id
                     message.content['name'] = message.content.user.name
@@ -364,7 +422,7 @@ export default {
         // 选择表情
         selectEmoji(emoji){
             this.sendText += emoji.emoji;
-            this.emojiShow = false;
+            // this.emojiShow = false;
         },
         // 展示表情
         showEmoji(){
@@ -382,11 +440,50 @@ export default {
         },
         // 点击快捷回复
         quickRrep(val) {
+            this.$refs.focusTextarea.focus();
             this.sendText = val;
         },
+        clearConversation(){
+            let that = this
+            this.$confirm('确认清空所有会话', '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    RongIMClient.getInstance().clearConversations({
+                        onSuccess: function() {
+                            that.userList = []
+                        },
+                        onError: function(error) {
+                            that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+                        }
+                    });
+                })
+                .catch(() => {});
+        },
+        // clearConverHis(){
+        //     let that = this
+        //     this.$confirm('确认清除所有会话消息', '提示', {
+        //         type: 'warning'
+        //     })
+        //         .then(() => {
+        //             RongIMClient.getInstance().clearConversations({
+        //                 onSuccess: function() {
+        //                     that.now_user = ''
+        //                 },
+        //                 onError: function(error) {
+        //                     that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+        //                 }
+        //             });
+        //         })
+        //         .catch(() => {});
+        // }
     },
     mounted() {
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
+
+        if(!JSON.parse(localStorage.getItem('userInfo'))){
+            return
+        }
         var userInfo = {
             appKey: "82hegw5u8vgdx",
             token:rToken
@@ -398,18 +495,7 @@ export default {
         setTimeout(()=>{
             this.conversation()
             this.emoji = RongIMLib.RongIMEmoji.list
-            console.log(RongIMLib.RongIMEmoji.list)
         },1000)
-        
-
-//         RongIMClient.getInstance().clearConversations({
-//     onSuccess: function() {
-//       // 清除会话成功
-//     },
-//     onError: function(error) {
-//       // error => 清除会话错误码
-//     }
-// });
         // this.scrollEnd();
     },
 
@@ -440,13 +526,36 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        position: relative;
+        .not_read{
+            position: absolute;
+            right: 8px;
+            background: #ff4e4e;
+            padding: 0 4px;
+            border-radius: 50%;
+            display: inline-block;
+            height: 16px;
+            font-size: 12px;
+            line-height: 16px;
+            color: white;
+            top: calc(50% - 8px);
+        }
+        .head_portrait{
+            height: 40px;
+            width: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 0;
+            vertical-align: middle;
+        }
     }
     .box {
         height: 730px;
         display: flex;
         background: white;
         .people_list {
-            flex: .12;
+            flex: .2;
             border-right: 1px solid @border-color;
             box-sizing: border-box;
             background: #f7f7f7;
@@ -473,7 +582,7 @@ export default {
             }
         }
         .chat {
-            flex: .6;
+            flex: .52;
             .record {
                 height: 72%;
                 border-bottom: 1px solid @border-color;
@@ -620,7 +729,13 @@ export default {
                             background: @border-color;
                         }
                     }
-
+                }
+                .operating_btn{
+                    padding-left:10px ;
+                    button{
+                        margin-bottom: 12px;
+                        margin-left: 0;
+                    }
                 }
             }
             // element

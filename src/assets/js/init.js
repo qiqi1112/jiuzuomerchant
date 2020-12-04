@@ -48,18 +48,22 @@ export default function init(userInfo,callbacks) {
             switch(message.messageType){
                 case RongIMClient.MessageType.TextMessage:
                     num += 1
+                    console.log('收到1')
+                    console.log(message)
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 文字内容
                     break;
                 case RongIMClient.MessageType.VoiceMessage:
                     num += 1
+                    console.log('收到2')
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 格式为 AMR 的音频 base64
                     break;
                 case RongIMClient.MessageType.ImageMessage:
                     num += 1
+                    console.log('收到3')
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 图片缩略图 base64
@@ -67,6 +71,7 @@ export default function init(userInfo,callbacks) {
                     break;
                 case RongIMClient.MessageType.LocationMessage:
                     num += 1
+                    console.log('收到4')
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.latiude => 纬度
@@ -75,18 +80,19 @@ export default function init(userInfo,callbacks) {
                     break;
                 case RongIMClient.MessageType.RichContentMessage:
                     num += 1
+                    console.log('收到4')
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 文本消息内容
                     // message.content.imageUri => 图片 base64
                     // message.content.url => 原图 URL
                     break;
-                case RongIMClient.MessageType.TypingStatusMessage:
-                    num +=1
-                    console.log(message)
-                    store.commit('newMsg', message);
-                    store.commit('newMsgState',num)
-                    break;
+                // case RongIMClient.MessageType.TypingStatusMessage:
+                //     num +=1
+                //     console.log('收到5')
+                //     store.commit('newMsg', message);
+                //     store.commit('newMsgState',num)
+                //     break;
                 // case RongIMClient.MessageType.InformationNotificationMessage:
                 //     store.commit('newMsg', message);
                 //     store.commit('newMsgState',num)
@@ -111,7 +117,7 @@ export default function init(userInfo,callbacks) {
                 //     store.commit('newMsg', message);
                 //     store.commit('newMsgState',num)
                 //     break;
-                default:
+                // default:
                     // console.log(14)
                     // store.commit('newMsg', message);
             }
