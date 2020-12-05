@@ -526,6 +526,7 @@ export default {
                                     case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
                                         info = '不在聊天室中';
                                         break;
+                                        
                                 }
                                 console.log('发送失败:' + info + errorCode);
                             }
