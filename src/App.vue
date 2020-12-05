@@ -1,6 +1,8 @@
 <template>
     <div id="app" @click="close">
-        <chatRoom></chatRoom>
+        <template v-if="$store.state.showChatRoom">
+            <chatRoom></chatRoom>
+        </template>
         <router-view></router-view>
     </div>
 </template>
@@ -18,7 +20,7 @@ export default {
         close() {
             this.$store.commit('change', 2);
         }
-    }
+    },
 };
 </script>
 <style lang='less'>

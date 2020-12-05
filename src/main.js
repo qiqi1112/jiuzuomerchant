@@ -26,7 +26,7 @@ import {
     file_get,
     file_post,
     imgHead,
-    fileUploadUrl
+    fileUploadUrl,
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'

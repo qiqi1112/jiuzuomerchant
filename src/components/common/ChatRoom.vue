@@ -2,9 +2,8 @@
     <div class="chat_room" id="chat_room">
         <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat"></div>
 
-
-        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" >
-            <div id="service" v-if="showRoom">
+        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh">
+            <div id="service" v-if="showRoom && $store.state.showChatRoom">
                 <div class="box">
                     <div class="people_list">
                         <ul>
@@ -23,6 +22,7 @@
                                 <div class="getMore" v-show="!hasHistoryMsg">没有更多了</div>
                                 <div class="cli" ref='topDistance' >
                                     <div class="cmsg" v-for="(item,i) in msgArr" :key="i" ref="cmsg">
+                                        <div class="send_or_rece">{{item.sentTime | formatTime(that)}}</div>
                                         <div class="msg_list" v-if="item.messageDirection==2">
                                             <div class="headImg">
                                                 <img v-if="item.content" :src="imgHead+item.content.portrait" alt="">
@@ -52,7 +52,6 @@
                             </div>
                         </div>
                         <div class="text_box">
-                            <!-- @keyup.enter='send()' -->
                             <div class="icons">
                                 <div class="flexo">
                                     <img class="send_icon" @click="showEmoji" style="height:20px" src="../../assets/img/emoji.png" alt="">
@@ -62,10 +61,46 @@
                                 </div>
                                 <div class="flexo">
                                     <img class="send_icon" style="height:20px" src="../../assets/img/tupian.png" alt="">
+                                    <!-- <el-upload
+                                        action="fakeaction"
+                                        list-type="picture-card"
+                                        class="up_file"
+                                        :on-preview="handlePictureCardPreview"
+                                        :on-remove="handleRemove">
+                                    </el-upload> -->
+                                    <!-- :on-preview="handlePictureCardPreview"  查看大图-->
+        <!-- list-type="picture-card" -->
+                                    <el-upload
+                                        v-loading="loading"
+                                        action="fakeaction"
+                                        list-type="picture-card"
+                                        :http-request="uploadSectionFile"
+                                        :limit="4"
+                                        :auto-upload="false"
+                                        multiple
+                                        :file-list="form.list"
+                                        :on-change="handleChange"
+                                        :on-remove="handleRemove"
+                                    >
+                                    <!-- <img class="up_icon" style="height:20px" src="../../assets/img/tupian.png" alt=""> -->
+                                    </el-upload>
+
+                                    <ul v-if="form.list.length>0" class="imgs">
+                                        <li v-for="(item,i) in form.list" :key="i">
+                                            <img :src="item.url" alt="">
+                                            <span class="del" @click="handleRemove(item)">x</span>
+                                        </li>
+                                        <li></li>
+                                    </ul>
+
+
+                                    <!-- <el-dialog :visible.sync="dialogVisible">
+                                        <img width="100%" :src="dialogImageUrl" alt="">
+                                    </el-dialog> -->
+
                                 </div>
                             </div>
-                            <!-- @keyup.enter='send()' -->
-                            <textarea ref="focusTextarea" class="textarea"  v-html="selectEmojiHtml" v-model="sendText" id=""></textarea>
+                            <textarea ref="focusTextarea" @keyup.ctrl.enter='send()'  class="textarea"  v-html="selectEmojiHtml" v-model="sendText" id=""></textarea>
                             <div class="btn_oper">
                                 <el-button type="primary" @click="send()">发送</el-button>
                             </div>
@@ -103,6 +138,18 @@ import init from "../../assets/js/init";
 export default {
     data() {
         return {
+            loading:false,
+            formData: [],
+            dialogImageUrl: '',
+            dialogVisible: false,
+            loading: false,
+            form: {
+                list: []
+            },
+            joinUrl: this.$imgHead,
+            uplodeImg: [],
+            // 以上图片上传
+            that:this,
             getMore:true,
             imgHead: this.$imgHead,
             showRoom:false,
@@ -121,15 +168,15 @@ export default {
             moreHistory:true,
             userList: [],
             oneList: [
-                '你好，请问有什么问题呢？', 'yuo can do this', 'OK'
+                '你好，请问有什么问题呢？', "You're welcome", 'OK'
             ],
             selfInfo:'',
             emoji:[],
             emojiShow: false,
             hasHistoryMsg:true,
-            firstDomHeight:null,
-            twoDomHeight:null,
-
+            // firstDomHeight:null,
+            // twoDomHeight:null,
+            scorllFalse:false,//用于判断 切换会话时 停止监听 滚动条
         };
     },
 
@@ -161,6 +208,7 @@ export default {
     },
     created(){
         this.selfInfo = JSON.parse(localStorage.getItem('userInfo')) 
+
     },
 
     computed:{
@@ -214,11 +262,15 @@ export default {
                         lastObj.content['id'] = res.data.userId
                         lastObj.content['name'] = res.data.nickname
                         lastObj.content['portrait'] = res.data.headPortrait
-                        this.msgArr.push(lastObj)
-                        this.$nextTick(this.scrollEnd);
+                        // this.msgArr.push(lastObj)
+                        // this.$nextTick(this.scrollEnd);
                         // 当前聊天等于消息发送人  清空未读
                         if(lastObj.senderUserId == this.now_user.targetId){
                             this.clearUnreadNum(lastObj.targetId)
+                            this.msgArr.push(lastObj)
+                            // this.$nextTick(this.scrollEnd);
+                        }else{
+                            // 当前聊天不是发送人
                         }
                     }else{
                         this.$message({ message: res.msg, type: 'warning' });
@@ -229,8 +281,56 @@ export default {
             deep:true
         }
     },
+    filters:{
+        formatTime(time,that){
+            let diff = new Date().getTime() - new Date(time).getTime()
+            let getHours,minutes,seconds,leve1,leve2,leve3
+            leve1 =  diff%(24*3600*1000) 
+            getHours = Math.floor(leve1/(3600*1000))
+            leve2 =  leve1%(3600*1000) 
+            minutes = Math.floor(leve2/(60*1000))
+            leve3 = leve2%(60*1000) 
+            seconds = Math.floor(leve3/1000)
+
+            let nowHours =  new Date().getHours(); //当前几点
+
+            // 上面获取小时有问题
+            
+            if(getHours>nowHours && getHours<=24){
+                return '昨天' + that.$regular.timeData(time,4)
+            }
+
+            if(getHours>0 && getHours<=3){
+                return getHours + '小时前'
+            }
+
+            if(getHours>3 && getHours<24){
+                return that.$regular.timeData(time,3)
+            }
+            if(getHours>=24 && getHours<48){
+                return that.$regular.timeData(time,1)
+            }
+            if(getHours>=48){
+                return that.$regular.timeData(time,3)
+            }
+
+            if(minutes>0 && minutes<=10){
+                return minutes + '分钟前'
+            }
+            if(minutes>10){
+                return that.$regular.timeData(time,4)
+            }
+
+            if(seconds>0){
+                return '刚刚'
+            }
+        }
+    },
 
     methods: {
+        // function addZero(num) {
+        //     return num < 10 ? '0' + num : num
+        // },
         showChat(){
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
             if(isClick == 'true') {
@@ -240,10 +340,12 @@ export default {
             // this.conversation()
         },
         getChat(val, i) {
+            this.scorllFalse = true    
             this.now_user = val;
             this.active = i;
             this.emojiShow = false;
             this.getMore = true
+            this.hasHistoryMsg = true
             this.getAssignHis(1)
         },
         // 会话列表
@@ -252,6 +354,7 @@ export default {
             RongIMClient.getInstance().getConversationList({
                 onSuccess: function(list) {
                     let userId = ''
+                    if(list.length<=0)return
                     list.forEach(v=>{
                         userId = v.targetId 
                         that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
@@ -265,7 +368,6 @@ export default {
                             }
                         });
                     })
-                    
                 },
                 onError: function(error) {
                     // do something
@@ -289,11 +391,11 @@ export default {
         },
 
         scrollEvent(event){
+            if(this.scorllFalse)return
             let parent_scroll = this.$refs.parTopDistance.getBoundingClientRect().top
             let child_scroll = this.$refs.topDistance.getBoundingClientRect().top
             if(parent_scroll<=child_scroll){
-                this.firstDomHeight = this.$refs.topDistance.getBoundingClientRect().height
-                console.log(this.firstDomHeight)
+                // this.firstDomHeight = this.$refs.topDistance.getBoundingClientRect().height
                 this.debounce(this.getAssignHis,500);
             }
         },
@@ -306,18 +408,21 @@ export default {
 
         // 获取指定用户的 会话历史
         getAssignHis(type=''){
-            let that = this
+            let that = this,timer=0
             if(!that.hasHistoryMsg)return
             this.getMore = true
             if(type == 1){
                 that.msgArr = []
             }
+            if(this.msgArr.length>0){
+                timer = this.msgArr[0].sentTime
+            }else{
+                timer = 0
+            }
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
-            // RongIMClient.getInstance().resetGetHistoryMessages(RongIMLib.ConversationType.PRIVATE,this.now_user.targetId);
-            var timestrap = null; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
+            var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
-            console.log(timestrap)
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
                 onSuccess: function(list, hasMsg) {
                     that.hasHistoryMsg = hasMsg;
@@ -362,15 +467,7 @@ export default {
                             this.$refs.cmsg[list.length-1].scrollIntoView()
                         })
                     }
-
-                    // setTimeout(()=>{
-                    //     // this.twoDomHeight = this.$refs.topDistance.getBoundingClientRect().height
-                    //     // this.$nextTick(() => {
-                    //     //     this.$refs.topDistance.scrollTo(0,200);
-                    //     // })
-                        
-                    // },1)
-
+                    this.scorllFalse = false
                     this.getMore = false
                 }else{
                     this.$message({ message: res.msg, type: 'warning' });
@@ -381,14 +478,63 @@ export default {
         send() {
             this.emojiShow = false;
             let that = this
-            // let parent_scroll = this.$refs.parTopDistance.getBoundingClientRect().top
-            // let child_scroll = this.$refs.topDistance.getBoundingClientRect().top
-            // console.log(this.$refs.parTopDistance.getBoundingClientRect())
-            // console.log(this.$refs.topDistance.getBoundingClientRect())
-            if (!this.sendText) {
+            if (!this.sendText && this.form.list.length<=0) {
                 this.$message('发送消息不能为空');
                 return;
             }
+            if(this.form.list.length>0){
+                this.form.list.forEach(v=>{
+                    let base64Str,imageUri,msg,conversationType,targetId,image,base64
+                    image = new Image();  
+                    image.crossOrigin = '';
+                    image.src = this.joinUrl + v.name;  
+                    image.onload = function(){  
+                        base64 = that.$regular.getBase64Image(image);  
+                        base64Str = base64.split(',')[1];
+                        imageUri = that.joinUrl + v.name; // 上传到自己服务器的 URL。
+                        msg = new RongIMLib.ImageMessage({content: base64Str, imageUri: imageUri});
+                        conversationType = RongIMLib.ConversationType.PRIVATE; // 单聊, 其他会话选择相应的会话类型即可
+                        targetId = that.now_user.targetId; // 目标 Id
+                        RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
+                            onSuccess: function (message) {
+                                // message 为发送的消息对象并且包含服务器返回的消息唯一 Id 和发送消息时间戳
+                                that.form.list = [];
+                                message.content['id'] = that.selfInfo.storeId;
+                                message.content['name'] = that.selfInfo.storeName
+                                message.content['portrait'] = that.selfInfo.logo
+                                that.msgArr.push(message);
+                                that.$nextTick(that.scrollEnd);
+                            },
+                            onError: function (errorCode, message) {
+                                var info = '';
+                                switch (errorCode) {
+                                    case RongIMLib.ErrorCode.TIMEOUT:
+                                        info = '超时';
+                                        break;
+                                    case RongIMLib.ErrorCode.UNKNOWN:
+                                        info = '未知错误';
+                                        break;
+                                    case RongIMLib.ErrorCode.REJECTED_BY_BLACKLIST:
+                                        info = '在黑名单中，无法向对方发送消息';
+                                        break;
+                                    case RongIMLib.ErrorCode.NOT_IN_DISCUSSION:
+                                        info = '不在讨论组中';
+                                        break;
+                                    case RongIMLib.ErrorCode.NOT_IN_GROUP:
+                                        info = '不在群组中';
+                                        break;
+                                    case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
+                                        info = '不在聊天室中';
+                                        break;
+                                }
+                                console.log('发送失败:' + info + errorCode);
+                            }
+                        });
+                    }      
+                })
+            }
+           
+            if(!this.sendText)return
             // var msg = new RongIMLib.TextMessage({
             //     content: this.sendText,
             //     extra: "附加信息"
@@ -511,6 +657,7 @@ export default {
                 })
                 .catch(() => {});
         },
+        
         // clearConverHis(){
         //     let that = this
         //     this.$confirm('确认清除所有会话消息', '提示', {
@@ -528,8 +675,50 @@ export default {
         //         })
         //         .catch(() => {});
         // }
+
+
+
+        // 图片上传
+        uploadImg() {
+            let config = {
+                'Content-Type': 'multipart/form-data'
+            };
+            let fromdata = new FormData();
+            fromdata.append('file', this.formData);
+            this.$file_post('/merchant/store/system/upload/create', fromdata, config).then((res) => {
+                if (res.code == 0) {
+                    let img = {
+                        name: res.data,
+                        url: this.joinUrl + res.data
+                    };
+                    this.form.list.push(img);
+                    console.log( this.form.list)
+                } else {
+                    this.$message.error(`图片上传失败，请刷新后再试`);
+                }
+                this.loading = false;
+            });
+        },
+        handleRemove(file) {
+            this.form.list.forEach((i, index) => {
+                if (file.name == i.name) {
+                    this.form.list.splice(index, 1);
+                }
+            });
+        },
+        handleChange(file, fileList) {
+            this.formData = file.raw;
+            this.loading = true;
+            this.uploadImg();
+        },
+        uploadSectionFile(file) {},
+        handlePictureCardPreview(file) {
+            this.dialogImageUrl = file.url;
+            this.dialogVisible = true;
+        }
     },
     mounted() {
+
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
 
         if(!localStorage.getItem('userInfo')){
@@ -549,7 +738,6 @@ export default {
         },1000)
         // this.scrollEnd();
     },
-
 };
 </script>
 <style scoped lang='less'>
@@ -569,6 +757,7 @@ export default {
     .msg_picture{
         width: 200px;
         height: auto;
+        border-radius: 4px;
     }
 }
 @border-color: #e2e2e2;
@@ -682,6 +871,12 @@ export default {
                 .cli {
                     padding: 10px 20px;
                     .cmsg {
+                        .send_or_rece{
+                            text-align: center;
+                            line-height: 25px;
+                            font-size: 12px;
+                            color: #999;
+                        }
                         .msg_list {
                             display: flex;
                             padding: 10px 0;
@@ -736,6 +931,17 @@ export default {
                         display: inline-block;
                         margin-right: 10px;
                         position: relative;
+                        height: 20px;
+                        width: 20px;
+                        .up_file{
+                            position: absolute;
+                            width: 20px;
+                            height: 20px;
+                            left: 0;
+                            top: 0;
+                            opacity: 0;
+                            cursor: pointer;
+                        }
                         .emoji_box{
                             background: #fff;
                             z-index: 20;
@@ -764,6 +970,58 @@ export default {
                         .emoji_box {
                             -ms-overflow-style: none;
                         }
+
+                        /deep/.el-upload--picture-card{
+                            background: none;
+                            border: none;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 20px;
+                            height: 20px;
+                        }
+                        .imgs{
+                            position: absolute;
+                            width: 296px;
+                            left: 30px;
+                            display: inline-block;
+                            top: -172px;
+                            background: #f7f7f7;
+                            box-shadow: 0 0 5px #6d6d6d;
+                            border-radius: 4px;
+                            padding: 5px;
+                            .del{
+                                color: red;
+                                font-size: 20px;
+                                right: 8px;
+                                position: absolute;
+                                cursor: pointer;
+                            }
+                            li{
+                                display: inline-block;
+                                position: relative;
+                            }
+                            img{
+                                width: 148px;
+                                height: 148px;
+                                object-fit: cover;
+                                border-radius: 5px;
+                                border: 1px solid #dcdcdc;
+                                box-sizing: border-box;
+                            }
+                        }
+                        /deep/ .el-upload-list{
+                            
+                            display: none;
+                        }
+
+                        // /deep/.el-upload-list--picture-card .el-upload-list__item{
+                        //     margin: 0;
+                        // }
+                        // .el-upload-list__item-thumbnail{
+                        //     object-fit: cover;
+                        // }
+                      
                     }
                 }
                 .send_icon{

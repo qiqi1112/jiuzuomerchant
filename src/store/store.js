@@ -35,7 +35,7 @@ const store = new Vuex.Store({
         },
         newMsgState(state,num){
             state.newMsgNum = num
-        }
+        },
     },
     // getters:{
     //     nameInfo(state){

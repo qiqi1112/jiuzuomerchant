@@ -1,8 +1,8 @@
 /*
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2020-10-21 14:20:19
+ * @Last Modified by: xu.xiao
+ * @Last Modified time: 2020-12-05 17:14:00
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -118,6 +118,18 @@ function timestampToTime(timestamp) {
 }
 
 
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+    var dataURL = canvas.toDataURL("image/" + ext);
+    return dataURL;
+}
+
+
 export default {
     phone,
     money,
@@ -127,5 +139,6 @@ export default {
     inputText,
     timestampToTime,
     deep,
-    pureNumber
+    pureNumber,
+    getBase64Image
 }
