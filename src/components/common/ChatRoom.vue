@@ -81,6 +81,7 @@
                                         :file-list="form.list"
                                         :on-change="handleChange"
                                         :on-remove="handleRemove"
+                                        :on-exceed="exceed"
                                     >
                                     <!-- <img class="up_icon" style="height:20px" src="../../assets/img/tupian.png" alt=""> -->
                                     </el-upload>
@@ -347,6 +348,7 @@ export default {
             this.getMore = true
             this.hasHistoryMsg = true
             this.getAssignHis(1)
+            this.$nextTick(this.scrollEnd);
         },
         // 会话列表
         conversation(){
@@ -475,6 +477,9 @@ export default {
                 
             });
         },
+        useImg(base64){
+            console.log(base64)
+        },
         send() {
             this.emojiShow = false;
             let that = this
@@ -484,53 +489,66 @@ export default {
             }
             if(this.form.list.length>0){
                 this.form.list.forEach(v=>{
-                    let base64Str,imageUri,msg,conversationType,targetId,image,base64
+                    let base64Str,imageUri,msg,conversationType,targetId,image,base64,yasuo
                     image = new Image();  
                     image.crossOrigin = '';
                     image.src = this.joinUrl + v.name;  
                     image.onload = function(){  
-                        base64 = that.$regular.getBase64Image(image);  
-                        base64Str = base64.split(',')[1];
-                        imageUri = that.joinUrl + v.name; // 上传到自己服务器的 URL。
-                        msg = new RongIMLib.ImageMessage({content: base64Str, imageUri: imageUri});
-                        conversationType = RongIMLib.ConversationType.PRIVATE; // 单聊, 其他会话选择相应的会话类型即可
-                        targetId = that.now_user.targetId; // 目标 Id
-                        RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
-                            onSuccess: function (message) {
-                                // message 为发送的消息对象并且包含服务器返回的消息唯一 Id 和发送消息时间戳
-                                that.form.list = [];
-                                message.content['id'] = that.selfInfo.storeId;
-                                message.content['name'] = that.selfInfo.storeName
-                                message.content['portrait'] = that.selfInfo.logo
-                                that.msgArr.push(message);
-                                that.$nextTick(that.scrollEnd);
-                            },
-                            onError: function (errorCode, message) {
-                                var info = '';
-                                switch (errorCode) {
-                                    case RongIMLib.ErrorCode.TIMEOUT:
-                                        info = '超时';
-                                        break;
-                                    case RongIMLib.ErrorCode.UNKNOWN:
-                                        info = '未知错误';
-                                        break;
-                                    case RongIMLib.ErrorCode.REJECTED_BY_BLACKLIST:
-                                        info = '在黑名单中，无法向对方发送消息';
-                                        break;
-                                    case RongIMLib.ErrorCode.NOT_IN_DISCUSSION:
-                                        info = '不在讨论组中';
-                                        break;
-                                    case RongIMLib.ErrorCode.NOT_IN_GROUP:
-                                        info = '不在群组中';
-                                        break;
-                                    case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
-                                        info = '不在聊天室中';
-                                        break;
-                                        
+                        base64 = that.$regular.getBase64Image(image); 
+                        if(base64.length>=600000){
+                            yasuo = 400
+                        }else if(base64.length>=400000){
+                            yasuo = 500
+                        }else if(base64.length>=200000){
+                            yasuo = 800
+                        }else{
+                            yasuo = 1000
+                        }
+                        that.$regular.compress(base64, yasuo, 0.5).then(function (val) {
+                            base64Str = val.split(',')[1]
+                            console.log(base64Str.length)
+                            imageUri = that.joinUrl + v.name; // 上传到自己服务器的 URL。
+                            msg = new RongIMLib.ImageMessage({content: base64Str, imageUri: imageUri});
+                            conversationType = RongIMLib.ConversationType.PRIVATE; // 单聊, 其他会话选择相应的会话类型即可
+                            targetId = that.now_user.targetId; // 目标 Id
+                            RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
+                                onSuccess: function (message) {
+                                    // message 为发送的消息对象并且包含服务器返回的消息唯一 Id 和发送消息时间戳
+                                    that.form.list = [];
+                                    message.content['id'] = that.selfInfo.storeId;
+                                    message.content['name'] = that.selfInfo.storeName
+                                    message.content['portrait'] = that.selfInfo.logo
+                                    that.msgArr.push(message);
+                                    that.$nextTick(that.scrollEnd);
+                                },
+                                onError: function (errorCode, message) {
+                                    var info = '';
+                                    switch (errorCode) {
+                                        case RongIMLib.ErrorCode.TIMEOUT:
+                                            info = '超时';
+                                            break;
+                                        case RongIMLib.ErrorCode.UNKNOWN:
+                                            info = '未知错误';
+                                            break;
+                                        case RongIMLib.ErrorCode.REJECTED_BY_BLACKLIST:
+                                            info = '在黑名单中，无法向对方发送消息';
+                                            break;
+                                        case RongIMLib.ErrorCode.NOT_IN_DISCUSSION:
+                                            info = '不在讨论组中';
+                                            break;
+                                        case RongIMLib.ErrorCode.NOT_IN_GROUP:
+                                            info = '不在群组中';
+                                            break;
+                                        case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
+                                            info = '不在聊天室中';
+                                            break;
+                                    }
+                                    console.log('发送失败:' + info + errorCode);
                                 }
-                                console.log('发送失败:' + info + errorCode);
-                            }
+                            });
                         });
+
+                       
                     }      
                 })
             }
@@ -693,7 +711,6 @@ export default {
                         url: this.joinUrl + res.data
                     };
                     this.form.list.push(img);
-                    console.log( this.form.list)
                 } else {
                     this.$message.error(`图片上传失败，请刷新后再试`);
                 }
@@ -707,15 +724,36 @@ export default {
                 }
             });
         },
+         beforeAvatarUpload(file) {
+            
+            const isJPG = file.type === 'image/jpeg';
+            const isLt2M = file.size / 1024 / 1024 < 0.4;
+            console.log(isLt2M)
+            if (!isJPG) {
+            this.$message.error('上传头像图片只能是 JPG 格式!');
+            }
+            if (!isLt2M) {
+            this.$message.error('上传头像图片大小不能超过 2MB!');
+            }
+            return isJPG && isLt2M;
+        },
         handleChange(file, fileList) {
+            if(file.size / 1024 / 1024 > .4){
+                this.$message({ message: '选择图片太大', type: 'warning' });
+                return
+            }
             this.formData = file.raw;
             this.loading = true;
             this.uploadImg();
         },
-        uploadSectionFile(file) {},
+        uploadSectionFile(file) {
+        },
         handlePictureCardPreview(file) {
             this.dialogImageUrl = file.url;
             this.dialogVisible = true;
+        },
+        exceed(files, fileList){
+            this.$message({ message: '一次最多支持发送4张图片', type: 'warning' });
         }
     },
     mounted() {
