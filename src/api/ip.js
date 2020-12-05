@@ -45,12 +45,18 @@ api_request.interceptors.request.use(config => {
 
 api_request.interceptors.response.use(
   function (response) {
-    if (response.data.code === 660 || response.data.code == 700) {
+    if (response.data.code == 700) {
       //如果未登录或者被禁用，就直接跳到登录页面
       localStorage.removeItem('userInfo');
       router.push("/login");
       Message.error(response.data.msg);
       return Promise.reject(response.data);
+    }
+
+    if (response.data.code == 600) {
+      Message.error(response.data.msg);
+      return response;
+
     }
 
     return Promise.resolve(response);

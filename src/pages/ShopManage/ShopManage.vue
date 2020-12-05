@@ -498,7 +498,7 @@ export default {
             let commodityPicture = true;
             let skuSwitch = true;
             // console.log(data)
-            if (!data.name) {
+            if (data.name == '') {
                 this.$message.warning('请输入商品名称');
                 return;
             }
@@ -569,7 +569,7 @@ export default {
                 }
                 data.skuList.map((item) => {
                     if (!item.specName || !item.originalPrice || !item.statisticalPrice) {
-                        this.$message.warning('请输入商品规格');
+                        this.$message.warning('请输入正确的商品规格');
                         skuSwitch = false;
                     }
                 });

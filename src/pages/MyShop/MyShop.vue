@@ -5,13 +5,16 @@
             <div class="left-wrap">
                 <h4>
                     <span>店铺信息</span>
-                    <el-button type="primary" @click="editShopInfo">编辑</el-button>
+                    <el-button type="primary" @click="putawayStore" v-if="isReadonly">申请上架店铺</el-button>
                     <el-button
-                        :type="recoType == 1 ? 'primary' : recoType == 2 ? 'warning' : 'success'"
+                        :disabled="recoType != 1"
+                        :type="recoType == 1 ? 'primary' : recoType == 2 ? 'info' : 'success'"
                         @click="storeRecommend"
-                        v-if="!isReadonly && recoType"
+                        v-if="isReadonly && recoType"
                         >{{ recoType | recoType }}
                     </el-button>
+                    <el-button type="primary" v-if="isReadonly" @click="editShopInfo">编辑</el-button>
+
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly && !isUpdate">暂存数据</el-button>
                     <el-button @click="cancelSubmit" v-if="!isReadonly && isUpdate">取消</el-button>
@@ -1089,6 +1092,40 @@ export default {
             }
         },
 
+        //申请上架店铺/下架店铺
+        putawayStore() {
+            let txt = '';
+            if (xx == 0) {
+                txt = '是否向平台申请上架店铺，为保证呈现给用户的数据准确性，上架成功后需再次申请下架店铺才能进行资料变更';
+            }
+
+            if (xx == 1) {
+                txt = '是否向平台申请下架店铺，为保证呈现给用户的数据准确性，下架成功后需重新提交上架店铺审核，通过后则能在App展示';
+            }
+
+            this.$confirm(txt, '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    this.$get('').then((res) => {
+                        if (res.code === 0) {
+                            this.$message.success('申请成功');
+                        }
+                    });
+                })
+                .catch(() => {});
+        },
+
+        //获取上架/下架店铺状态
+        getPutawayStoreStatus() {
+            this.$get('').then((res) => {
+                if (res.code === 0) {
+                    // this. = res.data.type;
+                }
+            });
+        },
+
+
         //申请商家推荐
         storeRecommend() {
             if (this.recoType == 1) {
@@ -1497,7 +1534,6 @@ export default {
 
         //编辑商铺信息
         editShopInfo() {
-            this.storeRecommendType(); //获取申请商家推荐状态
             this.editShopInit(); //初始化操作
             this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
             this.getShopType(); //获取店铺类型
@@ -2137,7 +2173,7 @@ export default {
         getStoreInfo() {
             this.wrapLoading = true;
             this.$get('/merchant/store/getStoreInfo').then((res) => {
-                if (res.code == 0) {
+                if (res.code === 0) {
                     let result = res.data;
                     this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
@@ -2190,6 +2226,8 @@ export default {
 
                     //座位属性回显
                     this.showSeatAtt();
+
+                    this.storeRecommendType(); //获取申请商家推荐状态
 
                     this.wrapLoading = false;
 

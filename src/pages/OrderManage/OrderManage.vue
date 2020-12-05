@@ -807,7 +807,7 @@ export default {
 
         //到店操作
         reachStore() {
-            this.isHandleRequest(this.upSeatId, 4);
+            this.isHandleRequest(this.upSeatId, 4,this.reachStoreCode);
         },
 
         //到店操作对话框中的取消按钮
@@ -817,10 +817,11 @@ export default {
         },
 
         //是否到店与是否消费请求
-        isHandleRequest(id, status) {
+        isHandleRequest(id, status, smsCode = '') {
             let data = {
                 id,
-                status
+                status,
+                smsCode
             };
 
             this.$put('/merchant/store/order/status', data).then((res) => {
@@ -831,29 +832,12 @@ export default {
                 } else {
                     this.$message.error(res.msg);
                 }
+                this.reachStoreCode = '';
             });
-        },
-
-        //是否到店确认
-        isReachStore(row) {
-            this.$confirm('是否确认到店?', '提示', {
-                distinguishCancelAndClose: true,
-                confirmButtonText: '已到店',
-                cancelButtonText: '未到店',
-                type: 'warning'
-            })
-                .then(() => {
-                    this.isHandleRequest(row.id, 4); //已到店
-                })
-                .catch((action) => {
-                    action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
-                });
         },
 
         //是否离店确认
         isConComplete(row) {
-            console.log('xxx', row);
-
             this.$confirm('是否确认离店?', '提示', {
                 distinguishCancelAndClose: true,
                 confirmButtonText: '已离店',
@@ -867,6 +851,22 @@ export default {
                     // action === 'cancel' && this.isHandleRequest(row.id, 5); //未消费
                 });
         }
+
+        //是否到店确认
+        // isReachStore(row) {
+        //     this.$confirm('是否确认到店?', '提示', {
+        //         distinguishCancelAndClose: true,
+        //         confirmButtonText: '已到店',
+        //         cancelButtonText: '未到店',
+        //         type: 'warning'
+        //     })
+        //         .then(() => {
+        //             this.isHandleRequest(row.id, 4); //已到店
+        //         })
+        //         .catch((action) => {
+        //             action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
+        //         });
+        // },
     },
 
     mounted() {

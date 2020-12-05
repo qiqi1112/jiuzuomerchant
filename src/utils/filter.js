@@ -236,10 +236,10 @@ Vue.filter("recoType", function (oldVal) {
             newVal = '申请商家推荐';
             break;
         case 2:
-            newVal = '等待审核';
+            newVal = '商家推荐审核中';
             break;
         case 3:
-            newVal = '申请成功';
+            newVal = '商家推荐申请成功';
             break;
     }
     return newVal;

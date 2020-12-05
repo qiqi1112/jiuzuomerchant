@@ -19,7 +19,7 @@
                 header-cell-class-name="table-header"
                 @row-dblclick="lineDb"
             >
-                <el-table-column prop="id" label="ID" fixed width="180" align="center"></el-table-column>
+                <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="userName" min-width="150" label="评论用户"></el-table-column>
                 <el-table-column prop="content" min-width="280" label="评论详情">
                     <template slot-scope="scope">
@@ -33,8 +33,9 @@
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
-                            v-for="(item,index) in scope.row.appraisePictureList" :key="index"
-                            :src="imgHead+item"
+                            v-for="(item, index) in scope.row.appraisePictureList"
+                            :key="index"
+                            :src="imgHead + item"
                         ></el-image>
                     </template>
                 </el-table-column>
@@ -83,7 +84,7 @@
                                 <div>{{ form.appraiseLevel }}</div>
                             </el-form-item>
                             <el-form-item label="评论时间">
-                                <div>{{form.createTime}}</div>
+                                <div>{{ form.createTime }}</div>
                             </el-form-item>
                             <el-form-item label="标签" v-if="form.labels">
                                 <div class="lab_list">
@@ -95,40 +96,40 @@
                             </el-form-item>
                             <el-form-item label="配图/视频：" v-if="form.pictureList">
                                 <div class="imgs">
-                                    <div v-for="(item,i) in form.pictureList" :key="i" style="display:inline-block">
-                                        <img v-if="item.substr(item.length-3) != 'mp4'" :src="imgHead+item">
+                                    <div v-for="(item, i) in form.pictureList" :key="i" style="display: inline-block">
+                                        <img v-if="item.substr(item.length - 3) != 'mp4'" :src="imgHead + item" />
                                         <video v-else width="320" height="240" controls class="video">
-                                            <source :src="imgHead+item" type="video/mp4">
+                                            <source :src="imgHead + item" type="video/mp4" />
                                             您的浏览器不支持 video 标签。
-                                        </video>    
+                                        </video>
                                     </div>
                                 </div>
                             </el-form-item>
                             <div class="look_more" @click="moreComs" v-if="!more">查看评论</div>
                             <div class="look_more" v-if="more" @click="more = false">收回评论</div>
                             <div class="coms_box" v-if="more">
-                                <div class="reply_num">回复（{{coms_total}}）：</div>
+                                <div class="reply_num">回复（{{ coms_total }}）：</div>
                                 <div class="coms">
-                                    <div v-for="(item,index) in coms_list" :key="index" class="com_li">
+                                    <div v-for="(item, index) in coms_list" :key="index" class="com_li">
                                         <div class="com_top">
                                             <div class="user">
-                                                <span class="user_name">{{item.userName}}</span>
-                                                <span class="com_time">{{item.createTime}}</span>
+                                                <span class="user_name">{{ item.userName }}</span>
+                                                <span class="com_time">{{ item.createTime }}</span>
                                             </div>
                                             <div class="like">
                                                 <i class="iconfont icon-dianzan"></i>
-                                                <span class="like_num">{{item.fabulous}}</span>
-                                                <span>{{index+1}}楼</span>
+                                                <span class="like_num">{{ item.fabulous }}</span>
+                                                <span>{{ index + 1 }}楼</span>
                                             </div>
                                         </div>
                                         <div class="com_text">
-                                            <span>{{item.comment}}</span>
-                                            <template v-if="item.childList.length>0">
-                                                <div v-for="(child,i) in item.childList" :key="i" class="child_com">
+                                            <span>{{ item.comment }}</span>
+                                            <template v-if="item.childList.length > 0">
+                                                <div v-for="(child, i) in item.childList" :key="i" class="child_com">
                                                     <div class="com_text">
                                                         <span class="reply" v-if="child.userId == child.master">楼主回复:</span>
-                                                        <span class="reply" v-else>{{child.userName}}:</span>
-                                                        <span>{{child.comment}}</span>
+                                                        <span class="reply" v-else>{{ child.userName }}:</span>
+                                                        <span>{{ child.comment }}</span>
                                                     </div>
                                                 </div>
                                             </template>
@@ -158,9 +159,9 @@ export default {
                 pageSize: 20,
                 tel: ''
             },
-            com:{
+            com: {
                 pageIndex: 1,
-                pageSize: 200,
+                pageSize: 200
             },
             imgHead: this.$imgHead,
             doing: '',
@@ -168,9 +169,9 @@ export default {
             pageTotal: null,
             editVisible: false,
             tableData: [],
-            coms_list:[],//子评论列表
-            more:false,
-            coms_total:'',//子评论总数
+            coms_list: [], //子评论列表
+            more: false,
+            coms_total: '' //子评论总数
         };
     },
     created() {
@@ -181,7 +182,7 @@ export default {
             let data = {
                 pageNo: this.pageIndex,
                 pageSize: this.pageSize,
-                keywords:this.text
+                keywords: this.text
             };
             this.$post('/merchant/store/appraise/appraiseListByStoreId', data).then((res) => {
                 if (res.code == 0) {
@@ -191,7 +192,7 @@ export default {
                     //     this.$set(i, 'labels', lab);
                     // });
                     this.tableData = res.data.list;
-                    this.pageTotal = res.data.total
+                    this.pageTotal = res.data.total;
                 } else {
                     this.$message({ message: res.mesg, type: 'warning' });
                 }
@@ -208,14 +209,14 @@ export default {
         },
         // 编辑操作
         handleEdit(index = '', row = '') {
-            this.more = false
+            this.more = false;
             this.$get(`/merchant/store/appraise/getById/${row.id}`).then((res) => {
-                if(res.code == 0){
+                if (res.code == 0) {
                     this.editVisible = true;
                     this.idx = index;
-                    this.form = res.data
-                }else{
-                    this.$message.error(res.data);        
+                    this.form = res.data;
+                } else {
+                    this.$message.error(res.data);
                 }
             });
             // this.form = {};
@@ -239,22 +240,22 @@ export default {
             this.getData();
         },
         // 查看帖子详情
-        moreComs(){
+        moreComs() {
             let data = {
                 pageNo: this.com.pageIndex,
                 pageSize: this.com.pageSize,
                 aid: this.form.id
-            }
-            this.$post(`/merchant/store/appraise/firstList`,data).then((res) => {
-                if(res.code == 0){
-                    this.more = true
-                    this.coms_list = res.data.list
-                    this.coms_total = res.data.total
-                }else{
-                    this.$message.error(res.msg);        
+            };
+            this.$post(`/merchant/store/appraise/firstList`, data).then((res) => {
+                if (res.code == 0) {
+                    this.more = true;
+                    this.coms_list = res.data.list;
+                    this.coms_total = res.data.total;
+                } else {
+                    this.$message.error(res.msg);
                 }
             });
-        },
+        }
     }
 };
 </script>
@@ -299,63 +300,63 @@ export default {
         width: 200px;
         display: inline-block;
     }
-    .look_more{
+    .look_more {
         padding-left: 90px;
         cursor: pointer;
-        &:hover{
-            color: #409EFF;
+        &:hover {
+            color: #409eff;
         }
     }
-    .coms_box{
+    .coms_box {
         height: 300px;
         overflow-y: scroll;
-        .reply_num{
+        .reply_num {
             line-height: 42px;
         }
-        .coms{
+        .coms {
             margin-left: 30px;
             padding-right: 40px;
-            .com_li{
+            .com_li {
                 padding-bottom: 12px;
                 margin-bottom: 12px;
                 border-bottom: 1px solid #999;
-                .com_top{
+                .com_top {
                     display: flex;
                     margin-bottom: 8px;
                     font-size: 14px;
-                    .user{
+                    .user {
                         flex: 1;
-                        .user_name{
+                        .user_name {
                             margin-right: 24px;
                         }
-                        .com_time{
+                        .com_time {
                             color: #bbb;
                         }
                     }
-                    .like{
+                    .like {
                         flex: 1;
                         text-align: right;
-                        .like_num{
+                        .like_num {
                             margin: 0 30px 0 8px;
                         }
                     }
                 }
-                .com_text{
+                .com_text {
                     font-size: 14px;
                     position: relative;
-                    .iconfont{
+                    .iconfont {
                         position: absolute;
                         left: -25px;
                         cursor: pointer;
                     }
-                    .icon-dui{
-                        color: #409EFF;
+                    .icon-dui {
+                        color: #409eff;
                     }
-                    .child_com{
+                    .child_com {
                         margin-top: 10px;
                     }
-                    .reply{
-                        color: #409EFF;
+                    .reply {
+                        color: #409eff;
                         margin-right: 15px;
                     }
                 }
