@@ -51,6 +51,13 @@ export default new Router({
                     }
                 },
                 {
+                    path: '/begintabledetails',
+                    component: () => import( /* webpackChunkName: "ordermanage" */ '../pages/Begintabledetails/Begintabledetails.vue'),
+                    meta: {
+                        title: '开台详情'
+                    }
+                },
+                {
                     path: '/nummanage',
                     component: () => import( /* webpackChunkName: "nummanage" */ '../pages/NumManage/NumManage.vue'),
                     meta: {

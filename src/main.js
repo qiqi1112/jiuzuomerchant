@@ -8,6 +8,10 @@ import store from './store/store'
 import rongyun from '@/assets/js/rongyun'
 import emoji from '@/assets/js/emoji'
 
+// import libamr from '@/assets/js/libamr'
+// import rongIMVoice from '@/assets/js/rongIMVoice'
+
+
 import './assets/css/icon/iconfont.css';
 import {
     messages
