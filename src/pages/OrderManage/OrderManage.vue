@@ -63,7 +63,7 @@
                 </el-table-column>
                 <el-table-column prop="orderType" label="订单类型">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.orderType == 0 ? '预定桌' : 'AA拼单' }}</span>
+                        <span>{{ scope.row.orderType | orderType }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="orderNo" label="总订单号" min-width="160"></el-table-column>

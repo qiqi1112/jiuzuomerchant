@@ -1,55 +1,57 @@
 <template>
     <div>
-        <ul class="tabs-box">
-            <li v-for="(item, index) in recordList" :key="index">
-                <div v-if="propUserInfo.activeName == 'rowRecord'">
-                    <p>
-                        <span>取号类型：</span>
-                        <span>{{ item.type }}</span>
-                    </p>
-                    <p>
-                        <span>取号状态：</span>
-                        <span>{{ item.isOff == 1 ? '取消' : '未取消' }}</span>
-                    </p>
-                </div>
-                <div v-if="propUserInfo.activeName == 'evalRecord'">
-                    <p>
-                        <span>消费类型：</span>
-                        <span>{{ item.orderType | conType }}</span>
-                    </p>
-                    <p>
-                        <span>打分：</span>
-                        <span>{{ item.appraiseLevel }}</span>
-                    </p>
-                </div>
-                <div v-if="propUserInfo.activeName == 'conRecord'">
-                    <p>
-                        <span>支付方式：</span>
-                        <span>{{ item.payWay | payType }}</span>
-                    </p>
-                    <p>
-                        <span>金额：</span>
-                        <span>{{ item.payAmount }}</span>
-                    </p>
-                </div>
+        <template v-if="recordList.length > 0">
+            <ul class="tabs-box">
+                <li v-for="(item, index) in recordList" :key="index">
+                    <div v-if="propUserInfo.activeName == 'rowRecord'">
+                        <p>
+                            <span>取号类型：</span>
+                            <span>{{ item.type }}</span>
+                        </p>
+                        <p>
+                            <span>取号状态：</span>
+                            <span>{{ item.isOff == 1 ? '取消' : '未取消' }}</span>
+                        </p>
+                    </div>
+                    <div v-if="propUserInfo.activeName == 'evalRecord'">
+                        <p>
+                            <span>消费类型：</span>
+                            <span>{{ item.orderType | conType }}</span>
+                        </p>
+                        <p>
+                            <span>打分：</span>
+                            <span>{{ item.appraiseLevel }}</span>
+                        </p>
+                    </div>
+                    <div v-if="propUserInfo.activeName == 'conRecord'">
+                        <p>
+                            <span>支付方式：</span>
+                            <span>{{ item.payWay | payType }}</span>
+                        </p>
+                        <p>
+                            <span>金额：</span>
+                            <span>{{ item.payAmount }}</span>
+                        </p>
+                    </div>
 
-                <p>
-                    <span>{{ item.createTime }}</span>
-                    <span>{{ item.dayOfWeak | dayOfWeek }}</span>
-                </p>
-            </li>
-        </ul>
-        <!-- 对话框里的标签页数据分页 -->
-        <el-pagination
-            v-if="recordList.length > 0"
-            background
-            layout="prev, pager, next"
-            @current-change="handleCurrentChange"
-            :total="dataListCount"
-            :current-page="currentPage"
-            :page-size="pagesize"
-            class="page"
-        ></el-pagination>
+                    <p>
+                        <span>{{ item.createTime }}</span>
+                        <span>{{ item.dayOfWeak | dayOfWeek }}</span>
+                    </p>
+                </li>
+            </ul>
+            <!-- 对话框里的标签页数据分页 -->
+            <el-pagination
+                background
+                layout="prev, pager, next"
+                @current-change="handleCurrentChange"
+                :total="dataListCount"
+                :current-page="currentPage"
+                :page-size="pagesize"
+                class="page"
+            ></el-pagination>
+        </template>
+        <template v-else>暂无更多记录</template>
     </div>
 </template>
 
@@ -120,20 +122,21 @@ export default {
 .tabs-box {
     li {
         display: flex;
-        justify-content: space-between;
         border-bottom: 1px dashed #ddd;
         padding: 14px 0;
 
         > div {
+            width: 66.6666%;
             display: flex;
-            justify-content: space-between;
 
-            p {
-                margin-right: 200px;
+            > p {
+                width: 50%;
             }
         }
 
         > p:last-child {
+            width: 33.3333%;
+
             span:first-child {
                 margin-right: 20px;
             }

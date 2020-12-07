@@ -90,11 +90,11 @@
                     <div>
                         <p>
                             <span>本店会员：</span>
-                            <span>{{ userInfo.vip }}</span>
+                            <span>{{ userInfo.vip | yesOrNo }}</span>
                         </p>
                         <p>
                             <span>收藏本店：</span>
-                            <span>{{ userInfo.collectionMerchantStatus }}</span>
+                            <span>{{ userInfo.collectionMerchantStatus | yesOrNo }}</span>
                         </p>
                         <p>
                             <span>累计消费：</span>

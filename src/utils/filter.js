@@ -302,3 +302,26 @@ Vue.filter("showAppGoodsType", function (oldVal) {
     }
     return newVal;
 })
+
+//订单类型
+Vue.filter("orderType", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 0:
+            newVal = '预定桌';
+            break;
+        case 1:
+            newVal = 'AA拼单';
+            break;
+        case 2:
+            newVal = '抢座';
+            break;
+        case 3:
+            newVal = '会员卡';
+            break;
+        case 4:
+            newVal = '线下添单';
+            break;
+    }
+    return newVal;
+})
