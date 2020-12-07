@@ -148,7 +148,7 @@
                                                     <template slot="append">￥</template>
                                                 </el-input>
                                                 <span class="tt">赠</span>
-                                                <el-input v-model="domain.minus" class="num" :disabled="readOnly"> </el-input>
+                                                <el-input v-model="domain.minus" class="num" placeholder="自定义商品" :disabled="readOnly"> </el-input>
                                                 <span class="tt">送</span>
                                                 <el-input v-model="domain.give" class="num" :disabled="readOnly">
                                                     <template slot="append">张</template>
@@ -278,6 +278,11 @@ export default {
         // 查看/编辑操作
         handleEdit(index = '', row = '', type) {
             this.form = {};
+            if(row.category == 3){
+                // 当前类型为消费礼券时
+                let arr = row.details.split('赠')
+                row.discountMoney = arr[1]
+            }
             if (row) {
                 this.couId = row.id;
                 if (type == 1) {

@@ -1,0 +1,65 @@
+{
+  "id": "2242867",
+  "name": "admin_shangjia",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "595349",
+      "name": "评论",
+      "font_class": "pinglun",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "1306575",
+      "name": "员工管理",
+      "font_class": "yuangongguanli",
+      "unicode": "e6be",
+      "unicode_decimal": 59070
+    },
+    {
+      "icon_id": "7366414",
+      "name": "财务",
+      "font_class": "caiwu",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "9945087",
+      "name": "优惠券",
+      "font_class": "youhuiquan",
+      "unicode": "e69e",
+      "unicode_decimal": 59038
+    },
+    {
+      "icon_id": "11110995",
+      "name": "仓库",
+      "font_class": "cangku",
+      "unicode": "e67d",
+      "unicode_decimal": 59005
+    },
+    {
+      "icon_id": "12592398",
+      "name": "设置",
+      "font_class": "shezhi",
+      "unicode": "e74b",
+      "unicode_decimal": 59211
+    },
+    {
+      "icon_id": "16063966",
+      "name": "日志",
+      "font_class": "icon_rzhi",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "14095239",
+      "name": "点赞",
+      "font_class": "dianzan",
+      "unicode": "e775",
+      "unicode_decimal": 59253
+    }
+  ]
+}

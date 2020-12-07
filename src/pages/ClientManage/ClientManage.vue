@@ -29,9 +29,11 @@
             <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
                 <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="petName" label="用户昵称"></el-table-column>
-                <el-table-column label="用户手机" min-width="100">
+                <el-table-column label="用户手机" min-width="130">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.phone }}</span>
+                        <el-link @click="getPhone(scope.row.userId)" type="primary"
+                            >{{ scope.row.phone }}<i class="el-icon-phone el-icon--right" style="margin-left: 10px"></i>
+                        </el-link>
                     </template>
                 </el-table-column>
                 <el-table-column label="本店会员" min-width="80">
@@ -60,6 +62,16 @@
                     </template>
                 </el-table-column>
             </el-table>
+
+            <!-- 获取用户隐私号码 -->
+            <el-dialog :visible.sync="priNumberDialog" class="priNumber-dialog">
+                <span class="add-classify-title">动态号码</span>
+                <h2 style="margin-bottom: 10px">用户动态号码请在2分钟内使用</h2>
+                <h2>{{ priNumber }}</h2>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="priNumberDialog = false">确 定</el-button>
+                </div>
+            </el-dialog>
 
             <!-- 对话框 -->
             <el-dialog :visible.sync="dialogFormVisible" @close="handleClose">
@@ -162,6 +174,9 @@ export default {
 
             userInfo: {}, //用户相关属性
 
+            priNumber: '', //用户隐私号码
+            priNumberDialog: false, //用户隐私号码弹窗开关
+
             //传给子组件的值
             propUserInfo: {
                 userId: '',
@@ -177,6 +192,18 @@ export default {
     },
 
     methods: {
+        //获取用户隐私号码
+        getPhone(userId) {
+            this.$post(`/merchant/store/customer/customer/${userId}`).then((res) => {
+                if (res.code === 0) {
+                    this.priNumber = res.data;
+                    this.priNumberDialog = true;
+                } else {
+                    this.$message.error(res.msg);
+                }
+            });
+        },
+
         //表格数据页码发生变化后
         handleCurrentChange(val) {
             this.currentPage = val;
@@ -248,6 +275,13 @@ export default {
 
 /deep/.el-dialog__header {
     padding: 0;
+}
+
+/deep/.priNumber-dialog {
+    .el-dialog {
+        text-align: center;
+        width: 30%;
+    }
 }
 
 .add-classify-title {

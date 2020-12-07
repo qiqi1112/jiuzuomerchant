@@ -135,7 +135,7 @@
                     </div>
                     <div class="banner" v-loading="loading">
                         <div class="imgs">
-                            <p>活动Banner图:</p>
+                            <p>活动详情宣传图:</p>
                             <el-upload
                                 class="avatar-uploader"
                                 action="fakeaction"
@@ -150,6 +150,7 @@
                             <el-dialog :visible.sync="dialogVisible">
                                 <img width="100%" :src="dialogImageUrl" alt="" />
                             </el-dialog>
+                            <span>（*请上传尺寸大小为351*154，格式为jpg/jpeg/png的图片）</span>
                         </div>
                     </div>
 
@@ -170,6 +171,7 @@
                             <el-dialog :visible.sync="dialogVisible1">
                                 <img width="100%" :src="dialogImageUrl1" alt="" />
                             </el-dialog>
+                            <span>(*请上传尺寸大小为120*120，格式为jpg/jpeg/png的图片）</span>
                         </div>
                     </div>
                 </div>

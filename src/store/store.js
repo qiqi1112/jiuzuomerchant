@@ -10,6 +10,8 @@ const store = new Vuex.Store({
         popupState1:false,  
         popupState2:false, 
         showChatRoom:true,
+        newMsgArr:[],//聊天 监听到新消息
+        newMsgNum:0,//用户 聊天页面  监听是否有新消息
     },
     getters:{
 
@@ -27,7 +29,13 @@ const store = new Vuex.Store({
         },
         showChat(state,val){
             state.showChatRoom = val
-        }
+        },
+        newMsg(state,val){
+            state.newMsgArr.push(val)
+        },
+        newMsgState(state,num){
+            state.newMsgNum = num
+        },
     },
     // getters:{
     //     nameInfo(state){

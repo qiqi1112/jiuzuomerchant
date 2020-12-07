@@ -1,24 +1,26 @@
 <template>
     <div id="app" @click="close">
-        <!-- <chatRoom></chatRoom> -->
+        <template v-if="$store.state.showChatRoom">
+            <chatRoom></chatRoom>
+        </template>
         <router-view></router-view>
     </div>
 </template>
 <script>
-// import chatRoom from './components/common/ChatRoom'
+import chatRoom from './components/common/ChatRoom';
 export default {
     data() {
         return {};
     },
     created() {},
     components: {
-        // chatRoom
+        chatRoom
     },
     methods: {
         close() {
             this.$store.commit('change', 2);
         }
-    }
+    },
 };
 </script>
 <style lang='less'>

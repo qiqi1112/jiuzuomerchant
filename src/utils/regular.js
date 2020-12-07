@@ -1,8 +1,8 @@
 /*
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2020-10-21 14:20:19
+ * @Last Modified by: xu.xiao
+ * @Last Modified time: 2020-12-05 18:13:42
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -118,6 +118,53 @@ function timestampToTime(timestamp) {
 }
 
 
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+    var dataURL = canvas.toDataURL("image/" + ext);
+    return dataURL;
+}
+
+function compress(base64String, w, quality) {
+    var getMimeType = function (urlData) {
+        var arr = urlData.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1];
+        // return mime.replace("image/", "");
+        return mime;
+    };
+    var newImage = new Image();
+    var imgWidth, imgHeight;
+
+    var promise = new Promise(resolve => newImage.onload = resolve);
+    newImage.src = base64String;
+    return promise.then(() => {
+        imgWidth = newImage.width;
+        imgHeight = newImage.height;
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        if (Math.max(imgWidth, imgHeight) > w) {
+            if (imgWidth > imgHeight) {
+                canvas.width = w;
+                canvas.height = w * imgHeight / imgWidth;
+            } else {
+                canvas.height = w;
+                canvas.width = w * imgWidth / imgHeight;
+            }
+        } else {
+            canvas.width = imgWidth;
+            canvas.height = imgHeight;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height);
+        var base64 = canvas.toDataURL(getMimeType(base64String), quality);
+        return base64;
+    });
+}
+
 export default {
     phone,
     money,
@@ -127,5 +174,7 @@ export default {
     inputText,
     timestampToTime,
     deep,
-    pureNumber
+    pureNumber,
+    getBase64Image,
+    compress
 }

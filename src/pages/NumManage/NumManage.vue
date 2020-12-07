@@ -23,7 +23,7 @@
                 
                 <div>
                     <el-button @click="call()" type="primary" icon="el-icon-dish">呼叫下一位</el-button>
-                    <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button>
+                    <!-- <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button> -->
                 </div>
             </div>
 
@@ -611,7 +611,7 @@ export default {
         position: fixed;
         width: 90%;
         background: #f7f7f7;
-        z-index: 2222;
+        z-index: 100;
         padding: 20px 0;
         padding-left: 15px;
         box-shadow: 0 1px 3px #ececec;

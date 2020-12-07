@@ -176,13 +176,10 @@ Vue.filter("payStatus", function (oldVal) {
     let newVal = '';
     switch (oldVal) {
         case 0:
-            newVal = '已支付';
+            newVal = '未支付';
             break;
         case 1:
-            newVal = '待支付';
-            break;
-        case 2:
-            newVal = '未支付';
+            newVal = '已支付';
             break;
     }
     return newVal;
@@ -239,10 +236,27 @@ Vue.filter("recoType", function (oldVal) {
             newVal = '申请商家推荐';
             break;
         case 2:
-            newVal = '等待审核';
+            newVal = '商家推荐审核中';
             break;
         case 3:
-            newVal = '申请成功';
+            newVal = '商家推荐申请成功';
+            break;
+    }
+    return newVal;
+})
+
+//商家上下架状态
+Vue.filter("putawayStatus", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 1:
+            newVal = '申请店铺下线';
+            break;
+        case 2:
+            newVal = '申请店铺上线';
+            break;
+        case 3:
+            newVal = '申请中';
             break;
     }
     return newVal;

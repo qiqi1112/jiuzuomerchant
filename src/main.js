@@ -5,7 +5,10 @@ import {VueJsonp} from 'vue-jsonp'
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import store from './store/store'
-import VueSocketIO from 'vue-socket.io'
+import rongyun from '@/assets/js/rongyun'
+import emoji from '@/assets/js/emoji'
+
+import './assets/css/icon/iconfont.css';
 import {
     messages
 } from './components/common/i18n';
@@ -23,7 +26,7 @@ import {
     file_get,
     file_post,
     imgHead,
-    fileUploadUrl
+    fileUploadUrl,
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
 import regular from './utils/regular'
@@ -42,8 +45,8 @@ Vue.prototype.$file_get = file_get;
 Vue.prototype.$file_post = file_post;
 Vue.prototype.$imgHead = imgHead;
 Vue.prototype.$fileUploadUrl = fileUploadUrl;
-
-
+// Vue.prototype.$ry = rongyun
+// Vue.prototype.$emoji = emoji
 
 
 Vue.config.productionTip = false;
@@ -67,23 +70,7 @@ router.beforeEach((to, from, next) => {
         next('/login');
     } else {
         if (role) {
-            // Vue.use(new VueSocketIO({
-            //     debug: false,
-            //     connection: 'http://192.168.31.94:9210',
-            //     vuex: {
-            //         store,
-            //         actionPrefix: 'SOCKET_',
-            //         mutationPrefix: 'SOCKET_'
-            //     },
-            //     options: {
-            //         path: "/socket.io",
-            //         transports: ['websocket','polling'],
-            //         query: {
-            //             token:role.token ,
-            //             signature:'customer'
-            //         }
-            //     }
-            // }))
+
         }
         next()
     }

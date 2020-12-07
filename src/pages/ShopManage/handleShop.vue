@@ -4,7 +4,7 @@
             <el-form ref="goodsForm" :model="goodsForm" label-width="80px">
                 <div class="good-name-box">
                     <div>
-                        <span>商品名称：</span>
+                        <span>*商品名称：</span>
                         <el-input v-model="goodsForm.name" style="width: 160px"></el-input>
                     </div>
                     <div>
@@ -21,7 +21,7 @@
                 <!-- 商品规格 -->
                 <template v-if="activeNum != 1 && activeNum != 11">
                     <p class="drinks-spec">
-                        <span>商品规格：</span>
+                        <span>*商品规格：</span>
                         <el-form
                             :model="goodsForm.dynamicValidateForm"
                             ref="goodsForm.dynamicValidateForm"
@@ -36,14 +36,18 @@
                                 ></el-input>
                                 <el-input
                                     v-model="item.originalPrice"
-                                    placeholder="如：9.99"
+                                    placeholder="原价（如：9.99）"
                                     style="width: 170px; margin-right: 10px"
                                 >
                                     <template slot="append">￥</template>
                                 </el-input>
-                                <!-- <el-input v-model="item.presentPrice" placeholder="现价（如：9.99）" style="width: 170px; margin-right: 10px">
-                                <template slot="append">￥</template>
-                            </el-input> -->
+                                <el-input
+                                    v-model="item.statisticalPrice"
+                                    placeholder="现价（如：9.99）"
+                                    style="width: 170px; margin-right: 10px"
+                                >
+                                    <template slot="append">￥</template>
+                                </el-input>
                                 <el-button @click="addDomain">
                                     <i class="el-icon-plus"></i>
                                 </el-button>
@@ -73,7 +77,7 @@
                 <template v-if="activeNum == 1">
                     <!-- 套餐选择单品 -->
                     <p>
-                        <span>选择商品：</span>
+                        <span>*选择商品：</span>
                         <el-select
                             v-model="goodName"
                             filterable
@@ -122,9 +126,9 @@
                         </el-table>
                     </p>
                     <p>
-                        <span>套餐原单价：</span>
+                        <span>*套餐原单价：</span>
                         <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px" readonly></el-input>
-                        <span>套餐现单价：</span>
+                        <span>*套餐现单价：</span>
                         <el-input v-model="goodsForm.comboNowPrice" style="width: 120px"></el-input>
                     </p>
                 </template>
@@ -132,10 +136,13 @@
                 <!-- 会员卡 -->
                 <template v-if="activeNum == 11">
                     <p>
-                        <span>会员卡积分：</span>
+                        <span>*会员卡积分：</span>
                         <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
 
-                        <span>商品单价：</span>
+                        <span>*会员卡原价：</span>
+                        <el-input v-model="goodsForm.statisticalPrice" style="width: 120px; margin-right: 20px"></el-input>
+
+                        <span>*会员卡现价：</span>
                         <el-input v-model="goodsForm.nowPrice" style="width: 120px"></el-input>
                     </p>
                 </template>
@@ -163,7 +170,7 @@
                     <img v-if="goodsForm.bannerImageUrl" :src="showImgPrefix + goodsForm.bannerImageUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
-                <span v-if="goodsForm.checkedBanner == 1">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
+                <span v-if="goodsForm.checkedBanner == 1">（*选填，请上传尺寸为351*140，格式为jpg/jpeg/png的图片）</span>
             </template>
 
             <!-- 酒水上传广告图与推荐位图 -->
@@ -191,7 +198,7 @@
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
 
-                            <span v-if="goodsForm.checkedBanner == 1">（*选填，如需商店轮播推荐，请添加广告图片 351*86）</span>
+                            <span v-if="goodsForm.checkedBanner == 1">（*选填，请上传尺寸为351*140，格式为jpg/jpeg/png的图片）</span>
                         </div>
                     </div>
 
@@ -223,7 +230,7 @@
                                 <img v-if="goodsForm.recoImageUrl" :src="showImgPrefix + goodsForm.recoImageUrl" class="avatar" />
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
-                            <span v-if="goodsForm.checkedReco == 1">（*如需商家推荐，请添加推荐位图片 120*160）</span>
+                            <span v-if="goodsForm.checkedReco == 1">（*选填，请上传尺寸为120*160，格式为jpg/jpeg/png的图片）</span>
                         </div>
                     </div>
                 </div>
@@ -234,7 +241,7 @@
                 <!-- 缩略图 -->
                 <div class="thum-img-box">
                     <p>
-                        <span>商品缩略图：</span>
+                        <span>*商品缩略图：</span>
                         <el-upload
                             class="avatar-uploader"
                             action="1"
@@ -246,28 +253,32 @@
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </p>
+                    <span>（*请上传尺寸为80*80，格式为jpg/jpeg/png的图片）</span>
                 </div>
 
                 <!-- 详情图 -->
-                <p>
-                    <span>商品详情图：</span>
-                    <el-upload
-                        class="avatar-uploader detail-img-box"
-                        action="1"
-                        :show-file-list="false"
-                        :http-request="uploadDetailFiles"
-                        :on-error="uploadError"
-                    >
-                        <img v-if="goodsForm.detailImageUrl" :src="showImgPrefix + goodsForm.detailImageUrl" class="avatar" />
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </p>
+                <div class="details-img-box">
+                    <p>
+                        <span>*商品详情图：</span>
+                        <el-upload
+                            class="avatar-uploader detail-img-box"
+                            action="1"
+                            :show-file-list="false"
+                            :http-request="uploadDetailFiles"
+                            :on-error="uploadError"
+                        >
+                            <img v-if="goodsForm.detailImageUrl" :src="showImgPrefix + goodsForm.detailImageUrl" class="avatar" />
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                    </p>
+                    <span>（*请上传尺寸为351*181，格式为jpg/jpeg/png的图片）</span>
+                </div>
             </template>
 
             <!-- 会员卡卡片列表 -->
             <template>
                 <div class="vip-card-wrap" v-if="activeNum == 11">
-                    <span>商品缩略图：</span>
+                    <span>*会员卡缩略图：</span>
                     <div class="image-box" v-if="thumImageBox">
                         <img
                             ref="thumImg"
@@ -300,9 +311,7 @@ export default {
         };
     },
 
-    created() {
-       
-    },
+    created() {},
 
     watch: {
         //如果切换到会员卡页面就加载会员卡卡片列表
@@ -443,6 +452,7 @@ export default {
                 specName: '', //规格
                 originalPrice: '', //规格原价
                 presentPrice: '', //规格现价
+                statisticalPrice: '', //新增的现价
                 skuCode: '' //sku码
             });
         },
@@ -547,7 +557,7 @@ export default {
     }
 
     .left-box {
-        width: 70%;
+        width: 68%;
 
         .banner-img-box {
             /deep/.el-upload--text {
@@ -602,7 +612,7 @@ export default {
     }
 
     .right-box {
-        width: 30%;
+        width: 32%;
 
         .detail-img-box {
             /deep/.avatar-uploader-icon {
@@ -619,7 +629,8 @@ export default {
             }
         }
 
-        .thum-img-box {
+        .thum-img-box,
+        .details-img-box {
             margin-bottom: 30px;
 
             > p {
@@ -629,7 +640,7 @@ export default {
 
         .vip-card-wrap {
             > span {
-                min-width: 84px;
+                min-width: 100px;
             }
 
             display: flex;

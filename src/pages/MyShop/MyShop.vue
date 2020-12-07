@@ -5,13 +5,17 @@
             <div class="left-wrap">
                 <h4>
                     <span>店铺信息</span>
-                    <el-button type="primary" @click="editShopInfo">编辑</el-button>
                     <el-button
-                        :type="recoType == 1 ? 'primary' : recoType == 2 ? 'warning' : 'success'"
+                        :disabled="recoType != 1"
+                        :type="recoType == 1 ? 'primary' : recoType == 2 ? 'info' : 'success'"
                         @click="storeRecommend"
-                        v-if="!isReadonly && recoType"
+                        v-if="isReadonly && recoType"
                         >{{ recoType | recoType }}
                     </el-button>
+                    <el-button :disabled="putawayStatus === 3" type="primary" @click="putawayStore" v-if="isReadonly && putawayStatus">{{
+                        putawayStatus | putawayStatus
+                    }}</el-button>
+                    <el-button type="primary" v-if="isReadonly && putawayStatus == 2" @click="editShopInfo">编辑</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly && !isUpdate">暂存数据</el-button>
                     <el-button @click="cancelSubmit" v-if="!isReadonly && isUpdate">取消</el-button>
@@ -110,7 +114,7 @@
                     </div>
 
                     <!-- 新增 -->
-                    <div v-if="!isReadonly">
+                    <div v-if="!isReadonly && servicePhoneArr.length < 3">
                         <el-input v-model="servicePhone" placeholder="客服电话" style="width: 30%; margin-right: 10px" clearable></el-input>
                         <el-button type="primary" @click="addServicePhone">添加</el-button>
                     </div>
@@ -205,7 +209,7 @@
                 <!-- 商品文本域部分 -->
                 <div class="shop-desc">
                     <!-- 商品店面简介 -->
-                    <div class="goods-brief">
+                    <div>
                         <span>商品店面简介：</span>
                         <el-input
                             type="textarea"
@@ -217,6 +221,14 @@
                             show-word-limit
                         ></el-input>
                     </div>
+
+                    <!-- 订单最晚保留时间 -->
+                    <div>
+                        <span>晚于最晚到店时间订单的保留分钟数：</span>
+                        <el-select clearable v-model="latestRetainTime" placeholder="最晚保留时间（分钟）" :disabled="isReadonly">
+                            <el-option v-for="(item, index) in timeQuanArr" :key="index" :label="item" :value="item"></el-option>
+                        </el-select>
+                    </div>
                 </div>
             </div>
 
@@ -227,7 +239,7 @@
                 <div class="shop-info">
                     <!-- banner展示图 -->
                     <div class="banner-box" v-loading="imgLoading.loading">
-                        <p>店铺banner图</p>
+                        <p>店铺顶部展示图</p>
                         <div v-if="isReadonly">
                             <div v-for="(item, index) in bannerShowBox" :key="index">
                                 <!-- 如果匹配到mp4的视频就不回显到图片标签里 -->
@@ -253,6 +265,9 @@
                         >
                             <i class="el-icon-plus"></i>
                         </el-upload>
+                        <span style="word-break: break-all; display: block; width: 76%; font-size: 12px"
+                            >（*请上传尺寸大小为351*181，格式为jpg/jpeg/png/mp4的图片或视频，最多一个视频）</span
+                        >
                     </div>
 
                     <div class="rowNum-box">
@@ -272,10 +287,13 @@
                                 <img v-if="rowNumImageUrl" :src="showImgPrefix + rowNumImageUrl" class="avatar" />
                                 <i class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
+                            <span style="word-break: break-all; display: block; width: 76%; margin-top: 10px; font-size: 12px"
+                                >(*请上传尺寸大小为351*181，格式为jpg/jpeg/png的图片）</span
+                            >
                         </div>
                         <!-- 店铺长图 -->
                         <div class="botm" v-loading="imgLoading.loading4">
-                            <p>店铺长图（用于展示位置变化）</p>
+                            <p>店铺长图</p>
                             <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + appShopImageUrl" class="avatar" />
                             <el-upload
                                 v-else
@@ -289,6 +307,9 @@
                                 <img v-if="appShopImageUrl" :src="showImgPrefix + appShopImageUrl" class="avatar" />
                                 <i class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
+                            <span style="word-break: break-all; display: block; width: 76%; margin-top: 10px; font-size: 12px">
+                                (*请上传尺寸大小为351*154，格式为jpg/jpeg/png的图片，用于展示位置变化）</span
+                            >
                         </div>
                     </div>
 
@@ -308,6 +329,7 @@
                             <img v-if="!!overallImageUrl" :src="showImgPrefix + overallImageUrl" class="avatar" />
                             <i class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
+                        <span></span>
                     </div>
                 </div>
                 <!-- 店铺卡座 -->
@@ -365,6 +387,7 @@
                                 <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
                                     <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
                                         <span
+                                            :title="itemX + '-' + itemY"
                                             ref="seatSpan"
                                             :data-indexX="indexX + 1"
                                             :data-indexY="indexY + 1"
@@ -482,6 +505,17 @@
                     <!-- 当选择ktv时展示的座位属性 -->
                     <div class="ktv-wrap">
                         <div class="ktv-left-box" v-if="isLookKtvInfo">
+                            <!-- 所属楼层 -->
+                            <div>
+                                <span>所属楼层：</span>
+                                <el-input
+                                    :readonly="isReadonly"
+                                    v-model="presentKtvInfo.floor"
+                                    placeholder="所属楼层"
+                                    style="width: 50%"
+                                ></el-input>
+                            </div>
+
                             <!-- 包间类型 -->
                             <div>
                                 <span>包间类型：</span>
@@ -549,7 +583,7 @@
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.haveToilet" label="1">有</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.haveToilet" label="2">无</el-radio>
                             </div>
-                            <!-- 机麻 -->
+                            <!-- 配套设施 -->
                             <div>
                                 <span>配套设施：</span>
                                 <template>
@@ -612,6 +646,7 @@
                                     <div class="longRetain">
                                         <span>最晚保留时间：</span>
                                         <el-select
+                                            clearable
                                             :disabled="isReadonly"
                                             style="width: 50%"
                                             v-model="item.latestTime"
@@ -678,10 +713,11 @@
                                     <div class="longRetain">
                                         <span>最晚保留时间：</span>
                                         <el-select
+                                            clearable
                                             style="width: 50%"
                                             v-model="timeQuanObj.latestTime"
                                             placeholder="最晚保留时间（分钟）"
-                                            :readonly="isReadonly"
+                                            :disabled="isReadonly"
                                         >
                                             <el-option
                                                 v-for="(item, index) in timeQuanArr"
@@ -852,6 +888,8 @@ export default {
             isReadonly: true, //编辑信息开关
             isUpdate: true, //判断当前操作为修改还是新增店铺
 
+            putawayStatus: '', //店铺的申请上下架状态
+
             recoType: '', //申请推荐位状态
             shopId: '', //门店ID
             logoImageUrl: '', //店铺logo
@@ -886,6 +924,7 @@ export default {
 
             goodsBrief: '', //商品店面简介
             shopMatter: '', //订桌注意事项
+            latestRetainTime: '', //晚于最晚保留时间的订单保留分钟数
 
             bannerShowBox: [], //要上传的banner图集和回显的banner图集（回显在自定义的位置）
             bannerImgBox: [], //要回显的banner图集（只能显示在上传图集的容器中）
@@ -947,7 +986,9 @@ export default {
 
             //当前ktv包间对应的详细信息
             presentKtvInfo: {
+                floor: '', //所属楼层
                 roomTypeId: '', //包间类型
+                // roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
@@ -1007,8 +1048,11 @@ export default {
             } else if (!this.goodsBrief) {
                 this.$message.error('请输入商品店名简介');
                 return;
+            } else if (!this.latestRetainTime) {
+                this.$message.error('请选择晚于最晚到店时间订单的保留分钟数');
+                return;
             } else if (this.bannerShowBox.length == 0) {
-                this.$message.error('请上传店铺banner图');
+                this.$message.error('请上传店铺轮播图');
                 return;
             } else if (!this.rowNumImageUrl) {
                 this.$message.error('请上传排号横幅图');
@@ -1049,6 +1093,42 @@ export default {
                 this.districtCode = data.ad_info.adcode;
                 this.searchAddress = data.title;
                 this.trustAddress = data.trustAddress;
+            }
+        },
+
+        //获取上架下架状态
+        getPutawayStatus() {
+            this.$get('/merchant/store/settled/applyOnlineType').then((res) => {
+                if (res.code === 0) {
+                    this.putawayStatus = res.data.type;
+                }
+            });
+        },
+
+        //申请上架店铺/下架店铺
+        putawayStore() {
+            if (this.putawayStatus !== 3) {
+                let txt = '';
+                if (this.putawayStatus == 1) {
+                    txt = '是否向平台申请下线店铺，为保证呈现给用户的数据准确性，下线成功后需重新提交上线店铺审核，通过后则能在App展示';
+                }
+
+                if (this.putawayStatus == 2) {
+                    txt = '是否向平台申请上线店铺，为保证呈现给用户的数据准确性，上线成功后需再次申请下线店铺才能进行资料变更';
+                }
+
+                this.$confirm(txt, '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$get('/merchant/store/settled/applyOnline').then((res) => {
+                            if (res.code === 0) {
+                                this.$message.success('申请成功');
+                                this.getPutawayStatus();
+                            }
+                        });
+                    })
+                    .catch(() => {});
             }
         },
 
@@ -1460,9 +1540,6 @@ export default {
 
         //编辑商铺信息
         editShopInfo() {
-            console.log(this.shopLoca);
-
-            this.storeRecommendType(); //获取申请商家推荐状态
             this.editShopInit(); //初始化操作
             this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
             this.getShopType(); //获取店铺类型
@@ -1470,6 +1547,7 @@ export default {
             this.showBannerVideo(); //回显banner图集里的视频
             this.clearKtvInfo(); //清空ktv包间属性数据
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
+            this.imgUploadWatch('.banner-show-box', this.bannerShowBox, 5); //根据上传的banner图个数，来显示与隐藏上传图标
         },
 
         //请求成功后，处理的操作
@@ -1487,6 +1565,13 @@ export default {
         submitShopRequest() {
             this.wrapLoading = true;
 
+            //不让传过去的banner集合的第一个值为.mp4格式
+            const index = this.bannerShowBox[0].indexOf('mp4');
+            if (index !== -1) {
+                [this.bannerShowBox[0], this.bannerShowBox[1]] = [this.bannerShowBox[1], this.bannerShowBox[0]];
+            }
+
+            //转换ktv相关字段
             let ktvRoomList = [];
             if (this.shopLocaIndex == 3) {
                 ktvRoomList = this.cloneSnacks(); //数组转json形式（赠品）
@@ -1510,6 +1595,7 @@ export default {
                 districtCode: this.districtCode,
                 endTime: this.endBussTime,
                 goodsStoreSynopsis: this.goodsBrief,
+                latestRetainTime: this.latestRetainTime,
                 labels: this.dynamicTags.join(','),
                 layoutPicture: this.overallImageUrl,
                 logo: this.logoImageUrl,
@@ -1537,18 +1623,24 @@ export default {
                 console.log('修改时传的值', data);
 
                 this.$put('/merchant/store/update', data).then((res) => {
-                    if (res.code == 0) {
+                    if (res.code === 0) {
                         this.requestSuccessInit('修改成功');
+                    } else {
+                        this.wrapLoading = false;
+                        this.$message.error(res.msg);
                     }
                 });
             } else {
                 console.log('新增时传的值', data);
 
                 this.$post('/merchant/store/save', data).then((res) => {
-                    if (res.code == 0) {
+                    if (res.code === 0) {
                         this.requestSuccessInit('新增成功');
                         localStorage.removeItem('storageInfo');
                         this.isUpdate = true;
+                    } else {
+                        this.wrapLoading = false;
+                        this.$message.error(res.msg);
                     }
                 });
             }
@@ -2014,7 +2106,9 @@ export default {
         //清空ktv包间属性编辑区域的数据
         clearKtvInfo() {
             this.presentKtvInfo = {
+                floor: '', //所属楼层
                 roomTypeId: '', //包间类型
+                // roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
@@ -2054,7 +2148,9 @@ export default {
 
         //提交保存ktv包间信息
         ktvSureSub() {
-            if (!this.presentKtvInfo.roomTypeId) {
+            if (!this.presentKtvInfo.floor) {
+                this.$message.error('请输入所属楼层');
+            } else if (!this.presentKtvInfo.roomTypeId) {
                 this.$message.error('请选择包间类型');
             } else if (this.presentKtvInfo.roomTimeIntervalList.length == 0) {
                 this.$message.error('请添加时间段分布');
@@ -2068,19 +2164,29 @@ export default {
                     if (!this.ktvRoomList) {
                         this.ktvRoomList = [];
                     }
+
+                    //获取时间段里的所有最低消费
+                    let minConArr = this.presentKtvInfo.roomTimeIntervalList.map((item) => {
+                        return item.minConsumption;
+                    });
+
+                    this.presentKtvInfo.minConsumption = Math.min(...minConArr); //返回ktv包间最小值
+
                     //将当前用户添加的KTV信息存到上传数组中
                     this.ktvRoomList.push(this.presentKtvInfo);
                     this.$message.success('新增成功');
                 }
                 this.clearKtvInfo();
             }
+
+            console.log(this.ktvRoomList);
         },
 
         //回显店铺数据
         getStoreInfo() {
             this.wrapLoading = true;
             this.$get('/merchant/store/getStoreInfo').then((res) => {
-                if (res.code == 0) {
+                if (res.code === 0) {
                     let result = res.data;
                     this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
@@ -2091,6 +2197,7 @@ export default {
                     this.districtCode = result.districtCode;
                     this.endBussTime = result.endTime;
                     this.goodsBrief = result.goodsStoreSynopsis;
+                    this.latestRetainTime = result.latestRetainTime;
                     this.dynamicTags = result.labels.split(',');
                     this.overallImageUrl = result.layoutPicture;
                     this.logoImageUrl = result.logo;
@@ -2133,6 +2240,12 @@ export default {
                     //座位属性回显
                     this.showSeatAtt();
 
+                    //获取申请商家推荐状态
+                    this.storeRecommendType();
+
+                    //获取商家上架下架状态
+                    this.getPutawayStatus();
+
                     this.wrapLoading = false;
 
                     console.log('当前店铺数据', res.data);
@@ -2158,11 +2271,6 @@ export default {
                         .catch(() => {
                             this.$router.push('/index');
                         });
-                } else if (res.code === 660 || res.code === 700) {
-                    this.wrapLoading = false;
-                    localStorage.removeItem('userInfo');
-                    this.$message.error(res.msg);
-                    this.$router.push('/login');
                 }
             });
         },
@@ -2216,6 +2324,7 @@ export default {
                 // submitShopType: this.submitShopType,
                 perCon: this.perCon,
                 goodsBrief: this.goodsBrief,
+                latestRetainTime: this.latestRetainTime,
                 shopMatter: this.shopMatter,
                 bannerImgBox: this.bannerImgBox,
                 bannerShowBox: this.bannerShowBox,
@@ -2261,6 +2370,7 @@ export default {
                 // this.submitShopType = storageInfo.submitShopType;
                 this.perCon = storageInfo.perCon;
                 this.goodsBrief = storageInfo.goodsBrief;
+                this.latestRetainTime = storageInfo.latestRetainTime;
                 this.shopMatter = storageInfo.shopMatter;
                 this.bannerImgBox = storageInfo.bannerImgBox;
                 this.bannerShowBox = storageInfo.bannerShowBox;
@@ -2298,6 +2408,14 @@ export default {
 
         //座位行数/列数改变
         changeSeatNum() {
+            // this.$confirm('修改行列将会清空之前配置的座位信息，确定要修改吗？', '警告', {
+            //         type: 'warning'
+            //     })
+            //         .then(() => {
+
+            //         })
+            //         .catch(() => {});
+
             if (!this.isReadonly && this.x % 1 == 0 && this.y % 1 == 0) {
                 this.isClickSeat = false;
                 this.createSeatFn(); //创建座位
@@ -2346,12 +2464,6 @@ export default {
     created() {
         this.getShopType(); //获取店铺类型
         this.getKtvType(); //获取ktv包间类型
-
-        // if (process.env.NODE_ENV === 'development') {
-        //     this.showImgPrefix = this.$imgHead;
-        // } else {
-        //     this.showImgPrefix = 'https://store.cdhqht.com/merchant/store/system/upload/down?keyName=';
-        // }
     },
 
     mounted() {
@@ -2474,7 +2586,9 @@ export default {
     }
 
     .shop-desc {
-        .goods-brief {
+        margin-bottom: 50px;
+
+        > div {
             display: flex;
             align-items: center;
             margin-bottom: 30px;
@@ -2686,7 +2800,7 @@ export default {
         }
 
         .banner-box {
-            width: 38%;
+            width: 50%;
             /deep/ .el-upload-list--picture-card .el-upload-list__item {
                 transition: none;
             }
@@ -2715,6 +2829,8 @@ export default {
         }
 
         .overall-box {
+            width: 20%;
+
             > p {
                 margin-bottom: 10px;
             }
@@ -2737,6 +2853,8 @@ export default {
         }
 
         .rowNum-box {
+            width: 30%;
+
             div {
                 > p {
                     margin-bottom: 10px;
@@ -2749,7 +2867,7 @@ export default {
             }
 
             div.top {
-                margin-bottom: 30px;
+                margin-bottom: 50px;
             }
 
             /deep/ .el-upload--text {
@@ -2918,7 +3036,7 @@ export default {
                 max-height: 420px;
                 width: 70%;
                 overflow-y: auto;
-                margin-bottom: 0;
+                margin: 20px 0;
             }
 
             .date-dist {
@@ -2926,6 +3044,10 @@ export default {
                 border-radius: 4px;
                 padding: 20px 20px 10px;
                 margin-bottom: 20px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
 
                 > div {
                     width: 100%;
@@ -3156,7 +3278,7 @@ export default {
 }
 
 .aisle-book {
-    background-color: #ddd !important;
+    background-color: #999 !important;
     border: 1px solid transparent !important;
 }
 
@@ -3220,7 +3342,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     border: 1px solid transparent;
-    background-color: #ddd !important;
+    background-color: #999 !important;
     cursor: pointer;
 }
 </style>

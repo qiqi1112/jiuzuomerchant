@@ -14,8 +14,17 @@
                     <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort" style="margin-right: 10px"
                         >添加商品</el-button
                     >
-                    <el-button v-if="goodsData.length > 0" type="danger" icon="el-icon-delete" @click="isSelect = true">批量删除</el-button>
-                    <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll">确定</el-button>
+                    <el-button
+                        v-if="goodsData.length > 0"
+                        type="danger"
+                        icon="el-icon-delete"
+                        @click="isSelect = true"
+                        style="margin-right: 10px"
+                        >批量删除</el-button
+                    >
+                    <el-button v-if="isSelect && goodsData.length > 0" type="warning" @click="sureDelAll" style="margin-right: 10px"
+                        >确定</el-button
+                    >
                     <el-button v-if="isSelect && goodsData.length > 0" @click="cancelDelete">取消</el-button>
                 </el-row>
 
@@ -24,7 +33,7 @@
                     <el-button type="primary" @click="handleSelGoodsType" class="mr10" v-if="goodsData.length > 0">APP展示选择</el-button>
                     <el-input
                         v-model="searchName"
-                        @keydown.13.native="getGoodsInfo"
+                        @keydown.13.native="searchGoodsInfo"
                         placeholder="商品名称"
                         class="handle-input mr10"
                         clearable
@@ -32,7 +41,7 @@
                     <el-select v-model="value" placeholder="选择分类" class="mr10" style="width: 100px" clearable>
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
-                    <el-button type="primary" icon="el-icon-search" @click="getGoodsInfo">搜索</el-button>
+                    <el-button type="primary" icon="el-icon-search" @click="searchGoodsInfo">搜索</el-button>
                 </div>
             </div>
 
@@ -153,6 +162,7 @@ export default {
                 originPrice: '', //原价
                 nowPrice: '', //现价
                 comboNowPrice: '', //套餐现价
+                statisticalPrice: '', //会员卡原价
                 checkedBanner: false, //商家广告banner位开关
                 checkedReco: false, //商家推荐位开关
                 area: '', //产地
@@ -172,6 +182,7 @@ export default {
                             specName: '', //规格
                             originalPrice: '', //规格原价
                             presentPrice: '', //规格现价
+                            statisticalPrice: '', //新增的现价
                             skuCode: '' //sku码
                         }
                     ]
@@ -240,6 +251,12 @@ export default {
     },
 
     methods: {
+        //搜索操作
+        searchGoodsInfo() {
+            this.currentPage = 1;
+            this.getGoodsInfo(); //请求数据
+        },
+
         //APP展示选择按钮
         handleSelGoodsType() {
             this.$get('/merchant/store/goods/hiddenList').then((res) => {
@@ -327,6 +344,8 @@ export default {
 
                     this.isUpdate = false;
                     this.dialogVisible = true;
+                } else {
+                    this.$message.error(res.msg);
                 }
                 console.log('标题排序', this.titleArrList);
             });
@@ -360,6 +379,7 @@ export default {
                 originPrice: '', //原价
                 nowPrice: '', //现价
                 comboNowPrice: '', //套餐现价
+                statisticalPrice: '', //会员卡原价
                 checkedBanner: false, //商家广告banner位开关
                 checkedReco: false, //商家推荐位开关
                 area: '', //产地
@@ -380,6 +400,7 @@ export default {
                             specName: '', //规格
                             originalPrice: '', //规格原价
                             presentPrice: '', //规格现价
+                            statisticalPrice: '', //新增的现价
                             skuCode: '' //sku码
                         }
                     ]
@@ -460,21 +481,24 @@ export default {
                 id: this.goodId,
                 infoPicture: this.goodsForm.detailImageUrl,
                 presentPrice: this.goodsForm.nowPrice,
+                // statisticalPrice: this.goodsForm.statisticalPrice,
                 recommendAdPicture: this.goodsForm.bannerImageUrl,
                 recommendPicture: this.goodsForm.recoImageUrl,
                 recommendPictureSort: this.goodsForm.recoWeight,
                 setMealGoodsList: this.goodsForm.tableData,
                 skuList: this.goodsForm.dynamicValidateForm.domains,
-                statisticalPrice: this.goodsForm.comboNowPrice,
+                statisticalPrice:
+                    this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
                 year: this.goodsForm.year
             };
+
             console.log(data);
             // 判断传商品价格开关
             let commodityPrice = true;
             let commodityPicture = true;
             let skuSwitch = true;
             // console.log(data)
-            if (!data.name) {
+            if (data.name == '') {
                 this.$message.warning('请输入商品名称');
                 return;
             }
@@ -486,6 +510,7 @@ export default {
             }
             if (this.goodsForm.checkedReco == 1 && !data.recommendPicture) {
                 this.$message.warning('请添加推荐位图片');
+                this.goodsForm.checkedReco = false;
                 return;
             }
             if (this.activeNum == 1) {
@@ -543,8 +568,8 @@ export default {
                     return;
                 }
                 data.skuList.map((item) => {
-                    if (!item.specName || !item.originalPrice) {
-                        this.$message.warning('请输入商品规格');
+                    if (!item.specName || !item.originalPrice || !item.statisticalPrice) {
+                        this.$message.warning('请输入正确的商品规格');
                         skuSwitch = false;
                     }
                 });
@@ -603,6 +628,7 @@ export default {
                         originPrice: res.originalPrice, //原价
                         nowPrice: res.presentPrice, //现价
                         comboNowPrice: res.statisticalPrice, //套餐现价
+                        statisticalPrice: res.statisticalPrice, //会员卡现价
                         checkedBanner: res.recommendAdStatus === 1 ? true : false, //商家广告banner位开关
                         checkedReco: res.recommendStatus === 1 ? true : false, //商家推荐位开关
                         area: res.area, //产地
@@ -635,14 +661,6 @@ export default {
 
             return Math.min(...newArr); //返回最小值
         }
-    },
-
-    created() {
-        // if (process.env.NODE_ENV === 'development') {
-        //     this.showImgPrefix = this.$imgHead;
-        // } else {
-        //     this.showImgPrefix = 'http://47.108.204.66:8078/admin/system/upload/down?keyName=';
-        // }
     },
 
     mounted() {
