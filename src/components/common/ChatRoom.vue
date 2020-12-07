@@ -1,9 +1,16 @@
 <template>
     <div class="chat_room" id="chat_room">
-        <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat"></div>
+        <audio muted="true" autoplay  ref="audio">
+            <source src="/file/merchant/store/system/upload/down?keyName=default/system/message.mp3" type="audio/ogg">
+            <source src="/file/merchant/store/system/upload/down?keyName=default/system/message.mp3" type="audio/mpeg">
+            您的浏览器不支持播放音频，请使用google或其它浏览器
+        </audio>
+        <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat">
+            <span class="all_unread" v-show="$store.state.headerUnread>0">{{$store.state.headerUnread}}</span>
+        </div>
 
         <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh">
-            <div id="service" v-if="showRoom && $store.state.showChatRoom">
+            <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg">
                 <div class="box">
                     <div class="people_list">
                         <ul>
@@ -35,7 +42,21 @@
                                             <div class="msg" v-if="item.messageType == 'ImageMessage'">
                                                 <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
                                             </div>
+                                            <!-- 订单消息 -->
+                                            <div class="msg" v-if="item.senderUserId == '10001'">
+                                                <div class="orderinfo">
+                                                    {{item.content.content}}   
+                                                </div>
+                                            </div>
+                                            <!-- 官方消息 -->
+                                            <div class="msg" v-if="item.senderUserId == '10000'">
+                                                <div class="official">
+                                                    <div>{{item.content.title}}</div>        
+                                                    <div>{{item.content.content}}</div>
+                                                </div>
+                                            </div>
                                         </div>
+
                                         <div class="msg_list self" v-else>
                                             <div class="msg self_msg"  v-if="item.messageType == 'TextMessage'">
                                                 <div>{{item.content.content}}</div>
@@ -61,15 +82,6 @@
                                 </div>
                                 <div class="flexo">
                                     <img class="send_icon" style="height:20px" src="../../assets/img/tupian.png" alt="">
-                                    <!-- <el-upload
-                                        action="fakeaction"
-                                        list-type="picture-card"
-                                        class="up_file"
-                                        :on-preview="handlePictureCardPreview"
-                                        :on-remove="handleRemove">
-                                    </el-upload> -->
-                                    <!-- :on-preview="handlePictureCardPreview"  查看大图-->
-        <!-- list-type="picture-card" -->
                                     <el-upload
                                         v-loading="loading"
                                         action="fakeaction"
@@ -83,7 +95,6 @@
                                         :on-remove="handleRemove"
                                         :on-exceed="exceed"
                                     >
-                                    <!-- <img class="up_icon" style="height:20px" src="../../assets/img/tupian.png" alt=""> -->
                                     </el-upload>
 
                                     <ul v-if="form.list.length>0" class="imgs">
@@ -93,11 +104,6 @@
                                         </li>
                                         <li></li>
                                     </ul>
-
-
-                                    <!-- <el-dialog :visible.sync="dialogVisible">
-                                        <img width="100%" :src="dialogImageUrl" alt="">
-                                    </el-dialog> -->
 
                                 </div>
                             </div>
@@ -178,6 +184,7 @@ export default {
             // firstDomHeight:null,
             // twoDomHeight:null,
             scorllFalse:false,//用于判断 切换会话时 停止监听 滚动条
+            audioUrl:""
         };
     },
 
@@ -209,7 +216,7 @@ export default {
     },
     created(){
         this.selfInfo = JSON.parse(localStorage.getItem('userInfo')) 
-
+        
     },
 
     computed:{
@@ -224,6 +231,47 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
+               
+                if(lastObj.messageType == 'TextMessage'){
+                    this.audioUrl = 'default/system/message.mp3'
+                    this.$notify.info({
+                        title: '提示',
+                        message: '您有一条新的消息',
+                        duration: 5000
+                    });
+                }else if(lastObj.messageType == 'OrderMessage'){
+                    this.audioUrl = 'default/system/message.mp3'
+                    this.$notify.info({
+                        title: '提示',
+                        message: '您有一条新的订单',
+                        duration: 0
+                    });
+                }else if(lastObj.messageType == 'SystemMessage'){
+                    this.audioUrl = 'default/system/message.mp3'
+                    this.$notify.info({
+                        title: '提示',
+                        message: '您有一条新的官方消息',
+                        duration: 5000
+                    });
+                }
+
+                // this.$refs.audio.src = this.imgHead + this.audioUrl
+                // var audio = new Audio()
+                // var source = new Source()
+                // audio.appendChild(source)
+
+                // source.src = this.imgHead + this.audioUrl;
+                // source.type = "audio/mpeg"
+
+                // audio.autoplay = true;
+                
+                // console.log(audio)
+
+                var audio=this.$refs.audio
+                // console.log(audio)
+                // audio.load()
+                // audio.play()
+
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
                 for(let i=0;i<this.userList.length;i++){
@@ -271,6 +319,7 @@ export default {
                             this.msgArr.push(lastObj)
                             // this.$nextTick(this.scrollEnd);
                         }else{
+                            that.$store.state.headerUnread +=1
                             // 当前聊天不是发送人
                         }
                     }else{
@@ -284,54 +333,52 @@ export default {
     },
     filters:{
         formatTime(time,that){
-            let diff = new Date().getTime() - new Date(time).getTime()
-            let getHours,minutes,seconds,leve1,leve2,leve3
-            leve1 =  diff%(24*3600*1000) 
-            getHours = Math.floor(leve1/(3600*1000))
-            leve2 =  leve1%(3600*1000) 
-            minutes = Math.floor(leve2/(60*1000))
-            leve3 = leve2%(60*1000) 
-            seconds = Math.floor(leve3/1000)
+            var s1 = new Date(time),
+            s2 = new Date(),
+            runTime = parseInt((s2.getTime() - s1.getTime()) / 1000);
+            var year = Math.floor(runTime / 86400 / 365);
+            runTime = runTime % (86400 * 365);
+            var month = Math.floor(runTime / 86400 / 30);
+            runTime = runTime % (86400 * 30);
+            var day = Math.floor(runTime / 86400);
+            runTime = runTime % 86400;
+            var hour = Math.floor(runTime / 3600);
+            runTime = runTime % 3600;
+            var minute = Math.floor(runTime / 60);
+            runTime = runTime % 60;
+            var second = runTime;
 
-            let nowHours =  new Date().getHours(); //当前几点
-
-            // 上面获取小时有问题
-            
-            if(getHours>nowHours && getHours<=24){
-                return '昨天' + that.$regular.timeData(time,4)
-            }
-
-            if(getHours>0 && getHours<=3){
-                return getHours + '小时前'
-            }
-
-            if(getHours>3 && getHours<24){
-                return that.$regular.timeData(time,3)
-            }
-            if(getHours>=24 && getHours<48){
-                return that.$regular.timeData(time,1)
-            }
-            if(getHours>=48){
+            if(year>0 || month>0){
                 return that.$regular.timeData(time,3)
             }
 
-            if(minutes>0 && minutes<=10){
-                return minutes + '分钟前'
+            if(day>0){
+                return that.$regular.timeData(time,3)
             }
-            if(minutes>10){
+
+            if(hour>0 && hour<=3){
+                return hour + '小时前'
+            }
+
+            if(hour>3){
                 return that.$regular.timeData(time,4)
             }
 
-            if(seconds>0){
+            if(minute>0 && minute<=10){
+                return minute + '分钟前'
+            }
+
+            if(minute>10){
+                return that.$regular.timeData(time,4)
+            }
+
+            if(second>0){
                 return '刚刚'
             }
         }
     },
 
     methods: {
-        // function addZero(num) {
-        //     return num < 10 ? '0' + num : num
-        // },
         showChat(){
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
             if(isClick == 'true') {
@@ -378,12 +425,14 @@ export default {
         },
         // 清除 未读消息条数
         clearUnreadNum(userId){
+            let that = this
             // 成功获取对话历史后 清空 未读条数
             var conversationType = RongIMLib.ConversationType.PRIVATE;
             var targetId = userId;
             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
                 onSuccess: function(){
                     // 清除未读消息成功
+                    that.allUnreadMsg()
                 },
                 onError: function(error){
                     // that.$message({ message: res.msg, type: 'warning' });
@@ -446,7 +495,7 @@ export default {
                 if(res.code == 0){
                     let newArr = []
                     let userInfo = res.data
-                    list.forEach(v=>{
+                    list.forEach((v,i)=>{
                         // 调用历史记录
                         if(v.messageDirection == 2){
                             v.content['id'] = userInfo.id
@@ -462,6 +511,7 @@ export default {
                     newArr.forEach(v=>{
                         this.msgArr.unshift(v)
                     })
+                    console.log(this.msgArr)
                     if(type == 1){
                         this.$nextTick(this.scrollEnd);
                     }else{
@@ -477,9 +527,7 @@ export default {
                 
             });
         },
-        useImg(base64){
-            console.log(base64)
-        },
+
         send() {
             this.emojiShow = false;
             let that = this
@@ -543,7 +591,7 @@ export default {
                                             info = '不在聊天室中';
                                             break;
                                     }
-                                    console.log('发送失败:' + info + errorCode);
+                                    alert('发送失败:' + info + errorCode);
                                 }
                             });
                         });
@@ -667,7 +715,24 @@ export default {
                 .then(() => {
                     RongIMClient.getInstance().clearConversations({
                         onSuccess: function() {
-                            that.userList = []
+                            that.userList.forEach(v=>{
+                                let conversationType = RongIMLib.ConversationType.PRIVATE;
+                                let targetId = v.targetId;
+                                RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
+                                    onSuccess: function(){
+                                        // 清除未读消息成功
+                                        that.userList = []
+                                        that.now_user = ''
+                                        that.allUnreadMsg()
+                                    },
+                                    onError: function(error){
+                                        // error => 清除未读消息数错误码
+                                        console.log(error)
+                                    }
+                                });
+                            })
+                            return
+
                         },
                         onError: function(error) {
                             that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
@@ -754,10 +819,30 @@ export default {
         },
         exceed(files, fileList){
             this.$message({ message: '一次最多支持发送4张图片', type: 'warning' });
+        },
+
+        // 获取所有未读消息
+        allUnreadMsg(){
+            let that = this
+            RongIMClient.getInstance().getTotalUnreadCount({
+                onSuccess: function(count) {
+                    that.$store.state.headerUnread = count
+                },
+                onError: function(error) {
+                    // error => 获取总未读数错误码
+                    console.log(error)
+                }
+            });
         }
     },
     mounted() {
+        // var audio=this.$refs.audio
+        // if (audio.paused) { //判读是否播放  
+        //     audio.paused=false;
+        //     audio.play(); //没有就播放 
+        // }  
 
+        let that = this
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
 
         if(!localStorage.getItem('userInfo')){
@@ -774,6 +859,7 @@ export default {
         setTimeout(()=>{
             this.conversation()
             this.emoji = RongIMLib.RongIMEmoji.list
+            this.allUnreadMsg()
         },1000)
         // this.scrollEnd();
     },
@@ -792,6 +878,16 @@ export default {
         top: 80%;
         z-index: 20;
         cursor: pointer;
+        .all_unread{
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 2px 5px;
+            background: red;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+        }
     }
     .msg_picture{
         width: 200px;
@@ -936,7 +1032,7 @@ export default {
                         .msg {
                             flex: .92;
                             width: 200px;
-                            div {
+                            &>div {
                                 padding: 10px;
                                 border-radius: 10px;
                                 color: #f3f3f3;

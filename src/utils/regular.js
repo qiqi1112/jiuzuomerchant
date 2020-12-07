@@ -2,7 +2,7 @@
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
  * @Last Modified by: xu.xiao
- * @Last Modified time: 2020-12-05 18:13:42
+ * @Last Modified time: 2020-12-07 09:23:57
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -118,6 +118,7 @@ function timestampToTime(timestamp) {
 }
 
 
+// 图片转base64
 function getBase64Image(img) {
     var canvas = document.createElement("canvas");
     canvas.width = img.width;
@@ -129,6 +130,8 @@ function getBase64Image(img) {
     return dataURL;
 }
 
+
+// 压缩base64
 function compress(base64String, w, quality) {
     var getMimeType = function (urlData) {
         var arr = urlData.split(',');

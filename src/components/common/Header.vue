@@ -15,14 +15,14 @@
                     </el-tooltip>
                 </div>
                 <!-- 消息中心 -->
-                <!-- <div class="btn-bell">
-                    <el-tooltip effect="dark" :content="message ? `有${message}条未读消息` : `消息中心`" placement="bottom">
-                        <router-link to="/tabs">
-                            <i class="el-icon-bell"></i>
-                        </router-link>
+                <div class="btn-bell" @click="information">
+                    <el-tooltip effect="dark" :content="$store.state.headerUnread ? `有${$store.state.headerUnread}条未读消息` : `消息中心`" placement="bottom">
+                        <!-- <router-link to="/tabs">
+                        </router-link> -->
+                        <i class="el-icon-bell"></i>
                     </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div> -->
+                    <span class="btn-bell-badge" v-if="$store.state.headerUnread>0"></span>
+                </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
                     <img :src="logo" />
@@ -94,6 +94,9 @@ export default {
         }
     },
     methods: {
+        information(){
+            this.$store.state.headerClickMsgFun = !this.$store.state.headerClickMsgFun
+        },
         //对话框里的确认操作
         handleConfrim() {
             let data = {

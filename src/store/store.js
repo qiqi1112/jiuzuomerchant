@@ -12,6 +12,8 @@ const store = new Vuex.Store({
         showChatRoom:true,
         newMsgArr:[],//聊天 监听到新消息
         newMsgNum:0,//用户 聊天页面  监听是否有新消息
+        headerUnread:0,//头部  未读消息
+        headerClickMsg:false,//顶部点击消息  弹出 聊天页
     },
     getters:{
 
@@ -36,6 +38,13 @@ const store = new Vuex.Store({
         newMsgState(state,num){
             state.newMsgNum = num
         },
+        headerUnreadFun(state,num){
+            state.headerUnread = num
+        },
+        headerClickMsgFun(state,type){
+            state.headerClickMsg = type
+        }
+
     },
     // getters:{
     //     nameInfo(state){
