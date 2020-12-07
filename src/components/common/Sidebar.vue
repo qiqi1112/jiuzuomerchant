@@ -72,6 +72,11 @@ export default {
                     title: '订单管理'
                 },
                 {
+                    icon: 'el-icon-goblet-square-full',
+                    index: 'begintabledetails',
+                    title: '开台详情'
+                },
+                {
                     icon: 'el-icon-s-grid',
                     index: 'nummanage',
                     title: '排号管理'

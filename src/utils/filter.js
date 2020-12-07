@@ -288,3 +288,47 @@ Vue.filter("showAppGoodsType", function (oldVal) {
     }
     return newVal;
 })
+//订单类型
+Vue.filter("orderType", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 0:
+            newVal = '预定桌';
+            break;
+        case 1:
+            newVal = 'AA拼单';
+            break;
+        case 2:
+            newVal = '抢座';
+            break;
+        case 3:
+            newVal = '会员卡';
+            break;
+        case 4:
+            newVal = '线下添单';
+            break;
+    }
+    return newVal;
+})
+// 价格保留两位
+Vue.filter("returnFloat", function (value) {
+    if (value) {
+        var value = Math.round(parseFloat(value) * 100) / 100;
+        var xsd = value.toString().split(".");
+        if (xsd.length == 1) {
+            value = '￥' + value.toString() + ".00";
+            return value;
+        }
+        if (xsd.length > 1) {
+            if (xsd[1].length < 2) {
+                value = '￥' + value.toString() + "0";
+            } else {
+                value = '￥' + value.toString();
+            }
+            return value;
+        }
+    } else {
+        return '￥' + 0 + '.' + "00"
+    }
+
+})
