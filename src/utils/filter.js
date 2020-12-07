@@ -245,6 +245,23 @@ Vue.filter("recoType", function (oldVal) {
     return newVal;
 })
 
+//商家上下架状态
+Vue.filter("putawayStatus", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 1:
+            newVal = '申请店铺下线';
+            break;
+        case 2:
+            newVal = '申请店铺上线';
+            break;
+        case 3:
+            newVal = '申请中';
+            break;
+    }
+    return newVal;
+})
+
 //APP要展示的商品分类
 Vue.filter("showAppGoodsType", function (oldVal) {
     let newVal = '';

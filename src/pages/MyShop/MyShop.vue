@@ -5,7 +5,6 @@
             <div class="left-wrap">
                 <h4>
                     <span>店铺信息</span>
-                    <el-button type="primary" @click="putawayStore" v-if="isReadonly">申请上架店铺</el-button>
                     <el-button
                         :disabled="recoType != 1"
                         :type="recoType == 1 ? 'primary' : recoType == 2 ? 'info' : 'success'"
@@ -13,8 +12,10 @@
                         v-if="isReadonly && recoType"
                         >{{ recoType | recoType }}
                     </el-button>
-                    <el-button type="primary" v-if="isReadonly" @click="editShopInfo">编辑</el-button>
-
+                    <el-button :disabled="putawayStatus === 3" type="primary" @click="putawayStore" v-if="isReadonly && putawayStatus">{{
+                        putawayStatus | putawayStatus
+                    }}</el-button>
+                    <el-button type="primary" v-if="isReadonly && putawayStatus == 2" @click="editShopInfo">编辑</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly && !isUpdate">暂存数据</el-button>
                     <el-button @click="cancelSubmit" v-if="!isReadonly && isUpdate">取消</el-button>
@@ -582,7 +583,7 @@
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.haveToilet" label="1">有</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.haveToilet" label="2">无</el-radio>
                             </div>
-                            <!-- 机麻 -->
+                            <!-- 配套设施 -->
                             <div>
                                 <span>配套设施：</span>
                                 <template>
@@ -887,6 +888,8 @@ export default {
             isReadonly: true, //编辑信息开关
             isUpdate: true, //判断当前操作为修改还是新增店铺
 
+            putawayStatus: '', //店铺的申请上下架状态
+
             recoType: '', //申请推荐位状态
             shopId: '', //门店ID
             logoImageUrl: '', //店铺logo
@@ -985,6 +988,7 @@ export default {
             presentKtvInfo: {
                 floor: '', //所属楼层
                 roomTypeId: '', //包间类型
+                // roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
@@ -1092,39 +1096,41 @@ export default {
             }
         },
 
-        //申请上架店铺/下架店铺
-        putawayStore() {
-            let txt = '';
-            if (xx == 0) {
-                txt = '是否向平台申请上架店铺，为保证呈现给用户的数据准确性，上架成功后需再次申请下架店铺才能进行资料变更';
-            }
-
-            if (xx == 1) {
-                txt = '是否向平台申请下架店铺，为保证呈现给用户的数据准确性，下架成功后需重新提交上架店铺审核，通过后则能在App展示';
-            }
-
-            this.$confirm(txt, '提示', {
-                type: 'warning'
-            })
-                .then(() => {
-                    this.$get('').then((res) => {
-                        if (res.code === 0) {
-                            this.$message.success('申请成功');
-                        }
-                    });
-                })
-                .catch(() => {});
-        },
-
-        //获取上架/下架店铺状态
-        getPutawayStoreStatus() {
-            this.$get('').then((res) => {
+        //获取上架下架状态
+        getPutawayStatus() {
+            this.$get('/merchant/store/settled/applyOnlineType').then((res) => {
                 if (res.code === 0) {
-                    // this. = res.data.type;
+                    this.putawayStatus = res.data.type;
                 }
             });
         },
 
+        //申请上架店铺/下架店铺
+        putawayStore() {
+            if (this.putawayStatus !== 3) {
+                let txt = '';
+                if (this.putawayStatus == 1) {
+                    txt = '是否向平台申请下线店铺，为保证呈现给用户的数据准确性，下线成功后需重新提交上线店铺审核，通过后则能在App展示';
+                }
+
+                if (this.putawayStatus == 2) {
+                    txt = '是否向平台申请上线店铺，为保证呈现给用户的数据准确性，上线成功后需再次申请下线店铺才能进行资料变更';
+                }
+
+                this.$confirm(txt, '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$get('/merchant/store/settled/applyOnline').then((res) => {
+                            if (res.code === 0) {
+                                this.$message.success('申请成功');
+                                this.getPutawayStatus();
+                            }
+                        });
+                    })
+                    .catch(() => {});
+            }
+        },
 
         //申请商家推荐
         storeRecommend() {
@@ -1617,18 +1623,24 @@ export default {
                 console.log('修改时传的值', data);
 
                 this.$put('/merchant/store/update', data).then((res) => {
-                    if (res.code == 0) {
+                    if (res.code === 0) {
                         this.requestSuccessInit('修改成功');
+                    } else {
+                        this.wrapLoading = false;
+                        this.$message.error(res.msg);
                     }
                 });
             } else {
                 console.log('新增时传的值', data);
 
                 this.$post('/merchant/store/save', data).then((res) => {
-                    if (res.code == 0) {
+                    if (res.code === 0) {
                         this.requestSuccessInit('新增成功');
                         localStorage.removeItem('storageInfo');
                         this.isUpdate = true;
+                    } else {
+                        this.wrapLoading = false;
+                        this.$message.error(res.msg);
                     }
                 });
             }
@@ -2096,6 +2108,7 @@ export default {
             this.presentKtvInfo = {
                 floor: '', //所属楼层
                 roomTypeId: '', //包间类型
+                // roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
                 haveToilet: '2', //独立卫生间
@@ -2227,7 +2240,11 @@ export default {
                     //座位属性回显
                     this.showSeatAtt();
 
-                    this.storeRecommendType(); //获取申请商家推荐状态
+                    //获取申请商家推荐状态
+                    this.storeRecommendType();
+
+                    //获取商家上架下架状态
+                    this.getPutawayStatus();
 
                     this.wrapLoading = false;
 
@@ -3019,7 +3036,7 @@ export default {
                 max-height: 420px;
                 width: 70%;
                 overflow-y: auto;
-                margin-bottom: 0;
+                margin: 20px 0;
             }
 
             .date-dist {
@@ -3027,6 +3044,10 @@ export default {
                 border-radius: 4px;
                 padding: 20px 20px 10px;
                 margin-bottom: 20px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
 
                 > div {
                     width: 100%;
