@@ -1,175 +1,177 @@
 <template>
-    <div class="Begintabledetails" v-loading="wrapLoading">
-        <div class="crumbs">
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
-            </el-breadcrumb>
-            <div>
-                <b>楼层</b>
-            </div>
-            <span></span>
-        </div>
-        <div>
-            <div class="shop-seat">
-                <!-- 左边座位展示 -->
-                <div class="left-box">
-                    <!-- 座位行数和列数 -->
-                    <p class="input-seat">
-                        <label style="margin-right: 30px">
-                            座位行数：
-                            <el-input-number
-                                :step="1"
-                                step-strictly
-                                :disabled="isReadonly"
-                                v-model="x"
-                                :min="6"
-                                style="width: 120px"
-                                label="行数"
-                                @blur="checkNull(x, '座位行数')"
-                                @change="changeSeatNum"
-                            ></el-input-number>
-                        </label>
-                        <label style="margin-right: 30px">
-                            座位列数：
-                            <el-input-number
-                                :step="1"
-                                step-strictly
-                                :disabled="isReadonly"
-                                v-model="y"
-                                :min="6"
-                                style="width: 120px"
-                                label="列数"
-                                @blur="checkNull(y, '座位列数')"
-                                @change="changeSeatNum"
-                            ></el-input-number>
-                        </label>
-                    </p>
-                    <!-- 座位属性标题 -->
-                    <div class="seat-title">
-                        <p v-for="(item, index) in seatAttOpt" :key="index">
-                            <span :class="item.class"></span>
-                            {{ item.name }}
-                        </p>
-                    </div>
-                    <!-- 回显的座位图 -->
-                    <div v-if="x && y" class="seat-box" ref="seatBox" :style="{ width: 32 * y + 30 + 'px' }" style="overflow: hidden">
-                        <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
-                            <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
-                                <span
-                                    ref="seatSpan"
-                                    :data-indexX="indexX + 1"
-                                    :data-indexY="indexY + 1"
-                                    class="seat"
-                                    @click="changeStauts($event, seatStyle)"
-                                    @contextmenu.prevent="changeStauts($event, 'canBook')"
-                                ></span>
-                            </div>
-                        </div>
-                    </div>
+    <div class="container" v-loading="wrapLoading">
+        <div class="Begintabledetails">
+            <div class="crumbs">
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
+                </el-breadcrumb>
+                <div>
+                    <b>楼层</b>
                 </div>
-                <!-- 座位属性 -->
-                <div class="right-box">
-                    <h4 class="title">开台详情</h4>
-                    <div class="padd">
-                        <span>预定用户:</span>
-                        <el-input :disabled="isReadonly" v-model="presentSeatInfo.contactName" placeholder="预定用户"></el-input>
-                    </div>
-                    <div class="padd">
-                        <span>预定手机:</span>
-                        <el-input :disabled="isReadonly" v-model="presentSeatInfo.contactTel" placeholder="预定手机"></el-input>
-                    </div>
-                    <div class="padd">
-                        <span>预定类型:</span>
-                        <span>{{ presentSeatInfo.orderType | orderType }}</span>
-                    </div>
-                    <div class="padd">
-                        <span class="small-span">实付金额:</span>
-                        <el-input
-                            class="smallInp"
-                            :disabled="isReadonly"
-                            v-model="presentSeatInfo.orderAmount"
-                            placeholder="实付金额"
-                        ></el-input>
-                        <span class="smallSpan">商品原价:</span>
-                        <el-input
-                            class="smallInps"
-                            :disabled="isReadonly"
-                            v-model="presentSeatInfo.payableAmount"
-                            placeholder="商品原价"
-                        ></el-input>
-                        <span class="small_span">优惠卷优惠:</span>
-                        <el-input
-                            class="smallInp"
-                            :disabled="isReadonly"
-                            v-model="presentSeatInfo.couponAmount"
-                            placeholder="优惠卷优惠"
-                        ></el-input>
-                    </div>
-                    <div class="moneyTime time-margin">
-                        <span>下单时间:</span>
-                        <span>{{ presentSeatInfo.paidTime }}</span>
-                    </div>
-                    <div class="moneyTime">
-                        <span>支付时间:</span>
-                        <span>{{ presentSeatInfo.payTime }}</span>
-                    </div>
-                    <div class="inventory-details" v-if="clickFlag">
-                        <span>清单详情:</span>
-                        <div class="details">
-                            <span class="header"> 座位信息 </span>
-                            <div style="display: flex">
-                                <div class="left">
-                                    <p>座位号：</p>
-                                    <p>容纳人数：</p>
-                                    <p>保留时间：</p>
-                                    <p>抵消金额：</p>
-                                </div>
-                                <div class="right">
-                                    <p>{{ presentSeatInfo.seatCode }}座</p>
-                                    <p>{{ presentSeatInfo.numberOfPeople }}人</p>
-                                    <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
-                                    <p>{{ presentSeatInfo.minAmount | returnFloat }}</p>
+                <span></span>
+            </div>
+            <div>
+                <div class="shop-seat">
+                    <!-- 左边座位展示 -->
+                    <div class="left-box">
+                        <!-- 座位行数和列数 -->
+                        <p class="input-seat">
+                            <label style="margin-right: 30px">
+                                座位行数：
+                                <el-input-number
+                                    :step="1"
+                                    step-strictly
+                                    :disabled="isReadonly"
+                                    v-model="x"
+                                    :min="6"
+                                    style="width: 120px"
+                                    label="行数"
+                                    @blur="checkNull(x, '座位行数')"
+                                    @change="changeSeatNum"
+                                ></el-input-number>
+                            </label>
+                            <label style="margin-right: 30px">
+                                座位列数：
+                                <el-input-number
+                                    :step="1"
+                                    step-strictly
+                                    :disabled="isReadonly"
+                                    v-model="y"
+                                    :min="6"
+                                    style="width: 120px"
+                                    label="列数"
+                                    @blur="checkNull(y, '座位列数')"
+                                    @change="changeSeatNum"
+                                ></el-input-number>
+                            </label>
+                        </p>
+                        <!-- 座位属性标题 -->
+                        <div class="seat-title">
+                            <p v-for="(item, index) in seatAttOpt" :key="index">
+                                <span :class="item.class"></span>
+                                {{ item.name }}
+                            </p>
+                        </div>
+                        <!-- 回显的座位图 -->
+                        <div v-if="x && y" class="seat-box" ref="seatBox" :style="{ width: 32 * y + 30 + 'px' }" style="overflow: hidden">
+                            <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
+                                <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
+                                    <span
+                                        ref="seatSpan"
+                                        :data-indexX="indexX + 1"
+                                        :data-indexY="indexY + 1"
+                                        class="seat"
+                                        @click="changeStauts($event, seatStyle)"
+                                        @contextmenu.prevent="changeStauts($event, 'canBook')"
+                                    ></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="details-two">
-                            <span class="header" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
-                            <div style="display: flex" v-for="(item, index) in presentSeatInfo.goodsList" :key="index">
-                                <div class="left">
-                                    <p>
-                                        <span>{{ item.goodsName }}</span>
-                                        <span>{{ item.quantity }}</span>
-                                    </p>
-                                </div>
-                                <div class="right">
-                                    <p>
-                                        <span>{{ item.activityPrice | returnFloat }}</span>
-                                        <span style="text-decoration: line-through; color: #888; margin-left: 10px">{{
-                                            item.originalPrice | returnFloat
-                                        }}</span>
-                                    </p>
+                    </div>
+                    <!-- 座位属性 -->
+                    <div class="right-box">
+                        <h4 class="title">开台详情</h4>
+                        <div class="padd">
+                            <span>预定用户:</span>
+                            <el-input :disabled="isReadonly" v-model="presentSeatInfo.contactName" placeholder="预定用户"></el-input>
+                        </div>
+                        <div class="padd">
+                            <span>预定手机:</span>
+                            <el-input :disabled="isReadonly" v-model="presentSeatInfo.contactTel" placeholder="预定手机"></el-input>
+                        </div>
+                        <div class="padd">
+                            <span>预定类型:</span>
+                            <span>{{ presentSeatInfo.orderType | orderType }}</span>
+                        </div>
+                        <div class="padd">
+                            <span class="small-span">实付金额:</span>
+                            <el-input
+                                class="smallInp"
+                                :disabled="isReadonly"
+                                v-model="presentSeatInfo.orderAmount"
+                                placeholder="实付金额"
+                            ></el-input>
+                            <span class="smallSpan">商品原价:</span>
+                            <el-input
+                                class="smallInps"
+                                :disabled="isReadonly"
+                                v-model="presentSeatInfo.payableAmount"
+                                placeholder="商品原价"
+                            ></el-input>
+                            <span class="small_span">优惠卷优惠:</span>
+                            <el-input
+                                class="smallInp"
+                                :disabled="isReadonly"
+                                v-model="presentSeatInfo.couponAmount"
+                                placeholder="优惠卷优惠"
+                            ></el-input>
+                        </div>
+                        <div class="moneyTime time-margin">
+                            <span>下单时间:</span>
+                            <span>{{ presentSeatInfo.paidTime }}</span>
+                        </div>
+                        <div class="moneyTime">
+                            <span>支付时间:</span>
+                            <span>{{ presentSeatInfo.payTime }}</span>
+                        </div>
+                        <div class="inventory-details" v-if="clickFlag">
+                            <span>清单详情:</span>
+                            <div class="details">
+                                <span class="header"> 座位信息 </span>
+                                <div style="display: flex">
+                                    <div class="left">
+                                        <p>座位号：</p>
+                                        <p>容纳人数：</p>
+                                        <p>保留时间：</p>
+                                        <p>抵消金额：</p>
+                                    </div>
+                                    <div class="right">
+                                        <p>{{ presentSeatInfo.seatCode }}座</p>
+                                        <p>{{ presentSeatInfo.numberOfPeople }}人</p>
+                                        <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
+                                        <p>{{ presentSeatInfo.minAmount | returnFloat }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="details-two">
-                            <span class="header" style="display: inline-block; margin-bottom: 5px"> 优惠卷 </span>
-                            <div style="display: flex">
-                                <div class="left">
-                                    <p>
-                                        <span>{{ presentSeatInfo.details }}</span>
-                                    </p>
+                            <div class="details-two">
+                                <span class="header" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
+                                <div style="display: flex" v-for="(item, index) in presentSeatInfo.goodsList" :key="index">
+                                    <div class="left">
+                                        <p>
+                                            <span>{{ item.goodsName }}</span>
+                                            <span>{{ item.quantity }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="right">
+                                        <p>
+                                            <span>{{ item.activityPrice | returnFloat }}</span>
+                                            <span style="text-decoration: line-through; color: #888; margin-left: 10px">{{
+                                                item.originalPrice | returnFloat
+                                            }}</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="details-two">
-                            <div style="display: flex; margin-top: 30px">
-                                <div class="left">
-                                    <p>经商家换座：</p>
-                                    <p>换座时间：</p>
+                            <div class="details-two">
+                                <span class="header" style="display: inline-block; margin-bottom: 5px"> 优惠卷 </span>
+                                <div style="display: flex">
+                                    <div class="left">
+                                        <p>
+                                            <span>{{ presentSeatInfo.details }}</span>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="right">
-                                    <p>{{ presentSeatInfo.changeSeatStatus }}座</p>
-                                    <p>{{ presentSeatInfo.changeSeatTime }}</p>
+                            </div>
+                            <div class="details-two">
+                                <div style="display: flex; margin-top: 30px">
+                                    <div class="left">
+                                        <p>经商家换座：</p>
+                                        <p>换座时间：</p>
+                                    </div>
+                                    <div class="right">
+                                        <p>{{ presentSeatInfo.changeSeatStatus }}座</p>
+                                        <p>{{ presentSeatInfo.changeSeatTime }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -603,7 +605,7 @@ export default {
 }
 
 .aisle-book {
-    background-color: #ddd !important;
+    background-color: #999 !important;
     border: 1px solid transparent !important;
 }
 .notBook {
@@ -650,7 +652,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     border: 1px solid transparent;
-    background-color: #ddd !important;
+    background-color: #999 !important;
     cursor: pointer;
 }
 </style>
