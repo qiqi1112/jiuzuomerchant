@@ -30,7 +30,7 @@
                         </p>
                         <p>
                             <span>金额：</span>
-                            <span>{{ item.payAmount }}</span>
+                            <span :style="{ color: item.type == 1 ? '#2ba245' : '#f00' }">{{ item.payAmount }}</span>
                         </p>
                     </div>
 
