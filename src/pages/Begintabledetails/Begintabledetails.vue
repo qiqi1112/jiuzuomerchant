@@ -73,36 +73,36 @@
                         <h4 class="title">开台详情</h4>
                         <div class="padd">
                             <span>预定用户:</span>
-                            <el-input :disabled="isReadonly" v-model="presentSeatInfo.contactName" placeholder="预定用户"></el-input>
+                            <el-input :disabled="isReadonly" v-model="presentSeatInfos.contactName" placeholder="预定用户"></el-input>
                         </div>
                         <div class="padd">
                             <span>预定手机:</span>
-                            <el-input :disabled="isReadonly" v-model="presentSeatInfo.contactTel" placeholder="预定手机"></el-input>
+                            <el-input :disabled="isReadonly" v-model="presentSeatInfos.contactTel" placeholder="预定手机"></el-input>
                         </div>
                         <div class="padd">
                             <span>预定类型:</span>
-                            <span>{{ presentSeatInfo.orderType | orderType }}</span>
+                            <span>{{ presentSeatInfos.orderType | orderType }}</span>
                         </div>
                         <div class="padd">
                             <span class="small-span">实付金额:</span>
                             <el-input
                                 class="smallInp"
                                 :disabled="isReadonly"
-                                v-model="presentSeatInfo.orderAmount"
+                                v-model="presentSeatInfos.orderAmount"
                                 placeholder="实付金额"
                             ></el-input>
                             <span class="smallSpan">商品原价:</span>
                             <el-input
                                 class="smallInps"
                                 :disabled="isReadonly"
-                                v-model="presentSeatInfo.payableAmount"
+                                v-model="presentSeatInfos.payableAmount"
                                 placeholder="商品原价"
                             ></el-input>
                             <span class="small_span">优惠卷优惠:</span>
                             <el-input
                                 class="smallInp"
                                 :disabled="isReadonly"
-                                v-model="presentSeatInfo.couponAmount"
+                                v-model="presentSeatInfos.couponAmount"
                                 placeholder="优惠卷优惠"
                             ></el-input>
                         </div>
@@ -169,8 +169,8 @@
                                         <p>换座时间：</p>
                                     </div>
                                     <div class="right">
-                                        <p>{{ presentSeatInfo.changeSeatStatus }}座</p>
-                                        <p>{{ presentSeatInfo.changeSeatTime }}</p>
+                                        <p>{{ presentSeatInfos.changeSeatStatus }}座</p>
+                                        <p>{{ presentSeatInfos.changeSeatTime }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -212,6 +212,7 @@ export default {
             seatStyle: 'canBook', //默认的选座样式
             allSeatDetailInfo: [], //所有座位详细信息
             presentSeatInfo: {}, //当前座位对应的详细信息
+            presentSeatInfos: {}, //当前座位对应的详细信息
             isClickSeat: false, //展示当前座位的详细信息开关
             isReadonly: true, //编辑信息开关
             startBussTime: '', //开始营业时间
@@ -268,10 +269,11 @@ export default {
             let code = this.presentSeatInfo.seatCode;
             this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
                 if (res.code == 0) {
+                    console.log(res)
                     res.data.orderAmount = this.price(res.data.orderAmount);
                     res.data.payableAmount = this.price(res.data.payableAmount);
                     res.data.couponAmount = this.price(res.data.couponAmount);
-                    this.presentSeatInfo = Object.assign(res.data, newObj);
+                    this.presentSeatInfos =  res.data, newObj;
                     this.clickFlag = true;
                 } else {
                     this.$message.error(res.msg);
