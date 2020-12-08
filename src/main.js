@@ -30,6 +30,7 @@ import {
     file_get,
     file_post,
     imgHead,
+    rongyunKey,
     fileUploadUrl,
 } from './api/index';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -48,6 +49,8 @@ Vue.prototype.$put = put;
 Vue.prototype.$file_get = file_get;
 Vue.prototype.$file_post = file_post;
 Vue.prototype.$imgHead = imgHead;
+Vue.prototype.$rongyunKey = rongyunKey;
+
 Vue.prototype.$fileUploadUrl = fileUploadUrl;
 // Vue.prototype.$ry = rongyun
 // Vue.prototype.$emoji = emoji

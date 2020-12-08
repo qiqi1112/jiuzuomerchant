@@ -867,15 +867,15 @@ export default {
         //     audio.paused=false;
         //     audio.play(); //没有就播放 
         // }  
-
         let that = this
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
 
         if(!localStorage.getItem('userInfo')){
             return
         }
+        console.log(this.$rongyunKey)
         var userInfo = {
-            appKey: "82hegw5u8vgdx",
+            appKey: this.$rongyunKey,
             token:rToken
         };
         // // 获取会话列表
