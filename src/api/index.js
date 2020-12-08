@@ -6,7 +6,8 @@ import {
     api_request,
     map_request,
     file_request,
-    imgHead
+    imgHead,
+    rongyunKey
 } from "./ip";
 import Message from "element-ui/packages/message/index.js";
 
@@ -144,5 +145,6 @@ export {
     file_get,
     file_post,
     imgHead,
-    fileUploadUrl
+    fileUploadUrl,
+    rongyunKey
 }

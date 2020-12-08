@@ -1,4 +1,4 @@
-let api, tengxun, file, imgHead, token
+let api, tengxun, file, imgHead, token,rongyunKey
 import axios from 'axios'
 import router from "../router";
 import Message from "element-ui/packages/message/index.js";
@@ -9,16 +9,19 @@ if (process.env.NODE_ENV === "development") {
   file = "/file"
   tengxun = "/map";
   imgHead = '/file/merchant/store/system/upload/down?keyName=';
+  rongyunKey = '82hegw5u8vgdx'
 } else if (process.env.NODE_ENV === "testing") {
   api = 'https://storetest.cdhqht.com'
   file = 'https://storetest.cdhqht.com'
   tengxun = 'https://apis.map.qq.com'
   imgHead = 'https://storetest.cdhqht.com/merchant/store/system/upload/down?keyName=';
+  rongyunKey = '82hegw5u8vgdx'
 } else {
   api = 'https://store.cdhqht.com'
   file = 'https://store.cdhqht.com'
   tengxun = 'https://apis.map.qq.com'
   imgHead = 'https://store.cdhqht.com/merchant/store/system/upload/down?keyName=';
+  rongyunKey = 'e0x9wycfepwtq'
 }
 
 
@@ -74,10 +77,10 @@ file_request.interceptors.request.use(config => {
   config.headers.common['X-Store-Token'] = token
   return config;
 });
-
 export {
   api_request,
   map_request,
   file_request,
-  imgHead
+  imgHead,
+  rongyunKey
 };
