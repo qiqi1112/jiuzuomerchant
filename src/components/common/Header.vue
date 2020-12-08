@@ -95,7 +95,7 @@ export default {
     },
     methods: {
         information(){
-            this.$store.state.headerClickMsgFun = !this.$store.state.headerClickMsgFun
+            this.$store.commit('headerClickMsgFun', !this.$store.state.headerClickMsg);
         },
         //对话框里的确认操作
         handleConfrim() {

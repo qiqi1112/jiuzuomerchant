@@ -420,11 +420,12 @@ export default {
                     nextType = null
                 }
             }
+            console.log(val)
             let data = {
-                id:+val.id,
+                id:val.id,
                 type:+type,
-                nextId:+nextId,
-                nextType:+nextType
+                nextId:nextId,
+                nextType:nextType
 
             }
             this.$post(`/merchant/store/ly/setContinuation`,data).then(res=>{

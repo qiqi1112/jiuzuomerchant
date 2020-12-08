@@ -9,7 +9,7 @@
             <span class="all_unread" v-show="$store.state.headerUnread>0">{{$store.state.headerUnread}}</span>
         </div>
 
-        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh">
+        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close='closeDialog'>
             <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg">
                 <div class="box">
                     <div class="people_list">
@@ -45,7 +45,8 @@
                                             <!-- 订单消息 -->
                                             <div class="msg" v-if="item.senderUserId == '10001'">
                                                 <div class="orderinfo">
-                                                    {{item.content.content}}   
+                                                    <div>{{item.content.content}}</div>
+                                                    <div @click="lookOrrder" style="text-align:center;padding-top:10px;border-top:1px solid white;cursor: pointer;">查看详情</div>
                                                 </div>
                                             </div>
                                             <!-- 官方消息 -->
@@ -72,7 +73,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="text_box">
+                        <div class="text_box" v-show="unInput">
                             <div class="icons">
                                 <div class="flexo">
                                     <img class="send_icon" @click="showEmoji" style="height:20px" src="../../assets/img/emoji.png" alt="">
@@ -114,7 +115,7 @@
                         </div>
                     </div>
                     <div class="chat" v-else></div>
-                    <div class="quick">
+                    <div class="quick" v-show="unInput">
 
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -184,7 +185,8 @@ export default {
             // firstDomHeight:null,
             // twoDomHeight:null,
             scorllFalse:false,//用于判断 切换会话时 停止监听 滚动条
-            audioUrl:""
+            audioUrl:"",
+            unInput:true,
         };
     },
 
@@ -222,16 +224,24 @@ export default {
     computed:{
         watchMsgNum(){
             return this.$store.state.newMsgNum
-        }
+        },
+        headClick(){
+            return this.$store.state.headerClickMsg
+        },
+        
     },
     watch: {
+        headClick:{
+            handler(val){
+                val?this.showRoom = true : this.showRoom = false
+            }
+        },
         watchMsgNum: {
             handler(newValue, oldValue) {
                 let that = this
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-               
                 if(lastObj.messageType == 'TextMessage'){
                     this.audioUrl = 'default/system/message.mp3'
                     this.$notify.info({
@@ -280,7 +290,6 @@ export default {
                         break
                     }
                 }
-               
                 if(newUser){
                     this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
                         if(res.code == 0){
@@ -379,6 +388,17 @@ export default {
     },
 
     methods: {
+        // 监听聊天的关闭弹窗
+        closeDialog(){
+            this.$store.commit('headerClickMsgFun', false);
+        },
+        lookOrrder(){
+            if(this.$route.path != '/ordermanage'){
+                this.$router.push('/ordermanage')
+            }
+            this.showRoom = false
+
+        },
         showChat(){
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
             if(isClick == 'true') {
@@ -388,6 +408,11 @@ export default {
             // this.conversation()
         },
         getChat(val, i) {
+            if(val.targetId == '10000' || val.targetId == '10001'){
+                this.unInput = false
+            }else{
+                this.unInput = true
+            }
             this.scorllFalse = true    
             this.now_user = val;
             this.active = i;
@@ -496,6 +521,7 @@ export default {
                     let newArr = []
                     let userInfo = res.data
                     list.forEach((v,i)=>{
+                        // RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
                         // 调用历史记录
                         if(v.messageDirection == 2){
                             v.content['id'] = userInfo.id
