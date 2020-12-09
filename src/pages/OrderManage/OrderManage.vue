@@ -237,7 +237,7 @@
                                         </el-input>
                                     </el-form-item>
                                     <el-form-item label="优惠券优惠：">
-                                        <el-input v-model="form.minAmount" readonly>
+                                        <el-input v-model="form.couponAmount" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
@@ -279,7 +279,7 @@
                                         </p>
                                         <p>
                                             <span>低消金额</span>
-                                            <span>￥{{ form.discountFee }}</span>
+                                            <span>￥{{ form.minAmount }}</span>
                                         </p>
                                     </div>
                                 </div>
