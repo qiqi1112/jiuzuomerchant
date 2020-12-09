@@ -57,7 +57,6 @@ export default function init(userInfo,callbacks) {
                     //     RongIMLib.RongIMVoice.play(audioFile, duration);
                     // });
 
-
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     // message.content.content => 文字内容

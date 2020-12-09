@@ -150,6 +150,7 @@ export default {
             if (command == 'loginout') {
                 this.$get('/merchant/store/logout').then(
                     (res) => {
+                        RongIMClient.getInstance().disconnect();
                         localStorage.removeItem('userInfo');
                         this.$message.success('退出成功');
                         this.$router.push('/login');

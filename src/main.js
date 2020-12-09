@@ -74,6 +74,7 @@ router.beforeEach((to, from, next) => {
     const role = JSON.parse(localStorage.getItem('userInfo')) || ''
     if (!role && to.path !== '/login') {
         // this.$socket.disconnect();
+        RongIMClient.getInstance().disconnect();
         next('/login');
     } else {
         if (role) {
