@@ -1,8 +1,7 @@
 <template>
     <div class="chat_room" id="chat_room">
-        <audio muted="true" autoplay  ref="audio">
-            <source src="/file/merchant/store/system/upload/down?keyName=default/system/message.mp3" type="audio/ogg">
-            <source src="/file/merchant/store/system/upload/down?keyName=default/system/message.mp3" type="audio/mpeg">
+        <audio ref="audio" :muted="isMute">
+            <source :src="joinUrl+audioUrl" type="audio/mp3">
             您的浏览器不支持播放音频，请使用google或其它浏览器
         </audio>
         <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat">
@@ -187,6 +186,7 @@ export default {
             scorllFalse:false,//用于判断 切换会话时 停止监听 滚动条
             audioUrl:"",
             unInput:true,
+            isMute:false,
         };
     },
 
@@ -218,7 +218,6 @@ export default {
     },
     created(){
         this.selfInfo = JSON.parse(localStorage.getItem('userInfo')) 
-        
     },
 
     computed:{
@@ -228,12 +227,19 @@ export default {
         headClick(){
             return this.$store.state.headerClickMsg
         },
-        
+        mute(){
+            return this.$store.state.headerClickMute
+        }
     },
     watch: {
         headClick:{
             handler(val){
                 val?this.showRoom = true : this.showRoom = false
+            }
+        },
+        mute:{
+            handler(val){
+                val?this.isMute = true : this.isMute = false
             }
         },
         watchMsgNum: {
@@ -280,7 +286,7 @@ export default {
                 var audio=this.$refs.audio
                 // console.log(audio)
                 // audio.load()
-                // audio.play()
+                audio.play()
 
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
@@ -397,7 +403,6 @@ export default {
                 this.$router.push('/ordermanage')
             }
             this.showRoom = false
-
         },
         showChat(){
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
@@ -427,9 +432,17 @@ export default {
             let that = this
             RongIMClient.getInstance().getConversationList({
                 onSuccess: function(list) {
+                    var result = [];
+                    var obj = {};
+                    for(var i =0; i<list.length; i++){
+                       if(!obj[list[i].targetId]){
+                          result.push(list[i]);
+                          obj[list[i].targetId] = true;
+                       }
+                    }
                     let userId = ''
-                    if(list.length<=0)return
-                    list.forEach(v=>{
+                    if(result.length<=0)return
+                    result.forEach(v=>{
                         userId = v.targetId 
                         that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
                             if(res.code == 0){
@@ -445,6 +458,7 @@ export default {
                 },
                 onError: function(error) {
                     // do something
+                    console.log(error)
                 }
             }, null);
         },
@@ -460,6 +474,7 @@ export default {
                     that.allUnreadMsg()
                 },
                 onError: function(error){
+                    console.log(error)
                     // that.$message({ message: res.msg, type: 'warning' });
                     // error => 清除未读消息数错误码
                 }
@@ -503,6 +518,7 @@ export default {
                 onSuccess: function(list, hasMsg) {
                     that.hasHistoryMsg = hasMsg;
                     let html = "";
+                    console.log(list)
                     that.getAssignInfo(that.now_user.targetId,list,type)
                     that.clearUnreadNum(that.now_user.targetId)
                     // list => Message 数组。
@@ -537,7 +553,6 @@ export default {
                     newArr.forEach(v=>{
                         this.msgArr.unshift(v)
                     })
-                    console.log(this.msgArr)
                     if(type == 1){
                         this.$nextTick(this.scrollEnd);
                     }else{
@@ -617,7 +632,7 @@ export default {
                                             info = '不在聊天室中';
                                             break;
                                     }
-                                    alert('发送失败:' + info + errorCode);
+                                    console.log('发送失败:' + info + errorCode);
                                 }
                             });
                         });
@@ -830,7 +845,7 @@ export default {
         },
         handleChange(file, fileList) {
             if(file.size / 1024 / 1024 > .4){
-                this.$message({ message: '选择图片太大', type: 'warning' });
+                this.$message({ message: '请压缩图片大小', type: 'warning' });
                 return
             }
             this.formData = file.raw;
@@ -873,7 +888,6 @@ export default {
         if(!localStorage.getItem('userInfo')){
             return
         }
-        console.log(this.$rongyunKey)
         var userInfo = {
             appKey: this.$rongyunKey,
             token:rToken
