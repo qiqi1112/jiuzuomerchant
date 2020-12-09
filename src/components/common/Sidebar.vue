@@ -92,7 +92,7 @@ export default {
                     title: '评论管理'
                 },
                 {
-                    icon: 'el-icon-lx-redpacket_fill',
+                    icon: 'iconfont icon-youhuiquan side',
                     index: 'coupons',
                     title: '优惠券'
                 },
@@ -107,27 +107,27 @@ export default {
                 //     title: '客服管理'
                 // },
                 {
-                    icon: 'el-icon-lx-commentfill',
+                    icon: 'iconfont icon-icon_rzhi side',
                     index: 'log',
                     title: '操作日志'
                 },
                 {
-                    icon: 'el-icon-lx-commentfill',
+                    icon: 'iconfont icon-shezhi side',
                     index: 'setting',
                     title: '设置'
                 },
                 {
-                    icon: 'el-icon-lx-commentfill',
+                    icon: 'iconfont icon-cangku side',
                     index: 'entrepotManage',
                     title: '仓库管理'
                 },
                 {
-                    icon: 'el-icon-lx-commentfill',
+                    icon: 'iconfont icon-yuangongguanli side',
                     index: 'staffManage',
                     title: '员工管理'
                 },
                 {
-                    icon: 'el-icon-lx-commentfill',
+                    icon: 'iconfont icon-caiwu side',
                     index: 'financeManage',
                     title: '财务管理'
                 }

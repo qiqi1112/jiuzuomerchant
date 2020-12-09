@@ -17,11 +17,14 @@
                 <!-- 消息中心 -->
                 <div class="btn-bell" @click="information">
                     <el-tooltip effect="dark" :content="$store.state.headerUnread ? `有${$store.state.headerUnread}条未读消息` : `消息中心`" placement="bottom">
-                        <!-- <router-link to="/tabs">
-                        </router-link> -->
                         <i class="el-icon-bell"></i>
                     </el-tooltip>
                     <span class="btn-bell-badge" v-if="$store.state.headerUnread>0"></span>
+                </div>
+                <div class="btn-bell" @click="mute">
+                    <el-tooltip effect="dark" :content="$store.state.headerClickMute ? `已静音` : `静音`" placement="bottom">
+                        <i style="font-size:20px" :class="$store.state.headerClickMute?'icon-jingyin':'icon-laba'" class="iconfont"></i>
+                    </el-tooltip>
                 </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
@@ -93,9 +96,20 @@ export default {
             return logo ? this.$imgHead + logo : require('../../assets/favicon.png');
         }
     },
+    created(){
+        if(localStorage.getItem('mute')){
+            this.$store.commit('headerClickMuteFun', localStorage.getItem('mute')==1?false:true);
+        }else{
+            this.$store.commit('headerClickMuteFun', false);
+        }
+    },
     methods: {
         information(){
             this.$store.commit('headerClickMsgFun', !this.$store.state.headerClickMsg);
+        },
+        mute(){
+            this.$store.commit('headerClickMuteFun', !this.$store.state.headerClickMute);
+            localStorage.setItem('mute',this.$store.state.headerClickMute==true?2:1)
         },
         //对话框里的确认操作
         handleConfrim() {

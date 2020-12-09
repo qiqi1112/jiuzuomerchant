@@ -14,6 +14,7 @@ const store = new Vuex.Store({
         newMsgNum:0,//用户 聊天页面  监听是否有新消息
         headerUnread:0,//头部  未读消息
         headerClickMsg:false,//顶部点击消息  弹出 聊天页
+        headerClickMute:false,//是否静音
     },
     getters:{
 
@@ -43,7 +44,10 @@ const store = new Vuex.Store({
         },
         headerClickMsgFun(state,type){
             state.headerClickMsg = type
-        }
+        },
+        headerClickMuteFun(state,type){
+            state.headerClickMute = type
+        },
 
     },
     // getters:{

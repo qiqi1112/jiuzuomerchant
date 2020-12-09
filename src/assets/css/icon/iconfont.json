@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10156373",
+      "name": "喇叭",
+      "font_class": "laba",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "15343025",
+      "name": "静音",
+      "font_class": "jingyin",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
       "icon_id": "595349",
       "name": "评论",
       "font_class": "pinglun",

@@ -39,7 +39,6 @@ export default function init(userInfo,callbacks) {
             }
         }
     });
-
     var num = 1
     // 消息监听器
     RongIMClient.setOnReceiveMessageListener({
@@ -199,7 +198,7 @@ export default function init(userInfo,callbacks) {
             console.log('token无效');
         },
         onError: function(errorCode){
-            console.log(errorcode);
+            console.log(errorCode);
         }
     };
     var config = {
