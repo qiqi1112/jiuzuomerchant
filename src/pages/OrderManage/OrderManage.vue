@@ -36,6 +36,13 @@
                 <el-select clearable v-model="searchObj.searchPayStatus" placeholder="支付状态" class="handle-input mr10">
                     <el-option v-for="(item, index) in payStatusArr" :key="index" :label="item.label" :value="item.value"></el-option>
                 </el-select>
+                <el-input
+                    clearable
+                    @keydown.13.native="handleSearch"
+                    v-model="searchObj.smsCode"
+                    placeholder="验证码"
+                    class="handle-input mr10"
+                ></el-input>
 
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
                 <el-button type="success" icon="el-icon-search" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
@@ -78,7 +85,7 @@
                         <span>{{ scope.row.payWay | payWay }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="orderAmount" label="实付金额"></el-table-column>
+                <el-table-column prop="paidAmount" label="实付金额"></el-table-column>
                 <el-table-column prop="payableAmount" label="商品原价"></el-table-column>
                 <el-table-column prop="details" label="优惠券"></el-table-column>
                 <el-table-column prop="remarks" label="备注信息"></el-table-column>
@@ -218,7 +225,7 @@
                             <div class="info2">
                                 <div>
                                     <el-form-item label="实付金额：">
-                                        <el-input v-model="form.orderAmount" readonly>
+                                        <el-input v-model="form.paidAmount" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
@@ -271,7 +278,7 @@
                                             <span>最晚至{{ form.retentionTime }}</span>
                                         </p>
                                         <p>
-                                            <span>抵消金额</span>
+                                            <span>低消金额</span>
                                             <span>￥{{ form.discountFee }}</span>
                                         </p>
                                     </div>
@@ -437,6 +444,7 @@ export default {
                 searchOrderType: '',
                 searchPayStatus: '',
                 searchNickName: '',
+                smsCode : '',
 
                 dataListCount: 0, //默认当前要显示的数据条数
                 currentPage: 1, //默认显示的页码所在位置（第一页）
@@ -717,7 +725,8 @@ export default {
                     orderNo: this.searchObj.searchOrderNum,
                     orderType: this.searchObj.searchOrderType,
                     paid: this.searchObj.searchPayStatus,
-                    contactName: this.searchObj.searchNickName
+                    contactName: this.searchObj.searchNickName,
+                    smsCode : this.searchObj.smsCode
                 };
 
                 try {
@@ -749,6 +758,14 @@ export default {
                     return;
                 }
             }
+
+            if (this.searchObj.smsCode) {
+                if (!regular.pureNumber(this.searchObj.smsCode)) {
+                    this.$message.error('验证码格式不正确');
+                    return;
+                }
+            }
+
             this.searchObj.currentPage = 1;
             this.getOrderInfo();
         },
