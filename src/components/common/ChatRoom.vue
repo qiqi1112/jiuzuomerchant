@@ -44,7 +44,19 @@
                                             <!-- 订单消息 -->
                                             <div class="msg" v-if="item.senderUserId == '10001'">
                                                 <div class="orderinfo">
-                                                    <div>{{item.content.content}}</div>
+                                                    <!-- {{item.content.content}} -->
+                                                    <div class="fx">
+                                                        <div style="flex:.3">内容:</div>
+                                                        <div style="flex:.7">{{item.content.content}}</div>
+                                                    </div>
+                                                    <div class="fx">
+                                                        <div style="flex:.3">时间:</div>
+                                                        <div style="flex:.7">{{$regular.timeData(item.sentTime,3)}}</div>
+                                                    </div>
+                                                    <div class="fx">
+                                                        <div style="flex:.3">用户名:</div>
+                                                        <div style="flex:.7">{{item.content.title}}</div>
+                                                    </div>
                                                     <div @click="lookOrrder" style="text-align:center;padding-top:10px;border-top:1px solid white;cursor: pointer;">查看详情</div>
                                                 </div>
                                             </div>
@@ -248,6 +260,7 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
+                console.log(lastObj)
                 if(lastObj.messageType == 'TextMessage'){
                     this.audioUrl = 'default/system/message.mp3'
                     this.$notify.info({
@@ -518,7 +531,6 @@ export default {
                 onSuccess: function(list, hasMsg) {
                     that.hasHistoryMsg = hasMsg;
                     let html = "";
-                    console.log(list)
                     that.getAssignInfo(that.now_user.targetId,list,type)
                     that.clearUnreadNum(that.now_user.targetId)
                     // list => Message 数组。
@@ -540,9 +552,16 @@ export default {
                         // RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
                         // 调用历史记录
                         if(v.messageDirection == 2){
-                            v.content['id'] = userInfo.id
-                            v.content['name'] = userInfo.nickname
-                            v.content['portrait'] = userInfo.headPortrait
+                            if(userInfo.id == "10001"){
+                                // 如果是订单消息
+                                v.content['id'] = userInfo.id
+                                v.content['name'] = userInfo.nickname
+                                v.content['portrait'] = v.content.headerImageUrl
+                            }else{
+                                v.content['id'] = userInfo.id
+                                v.content['name'] = userInfo.nickname
+                                v.content['portrait'] = userInfo.headPortrait
+                            }
                         }else if(v.messageDirection == 1){
                             v.content['id'] = this.selfInfo.storeId
                             v.content['name'] = this.selfInfo.storeName
@@ -553,6 +572,7 @@ export default {
                     newArr.forEach(v=>{
                         this.msgArr.unshift(v)
                     })
+                    console.log(this.msgArr)
                     if(type == 1){
                         this.$nextTick(this.scrollEnd);
                     }else{
@@ -1078,7 +1098,7 @@ export default {
                                 color: #f3f3f3;
                                 max-width: 400px;
                                 display: inline-block;
-                                background: #f37b1d;
+                                background: #de6200;
                             }
                         }
                         .self_img {
@@ -1090,6 +1110,13 @@ export default {
                                 margin-right: 0;
                                 text-align: left;
                                 background: #39b54a;
+                            }
+                        }
+                        .orderinfo{
+                            min-width: 220px;
+                            .fx{
+                                display: flex;
+                                margin-bottom: 12px;
                             }
                         }
                     }
@@ -1189,14 +1216,6 @@ export default {
                             
                             display: none;
                         }
-
-                        // /deep/.el-upload-list--picture-card .el-upload-list__item{
-                        //     margin: 0;
-                        // }
-                        // .el-upload-list__item-thumbnail{
-                        //     object-fit: cover;
-                        // }
-                      
                     }
                 }
                 .send_icon{
