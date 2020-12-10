@@ -397,7 +397,6 @@ export default {
                     nextId = this.robList[1].id
                     nextType = 2
                 }else{
-                    
                     if(this.rowList[0]){
                         nextId = this.rowList[0].id
                         nextType = 1
@@ -420,13 +419,15 @@ export default {
                     nextType = null
                 }
             }
-            console.log(val)
+            if(nextId == null || nextType == null){
+                this.$message.error('当前是最后一个订单');
+                return
+            }
             let data = {
                 id:val.id,
                 type:+type,
                 nextId:nextId,
                 nextType:nextType
-
             }
             this.$post(`/merchant/store/ly/setContinuation`,data).then(res=>{
                 if(res.code == 0){
@@ -622,6 +623,7 @@ export default {
         // margin-top: 20px;
         padding: 15px;
         display: flex;
+        min-width: 800px;
         .fl_box{
             flex: 1;
             .li_n{
@@ -678,11 +680,11 @@ export default {
                     }
                 }
             }
-            // @media screen and (max-width: 1400px) {
-            //     .now_num{
-            //         display: inherit;
-            //     }
-            // }
+            @media screen and (max-width: 1500px) {
+                .now_num{
+                    display: inherit;
+                }
+            }
             .suc_num,.fail_num{
                 .su_l{
                     display: flex;
@@ -715,11 +717,11 @@ export default {
                         margin-right: 10px;
                     }
                 }
-                // @media screen and (max-width: 1400px) {
-                //     .su_l{
-                //         display: inherit;
-                //     }
-                // }
+                @media screen and (max-width: 1500px) {
+                    .su_l{
+                        display: inherit;
+                    }
+                }
             }
             .jt{
                 margin-top: 3px;

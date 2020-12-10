@@ -409,28 +409,27 @@ export default {
             let conversationType = RongIMLib.ConversationType.PRIVATE;
             let targetId = item.targetId
             RongIMClient.getInstance().removeConversation(conversationType,targetId,{
-                        onSuccess: function() {
-                            RongIMClient.getInstance().clearUnreadCount(conversationType,targetId,{
-                                onSuccess:function(){
-                                    that.allUnreadMsg()
-                                    that.userList.splice(index,1)  
-                                    if(that.now_user){
-                                        // 删除的会话  是当前的聊天会话
-                                        if(that.now_user.targetId == targetId){
-                                            that.now_user = ''
-                                        }
-                                    }
-                                },
-                                onError:function(error){
-                                    console.log(error)
+                onSuccess: function() {
+                    RongIMClient.getInstance().clearUnreadCount(conversationType,targetId,{
+                        onSuccess:function(){
+                            that.allUnreadMsg()
+                            that.userList.splice(index,1)  
+                            if(that.now_user){
+                                // 删除的会话  是当前的聊天会话
+                                if(that.now_user.targetId == targetId){
+                                    that.now_user = ''
                                 }
-                            });
+                            }
                         },
-                        onError: function(error) {
-                            that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+                        onError:function(error){
+                            console.log(error)
                         }
                     });
-
+                },
+                onError: function(error) {
+                    that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+                }
+            });
         },
         // 模拟点击事件 执行 音频
         // simulationClick(){
@@ -1047,7 +1046,8 @@ export default {
         }
         .close_x{
             position: absolute;
-            right: 5px;
+            right: 0px;
+            top: -15px;
         }
     }
     .box {
