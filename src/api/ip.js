@@ -67,7 +67,8 @@ api_request.interceptors.response.use(
   },
   function (error) {
     return Promise.reject(error);
-  })
+  }
+)
 
 map_request.interceptors.request.use(config => {
   return config;
