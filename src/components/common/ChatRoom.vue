@@ -15,10 +15,11 @@
                 <div class="box">
                     <div class="people_list">
                         <ul>
-                            <li class="userList" :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i">
+                            <li class="userList" :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i" @mouseenter="mouseover(item,i)" @mouseleave="mouseLeave(item,i)">
                                 <img class="head_portrait"  :src="item.portrait" alt="">
                                 <span>{{item.name}}</span>
                                 <span class="not_read" v-show="item.unreadMessageCount>0 && active != i">{{item.unreadMessageCount}}</span>
+                                <span v-show="item.showClear" class="close_x"><i @click.stop="closeX(item,i)" class="el-icon-error"></i></span>
                             </li>
                         </ul>
                     </div>
@@ -397,6 +398,40 @@ export default {
     },
 
     methods: {
+        mouseover(val,index){
+            this.$set(this.userList[index],'showClear',true)
+        },
+        mouseLeave(val,index){
+            this.$set(this.userList[index],'showClear',false)
+        },
+        closeX(item,index){
+            let that = this
+            let conversationType = RongIMLib.ConversationType.PRIVATE;
+            let targetId = item.targetId
+            RongIMClient.getInstance().removeConversation(conversationType,targetId,{
+                        onSuccess: function() {
+                            RongIMClient.getInstance().clearUnreadCount(conversationType,targetId,{
+                                onSuccess:function(){
+                                    that.allUnreadMsg()
+                                    that.userList.splice(index,1)  
+                                    if(that.now_user){
+                                        // 删除的会话  是当前的聊天会话
+                                        if(that.now_user.targetId == targetId){
+                                            that.now_user = ''
+                                        }
+                                    }
+                                },
+                                onError:function(error){
+                                    console.log(error)
+                                }
+                            });
+                        },
+                        onError: function(error) {
+                            that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+                        }
+                    });
+
+        },
         // 模拟点击事件 执行 音频
         // simulationClick(){
         //     console.log(11111)
@@ -467,7 +502,6 @@ export default {
                         });
                     })
                     that.userList = arr
-                    console.log(that.userList)
                 },
                 onError: function(error) {
                     // do something
@@ -572,7 +606,6 @@ export default {
                     newArr.forEach(v=>{
                         this.msgArr.unshift(v)
                     })
-                    console.log(this.msgArr)
                     if(type == 1){
                         this.$nextTick(this.scrollEnd);
                     }else{
@@ -779,7 +812,7 @@ export default {
                         clearUnreadCount  // 清除会话未读数
                         clearConversations// 删除所有会话
                     */
-                   RongIMClient.getInstance().clearConversations({
+                    RongIMClient.getInstance().clearConversations({
                         onSuccess: function() {
                             RongIMClient.getInstance().clearTotalUnreadCount({
                                 onSuccess: function(){
@@ -1012,6 +1045,10 @@ export default {
             font-size: 0;
             vertical-align: middle;
         }
+        .close_x{
+            position: absolute;
+            right: 5px;
+        }
     }
     .box {
         height: 730px;
@@ -1021,7 +1058,7 @@ export default {
             flex: .2;
             border-right: 1px solid @border-color;
             box-sizing: border-box;
-            background: #f7f7f7;
+            background: #f5f5f5;
             overflow-y: scroll;
             ul {
                 li {
@@ -1058,6 +1095,8 @@ export default {
                 }
                 .chat_list {
                     overflow-y: scroll;
+                    height: calc(100% - 50px);
+                    background: #f7f7f7;
                     // &::-webkit-scrollbar {
                     //     display: none
                     // }
@@ -1084,7 +1123,6 @@ export default {
                     &::-webkit-scrollbar-corner{
                         background: #179a16;
                     }
-                    height: calc(100% - 50px);
                     .getMore{
                         text-align: center;
                         font-size: 12px;
