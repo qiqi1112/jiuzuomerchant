@@ -1,6 +1,7 @@
 <template>
     <div class="chat_room" id="chat_room">
-        <audio ref="audio" :muted="isMute">
+        <!-- :muted="isMute" -->
+        <audio ref="audio" >
             <source :src="joinUrl+audioUrl" type="audio/mp3">
             您的浏览器不支持播放音频，请使用google或其它浏览器
         </audio>
@@ -8,6 +9,7 @@
             <span class="all_unread" v-show="$store.state.headerUnread>0">{{$store.state.headerUnread}}</span>
         </div>
 
+        <!-- <div ref="simulation">1111</div> -->
         <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close='closeDialog'>
             <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg">
                 <div class="box">
@@ -141,7 +143,7 @@
 
                             <div class="operating_btn">
                                 <el-button type="primary" @click="clearConversation" class="btn">清空所有会话列表</el-button>
-                                <!-- <el-button type="primary" @click="clearConverHis" class="btn">清除所有会话历史</el-button> -->
+                                <el-button type="primary" v-show="now_user" @click="clearConverHisMsg" class="btn">清除当前会话历史记录</el-button>
                             </div>
                         </div>
 
@@ -260,47 +262,35 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-                console.log(lastObj)
-                if(lastObj.messageType == 'TextMessage'){
-                    this.audioUrl = 'default/system/message.mp3'
-                    this.$notify.info({
-                        title: '提示',
-                        message: '您有一条新的消息',
-                        duration: 5000
-                    });
-                }else if(lastObj.messageType == 'OrderMessage'){
-                    this.audioUrl = 'default/system/message.mp3'
-                    this.$notify.info({
-                        title: '提示',
-                        message: '您有一条新的订单',
-                        duration: 0
-                    });
-                }else if(lastObj.messageType == 'SystemMessage'){
-                    this.audioUrl = 'default/system/message.mp3'
-                    this.$notify.info({
-                        title: '提示',
-                        message: '您有一条新的官方消息',
-                        duration: 5000
-                    });
+                if(!lastObj.offLineMessage){
+                    if(lastObj.messageType == 'TextMessage'){
+                        this.audioUrl = 'default/system/message.mp3'
+                        this.$notify.info({
+                            title: '提示',
+                            message: '您有一条新的消息',
+                            duration: 5000
+                        });
+                    }else if(lastObj.messageType == 'OrderMessage'){
+                        this.audioUrl = 'default/system/message.mp3'
+                        this.$notify.info({
+                            title: '提示',
+                            message: '您有一条新的订单',
+                            duration: 0
+                        });
+                    }else if(lastObj.messageType == 'SystemMessage'){
+                        this.audioUrl = 'default/system/message.mp3'
+                        this.$notify.info({
+                            title: '提示',
+                            message: '您有一条新的官方消息',
+                            duration: 5000
+                        });
+                    }
                 }
-
-                // this.$refs.audio.src = this.imgHead + this.audioUrl
-                // var audio = new Audio()
-                // var source = new Source()
-                // audio.appendChild(source)
-
-                // source.src = this.imgHead + this.audioUrl;
-                // source.type = "audio/mpeg"
-
-                // audio.autoplay = true;
-                
+                // var audio=this.$refs.audio
                 // console.log(audio)
-
-                var audio=this.$refs.audio
-                // console.log(audio)
-                // audio.load()
-                audio.play()
-
+                // audio.pause()
+                // audio.play()
+                // this.$refs.simulation.$el.click()
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
                 for(let i=0;i<this.userList.length;i++){
@@ -407,6 +397,13 @@ export default {
     },
 
     methods: {
+        // 模拟点击事件 执行 音频
+        // simulationClick(){
+        //     console.log(11111)
+        //     var audio=this.$refs.audio
+        //     audio.play()
+        // },
+
         // 监听聊天的关闭弹窗
         closeDialog(){
             this.$store.commit('headerClickMsgFun', false);
@@ -453,7 +450,8 @@ export default {
                           obj[list[i].targetId] = true;
                        }
                     }
-                    let userId = ''
+                    var userId = ''
+                    let arr = []
                     if(result.length<=0)return
                     result.forEach(v=>{
                         userId = v.targetId 
@@ -462,12 +460,14 @@ export default {
                                 v['id'] = res.data.userId
                                 v['name'] = res.data.nickname
                                 v['portrait'] = that.imgHead + res.data.headPortrait
-                                that.userList.push(v)
+                                arr.push(v)
                             }else{
                                 that.$message({ message: '获取会话列表失败，请刷新', type: 'warning' });
                             }
                         });
                     })
+                    that.userList = arr
+                    console.log(that.userList)
                 },
                 onError: function(error) {
                     // do something
@@ -774,54 +774,87 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    RongIMClient.getInstance().clearConversations({
+                    /*
+                        clearTotalUnreadCount //清除全部会话未读数
+                        clearUnreadCount  // 清除会话未读数
+                        clearConversations// 删除所有会话
+                    */
+                   RongIMClient.getInstance().clearConversations({
                         onSuccess: function() {
-                            that.userList.forEach(v=>{
-                                let conversationType = RongIMLib.ConversationType.PRIVATE;
-                                let targetId = v.targetId;
-                                RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
-                                    onSuccess: function(){
-                                        // 清除未读消息成功
-                                        that.userList = []
-                                        that.now_user = ''
-                                        that.allUnreadMsg()
-                                    },
-                                    onError: function(error){
-                                        // error => 清除未读消息数错误码
-                                        console.log(error)
-                                    }
-                                });
-                            })
-                            return
-
+                            RongIMClient.getInstance().clearTotalUnreadCount({
+                                onSuccess: function(){
+                                    // 清除未读消息成功
+                                    that.userList = []
+                                    that.now_user = ''
+                                    that.allUnreadMsg()
+                                },
+                                onError: function(error){
+                                    // error => 清除未读消息数错误码
+                                    console.log(error)
+                                }
+                            });
                         },
                         onError: function(error) {
                             that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
                         }
                     });
+
+                    // RongIMClient.getInstance().clearConversations({
+                    //     onSuccess: function() {
+                    //         that.userList.forEach(v=>{
+                    //             let conversationType = RongIMLib.ConversationType.PRIVATE;
+                    //             let targetId = v.targetId;
+                    //             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
+                    //                 onSuccess: function(){
+                    //                     // 清除未读消息成功
+                    //                     that.userList = []
+                    //                     that.now_user = ''
+                    //                     that.allUnreadMsg()
+                    //                 },
+                    //                 onError: function(error){
+                    //                     // error => 清除未读消息数错误码
+                    //                     console.log(error)
+                    //                 }
+                    //             });
+                    //         })
+                    //         return
+
+                    //     },
+                    //     onError: function(error) {
+                    //         that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+                    //     }
+                    // });
                 })
                 .catch(() => {});
         },
         
-        // clearConverHis(){
-        //     let that = this
-        //     this.$confirm('确认清除所有会话消息', '提示', {
-        //         type: 'warning'
-        //     })
-        //         .then(() => {
-        //             RongIMClient.getInstance().clearConversations({
-        //                 onSuccess: function() {
-        //                     that.now_user = ''
-        //                 },
-        //                 onError: function(error) {
-        //                     that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
-        //                 }
-        //             });
-        //         })
-        //         .catch(() => {});
-        // }
 
-
+        clearConverHisMsg(){
+            let that = this
+            if(that.msgArr = []){
+                this.$message({ message: '当前会话没有历史记录', type: 'warning' });
+            }
+            this.$confirm('确认清除当前会话历史记录', '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    var params = {
+                        conversationType: RongIMLib.ConversationType.PRIVATE, // 会话类型
+                        targetId: this.now_user.targetId, // 目标 Id
+                        timestamp: 0 // 清除时间点
+                    };
+                    RongIMLib.RongIMClient.getInstance().clearRemoteHistoryMessages(params, {
+                        onSuccess: function() {
+                            that.msgArr = []
+                        },
+                        onError: function(error) {
+                            // 请排查：单群聊消息云存储是否开通
+                            console.log(error);
+                        }
+                    });
+                })
+                .catch(() => {});
+        },
 
         // 图片上传
         uploadImg() {
@@ -897,11 +930,6 @@ export default {
         }
     },
     mounted() {
-        // var audio=this.$refs.audio
-        // if (audio.paused) { //判读是否播放  
-        //     audio.paused=false;
-        //     audio.play(); //没有就播放 
-        // }  
         let that = this
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
 
