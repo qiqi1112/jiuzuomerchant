@@ -233,13 +233,13 @@ Vue.filter("recoType", function (oldVal) {
     let newVal = '';
     switch (oldVal) {
         case 1:
-            newVal = '申请商家推荐';
+            newVal = '申请店铺推荐';
             break;
         case 2:
-            newVal = '商家推荐审核中';
+            newVal = '推荐位申请中';
             break;
         case 3:
-            newVal = '商家推荐申请成功';
+            newVal = '店铺已被推荐';
             break;
     }
     return newVal;
@@ -250,10 +250,10 @@ Vue.filter("putawayStatus", function (oldVal) {
     let newVal = '';
     switch (oldVal) {
         case 1:
-            newVal = '申请店铺下线';
+            newVal = '店铺下线申请';
             break;
         case 2:
-            newVal = '申请店铺上线';
+            newVal = '店铺上线申请';
             break;
         case 3:
             newVal = '申请中';

@@ -99,7 +99,23 @@
                 <!-- <el-table-column prop="smsCode" label="验证码"></el-table-column> -->
                 <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
-                        <template v-if="scope.row.closedStatus === 0">
+                        <template v-if="scope.row.orderType === 2 && scope.row.status === 4">
+                            <el-button disabled type="success">已接单</el-button>
+                            <el-button disabled type="success">已到店</el-button>
+                            <el-button
+                                :disabled="scope.row.status == 6"
+                                :type="scope.row.status == 6 ? 'success' : 'primary'"
+                                @click="isConComplete(scope.row)"
+                                >{{ scope.row.status == 6 ? '已离店' : '确认离店' }}</el-button
+                            >
+                        </template>
+
+                        <template v-if="scope.row.orderType === 2 && scope.row.status !== 4"></template>
+
+                        <template v-if="scope.row.closedStatus === 0 && scope.row.orderType !== 2 && scope.row.status !== 4">
+                            <!-- <el-button v-if="scope.row.orderType === 2 && scope.row.status === 4" disabled type="success">已接单</el-button>
+                            <el-button v-if="scope.row.orderType === 2 && scope.row.status === 4" disabled type="success">已到店</el-button> -->
+
                             <el-button
                                 v-if="scope.row.status != 2"
                                 :disabled="(scope.row.status != 0 && scope.row.status != 1) || scope.row.status == 1"
@@ -444,7 +460,7 @@ export default {
                 searchOrderType: '',
                 searchPayStatus: '',
                 searchNickName: '',
-                smsCode : '',
+                smsCode: '',
 
                 dataListCount: 0, //默认当前要显示的数据条数
                 currentPage: 1, //默认显示的页码所在位置（第一页）
@@ -726,7 +742,7 @@ export default {
                     orderType: this.searchObj.searchOrderType,
                     paid: this.searchObj.searchPayStatus,
                     contactName: this.searchObj.searchNickName,
-                    smsCode : this.searchObj.smsCode
+                    smsCode: this.searchObj.smsCode
                 };
 
                 try {
@@ -824,7 +840,7 @@ export default {
 
         //到店操作
         reachStore() {
-            this.isHandleRequest(this.upSeatId, 4,this.reachStoreCode);
+            this.isHandleRequest(this.upSeatId, 4, this.reachStoreCode);
         },
 
         //到店操作对话框中的取消按钮
