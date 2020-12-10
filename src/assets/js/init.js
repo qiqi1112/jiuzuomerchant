@@ -3,7 +3,6 @@ export default function init(userInfo,callbacks) {
     if (!userInfo.appKey || !userInfo.token){
         return false; 
     }
-    console.log(333)
     //公有云初始化
     RongIMLib.RongIMClient.init(userInfo.appKey);
     
