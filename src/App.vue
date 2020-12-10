@@ -1,6 +1,6 @@
 <template>
     <div id="app" @click="close">
-        <template v-if="$store.state.showChatRoom">
+        <template v-if="!$store.state.showChatRoom">
             <chatRoom></chatRoom>
         </template>
         <router-view></router-view>
@@ -12,7 +12,8 @@ export default {
     data() {
         return {};
     },
-    created() {},
+    created() {
+    },
     components: {
         chatRoom
     },

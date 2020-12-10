@@ -9,7 +9,7 @@ const store = new Vuex.Store({
     state:{
         popupState1:false,  
         popupState2:false, 
-        showChatRoom:true,
+        showChatRoom:false,
         newMsgArr:[],//聊天 监听到新消息
         newMsgNum:0,//用户 聊天页面  监听是否有新消息
         headerUnread:0,//头部  未读消息

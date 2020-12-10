@@ -10,8 +10,6 @@ import emoji from '@/assets/js/emoji'
 
 // import libamr from '@/assets/js/libamr'
 // import rongIMVoice from '@/assets/js/rongIMVoice'
-
-
 import './assets/css/icon/iconfont.css';
 import {
     messages
@@ -74,7 +72,6 @@ router.beforeEach((to, from, next) => {
     const role = JSON.parse(localStorage.getItem('userInfo')) || ''
     if (!role && to.path !== '/login') {
         // this.$socket.disconnect();
-        RongIMClient.getInstance().disconnect();
         next('/login');
     } else {
         if (role) {

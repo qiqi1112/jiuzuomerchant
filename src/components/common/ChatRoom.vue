@@ -962,12 +962,12 @@ export default {
         }
     },
     mounted() {
-        let that = this
-        let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
-
         if(!localStorage.getItem('userInfo')){
             return
         }
+        let that = this
+        let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
+        console.log(2222)
         var userInfo = {
             appKey: this.$rongyunKey,
             token:rToken
