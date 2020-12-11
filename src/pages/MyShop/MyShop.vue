@@ -334,10 +334,57 @@
                 </div>
                 <!-- 店铺卡座 -->
                 <div v-if="shopLocaIndex == 1 || shopLocaIndex == 2">
+                    <!-- 新增/编辑楼层对话框 -->
+                    <el-dialog title="新增/编辑楼层" :visible.sync="seatFloorDialog" class="floor-dialog" @close="seatFloorDialog = false">
+                        <div class="input-box">
+                            <div v-for="(item, index) in list" :key="index">
+                                <span>楼层名称：</span>
+                                <el-input
+                                    v-model="item.floor"
+                                    placeholder="如：1楼"
+                                    style="width: 30%; margin-right: 10px"
+                                    clearable
+                                ></el-input>
+                                <el-button type="danger" @click="deleteFloorList(item)">删除</el-button>
+                            </div>
+                            <div>
+                                <span>楼层名称：</span>
+                                <el-input
+                                    v-model="floorName"
+                                    placeholder="如：1楼"
+                                    style="width: 30%; margin-right: 10px"
+                                    clearable
+                                ></el-input>
+                                <el-button type="primary" @click="creatFloorList">添加</el-button>
+                            </div>
+                        </div>
+
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="seatFloorDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="handleSeatFloor">确 定</el-button>
+                        </div>
+                    </el-dialog>
+
                     <h4>店铺卡座</h4>
                     <div class="shop-seat">
                         <!-- 左边座位展示 -->
                         <div class="left-box">
+                            <el-button v-if="isReadonly" type="primary" @click="addFloor" class="add-floor">编辑楼层</el-button>
+
+                            <template v-if="!isReadonly">
+                                <el-button
+                                    v-for="(item, index) in list"
+                                    :key="index"
+                                    type="primary"
+                                    @click="
+                                        '';
+
+                                    "
+                                    class="add-floor"
+                                    >{{ item.floor }}</el-button
+                                >
+                            </template>
+
                             <!-- 座位行数和列数 -->
                             <p class="input-seat">
                                 <label style="margin-right: 30px">
@@ -369,6 +416,7 @@
                                     ></el-input-number>
                                 </label>
                             </p>
+
                             <!-- 座位属性标题 -->
                             <div class="seat-title">
                                 <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
@@ -376,6 +424,7 @@
                                     {{ item.name }}
                                 </p>
                             </div>
+
                             <!-- 回显的座位图 -->
                             <div
                                 v-if="x && y"
@@ -446,14 +495,6 @@
                                     :min="1"
                                     @blur="checkNull(presentSeatInfo.numberOfPeople, '容纳人数')"
                                 ></el-input-number>
-                                <!-- <el-input
-                                    v-model="presentSeatInfo.numberOfPeople"
-                                    placeholder="容纳人数"
-                                    style="width: 50%; margin-right: 6px"
-                                    :readonly="isReadonly"
-                                    type="number"
-                                >
-                                </el-input> -->
                             </div>
                             <!-- 最晚保留时间 -->
                             <div class="lon-retain">
@@ -935,8 +976,8 @@ export default {
             rowNumImageUrl: '', //排号横幅图
             appShopImageUrl: '', //店铺长图
 
-            x: 20, //座位行数
-            y: 20, //座位列数
+            x: 6, //座位行数
+            y: 6, //座位列数
             //座位属性数组
             seatAttOpt: [
                 {
@@ -1003,10 +1044,36 @@ export default {
             },
 
             wrapLoading: false, //加载开关
-            allRegRight: false //全部验证通过的开关
+            allRegRight: false, //全部验证通过的开关
+
+            seatFloorDialog: false, //添加或修改楼层弹窗的开关
+            cassette: [], //所有楼层的座位数量
+            list: [], //所有楼层中所有的座位
+            floorName: '' //添加楼层名称的输入框
         };
     },
     methods: {
+        //打开添加/修改楼层对话框
+        addFloor() {
+            this.submitShopType = [];
+
+            //获取最新的楼层
+            this.getStoreInfo();
+
+            this.seatFloorDialog = true;
+        },
+
+        //确定添加/修改楼层
+        handleSeatFloor() {
+            //回显已经选择的店铺类型
+            this.showCheckType();
+
+            //修改店铺
+            this.submitShopRequest();
+
+            console.log(this.list);
+        },
+
         //验证所有输入的值
         checkFormInfo() {
             if (!this.shopName) {
@@ -1492,8 +1559,6 @@ export default {
                         }
                     });
                 }
-
-                console.log('yyyy', this.submitShopType);
             }
             // 单选情况下
             if (this.shopLocaIndex == 3) {
@@ -1508,20 +1573,24 @@ export default {
 
         //回显店铺类型样式（编辑时）
         showCheckType() {
-            this.shopTypeOptStrArr.forEach((item) => {
-                this.shopTypeOpt.forEach((obj) => {
-                    if (item == obj.recommendBrand) {
-                        this.submitShopType.push(obj.id); //将原有的类型id存入上传数组中
-                        this.$nextTick(() => {
-                            this.$refs.shopTypeSpan.forEach((item2) => {
-                                if (item2.innerHTML == obj.recommendBrand) {
-                                    item2.classList.add('shop-type-span'); //回显原有类型对应的样式
-                                }
-                            });
-                        });
-                    }
+            if (this.shopTypeOptStrArr != [] && this.shopTypeOpt != [] && this.$refs.shopTypeSpan != []) {
+                this.shopTypeOptStrArr.forEach((item) => {
+                    this.shopTypeOpt.forEach((obj) => {
+                        if (item == obj.recommendBrand) {
+                            this.submitShopType.push(obj.id); //将原有的类型id存入上传数组中
+                            if (!this.seatFloorDialog) {
+                                this.$nextTick(() => {
+                                    this.$refs.shopTypeSpan.forEach((item2) => {
+                                        if (item2.innerHTML == obj.recommendBrand) {
+                                            item2.classList.add('shop-type-span'); //回显原有类型对应的样式
+                                        }
+                                    });
+                                });
+                            }
+                        }
+                    });
                 });
-            });
+            }
         },
 
         //给地图子组件传值（编辑店铺时）
@@ -1585,6 +1654,8 @@ export default {
                 });
             }
 
+            console.log('店铺类型', this.submitShopType);
+
             //要传的值
             let data = {
                 appListBigPicture: this.appShopImageUrl,
@@ -1613,9 +1684,11 @@ export default {
                 tableReservationNotes: '订桌注意事项',
                 trustAddress: this.trustAddress,
                 type: this.submitShopType.join(','),
-                layoutList: this.allSeatDetailInfo,
+                // layoutList: this.allSeatDetailInfo,
                 ktvRoomList: ktvRoomList,
-                deleteKtvRoomList: this.deleteKtvRoomList
+                deleteKtvRoomList: this.deleteKtvRoomList,
+
+                list: this.list
             };
 
             if (this.isUpdate) {
@@ -1624,7 +1697,13 @@ export default {
 
                 this.$put('/merchant/store/update', data).then((res) => {
                     if (res.code === 0) {
-                        this.requestSuccessInit('修改成功');
+                        if (this.seatFloorDialog) {
+                            this.$message.success('修改成功');
+                            this.seatFloorDialog = false; //关闭编辑楼层对话框
+                            this.wrapLoading = false;
+                        } else {
+                            this.requestSuccessInit('修改成功');
+                        }
                     } else {
                         this.wrapLoading = false;
                         this.$message.error(res.msg);
@@ -1635,7 +1714,13 @@ export default {
 
                 this.$post('/merchant/store/save', data).then((res) => {
                     if (res.code === 0) {
-                        this.requestSuccessInit('新增成功');
+                        if (this.seatFloorDialog) {
+                            this.$message.success('新增成功');
+                            this.seatFloorDialog = false; //关闭编辑楼层对话框
+                            this.wrapLoading = false;
+                        } else {
+                            this.requestSuccessInit('新增成功');
+                        }
                         localStorage.removeItem('storageInfo');
                         this.isUpdate = true;
                     } else {
@@ -1789,8 +1874,8 @@ export default {
         },
 
         //回显店铺卡座数量（行和列数量）
-        getShopSeat(seat) {
-            seat = seat.split('x');
+        getShopSeat(index) {
+            let seat = this.list[index].cassettes.split('x');
             this.x = seat[0];
             this.y = seat[1];
         },
@@ -1972,6 +2057,106 @@ export default {
             }
         },
 
+        //删除楼层
+        deleteFloorList(item) {
+            const index = this.list.indexOf(item);
+            if (index !== -1) {
+                this.list.splice(index, 1);
+            }
+        },
+
+        //创建楼层
+        creatFloorList() {
+            if (this.floorName.trim() === '') {
+                this.$message.error('请输入正确的楼层名称');
+                return;
+            }
+
+            this.allSeatDetailInfo = [];
+
+            let layoutList = [];
+            //根据行数和列数动态的创建座位
+            for (let i = 1; i <= 6; i++) {
+                for (let j = 1; j <= 6; j++) {
+                    layoutList.push({
+                        minConsumption: 0,
+                        numberOfPeople: 1,
+                        seatAttribute: 2,
+                        seatCode: this.floorName + '-' + j + '-' + i,
+                        floor: this.floorName,
+                        floorPower: this.list.length,
+                        seatColumn: i,
+                        seatRow: j,
+                        seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
+                        seatType: 1,
+                        softHardStatus: '1',
+                        weekPriceList: [
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 1
+                            },
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 2
+                            },
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 3
+                            },
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 4
+                            },
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 5
+                            },
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 6
+                            },
+                            {
+                                id: '',
+                                price: 0.1,
+                                seatCode: '',
+                                storeId: '',
+                                weekIndex: 7
+                            }
+                        ]
+                    });
+                }
+            }
+
+            //创建楼层
+            this.list.push({
+                cassettes: '6x6',
+                floor: this.floorName,
+                floorPower: this.list.length,
+                layoutList
+            });
+
+            //清空新增输入框
+            this.floorName = '';
+        },
+
         //创建座位（夜店/清吧）
         createSeatFn() {
             this.allSeatDetailInfo = [];
@@ -2064,10 +2249,12 @@ export default {
         //对座位信息进行相关转换
         changeLayoutList(arr) {
             arr.forEach((item) => {
-                //将数值型转为字符型（软硬座）
-                if (item.softHardStatus) {
-                    item.softHardStatus = item.softHardStatus.toString();
-                }
+                item.layoutList.forEach((item2) => {
+                    //将数值型转为字符型（软硬座）
+                    if (item2.softHardStatus) {
+                        item2.softHardStatus = item2.softHardStatus.toString();
+                    }
+                });
             });
         },
 
@@ -2190,7 +2377,7 @@ export default {
                     let result = res.data;
                     this.shopId = result.id;
                     this.appShopImageUrl = result.appListBigPicture;
-                    let cassette = result.cassette;
+                    this.cassette = result.cassette;
                     this.city = result.city;
                     this.servicePhoneArr = result.customerServicePhoneList;
                     this.district = result.district;
@@ -2213,8 +2400,10 @@ export default {
                     this.shopBrief = result.synopsis;
                     this.trustAddress = result.trustAddress;
                     this.shopTypeArr = result.type.split(',');
-                    this.allSeatDetailInfo = result.layoutList;
+                    // this.allSeatDetailInfo = result.layoutList;
                     this.ktvRoomList = result.ktvRoomList;
+
+                    this.list = result.list;
 
                     //获取店铺类型
                     this.getShopType(result.storeLocation);
@@ -2225,14 +2414,15 @@ export default {
                     //回显视频banner
                     this.showBannerVid();
 
-                    //回显店铺卡座数量
-                    this.getShopSeat(cassette);
+                    //回显第一楼店铺卡座数量
+                    this.getShopSeat(0);
 
                     //获取经纬度
                     this.getlonlat(lonlat);
 
                     //对座位信息进行相关转换
-                    this.changeLayoutList(this.allSeatDetailInfo);
+                    // this.changeLayoutList(this.allSeatDetailInfo);
+                    this.changeLayoutList(this.list);
 
                     //对ktv信息进行相关转换
                     this.changeKtvList(this.ktvRoomList);
@@ -2245,6 +2435,9 @@ export default {
 
                     //获取商家上架下架状态
                     this.getPutawayStatus();
+
+                    //回显已经选择的店铺类型
+                    // this.showCheckType();
 
                     this.wrapLoading = false;
 
@@ -2281,7 +2474,6 @@ export default {
                 filterModule: index
             };
             this.$post('/merchant/store/screening/apiList', data).then((res) => {
-                console.log('xxxx', res.data);
                 if (res.data) {
                     this.shopTypeOpt = res.data.storeScreeningDTOS;
                     //回显店铺类型
@@ -2408,14 +2600,6 @@ export default {
 
         //座位行数/列数改变
         changeSeatNum() {
-            // this.$confirm('修改行列将会清空之前配置的座位信息，确定要修改吗？', '警告', {
-            //         type: 'warning'
-            //     })
-            //         .then(() => {
-
-            //         })
-            //         .catch(() => {});
-
             if (!this.isReadonly && this.x % 1 == 0 && this.y % 1 == 0) {
                 this.isClickSeat = false;
                 this.createSeatFn(); //创建座位
@@ -2446,6 +2630,13 @@ export default {
                 if (!this.isReadonly && this.shopLocaIndex == 3) {
                     this.imgUploadWatch('.ktv-banner', this.presentKtvInfo.sketchMap, 3);
                 }
+            },
+            deep: true
+        },
+
+        list: {
+            handler() {
+                console.log('更改更改更改');
             },
             deep: true
         },
@@ -2934,6 +3125,10 @@ export default {
                 display: flex;
                 margin-bottom: 20px;
             }
+
+            .add-floor {
+                margin-bottom: 20px;
+            }
         }
 
         .right-box {
@@ -3233,6 +3428,22 @@ export default {
 
 /deep/ .el-input--suffix .el-input__inner {
     padding-right: 0;
+}
+
+/deep/ .floor-dialog {
+    .el-dialog {
+        width: 30%;
+
+        .el-dialog__body {
+            padding: 10px 20px;
+        }
+
+        .input-box {
+            > div {
+                margin-bottom: 15px;
+            }
+        }
+    }
 }
 
 .el-tag + .el-tag {

@@ -1160,6 +1160,10 @@ export default {
             .info2 {
                 display: flex;
                 justify-content: space-between;
+
+                & > div:first-child {
+                    width: 40%;
+                }
             }
 
             .info3 {
@@ -1280,5 +1284,9 @@ export default {
         text-align: center;
         width: 30%;
     }
+}
+
+/deep/.el-form-item__label {
+    text-align: left;
 }
 </style>
