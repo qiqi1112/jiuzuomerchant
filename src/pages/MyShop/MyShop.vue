@@ -344,6 +344,7 @@
                                     placeholder="如：1楼"
                                     style="width: 30%; margin-right: 10px"
                                     clearable
+                                    @change="changeFloor(item)"
                                 ></el-input>
                                 <el-button type="danger" @click="deleteFloorList(item)">删除</el-button>
                             </div>
@@ -1074,6 +1075,15 @@ export default {
             console.log(this.list);
         },
 
+        //更改楼层名称，内部的座位的相关信息也要跟着改变
+        changeFloor(item) {
+            // item.floorPower = this.list.length;
+            item.layoutList.forEach((ele) => {
+                ele.floor = item.floor;
+                // ele.floorPower = item.floorPower;
+            });
+        },
+
         //验证所有输入的值
         checkFormInfo() {
             if (!this.shopName) {
@@ -1654,12 +1664,19 @@ export default {
                 });
             }
 
+            //传消息时，座位号前面要跟上当前的楼层号
+            this.list.forEach((item) => {
+                item.layoutList.forEach((item2) => {
+                    item2.seatCode = item.floor + '-' + item2.seatCode;
+                });
+            });
+
             console.log('店铺类型', this.submitShopType);
 
             //要传的值
             let data = {
                 appListBigPicture: this.appShopImageUrl,
-                cassette: `${this.x}x${this.y}`,
+                // cassette: `${this.x}x${this.y}`,
                 city: this.city,
                 customerServicePhoneList: this.servicePhoneArr,
                 district: this.district,
@@ -2082,7 +2099,7 @@ export default {
                         minConsumption: 0,
                         numberOfPeople: 1,
                         seatAttribute: 2,
-                        seatCode: this.floorName + '-' + j + '-' + i,
+                        seatCode: j + '-' + i,
                         floor: this.floorName,
                         floorPower: this.list.length,
                         seatColumn: i,
@@ -2436,6 +2453,14 @@ export default {
                     //获取商家上架下架状态
                     this.getPutawayStatus();
 
+                    //传消息时，座位号前面要跟上当前的楼层号
+                    this.list.forEach((item) => {
+                        item.layoutList.forEach((item2) => {
+                            const index = item2.seatCode.indexOf('-');
+                            item2.seatCode = item2.seatCode.substr(index + 1);
+                        });
+                    });
+
                     //回显已经选择的店铺类型
                     // this.showCheckType();
 
@@ -2630,13 +2655,6 @@ export default {
                 if (!this.isReadonly && this.shopLocaIndex == 3) {
                     this.imgUploadWatch('.ktv-banner', this.presentKtvInfo.sketchMap, 3);
                 }
-            },
-            deep: true
-        },
-
-        list: {
-            handler() {
-                console.log('更改更改更改');
             },
             deep: true
         },
