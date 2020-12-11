@@ -71,11 +71,10 @@ router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | 玖座`;
     const role = JSON.parse(localStorage.getItem('userInfo')) || ''
     if (!role && to.path !== '/login') {
-        // this.$socket.disconnect();
         next('/login');
     } else {
         if (role) {
-
+            
         }
         next()
     }

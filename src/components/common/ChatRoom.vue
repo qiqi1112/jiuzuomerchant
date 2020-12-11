@@ -143,8 +143,12 @@
                             </el-tabs>
 
                             <div class="operating_btn">
-                                <el-button type="primary" @click="clearConversation" class="btn">清空所有会话列表</el-button>
-                                <el-button type="primary" v-show="now_user" @click="clearConverHisMsg" class="btn">清除当前会话历史记录</el-button>
+                                <div>
+                                    <el-button type="primary" @click="clearConversation" class="btn">清空所有会话列表</el-button>
+                                </div>
+                                <div>
+                                    <el-button type="primary" v-show="now_user" @click="clearConverHisMsg" class="btn">清除当前会话历史记录</el-button>
+                                </div>
                             </div>
                         </div>
 
@@ -294,58 +298,63 @@ export default {
                 // this.$refs.simulation.$el.click()
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
-                for(let i=0;i<this.userList.length;i++){
-                    if(this.userList[i].targetId == lastObj.senderUserId){
-                        newUser = false   //找到一个相同  证明是已出现过
-                        break
+                let time = this.userList.length>0? 0 : 1000
+                let timer = setTimeout(()=>{
+                    clearTimeout(timer)
+                    for(let i=0;i<this.userList.length;i++){
+                        if(this.userList[i].targetId == lastObj.senderUserId){
+                            newUser = false   //找到一个相同  证明是已出现过
+                            break
+                        }
                     }
-                }
-                if(newUser){
-                    this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
+                    if(newUser){
+                        this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
+                            if(res.code == 0){
+                                lastObj['id'] = res.data.userId
+                                lastObj['name'] = res.data.nickname
+                                lastObj['portrait'] = this.imgHead + res.data.headPortrait
+                                // 获取未读消息条数
+                                var conversationType = RongIMLib.ConversationType.PRIVATE;
+                                var targetId = lastObj.targetId;
+                                RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
+                                    onSuccess: function(count){
+                                        lastObj['unreadMessageCount'] = count
+                                        that.userList.unshift(lastObj)    
+                                    },
+                                    onError: function(){
+                                        // that.$message({ message: res.msg, type: 'warning' });
+                                    }
+                                });
+                            }else{
+                                this.$message({ message: res.msg, type: 'warning' });
+                            }
+                        });
+                        return
+                    }
+                    this.$get(`/merchant/store/im/getUserById/${lastObj.senderUserId}`).then((res) => {
                         if(res.code == 0){
-                            lastObj['id'] = res.data.userId
-                            lastObj['name'] = res.data.nickname
-                            lastObj['portrait'] = this.imgHead + res.data.headPortrait
-                            // 获取未读消息条数
-                            var conversationType = RongIMLib.ConversationType.PRIVATE;
-                            var targetId = lastObj.targetId;
-                            RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
-                                onSuccess: function(count){
-                                    lastObj['unreadMessageCount'] = count
-                                    that.userList.unshift(lastObj)    
-                                },
-                                onError: function(){
-                                    // that.$message({ message: res.msg, type: 'warning' });
-                                }
-                            });
+                            lastObj.content['id'] = res.data.userId
+                            lastObj.content['name'] = res.data.nickname
+                            lastObj.content['portrait'] = res.data.headPortrait
+                            // this.msgArr.push(lastObj)
+                            // this.$nextTick(this.scrollEnd);
+                            // 当前聊天等于消息发送人  清空未读
+                            console.log(lastObj.senderUserId == this.now_user.targetId)
+                            if(lastObj.senderUserId == this.now_user.targetId){
+                                this.clearUnreadNum(lastObj.targetId)
+                                this.msgArr.push(lastObj)
+                                // this.$nextTick(this.scrollEnd);
+                            }else{
+                                that.$store.state.headerUnread +=1
+                                // 当前聊天不是发送人
+                            }
                         }else{
                             this.$message({ message: res.msg, type: 'warning' });
                         }
+                       
                     });
-                    return
-                }
+                },time)
 
-                this.$get(`/merchant/store/im/getUserById/${lastObj.senderUserId}`).then((res) => {
-                    if(res.code == 0){
-                        lastObj.content['id'] = res.data.userId
-                        lastObj.content['name'] = res.data.nickname
-                        lastObj.content['portrait'] = res.data.headPortrait
-                        // this.msgArr.push(lastObj)
-                        // this.$nextTick(this.scrollEnd);
-                        // 当前聊天等于消息发送人  清空未读
-                        if(lastObj.senderUserId == this.now_user.targetId){
-                            this.clearUnreadNum(lastObj.targetId)
-                            this.msgArr.push(lastObj)
-                            // this.$nextTick(this.scrollEnd);
-                        }else{
-                            that.$store.state.headerUnread +=1
-                            // 当前聊天不是发送人
-                        }
-                    }else{
-                        this.$message({ message: res.msg, type: 'warning' });
-                    }
-                   
-                });
             },
             deep:true
         }
@@ -952,6 +961,7 @@ export default {
             let that = this
             RongIMClient.getInstance().getTotalUnreadCount({
                 onSuccess: function(count) {
+                    console.log(count,'总数')
                     that.$store.state.headerUnread = count
                 },
                 onError: function(error) {
@@ -967,7 +977,6 @@ export default {
         }
         let that = this
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
-        console.log(2222)
         var userInfo = {
             appKey: this.$rongyunKey,
             token:rToken

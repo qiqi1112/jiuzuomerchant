@@ -44,7 +44,6 @@ const store = new Vuex.Store({
         },
         headerClickMsgFun(state,type){
             state.headerClickMsg = type
-            console.log(type)
         },
         headerClickMuteFun(state,type){
             state.headerClickMute = type
