@@ -57,7 +57,12 @@
                 <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
                 <el-table-column label="座位号/包间号" min-width="120">
                     <template slot-scope="scope">
-                        <el-link v-if="scope.row.status == 4" @click="editSeat(scope.row)" type="primary">{{ scope.row.seatCode }}</el-link>
+                        <el-button v-if="scope.row.orderType === 2 && scope.row.status === 4" @click="editSeat(scope.row)" type="primary"
+                            >设定座位</el-button
+                        >
+                        <el-link v-else-if="scope.row.status == 4" @click="editSeat(scope.row)" type="primary">{{
+                            scope.row.seatCode
+                        }}</el-link>
                         <span v-else>{{ scope.row.seatCode }}</span>
                     </template>
                 </el-table-column>
@@ -99,6 +104,7 @@
                 <!-- <el-table-column prop="smsCode" label="验证码"></el-table-column> -->
                 <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
+                        <!-- 如果顾客是预定桌且已到店 -->
                         <template v-if="scope.row.orderType === 2 && scope.row.status === 4">
                             <el-button disabled type="success">已接单</el-button>
                             <el-button disabled type="success">已到店</el-button>
@@ -110,12 +116,11 @@
                             >
                         </template>
 
-                        <template v-if="scope.row.orderType === 2 && scope.row.status !== 4"></template>
+                        <!-- 如果顾客是已到店，但还未到店 -->
+                        <template v-else-if="scope.row.orderType === 2 && scope.row.status !== 4"></template>
 
-                        <template v-if="scope.row.closedStatus === 0 && scope.row.orderType !== 2 && scope.row.status !== 4">
-                            <!-- <el-button v-if="scope.row.orderType === 2 && scope.row.status === 4" disabled type="success">已接单</el-button>
-                            <el-button v-if="scope.row.orderType === 2 && scope.row.status === 4" disabled type="success">已到店</el-button> -->
-
+                        <!-- 其他订单 -->
+                        <template v-else-if="scope.row.closedStatus === 0">
                             <el-button
                                 v-if="scope.row.status != 2"
                                 :disabled="(scope.row.status != 0 && scope.row.status != 1) || scope.row.status == 1"
@@ -169,8 +174,9 @@
                                 }}</el-button
                             >
                         </template>
-
-                        <template v-if="scope.row.closedStatus === 1">{{ scope.row.closedReason }}</template>
+                        <!--  -->
+                        <!-- 如果订单有误，就报相关错误 -->
+                        <template v-else-if="scope.row.closedStatus === 1">{{ scope.row.closedReason }}</template>
                     </template>
                 </el-table-column>
             </el-table>
