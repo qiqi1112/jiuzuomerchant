@@ -138,8 +138,13 @@
                                         <li @click="quickRrep(item)" v-for="(item,i) in oneList" :key="i">{{item}}</li>
                                     </ul>
                                 </el-tab-pane>
-                                <!-- <el-tab-pane label="香槟" name="second">清吧</el-tab-pane>
-                                <el-tab-pane label="啤酒" name="third">KTV</el-tab-pane> -->
+                                <el-tab-pane label="联系官方" name="service">
+                                    <div class="sves" v-for="(item,i) in service" :key="i" @click="createService(item)">
+                                        <img :src="imgHead+item.headPortrait" alt="">
+                                        <span>{{item.nickname}}</span>
+                                    </div>
+                                </el-tab-pane>
+                                <!-- <el-tab-pane label="啤酒" name="third">KTV</el-tab-pane> -->
                             </el-tabs>
 
                             <div class="operating_btn">
@@ -206,6 +211,7 @@ export default {
             audioUrl:"",
             unInput:true,
             isMute:false,
+            service:[],//客服
         };
     },
 
@@ -436,13 +442,6 @@ export default {
                 }
             });
         },
-        // 模拟点击事件 执行 音频
-        // simulationClick(){
-        //     console.log(11111)
-        //     var audio=this.$refs.audio
-        //     audio.play()
-        // },
-
         // 监听聊天的关闭弹窗
         closeDialog(){
             this.$store.commit('headerClickMsgFun', false);
@@ -800,7 +799,51 @@ export default {
             }
         },
         handleClick(tab, event) {
-            // console.log(tab, event);
+            if(tab.name == 'service'){
+                // if(this.service)return
+                this.$get('/merchant/store/im/getSystemId').then((res) => {
+                    console.log(res)
+                    if (res.code == 0) {
+                        this.service = res.data
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                }).catch(error=>{
+                    console.log(error)
+                });
+            }
+        },
+        // 创建客服
+        createService(service){
+            console.log(service)
+            let that = this;
+            let lastObj={};
+            let newUser = true;
+            for(let i=0;i<this.userList.length;i++){
+                if(this.userList[i].targetId == service.id){
+                    newUser = false   //找到一个相同  证明是已出现过
+                    break
+                }
+            }
+            lastObj['id'] = service.id
+            lastObj['targetId'] = service.id
+            lastObj['name'] = service.nickname
+            lastObj['portrait'] = this.imgHead +service.headPortrait
+            if(newUser){
+                // 获取未读消息条数
+                var conversationType = RongIMLib.ConversationType.PRIVATE;
+                var targetId = lastObj.id;
+                RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
+                    onSuccess: function(count){
+                        lastObj['unreadMessageCount'] = count
+                        that.userList.unshift(lastObj)    
+                    },
+                    onError: function(){
+                        // that.$message({ message: res.msg, type: 'warning' });
+                    }
+                });
+                return
+            }
         },
         // 点击快捷回复
         quickRrep(val) {
@@ -959,7 +1002,6 @@ export default {
             let that = this
             RongIMClient.getInstance().getTotalUnreadCount({
                 onSuccess: function(count) {
-                    console.log(count,'总数')
                     that.$store.state.headerUnread = count
                 },
                 onError: function(error) {
@@ -1318,6 +1360,25 @@ export default {
             box-sizing: border-box;
             .goods_list {
                 height: 100%;
+                .sves{
+                    height: 50px;
+                    padding:0 10px;
+                    line-height: 50px;
+                    cursor: pointer;
+                    img{
+                        height: 40px;
+                        width: 40px;
+                        border-radius: 50%;
+                        margin-right: 12px;
+                        vertical-align: middle;
+                    }
+                    span{
+                        font-size: 14px;
+                    }
+                }
+                .sves:hover{
+                    background: #e2e2e2;
+                }
                 .one {
                     li {
                         line-height: 40px;
