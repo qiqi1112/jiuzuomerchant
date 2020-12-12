@@ -60,7 +60,7 @@
                                                         <div style="flex:.3">用户名:</div>
                                                         <div style="flex:.7">{{item.content.title}}</div>
                                                     </div>
-                                                    <div @click="lookOrrder" style="text-align:center;padding-top:10px;border-top:1px solid white;cursor: pointer;">查看详情</div>
+                                                    <div @click="lookOrder" style="text-align:center;padding-top:10px;border-top:1px solid white;cursor: pointer;">查看详情</div>
                                                 </div>
                                             </div>
                                             <!-- 官方消息 -->
@@ -276,14 +276,14 @@ export default {
                             duration: 5000
                         });
                     }else if(lastObj.messageType == 'OrderMessage'){
-                        this.audioUrl = 'default/system/message.mp3'
+                        this.audioUrl = 'default/system/order.mp3'
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的订单',
                             duration: 0
                         });
                     }else if(lastObj.messageType == 'SystemMessage'){
-                        this.audioUrl = 'default/system/message.mp3'
+                        this.audioUrl = 'default/system/system.mp3'
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的官方消息',
@@ -291,11 +291,8 @@ export default {
                         });
                     }
                 }
-                // var audio=this.$refs.audio
-                // console.log(audio)
-                // audio.pause()
-                // audio.play()
-                // this.$refs.simulation.$el.click()
+                var audio=this.$refs.audio
+                audio.play()
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
                 let time = this.userList.length>0? 0 : 1000
@@ -339,7 +336,6 @@ export default {
                             // this.msgArr.push(lastObj)
                             // this.$nextTick(this.scrollEnd);
                             // 当前聊天等于消息发送人  清空未读
-                            console.log(lastObj.senderUserId == this.now_user.targetId)
                             if(lastObj.senderUserId == this.now_user.targetId){
                                 this.clearUnreadNum(lastObj.targetId)
                                 this.msgArr.push(lastObj)
@@ -451,9 +447,11 @@ export default {
         closeDialog(){
             this.$store.commit('headerClickMsgFun', false);
         },
-        lookOrrder(){
+        lookOrder(){
             if(this.$route.path != '/ordermanage'){
                 this.$router.push('/ordermanage')
+            }else{
+                this.$store.commit('onloadOrderFun', true);
             }
             this.showRoom = false
         },
@@ -924,7 +922,7 @@ export default {
                 }
             });
         },
-         beforeAvatarUpload(file) {
+        beforeAvatarUpload(file) {
             
             const isJPG = file.type === 'image/jpeg';
             const isLt2M = file.size / 1024 / 1024 < 0.4;

@@ -560,6 +560,19 @@ export default {
         };
     },
 
+    watch:{
+        watchOnloadOrder:{
+            handler(val){
+                this.getOrderInfo();
+            }
+        },
+    },
+    computed:{
+        watchOnloadOrder(){
+            return this.$store.state.onloadOrder
+        },
+    },
+
     methods: {
         //获取用户隐私号码
         getPhone(orderNo) {

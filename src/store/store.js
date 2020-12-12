@@ -15,6 +15,7 @@ const store = new Vuex.Store({
         headerUnread:0,//头部  未读消息
         headerClickMsg:false,//顶部点击消息  弹出 聊天页
         headerClickMute:false,//是否静音
+        onloadOrder:false,//是否从 消息记录中点进 订单页
     },
     getters:{
 
@@ -47,6 +48,9 @@ const store = new Vuex.Store({
         },
         headerClickMuteFun(state,type){
             state.headerClickMute = type
+        },
+        onloadOrderFun(state,type){
+            state.onloadOrder = type
         },
 
     },
