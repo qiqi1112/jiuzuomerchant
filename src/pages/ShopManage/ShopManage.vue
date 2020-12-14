@@ -470,8 +470,7 @@ export default {
                 listPicture: this.goodsForm.thumImageUrl,
                 name: this.goodsForm.name,
                 originalPrice: this.goodsForm.originPrice,
-                recommendAdStatus:
-                    this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
+                recommendAdStatus:this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
                 recommendStatus: this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2),
                 synopsis: this.goodsForm.desc,
                 type: this.activeNum,
@@ -487,8 +486,7 @@ export default {
                 recommendPictureSort: this.goodsForm.recoWeight,
                 setMealGoodsList: this.goodsForm.tableData,
                 skuList: this.goodsForm.dynamicValidateForm.domains,
-                statisticalPrice:
-                    this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
+                statisticalPrice:this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
                 year: this.goodsForm.year
             };
 
@@ -502,7 +500,6 @@ export default {
                 this.$message.warning('请输入商品名称');
                 return;
             }
-
             if (this.goodsForm.checkedBanner == 1 && !data.recommendAdPicture) {
                 this.$message.warning('请添加广告图片');
                 this.goodsForm.checkedBanner = false;
@@ -571,6 +568,7 @@ export default {
                     if (!item.specName || !item.originalPrice || !item.statisticalPrice) {
                         this.$message.warning('请输入正确的商品规格');
                         skuSwitch = false;
+                        return;
                     }
                 });
                 if (skuSwitch) {

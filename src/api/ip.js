@@ -1,4 +1,4 @@
-let api, tengxun, file, imgHead, token,rongyunKey
+let api, tengxun, file, imgHead, token, rongyunKey
 import axios from 'axios'
 import router from "../router";
 import Message from "element-ui/packages/message/index.js";
