@@ -859,8 +859,20 @@
                         </div>
                         <!-- ktv包间属性列表 -->
                         <div class="ktv-right-box">
+                            <!-- 回显楼层切换的按钮 -->
+                            <div>
+                                <el-button
+                                    v-for="(item, index) in list"
+                                    :key="index"
+                                    :type="nowKtvFloor == item.floor ? 'primary' : ''"
+                                    @click="changeShowKtvFloor(item, index)"
+                                    class="add-floor"
+                                    >{{ item.floor }}</el-button
+                                >
+                            </div>
+
                             <ul>
-                                <li v-for="(item, index) in ktvRoomList" :key="index">
+                                <li v-for="(item, index) in ktvList[nowKtvFloorIndex].ktvRoomList" :key="index">
                                     <div class="left-box">
                                         <div>
                                             <p>
@@ -891,6 +903,39 @@
                                     </div>
                                 </li>
                             </ul>
+
+                            <!-- <ul>
+                                <li v-for="(item, index) in ktvRoomList" :key="index">
+                                    <div class="left-box">
+                                        <div>
+                                            <p>
+                                                <span>包间类型：</span>
+                                                <span>{{ item.roomTypeId | roomType(ktvTypeOpt) }}</span>
+                                            </p>
+                                            <p>
+                                                <span>容纳人数：</span>
+                                                <span>{{ item.capacity }}人</span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p>
+                                                <span>包间数量：</span>
+                                                <span>{{ item.roomNumber }}个</span>
+                                            </p>
+                                            <p>
+                                                <span>最低消费：</span>
+                                                <span>{{ item.minConsumption }}元</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="right-box">
+                                        <el-button @click="lookKtvInfo(item)" type="primary">{{
+                                            isReadonly == true ? '查看' : '编辑'
+                                        }}</el-button>
+                                        <el-button @click="delKtvInfo(item)" type="danger" v-if="!isReadonly">删除</el-button>
+                                    </div>
+                                </li>
+                            </ul> -->
                         </div>
                     </div>
                 </div>
@@ -1054,7 +1099,10 @@ export default {
             floorName: '', //添加楼层名称的输入框
             nowFloor: '', //当前正在操作的楼层
             nowFloorIndex: -1, //当前正在操作的楼层的下标
-            nowFloorPower: '' //当前正在操作的楼层的权重
+            nowFloorPower: '', //当前正在操作的楼层的权重
+            ktvList: [], //回显KTV楼层列表专用
+            nowKtvFloor: '', //当前正在操作的KTV楼层
+            nowKtvFloorIndex: 0 //当前正在操作的KTV楼层的下标
         };
     },
     methods: {
@@ -1435,6 +1483,8 @@ export default {
             this.ktvBannerImgBox = [];
 
             //给每张图片加上前缀
+            // if (this.presentKtvInfo) {
+            // }
             let ktvBannerArr = this.presentKtvInfo.sketchMap.map((item) => {
                 return (item = this.showImgPrefix + item);
             });
@@ -1666,20 +1716,6 @@ export default {
             //不让传过去的banner集合的第一个值为.mp4格式
             this.bannerVideoSort();
 
-            //转换ktv相关字段
-            // let ktvRoomList = [];
-            // if (this.shopLocaIndex == 3) {
-            //     ktvRoomList = this.ktvStrTran(); //数组转json形式（赠品）
-            //     //相关数组转字符串
-            //     ktvRoomList.forEach((item) => {
-            //         item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
-            //         item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
-            //         item.haveMahjong = item.haveMahjong === false ? 2 : 1;
-            //         item.haveSwimming = item.haveSwimming === false ? 2 : 1;
-            //         item.haveTableTennis = item.haveTableTennis === false ? 2 : 1;
-            //     });
-            // }
-
             //传消息时，座位号前面要跟上当前的楼层号
             if (this.list.length !== 0) {
                 this.list.forEach((item) => {
@@ -1718,7 +1754,6 @@ export default {
                 trustAddress: this.trustAddress,
                 type: this.submitShopType.join(','),
                 layoutList: [],
-                // ktvRoomList: ktvRoomList,
                 ktvRoomList: this.ktvStrTran(),
                 deleteKtvRoomList: this.deleteKtvRoomList,
                 list: this.list
@@ -1897,6 +1932,12 @@ export default {
         //改变座位状态按钮（改变点击的座位颜色）
         changeStyle(style) {
             this.seatStyle = style;
+        },
+
+        //
+        changeShowKtvFloor(item, index) {
+            this.nowKtvFloor = item.floor;
+            this.nowKtvFloorIndex = index;
         },
 
         //切换楼层，楼层对应的行列跟着切换
@@ -2325,8 +2366,8 @@ export default {
         },
 
         //对ktv信息进行相关转换
-        changeKtvList() {
-            this.ktvRoomList.forEach((item) => {
+        changeKtvList(arr) {
+            arr.forEach((item) => {
                 //赠品json字符串转为数组对象
                 if (item.snacks) {
                     item.snacks = JSON.parse(item.snacks);
@@ -2479,6 +2520,7 @@ export default {
                     this.trustAddress = result.trustAddress;
                     this.shopTypeArr = result.type.split(',');
                     this.ktvRoomList = result.ktvRoomList;
+                    this.ktvList = result.list; //回显时根据楼层分类列表专用
                     this.list = result.list;
 
                     //获取店铺类型
@@ -2503,7 +2545,10 @@ export default {
                     this.changeLayoutList();
 
                     //对ktv信息进行相关转换
-                    this.changeKtvList();
+                    this.changeKtvList(this.ktvRoomList);
+                    this.ktvList.forEach((item) => {
+                        this.changeKtvList(item.ktvRoomList);
+                    });
 
                     //座位属性回显
                     this.showSeatAtt(0);
