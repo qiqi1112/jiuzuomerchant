@@ -386,68 +386,70 @@
                                 >
                             </div>
 
-                            <!-- 座位行数和列数 -->
-                            <p class="input-seat">
-                                <label style="margin-right: 30px">
-                                    座位行数：
-                                    <el-input-number
-                                        :step="1"
-                                        step-strictly
-                                        :disabled="isReadonly"
-                                        v-model="x"
-                                        :min="6"
-                                        style="width: 120px"
-                                        label="行数"
-                                        @blur="checkNull(x, '座位行数')"
-                                        @change="changeSeatNum"
-                                    ></el-input-number>
-                                </label>
-                                <label style="margin-right: 30px">
-                                    座位列数：
-                                    <el-input-number
-                                        :step="1"
-                                        step-strictly
-                                        :disabled="isReadonly"
-                                        v-model="y"
-                                        :min="6"
-                                        style="width: 120px"
-                                        label="列数"
-                                        @blur="checkNull(y, '座位列数')"
-                                        @change="changeSeatNum"
-                                    ></el-input-number>
-                                </label>
-                            </p>
-
-                            <!-- 座位属性标题 -->
-                            <div class="seat-title">
-                                <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
-                                    <span :class="item.class"></span>
-                                    {{ item.name }}
+                            <template v-if="list.length !== 0">
+                                <!-- 座位行数和列数 -->
+                                <p class="input-seat">
+                                    <label style="margin-right: 30px">
+                                        座位行数：
+                                        <el-input-number
+                                            :step="1"
+                                            step-strictly
+                                            :disabled="isReadonly"
+                                            v-model="x"
+                                            :min="6"
+                                            style="width: 120px"
+                                            label="行数"
+                                            @blur="checkNull(x, '座位行数')"
+                                            @change="changeSeatNum"
+                                        ></el-input-number>
+                                    </label>
+                                    <label style="margin-right: 30px">
+                                        座位列数：
+                                        <el-input-number
+                                            :step="1"
+                                            step-strictly
+                                            :disabled="isReadonly"
+                                            v-model="y"
+                                            :min="6"
+                                            style="width: 120px"
+                                            label="列数"
+                                            @blur="checkNull(y, '座位列数')"
+                                            @change="changeSeatNum"
+                                        ></el-input-number>
+                                    </label>
                                 </p>
-                            </div>
 
-                            <!-- 回显的座位图 -->
-                            <div
-                                v-if="x && y"
-                                class="seat-box"
-                                ref="seatBox"
-                                :style="{ width: 32 * y + 30 + 'px' }"
-                                style="overflow: hidden"
-                            >
-                                <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
-                                    <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
-                                        <span
-                                            :title="itemX + '-' + itemY"
-                                            ref="seatSpan"
-                                            :data-indexX="indexX + 1"
-                                            :data-indexY="indexY + 1"
-                                            class="seat"
-                                            @click="changeStauts($event, seatStyle)"
-                                            @contextmenu.prevent="changeStauts($event, 'canBook')"
-                                        ></span>
+                                <!-- 座位属性标题 -->
+                                <div class="seat-title">
+                                    <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
+                                        <span :class="item.class"></span>
+                                        {{ item.name }}
+                                    </p>
+                                </div>
+
+                                <!-- 回显的座位图 -->
+                                <div
+                                    v-if="x && y"
+                                    class="seat-box"
+                                    ref="seatBox"
+                                    :style="{ width: 32 * y + 30 + 'px' }"
+                                    style="overflow: hidden"
+                                >
+                                    <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
+                                        <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
+                                            <span
+                                                :title="itemX + '-' + itemY"
+                                                ref="seatSpan"
+                                                :data-indexX="indexX + 1"
+                                                :data-indexY="indexY + 1"
+                                                class="seat"
+                                                @click="changeStauts($event, seatStyle)"
+                                                @contextmenu.prevent="changeStauts($event, 'canBook')"
+                                            ></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </template>
                         </div>
                         <!-- 座位属性 -->
                         <div class="right-box" v-if="isClickSeat">
@@ -1069,16 +1071,14 @@ export default {
 
         //确定添加/修改楼层
         handleSeatFloor() {
-            if (this.list.length === 0) {
-                this.$message.error('楼层最低保留一层');
-                return;
+            this.checkFormInfo(); //验证所有输入的值
+            if (this.allRegRight) {
+                //修改店铺
+                this.submitShopRequest();
             }
 
             //回显已经选择的店铺类型
             this.showCheckType();
-
-            //修改店铺
-            this.submitShopRequest();
         },
 
         //更改楼层名称，内部的座位的相关信息也要跟着改变
@@ -1143,6 +1143,9 @@ export default {
                 return;
             } else if (!this.overallImageUrl && this.shopLocaIndex != 3) {
                 this.$message.error('请上传商家布局图');
+                return;
+            } else if (this.list.length === 0) {
+                this.$message.error('楼层最低保留一层');
                 return;
             } else {
                 this.allRegRight = true;
@@ -1913,6 +1916,7 @@ export default {
 
         //切换楼层，楼层对应的行列跟着切换
         changeShowFloor(item, index) {
+            console.log(item, index);
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
             this.nowFloorIndex = index; //当前操作的楼层的下标
@@ -2214,6 +2218,8 @@ export default {
                 floorPower: this.list.length,
                 layoutList
             });
+
+            this.changeShowFloor(this.list[this.list.length - 1], this.list.length);
 
             //清空新增输入框
             this.floorName = '';
