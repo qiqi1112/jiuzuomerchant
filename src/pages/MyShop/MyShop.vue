@@ -336,7 +336,7 @@
                 <!-- 店铺卡座 -->
                 <div v-if="shopLocaIndex == 1 || shopLocaIndex == 2">
                     <!-- 新增/编辑楼层对话框 -->
-                    <el-dialog title="新增/编辑楼层" :visible.sync="seatFloorDialog" class="floor-dialog" @close="seatFloorDialog = false">
+                    <el-dialog title="新增/编辑楼层" :visible.sync="seatFloorDialog" class="floor-dialog" @close="handleCancelEditFloor">
                         <div class="input-box">
                             <div v-for="(item, index) in list" :key="index">
                                 <span>楼层名称：</span>
@@ -361,7 +361,7 @@
                             </div>
                         </div>
                         <div slot="footer" class="dialog-footer">
-                            <el-button @click="seatFloorDialog = false">取 消</el-button>
+                            <el-button @click="handleCancelEditFloor">取 消</el-button>
                             <el-button type="primary" @click="handleSeatFloor">确 定</el-button>
                         </div>
                     </el-dialog>
@@ -386,7 +386,7 @@
                                 >
                             </div>
 
-                            <template v-if="list.length !== 0">
+                            <template v-if="list.length !== 0 && !seatFloorDialog">
                                 <!-- 座位行数和列数 -->
                                 <p class="input-seat">
                                     <label style="margin-right: 30px">
@@ -452,7 +452,7 @@
                             </template>
                         </div>
                         <!-- 座位属性 -->
-                        <div class="right-box" v-if="isClickSeat">
+                        <div class="right-box" v-if="list.length !== 0 && !seatFloorDialog && isClickSeat">
                             <p class="seat-detail">座位详情</p>
                             <!-- 座位属性 -->
                             <div class="seat-prop" v-if="!isReadonly">
@@ -1060,25 +1060,30 @@ export default {
     methods: {
         //打开添加/修改楼层对话框
         addFloor() {
-            //获取最新的楼层（老店铺才去获取）
-            if (this.isUpdate) {
-                this.submitShopType = [];
-                this.getStoreInfo();
+            this.checkFormInfo(); //验证所有输入的值
+            if (!this.allRegRight) {
+                return;
             }
 
+            //获取最新的楼层（老店铺才去获取）
+            if (this.isUpdate) {
+                this.getStoreInfo();
+            }
             this.seatFloorDialog = true;
         },
 
         //确定添加/修改楼层
         handleSeatFloor() {
-            this.checkFormInfo(); //验证所有输入的值
-            if (this.allRegRight) {
-                //修改店铺
-                this.submitShopRequest();
-            }
+            //添加店铺
+            this.submitShopRequest();
 
-            //回显已经选择的店铺类型
-            this.showCheckType();
+            this.seatFloorDialog = false; //关闭编辑楼层对话框
+        },
+
+        //取消编辑楼层
+        handleCancelEditFloor() {
+            this.seatFloorDialog = false;
+            this.changeShowFloor(this.list[0], 0);
         },
 
         //更改楼层名称，内部的座位的相关信息也要跟着改变
@@ -1111,7 +1116,7 @@ export default {
             } else if (!this.endBussTime) {
                 this.$message.error('请选择结束营业时间');
                 return;
-            } else if (this.submitShopType.length == 0) {
+            } else if (this.submitShopType.length === 0) {
                 this.$message.error('请选择店铺类型');
                 return;
             } else if (!this.perCon) {
@@ -1143,9 +1148,6 @@ export default {
                 return;
             } else if (!this.overallImageUrl && this.shopLocaIndex != 3) {
                 this.$message.error('请上传商家布局图');
-                return;
-            } else if (this.list.length === 0) {
-                this.$message.error('楼层最低保留一层');
                 return;
             } else {
                 this.allRegRight = true;
@@ -1557,6 +1559,7 @@ export default {
 
         //选择店铺类型
         checkType(e, item) {
+            console.log('店铺类型', this.submitShopType);
             // 多选情况下
             if (this.shopLocaIndex == 1 || this.shopLocaIndex == 2) {
                 if (!e.target.className) {
@@ -1588,6 +1591,7 @@ export default {
 
         //回显店铺类型样式（编辑时）
         showCheckType() {
+            this.submitShopType = [];
             if (this.shopTypeOptStrArr.length !== [] && this.shopTypeOpt !== [] && this.$refs.shopTypeSpan !== []) {
                 this.shopTypeOptStrArr.forEach((item) => {
                     this.shopTypeOpt.forEach((obj) => {
@@ -1626,7 +1630,7 @@ export default {
         editShopInfo() {
             this.editShopInit(); //初始化操作
             this.sendInfoToMap(); //给地图子组件传值（回显地址信息）
-            this.getShopType(); //获取店铺类型
+            // this.getShopType(); //获取店铺类型
             this.showCheckType(); //回显已经选择的店铺类型
             this.showBannerVideo(); //回显banner图集里的视频
             this.clearKtvInfo(); //清空ktv包间属性数据
@@ -1689,6 +1693,7 @@ export default {
             let data = {
                 appListBigPicture: this.appShopImageUrl,
                 city: this.city,
+                cassette: '6x6',
                 customerServicePhoneList: this.servicePhoneArr,
                 district: this.district,
                 districtCode: this.districtCode,
@@ -1725,16 +1730,6 @@ export default {
 
                 this.$put('/merchant/store/update', data).then((res) => {
                     if (res.code === 0) {
-                        if (this.seatFloorDialog) {
-                            // this.$message.success('修改成功');
-                            // this.seatFloorDialog = false; //关闭编辑楼层对话框
-                            // this.wrapLoading = false;
-                            // this.isReadonly = true;
-                            // this.getStoreInfo();
-
-                            this.seatFloorDialog = false; //关闭编辑楼层对话框
-                        }
-
                         this.requestSuccessInit('修改成功');
                     } else {
                         this.floorName = '';
@@ -1747,16 +1742,6 @@ export default {
 
                 this.$post('/merchant/store/save', data).then((res) => {
                     if (res.code === 0) {
-                        if (this.seatFloorDialog) {
-                            // this.$message.success('新增成功');
-                            // this.seatFloorDialog = false; //关闭编辑楼层对话框
-                            // this.wrapLoading = false;
-                            // this.isReadonly = true;
-                            // this.getStoreInfo();
-
-                            this.seatFloorDialog = false; //关闭编辑楼层对话框
-                        }
-
                         this.requestSuccessInit('新增成功');
                         localStorage.removeItem('storageInfo');
                         this.isUpdate = true;
@@ -1916,7 +1901,6 @@ export default {
 
         //切换楼层，楼层对应的行列跟着切换
         changeShowFloor(item, index) {
-            console.log(item, index);
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
             this.nowFloorIndex = index; //当前操作的楼层的下标
@@ -1928,8 +1912,8 @@ export default {
         //回显店铺卡座数量（行和列数量）
         getShopSeat(index) {
             let seat = this.list[index].cassettes.split('x');
-            this.x = seat[0];
-            this.y = seat[1];
+            this.x = +seat[0];
+            this.y = +seat[1];
         },
 
         //获取经纬度
@@ -2119,6 +2103,11 @@ export default {
 
         //删除楼层
         deleteFloorList(item) {
+            if (this.list.length === 0) {
+                this.$message.error('楼层最低保留一层');
+                return;
+            }
+
             const index = this.list.indexOf(item);
             if (index !== -1) {
                 this.list.splice(index, 1);
@@ -2218,8 +2207,6 @@ export default {
                 floorPower: this.list.length,
                 layoutList
             });
-
-            this.changeShowFloor(this.list[this.list.length - 1], this.list.length);
 
             //清空新增输入框
             this.floorName = '';
@@ -2453,7 +2440,9 @@ export default {
             this.list.forEach((item) => {
                 item.layoutList.forEach((item2) => {
                     const index = item2.seatCode.indexOf('-');
-                    item2.seatCode = item2.seatCode.substr(index + 1);
+                    if (index !== -1) {
+                        item2.seatCode = item2.seatCode.substr(index + 1);
+                    }
                 });
             });
         },
@@ -2525,6 +2514,9 @@ export default {
                     //获取商家上架下架状态
                     this.getPutawayStatus();
 
+                    //回显已经选择的店铺类型
+                    this.submitShopType = result.type.split(',');
+
                     //回显每个座位号时，不要带上楼层号
                     this.substrSeatNum();
 
@@ -2546,8 +2538,6 @@ export default {
                                 //如果有缓存就用缓存里的数据，否则就重新创建座位
                                 if (localStorage.getItem('storageInfo')) {
                                     this.getStorageInfo(); //获取缓存数据
-                                } else {
-                                    // this.createSeatFn(); //创建座位
                                 }
                                 this.wrapLoading = false;
                             })
@@ -2682,6 +2672,11 @@ export default {
                 // //座位属性回显
                 this.showSeatAtt(0);
 
+                //默认展示第一家店的信息
+                if (this.list.length !== 0) {
+                    this.changeShowFloor(this.list[0], 0);
+                }
+
                 // //获取已经选择的店铺类型
                 // this.showShopType(this.submitShopType);
 
@@ -2692,7 +2687,7 @@ export default {
 
         //座位行数/列数改变
         changeSeatNum() {
-            if (!this.isReadonly && this.x % 1 == 0 && this.y % 1 == 0) {
+            if (!this.isReadonly) {
                 this.isClickSeat = false;
                 this.createSeatFn(); //创建座位
             } else {

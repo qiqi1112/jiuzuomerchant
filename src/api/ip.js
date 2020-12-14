@@ -1,4 +1,4 @@
-let api, tengxun, file, imgHead, token,rongyunKey
+let api, tengxun, file, imgHead, token, rongyunKey
 import axios from 'axios'
 import router from "../router";
 import Message from "element-ui/packages/message/index.js";
@@ -54,12 +54,12 @@ api_request.interceptors.response.use(
       router.push("/login");
       // RongIMClient.getInstance().logout();//退出登录
       RongIMClient.getInstance().disconnect(); //断开链接
-      Message.error(response.data.msg);
+      // Message.error(response.data.msg);
       return Promise.reject(response.data);
     }
 
     if (response.data.code == 600) {
-      Message.error(response.data.msg);
+      // Message.error(response.data.msg);
       return response;
 
     }
