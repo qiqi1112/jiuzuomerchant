@@ -568,6 +568,7 @@ export default {
                     if (!item.specName || !item.originalPrice || !item.statisticalPrice) {
                         this.$message.warning('请输入正确的商品规格');
                         skuSwitch = false;
+                        return;
                     }
                 });
                 if (skuSwitch) {

@@ -502,15 +502,15 @@ export default {
                 {
                     label: '抢座',
                     value: '2'
-                },
-                {
-                    label: '会员卡',
-                    value: '3'
-                },
-                {
-                    label: '线下添单',
-                    value: '4'
                 }
+                // {
+                //     label: '会员卡',
+                //     value: '3'
+                // },
+                // {
+                //     label: '线下添单',
+                //     value: '4'
+                // }
             ],
 
             //支付状态
@@ -560,17 +560,17 @@ export default {
         };
     },
 
-    watch:{
-        watchOnloadOrder:{
-            handler(val){
+    watch: {
+        watchOnloadOrder: {
+            handler(val) {
                 this.getOrderInfo();
             }
-        },
+        }
     },
-    computed:{
-        watchOnloadOrder(){
-            return this.$store.state.onloadOrder
-        },
+    computed: {
+        watchOnloadOrder() {
+            return this.$store.state.onloadOrder;
+        }
     },
 
     methods: {
