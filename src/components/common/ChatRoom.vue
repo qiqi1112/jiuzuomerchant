@@ -33,10 +33,14 @@
                                     <div class="cmsg" v-for="(item,i) in msgArr" :key="i" ref="cmsg">
                                         <div class="send_or_rece">{{item.sentTime | formatTime(that)}}</div>
                                         <div class="msg_list" v-if="item.messageDirection==2">
+                                            
                                             <div class="headImg">
                                                 <img v-if="item.content" :src="imgHead+item.content.portrait" alt="">
                                             </div>
                                             <!-- 文本消息 -->
+                                            <div class="withdraw"  v-if="item.messageType == 'RecallCommandMessage'">
+                                                <div>对方撤回了一条消息</div>
+                                            </div>
                                             <div class="msg" v-if="item.messageType == 'TextMessage'">
                                                 <div>{{item.content.content}}</div>
                                             </div>
@@ -81,6 +85,9 @@
                                             </div>
                                             <div class="headImg self_img">
                                                 <img v-if="item.content" :src="imgHead + item.content.portrait" alt="">
+                                            </div>
+                                            <div class="withdraw "  v-if="item.messageType == 'RecallCommandMessage'">
+                                                你撤回了一条消息
                                             </div>
                                         </div>
                                     </div>
@@ -129,10 +136,11 @@
                         </div>
                     </div>
                     <div class="chat" v-else></div>
-                    <div class="quick" v-show="unInput">
+                    <!--  -->
+                    <div class="quick" >
 
                         <div class="goods_list">
-                            <el-tabs v-model="activeName" @tab-click="handleClick">
+                            <el-tabs v-model="activeName" @tab-click="handleClick" v-show="unInput">
                                 <el-tab-pane label="快捷回答" name="first">
                                     <ul class="one">
                                         <li @click="quickRrep(item)" v-for="(item,i) in oneList" :key="i">{{item}}</li>
@@ -273,6 +281,29 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
+                console.log(lastObj)
+
+                // 撤回
+                if(lastObj.messageType == 'RecallCommandMessage'){
+                    
+                    
+                    for(let i=0;i<this.userList.length;i++){
+                        if(lastObj.senderUserId == this.userList[i].senderUserId){
+                            console.log(this.userList[i])
+                        }
+                        break
+                    }
+
+
+
+                    return
+                }
+
+
+
+
+
+
                 if(!lastObj.offLineMessage){
                     if(lastObj.messageType == 'TextMessage'){
                         this.audioUrl = 'default/system/message.mp3'
@@ -523,6 +554,7 @@ export default {
             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
                 onSuccess: function(){
                     // 清除未读消息成功
+                    console.log(11)
                     that.allUnreadMsg()
                 },
                 onError: function(error){
@@ -562,12 +594,14 @@ export default {
             }else{
                 timer = 0
             }
+            console.log(this.now_user.targetId)
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
             var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
                 onSuccess: function(list, hasMsg) {
+                    console.log(list)
                     that.hasHistoryMsg = hasMsg;
                     let html = "";
                     that.getAssignInfo(that.now_user.targetId,list,type)
@@ -913,9 +947,10 @@ export default {
 
         clearConverHisMsg(){
             let that = this
-            if(that.msgArr = []){
-                this.$message({ message: '当前会话没有历史记录', type: 'warning' });
-            }
+            // if(that.msgArr = []){
+            //     this.$message({ message: '当前会话没有历史记录', type: 'warning' });
+            //     return
+            // }
             this.$confirm('确认清除当前会话历史记录', '提示', {
                 type: 'warning'
             })
@@ -1216,6 +1251,16 @@ export default {
                                 background: #de6200;
                             }
                         }
+                        .withdraw{
+                            &>div {
+                                padding: 10px;
+                                border-radius: 10px;
+                                color: white;
+                                max-width: 400px;
+                                display: inline-block;
+                                background:#dadada;
+                            }
+                        }
                         .self_img {
                             text-align: right;
                         }
@@ -1391,6 +1436,7 @@ export default {
                 }
                 .operating_btn{
                     padding-left:10px ;
+                    padding-top: 10px;
                     button{
                         margin-bottom: 12px;
                         margin-left: 0;

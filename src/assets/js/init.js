@@ -39,6 +39,7 @@ export default function init(userInfo,callbacks) {
     RongIMClient.setOnReceiveMessageListener({
         // 接收到的消息
         onReceived: function (message) {
+            console.log(message)
             // 判断消息类型
             switch(message.messageType){
                 case RongIMClient.MessageType.TextMessage:
@@ -94,9 +95,17 @@ export default function init(userInfo,callbacks) {
                 case RongIMClient.MessageType.SystemMessage:
                     // 官方消息
                     num += 1
+                    
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
                     break;
+
+                case RongIMClient.MessageType.RecallCommandMessage:
+                    // 测回消息
+                    num += 1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
+                    break
                 // case RongIMClient.MessageType.TypingStatusMessage:
                 //     num +=1
                 //     console.log('收到5')

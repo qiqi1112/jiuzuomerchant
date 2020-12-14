@@ -181,7 +181,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">返回</el-button>
-                <el-button type="primary" @click="saveEdit" v-if="dynamicValidateForm.examine == 0 || dynamicValidateForm.examine == 3"
+                <el-button type="primary" @click="saveEdit" v-if="dynamicValidateForm.examine == 0 || dynamicValidateForm.examine == 3 || dynamicValidateForm.examine == 2"
                     >确 定</el-button
                 >
             </span>
