@@ -9,6 +9,7 @@
             active-text-color="#20a0ff"
             unique-opened
             router
+            @select = "gowhere"
         >
             <template v-for="item in items">
                 <template v-if="item.subs">
@@ -130,7 +131,7 @@ export default {
                     icon: 'iconfont icon-caiwu side',
                     index: 'financeManage',
                     title: '财务管理'
-                }
+                },
                 // {
                 //     icon: 'el-icon-s-flag',
                 //     title: '广告活动',
@@ -221,21 +222,21 @@ export default {
                 //     index: 'i18n',
                 //     title: '国际化功能'
                 // },
-                // {
-                //     icon: 'el-icon-lx-warn',
-                //     index: '7',
-                //     title: '错误处理',
-                //     subs: [
-                //         {
-                //             index: 'permission',
-                //             title: '权限测试'
-                //         },
-                //         {
-                //             index: '404',
-                //             title: '404页面'
-                //         }
-                //     ]
-                // },
+                {
+                    icon: 'el-icon-lx-warn',
+                    index: '7',
+                    title: '错误处理',
+                    subs: [
+                        {
+                            index: 'permission',
+                            title: '权限测试'
+                        },
+                        {
+                            index: '404',
+                            title: '404页面'
+                        }
+                    ]
+                },
                 // {
                 //     icon: 'el-icon-lx-redpacket_fill',
                 //     index: '/donate',
@@ -255,6 +256,19 @@ export default {
             this.collapse = msg;
             bus.$emit('collapse-content', msg);
         });
+        // 获取店铺类型
+        this.$get('/merchant/store/getStoreInfo')
+        .then(res=>{
+            console.log(res.data.storeLocation)
+            if(res.data.storeLocation==3){
+                this.items[5].index='ktv'
+            }
+        })
+    },
+    methods:{
+        gowhere(e){
+            console.log(e)
+        }
     }
 };
 </script>
