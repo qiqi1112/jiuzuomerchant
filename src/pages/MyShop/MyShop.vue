@@ -853,89 +853,87 @@
                             </div>
                             <!-- 确定与取消 -->
                             <div v-if="!isReadonly">
-                                <el-button @click="ktvCancelSub">取消</el-button>
+                                <el-button @click="ktvCancelSub" v-if="!isUpdateKtvInfo">取消</el-button>
                                 <el-button @click="ktvSureSub" type="primary">{{ isUpdateKtvInfo == false ? '新增' : '修改' }}</el-button>
                             </div>
                         </div>
                         <!-- ktv包间属性列表 -->
                         <div class="ktv-right-box">
-                            <!-- 回显楼层切换的按钮 -->
-                            <div>
-                                <el-button
-                                    v-for="(item, index) in list"
-                                    :key="index"
-                                    :type="nowKtvFloor == item.floor ? 'primary' : ''"
-                                    @click="changeShowKtvFloor(item, index)"
-                                    class="add-floor"
-                                    >{{ item.floor }}</el-button
-                                >
-                            </div>
-
-                            <ul>
-                                <li v-for="(item, index) in ktvList[nowKtvFloorIndex].ktvRoomList" :key="index">
-                                    <div class="left-box">
-                                        <div>
-                                            <p>
-                                                <span>包间类型：</span>
-                                                <span>{{ item.roomTypeId | roomType(ktvTypeOpt) }}</span>
-                                            </p>
-                                            <p>
-                                                <span>容纳人数：</span>
-                                                <span>{{ item.capacity }}人</span>
-                                            </p>
+                            <template v-if="isReadonly">
+                                <div class="change-ktvFloor">
+                                    <el-button
+                                        v-for="(item, index) in list"
+                                        :key="index"
+                                        :type="nowKtvFloor == item.floor ? 'primary' : ''"
+                                        @click="changeShowKtvFloor(item, index)"
+                                        class="add-floor"
+                                        >{{ item.floor }}</el-button
+                                    >
+                                </div>
+                                <ul>
+                                    <li v-for="(item, index) in ktvList[nowKtvFloorIndex].ktvRoomList" :key="index">
+                                        <div class="left-box">
+                                            <div>
+                                                <p>
+                                                    <span>包间类型：</span>
+                                                    <span>{{ item.roomTypeId | roomType(ktvTypeOpt) }}</span>
+                                                </p>
+                                                <p>
+                                                    <span>容纳人数：</span>
+                                                    <span>{{ item.capacity }}人</span>
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p>
+                                                    <span>包间数量：</span>
+                                                    <span>{{ item.roomNumber }}个</span>
+                                                </p>
+                                                <p>
+                                                    <span>最低消费：</span>
+                                                    <span>{{ item.minConsumption }}元</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p>
-                                                <span>包间数量：</span>
-                                                <span>{{ item.roomNumber }}个</span>
-                                            </p>
-                                            <p>
-                                                <span>最低消费：</span>
-                                                <span>{{ item.minConsumption }}元</span>
-                                            </p>
+                                        <div class="right-box">
+                                            <el-button @click="lookKtvInfo(item)" type="primary">查看</el-button>
                                         </div>
-                                    </div>
-                                    <div class="right-box">
-                                        <el-button @click="lookKtvInfo(item)" type="primary">{{
-                                            isReadonly == true ? '查看' : '编辑'
-                                        }}</el-button>
-                                        <el-button @click="delKtvInfo(item)" type="danger" v-if="!isReadonly">删除</el-button>
-                                    </div>
-                                </li>
-                            </ul>
-
-                            <!-- <ul>
-                                <li v-for="(item, index) in ktvRoomList" :key="index">
-                                    <div class="left-box">
-                                        <div>
-                                            <p>
-                                                <span>包间类型：</span>
-                                                <span>{{ item.roomTypeId | roomType(ktvTypeOpt) }}</span>
-                                            </p>
-                                            <p>
-                                                <span>容纳人数：</span>
-                                                <span>{{ item.capacity }}人</span>
-                                            </p>
+                                    </li>
+                                </ul>
+                            </template>
+                            <template v-else>
+                                <ul>
+                                    <li v-for="(item, index) in ktvRoomList" :key="index">
+                                        <div class="left-box">
+                                            <div>
+                                                <p>
+                                                    <span>包间类型：</span>
+                                                    <span>{{ item.roomTypeId | roomType(ktvTypeOpt) }}</span>
+                                                </p>
+                                                <p>
+                                                    <span>容纳人数：</span>
+                                                    <span>{{ item.capacity }}人</span>
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p>
+                                                    <span>包间数量：</span>
+                                                    <span>{{ item.roomNumber }}个</span>
+                                                </p>
+                                                <p>
+                                                    <span>最低消费：</span>
+                                                    <span>{{ item.minConsumption }}元</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p>
-                                                <span>包间数量：</span>
-                                                <span>{{ item.roomNumber }}个</span>
-                                            </p>
-                                            <p>
-                                                <span>最低消费：</span>
-                                                <span>{{ item.minConsumption }}元</span>
-                                            </p>
+                                        <div class="right-box">
+                                            <el-button @click="lookKtvInfo(item)" type="primary">{{
+                                                isReadonly == true ? '查看' : '编辑'
+                                            }}</el-button>
+                                            <el-button @click="delKtvInfo(item)" type="danger" v-if="!isReadonly">删除</el-button>
                                         </div>
-                                    </div>
-                                    <div class="right-box">
-                                        <el-button @click="lookKtvInfo(item)" type="primary">{{
-                                            isReadonly == true ? '查看' : '编辑'
-                                        }}</el-button>
-                                        <el-button @click="delKtvInfo(item)" type="danger" v-if="!isReadonly">删除</el-button>
-                                    </div>
-                                </li>
-                            </ul> -->
+                                    </li>
+                                </ul>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -1717,7 +1715,7 @@ export default {
             this.bannerVideoSort();
 
             //传消息时，座位号前面要跟上当前的楼层号
-            if (this.list.length !== 0) {
+            if (this.list.length !== 0 && this.shopLocaIndex != 3) {
                 this.list.forEach((item) => {
                     item.layoutList.forEach((item2) => {
                         item2.seatCode = item.floor + '-' + item2.seatCode;
@@ -1756,7 +1754,7 @@ export default {
                 layoutList: [],
                 ktvRoomList: this.ktvStrTran(),
                 deleteKtvRoomList: this.deleteKtvRoomList,
-                list: this.list
+                list: this.shopLocaIndex == 3 ? [] : this.list
             };
 
             if (this.isUpdate) {
@@ -2040,16 +2038,6 @@ export default {
 
         //ktv里的相关字符串转换方法
         ktvStrTran() {
-            this.ktvList.forEach((item2) => {
-                item2.ktvRoomList.forEach((item) => {
-                    item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
-                    item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
-                    item.haveMahjong = item.haveMahjong === false ? 2 : 1;
-                    item.haveSwimming = item.haveSwimming === false ? 2 : 1;
-                    item.haveTableTennis = item.haveTableTennis === false ? 2 : 1;
-                });
-            });
-
             const newSeatArr = this.ktvRoomList.map((item) => {
                 item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
                 item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
@@ -2441,13 +2429,13 @@ export default {
         //取消保存ktv包间信息
         ktvCancelSub() {
             this.clearKtvInfo();
-            if (this.isUpdateKtvInfo) {
-                this.isUpdateKtvInfo = false;
-                this.getStoreInfo();
-                setTimeout(() => {
-                    this.showBannerVideo();
-                }, 500);
-            }
+            // if (this.isUpdateKtvInfo) {
+            //     this.isUpdateKtvInfo = false;
+            //     this.getStoreInfo();
+            //     setTimeout(() => {
+            //         this.showBannerVideo();
+            //     }, 500);
+            // }
         },
 
         //提交保存ktv包间信息
@@ -2465,12 +2453,8 @@ export default {
                     this.$message.success('修改成功');
                     this.isUpdateKtvInfo = false;
                 } else {
-                    // if (!this.ktvRoomList) {
-                    //     this.ktvRoomList = [];
-                    // }
-
-                    if (!this.ktvList) {
-                        this.ktvList = [];
+                    if (!this.ktvRoomList) {
+                        this.ktvRoomList = [];
                     }
 
                     //获取时间段里的所有最低消费
@@ -2481,29 +2465,12 @@ export default {
                     this.presentKtvInfo.minConsumption = Math.min(...minConArr); //返回ktv包间最小值
 
                     //将当前用户添加的KTV信息存到上传数组中
-                    // this.ktvRoomList.push(this.presentKtvInfo);
+                    this.ktvRoomList.push(this.presentKtvInfo);
 
-                    for (let i = 0; i < this.ktvList.length; i++) {
-                        if (this.ktvList[i].floor === this.presentKtvInfo.floor) {
-                            this.ktvList[i].ktvRoomList.push(this.presentKtvInfo);
-                            break;
-                        } else {
-                            let ktvRoomList = [];
-                            ktvRoomList.push(this.presentKtvInfo);
-                            this.ktvList.push({
-                                cassettes: '',
-                                floor: this.presentKtvInfo.floor,
-                                floorPower: this.ktvList.length,
-                                ktvRoomList
-                            });
-
-                            break;
-                        }
-                    }
-
-                    // this.ktvList.forEach((item, i) => {
-                    //     if (item.floor === this.presentKtvInfo.floor) {
+                    // for (let i = 0; i < this.ktvList.length; i++) {
+                    //     if (this.ktvList[i].floor === this.presentKtvInfo.floor) {
                     //         this.ktvList[i].ktvRoomList.push(this.presentKtvInfo);
+                    //         break;
                     //     } else {
                     //         let ktvRoomList = [];
                     //         ktvRoomList.push(this.presentKtvInfo);
@@ -2513,16 +2480,16 @@ export default {
                     //             floorPower: this.ktvList.length,
                     //             ktvRoomList
                     //         });
+                    //         break;
                     //     }
-                    // });
+                    // }
 
                     this.$message.success('新增成功');
                 }
                 this.clearKtvInfo();
             }
 
-            // console.log(this.ktvRoomList);
-            console.log(this.ktvList);
+            console.log(this.ktvRoomList);
         },
 
         //回显每个座位号时，不要带上楼层号
@@ -2598,6 +2565,8 @@ export default {
 
                     //对ktv信息进行相关转换
                     this.changeKtvList(this.ktvRoomList);
+
+                    //仅查看时对ktv相关信息进行转换
                     this.ktvList.forEach((item) => {
                         this.changeKtvList(item.ktvRoomList);
                     });
@@ -3523,6 +3492,10 @@ export default {
 
         .ktv-right-box {
             width: 38%;
+
+            .change-ktvFloor {
+                margin-bottom: 20px;
+            }
 
             .left-box {
                 display: flex;
