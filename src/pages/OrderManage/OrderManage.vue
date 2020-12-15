@@ -45,7 +45,7 @@
                 ></el-input>
 
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-search" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
+                <el-button type="success" icon="el-icon-view" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
                     >查看座位</el-button
                 >
             </div>
@@ -343,92 +343,88 @@
 
                 <!-- 座位详情图 -->
                 <div v-if="dialogStatus == 2">
-                    <div class="shop-seat">
-                        <!-- 左边座位展示 -->
-                        <div class="left-box">
-                            <!-- 座位属性标题 -->
-                            <div class="seat-title">
-                                <p v-for="(item, index) in seatAttOpt" :key="index">
-                                    <span :class="item.class"></span>
-                                    {{ item.name }}
-                                </p>
+                    <div class="Begintabledetails">
+                        <div class="crumbs">
+                            <el-breadcrumb separator="/">
+                                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
+                            </el-breadcrumb>
+                            <div>
+                                <b>楼层</b>
+                                <el-button
+                                    v-for="(item, index) in list"
+                                    :key="index"
+                                    :type="nowFloor == item.floor ? 'primary' : ''"
+                                    @click="changeShowFloor(item, index)"
+                                    class="add-floor"
+                                    >{{ item.floor }}</el-button
+                                >
                             </div>
-                            <!-- 回显的座位图 -->
-                            <div
-                                v-if="x && y"
-                                class="seat-box"
-                                ref="seatBox"
-                                :style="{ width: 32 * y + 30 + 'px' }"
-                                style="overflow: hidden"
-                            >
-                                <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
-                                    <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
-                                        <span
-                                            ref="seatSpan"
-                                            :data-indexX="indexX + 1"
-                                            :data-indexY="indexY + 1"
-                                            class="seat"
-                                            @click="changeStauts"
-                                        ></span>
-                                    </div>
-                                </div>
-                            </div>
+                            <span></span>
                         </div>
-                        <!-- 座位属性 -->
-                        <div class="right-box" v-if="isClickSeat">
-                            <p class="seat-detail">座位详情</p>
-                            <!-- 座位号 -->
-                            <div>
-                                <span>座位号：</span>
-                                <el-input
-                                    v-model="presentSeatInfo.seatCode"
-                                    placeholder="座位号"
-                                    style="width: 50%"
-                                    :readonly="isReadonly"
-                                ></el-input>
-                            </div>
-                            <!-- 座位类型 -->
-                            <div>
-                                <span>座位类型：</span>
-                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
-                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
-                            </div>
-                            <!-- 容纳人数 -->
-                            <div>
-                                <span>容纳人数：</span>
-                                <el-input
-                                    v-model="presentSeatInfo.numberOfPeople"
-                                    placeholder="容纳人数"
-                                    style="width: 50%; margin-right: 6px"
-                                    :readonly="isReadonly"
-                                ></el-input
-                                >人
-                            </div>
-                            <!-- 最晚保留时间 -->
-                            <div class="lon-retain">
-                                <span>保留最晚时间：</span>
-                                <el-time-select
-                                    style="width: 50%"
-                                    v-model="presentSeatInfo.seatLatestReservationTime"
-                                    :readonly="isReadonly"
-                                    :picker-options="{ start: '00:00', step: '00:10', end: '23:50' }"
-                                ></el-time-select>
-                            </div>
-                            <!-- 最低消费 -->
-                            <div class="min-charge">
-                                <span class="min-con">最低消费：</span>
-                                <div class="day-mincom">
-                                    <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                        <span>{{ item.weekIndex | dayOfWeek }}</span>
-                                        <el-input
-                                            v-model="item.price"
-                                            placeholder="最低消费"
-                                            style="width: 47%; margin-right: 6px"
-                                            :readonly="isReadonly"
-                                        >
-                                            <template slot="append">￥</template>
-                                        </el-input>
+                        <div>
+                            <div class="shop-seat">
+                                <!-- 左边座位展示 -->
+                                <div class="left-box">
+                                    <!-- 座位行数和列数 -->
+                                    <p class="input-seat">
+                                        <label style="margin-right: 30px">
+                                            座位行数：
+                                            <el-input-number
+                                                :step="1"
+                                                step-strictly
+                                                :disabled="isReadonly"
+                                                v-model="x"
+                                                :min="6"
+                                                style="width: 120px"
+                                                label="行数"
+                                                @blur="checkNull(x, '座位行数')"
+                                                @change="changeSeatNum"
+                                            ></el-input-number>
+                                        </label>
+                                        <label style="margin-right: 30px">
+                                            座位列数：
+                                            <el-input-number
+                                                :step="1"
+                                                step-strictly
+                                                :disabled="isReadonly"
+                                                v-model="y"
+                                                :min="6"
+                                                style="width: 120px"
+                                                label="列数"
+                                                @blur="checkNull(y, '座位列数')"
+                                                @change="changeSeatNum"
+                                            ></el-input-number>
+                                        </label>
                                     </p>
+                                    <!-- 座位属性标题 -->
+                                    <div class="seat-title">
+                                        <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
+                                            <span :class="item.class"></span>
+                                            {{ item.name }}
+                                        </p>
+                                    </div>
+                                    <!-- 回显的座位图 -->
+                                    <div
+                                        v-if="x && y"
+                                        class="seat-box"
+                                        ref="seatBox"
+                                        :style="{ width: 32 * y + 30 + 'px' }"
+                                        style="overflow: hidden"
+                                    >
+                                        <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
+                                            <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
+                                                <span
+                                                    :title="itemX + '-' + itemY"
+                                                    ref="seatSpan"
+                                                    :data-indexX="indexX + 1"
+                                                    :data-indexY="indexY + 1"
+                                                    class="seat"
+                                                    @click="changeStauts($event, seatStyle)"
+                                                    @contextmenu.prevent="changeStauts($event, 'canBook')"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -625,27 +621,27 @@ export default {
         //查看座位信息
         seeSeatInfo() {
             this.dialogStatus = 2;
-
             (async () => {
                 try {
-                    let result = await this.$get('/merchant/store/order/layoutList');
-
+                    let result = await this.$get('/merchant/store/getStoreInfo');
+                    console.log(result);
                     if (result.code == 0) {
-                        this.dialog = true;
+                        this.list = result.list;
+                    //     this.dialog = true;
 
-                        let res = result.data;
+                    //     let res = result.data;
 
-                        let cassette = res.cassette;
-                        this.allSeatDetailInfo = res.layoutList;
+                    //     let cassette = res.cassette;
+                    //     this.allSeatDetailInfo = res.layoutList;
 
-                        //回显店铺卡座数量
-                        this.getShopSeat(cassette);
+                    //     //回显店铺卡座数量
+                    //     this.getShopSeat(cassette);
 
-                        //对座位信息进行相关转换
-                        this.changeLayoutList(this.allSeatDetailInfo);
+                    //     //对座位信息进行相关转换
+                    //     this.changeLayoutList(this.allSeatDetailInfo);
 
-                        //座位属性回显
-                        this.showSeatAtt();
+                    //     //座位属性回显
+                    //     this.showSeatAtt();
                     }
                 } catch (error) {
                     console.log(error);

@@ -78,7 +78,7 @@
                         </div>
                     </div>
                     <!-- 座位属性 -->
-                    <div class="right-box">
+                    <div class="right-box" v-if="clickFlag">
                         <h4 class="title">开台详情</h4>
                         <div class="padd">
                             <span>预定用户:</span>
@@ -123,7 +123,7 @@
                             <span>支付时间:</span>
                             <span>{{ presentSeatInfo.payTime }}</span>
                         </div>
-                        <div class="inventory-details" v-if="clickFlag">
+                        <div class="inventory-details">
                             <span>清单详情:</span>
                             <div class="details">
                                 <span class="header"> 座位信息 </span>
@@ -229,7 +229,8 @@ export default {
             endBussTime: '', //结束营业时间
             input: '',
             clickFlag: false,
-            nowFloor: '' //当前正在操作的楼层
+            nowFloor: '',//当前正在操作的楼层
+            wrapLoading:true
         };
     },
     created() {
@@ -363,10 +364,10 @@ export default {
         },
         //回显店铺数据
         getStoreInfo() {
-            this.wrapLoading = false;
             this.$get('/merchant/store/getStoreInfo').then((res) => {
                 if (res.code == 0) {
-                    console.log(res);
+                    // console.log(res);
+                    this.wrapLoading = false;
                     let result = res.data;
                     let cassette = result.cassette;
                     this.allSeatDetailInfo = result.layoutList;
@@ -542,9 +543,15 @@ export default {
         }
     }
 }
+.container{
+    // width: 100%;
+    height: 100%;
+}
 .shop-seat {
+    width: 100%;
+    height: 100%;
     display: flex;
-    justify-content: center;
+    // justify-content: center;
     .left-box {
         margin-right: 30px;
 

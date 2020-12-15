@@ -2466,7 +2466,11 @@ export default {
 
                     //将当前用户添加的KTV信息存到上传数组中
                     this.ktvRoomList.push(this.presentKtvInfo);
-
+                    this.ktvRoomList.map(item=>{
+                        this.$set(item,'roomAttribute', 0);
+                    })
+                    
+                    console.log(this.ktvRoomList)
                     // for (let i = 0; i < this.ktvList.length; i++) {
                     //     if (this.ktvList[i].floor === this.presentKtvInfo.floor) {
                     //         this.ktvList[i].ktvRoomList.push(this.presentKtvInfo);
