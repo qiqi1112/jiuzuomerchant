@@ -33,9 +33,9 @@
                 <el-select clearable v-model="searchObj.searchOrderType" placeholder="订单类型" class="handle-input mr10">
                     <el-option v-for="(item, index) in orderTypeArr" :key="index" :label="item.label" :value="item.value"></el-option>
                 </el-select>
-                <el-select clearable v-model="searchObj.searchPayStatus" placeholder="支付状态" class="handle-input mr10">
+                <!-- <el-select clearable v-model="searchObj.searchPayStatus" placeholder="支付状态" class="handle-input mr10">
                     <el-option v-for="(item, index) in payStatusArr" :key="index" :label="item.label" :value="item.value"></el-option>
-                </el-select>
+                </el-select> -->
                 <el-input
                     clearable
                     @keydown.13.native="handleSearch"
@@ -514,16 +514,16 @@ export default {
             ],
 
             //支付状态
-            payStatusArr: [
-                {
-                    label: '未支付',
-                    value: '0'
-                },
-                {
-                    label: '已支付',
-                    value: '1'
-                }
-            ],
+            // payStatusArr: [
+            //     {
+            //         label: '未支付',
+            //         value: '0'
+            //     },
+            //     {
+            //         label: '已支付',
+            //         value: '1'
+            //     }
+            // ],
 
             isReadonly: true, //编辑信息开关
 
