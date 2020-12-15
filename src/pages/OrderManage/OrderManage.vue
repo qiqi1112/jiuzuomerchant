@@ -232,7 +232,7 @@
                             <div class="info1">
                                 <div>
                                     订单类型：
-                                    <span>{{ form.orderType == 0 ? '预定桌' : 'AA拼单' }}</span>
+                                    <span>{{ form.orderType | orderType }}</span>
                                 </div>
                                 <div>
                                     支付状态：
