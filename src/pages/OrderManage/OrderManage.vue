@@ -45,7 +45,7 @@
                 ></el-input>
 
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-search" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
+                <el-button type="success" icon="el-icon-view" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
                     >查看座位</el-button
                 >
             </div>
@@ -343,40 +343,102 @@
 
                 <!-- 座位详情图 -->
                 <div v-if="dialogStatus == 2">
-                    <div class="shop-seat">
-                        <!-- 左边座位展示 -->
-                        <div class="left-box">
-                            <!-- 座位属性标题 -->
-                            <div class="seat-title">
-                                <p v-for="(item, index) in seatAttOpt" :key="index">
-                                    <span :class="item.class"></span>
-                                    {{ item.name }}
-                                </p>
+                    <div class="Begintabledetails">
+                        <div class="crumbs">
+                            <el-breadcrumb separator="/" style="margin-bottom:10px">
+                                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
+                            </el-breadcrumb>
+                            <div>
+                                <b>楼层</b>
+                                <el-button
+                                    v-for="(item, index) in list"
+                                    :key="index"
+                                    :type="nowFloor == item.floor ? 'primary' : ''"
+                                    @click="changeShowFloor(item, index)"
+                                    class="add-floor"
+                                    >{{ item.floor }}</el-button
+                                >
                             </div>
-                            <!-- 回显的座位图 -->
-                            <div
-                                v-if="x && y"
-                                class="seat-box"
-                                ref="seatBox"
-                                :style="{ width: 32 * y + 30 + 'px' }"
-                                style="overflow: hidden"
-                            >
-                                <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
-                                    <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
-                                        <span
-                                            ref="seatSpan"
-                                            :data-indexX="indexX + 1"
-                                            :data-indexY="indexY + 1"
-                                            class="seat"
-                                            @click="changeStauts"
-                                        ></span>
+                            <span></span>
+                        </div>
+                        <div>
+                            <div class="shop-seat">
+                                <!-- 左边座位展示 -->
+                                <div class="left-box">
+                                    <!-- 座位行数和列数 -->
+                                    <p class="input-seat">
+                                        <label style="margin-right: 30px">
+                                            座位行数：
+                                            <el-input-number
+                                                :step="1"
+                                                step-strictly
+                                                :disabled="isReadonly"
+                                                v-model="x"
+                                                :min="6"
+                                                style="width: 120px"
+                                                label="行数"
+                                                @blur="checkNull(x, '座位行数')"
+                                            ></el-input-number>
+                                        </label>
+                                        <label style="margin-right: 30px">
+                                            座位列数：
+                                            <el-input-number
+                                                :step="1"
+                                                step-strictly
+                                                :disabled="isReadonly"
+                                                v-model="y"
+                                                :min="6"
+                                                style="width: 120px"
+                                                label="列数"
+                                                @blur="checkNull(y, '座位列数')"
+                                            ></el-input-number>
+                                        </label>
+                                    </p>
+                                    <!-- 座位属性标题 -->
+                                    <div class="seat-title">
+                                        <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
+                                            <span :class="item.class"></span>
+                                            {{ item.name }}
+                                        </p>
+                                    </div>
+                                    <!-- 回显的座位图 -->
+                                    <div
+                                        v-if="x && y"
+                                        class="seat-box"
+                                        ref="seatBox"
+                                        :style="{ width: 32 * y + 30 + 'px' }"
+                                        style="overflow: hidden"
+                                    >
+                                        <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
+                                            <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
+                                                <span
+                                                    :title="itemX + '-' + itemY"
+                                                    ref="seatSpan"
+                                                    :data-indexX="indexX + 1"
+                                                    :data-indexY="indexY + 1"
+                                                    class="seat"
+                                                    @click="changeStauts($event, seatStyle)"
+                                                    @contextmenu.prevent="changeStauts($event, 'canBook')"
+                                                ></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- 座位属性 -->
-                        <div class="right-box" v-if="isClickSeat">
+                                <div class="right-box" v-if="list.length !== 0 && isClickSeat">
                             <p class="seat-detail">座位详情</p>
+                            <!-- 座位属性 -->
+                            <div class="seat-prop" v-if="!isReadonly">
+                                <span>座位属性：</span>
+                                <div class="prop-box">
+                                    <span
+                                        :class="item.style"
+                                        v-for="(item, index) in seatAttOpt"
+                                        :key="index"
+                                        :title="item.name"
+                                        @click="changeStyle(item.style)"
+                                    ></span>
+                                </div>
+                            </div>
                             <!-- 座位号 -->
                             <div>
                                 <span>座位号：</span>
@@ -385,6 +447,7 @@
                                     placeholder="座位号"
                                     style="width: 50%"
                                     :readonly="isReadonly"
+                                    @blur="checkNull(presentSeatInfo.seatCode, '座位号')"
                                 ></el-input>
                             </div>
                             <!-- 座位类型 -->
@@ -396,22 +459,40 @@
                             <!-- 容纳人数 -->
                             <div>
                                 <span>容纳人数：</span>
-                                <el-input
+                                <el-input-number
+                                    :step="1"
+                                    step-strictly
                                     v-model="presentSeatInfo.numberOfPeople"
+                                    controls-position="right"
                                     placeholder="容纳人数"
                                     style="width: 50%; margin-right: 6px"
-                                    :readonly="isReadonly"
-                                ></el-input
-                                >人
+                                    :disabled="isReadonly"
+                                    :min="1"
+                                    @blur="checkNull(presentSeatInfo.numberOfPeople, '容纳人数')"
+                                ></el-input-number>
                             </div>
                             <!-- 最晚保留时间 -->
                             <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
+                                    @change="checkNull(presentSeatInfo.seatLatestReservationTime, '保留最晚时间')"
                                     style="width: 50%"
+                                    placeholder="最晚保留时间"
                                     v-model="presentSeatInfo.seatLatestReservationTime"
                                     :readonly="isReadonly"
-                                    :picker-options="{ start: '00:00', step: '00:10', end: '23:50' }"
+                                    :picker-options="
+                                        startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
+                                            ? {
+                                                  start: startBussTime,
+                                                  step: '00:10',
+                                                  end: '23:50'
+                                              }
+                                            : {
+                                                  start: startBussTime,
+                                                  step: '00:10',
+                                                  end: endBussTime
+                                              }
+                                    "
                                 ></el-time-select>
                             </div>
                             <!-- 最低消费 -->
@@ -421,8 +502,8 @@
                                     <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
                                         <span>{{ item.weekIndex | dayOfWeek }}</span>
                                         <el-input
+                                            @blur="checkPrice(item.price)"
                                             v-model="item.price"
-                                            placeholder="最低消费"
                                             style="width: 47%; margin-right: 6px"
                                             :readonly="isReadonly"
                                         >
@@ -430,6 +511,8 @@
                                         </el-input>
                                     </p>
                                 </div>
+                            </div>
+                        </div>
                             </div>
                         </div>
                     </div>
@@ -467,14 +550,13 @@ export default {
                 searchPayStatus: '',
                 searchNickName: '',
                 smsCode: '',
-
                 dataListCount: 0, //默认当前要显示的数据条数
                 currentPage: 1, //默认显示的页码所在位置（第一页）
                 pagesize: 10 //默认每页要显示多少条数据
             },
-
+            list: [],
             storeLocation: -1, //店铺类型（如果是KTV就不展示查看座位按钮）
-
+            seatStyle: 'canBook', //默认的选座样式
             dialog: false, //查看订单详情弹窗开关
             seatDia: false, //修改座位号弹窗开关
             tableData: [], //订单表格列表
@@ -482,13 +564,14 @@ export default {
             dialogStatus: 1, //根据操作显示不同的弹窗
             upSeatId: '', //当前要修改的id
             seatNum: '', //当前要修改的座位号
-
+            nowFloor: '', //当前正在操作的楼层
             priNumber: '', //用户隐私号码
             priNumberDialog: false, //用户隐私号码弹窗开关
 
             reachStoreCode: '', //到店验证码
             reachStoreDialog: false, //输入到店验证码对话框
-
+            startBussTime: '', //开始营业时间
+            endBussTime: '', //结束营业时间
             //订单类型
             orderTypeArr: [
                 {
@@ -625,45 +708,54 @@ export default {
         //查看座位信息
         seeSeatInfo() {
             this.dialogStatus = 2;
-
-            (async () => {
-                try {
-                    let result = await this.$get('/merchant/store/order/layoutList');
-
-                    if (result.code == 0) {
-                        this.dialog = true;
-
-                        let res = result.data;
-
-                        let cassette = res.cassette;
-                        this.allSeatDetailInfo = res.layoutList;
-
-                        //回显店铺卡座数量
-                        this.getShopSeat(cassette);
-
-                        //对座位信息进行相关转换
-                        this.changeLayoutList(this.allSeatDetailInfo);
-
-                        //座位属性回显
-                        this.showSeatAtt();
-                    }
-                } catch (error) {
-                    console.log(error);
+            this.$get('/merchant/store/getStoreInfo').then((result) => {
+                console.log(result);
+                if (result.code == 0) {
+                    this.list = result.data.list;
+                    this.dialog = true;
+                    console.log(this.list);
+                    //默认展示的楼层为第一楼
+                    this.nowFloor = this.list[0].floor;
+                    //回显店铺卡座数量
+                    this.getShopSeat(0);
+                    //座位属性回显
+                    this.showSeatAtt(0);
+                    //对座位信息进行相关转换
+                    this.changeLayoutList();
+                    //回显每个座位号时，不要带上楼层号
+                    this.substrSeatNum();
                 }
-            })();
+            });
         },
-
+        //切换楼层，楼层对应的行列跟着切换
+        changeShowFloor(item, index) {
+            this.isClickSeat = false;
+            this.nowFloor = item.floor; //当前操作的楼层
+            this.getShopSeat(index);
+            this.showSeatAtt(index);
+            // this.clickFlag = false;
+        },
         //查看当前座位信息
-        lookSeatInfo(e) {
+         lookEditSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
-            //匹配当前座位信息
-            this.allSeatDetailInfo.forEach((item) => {
-                if (item.seatRow == seatRow && item.seatColumn == seatColumn) {
-                    this.presentSeatInfo = item;
+            this.list.forEach((item) => {
+                if (item.floor === this.nowFloor) {
+                    item.layoutList.forEach((item2) => {
+                        if (item2.floor == item.floor && item2.seatRow == seatRow && item2.seatColumn == seatColumn) {
+                            //查看当前座位信息
+                            this.presentSeatInfo = item2;
 
-                    console.log('xxxxx', this.presentSeatInfo);
+                            //修改当前座位信息
+                            if (!this.isReadonly) {
+                                //修改当前座位的属性
+                                this.presentSeatInfo.seatAttribute = seatType;
+                                //修改当前座位为舞台/过道
+                                this.presentSeatInfo.seatType = stageCode;
+                            }
+                        }
+                    });
                 }
             });
         },
@@ -671,7 +763,7 @@ export default {
         //座位点击事件
         changeStauts(e, style) {
             this.isClickSeat = true; //展示当前点击的座位的详细信息
-            this.lookSeatInfo(e); //查看当前座位信息
+            this.lookEditSeatInfo(e); //查看当前座位信息
             this.clearSeatBorder(); //清空座位外边框（定位当前座位）
             e.target.classList.add('border'); //定位当前座位
         },
@@ -686,48 +778,50 @@ export default {
         },
 
         //对座位信息进行相关转换
-        changeLayoutList(arr) {
-            arr.forEach((item) => {
-                //将数值型转为字符型（软硬座）
-                if (item.softHardStatus || item.haveToilet) {
-                    item.softHardStatus = item.softHardStatus.toString();
-                }
+          changeLayoutList() {
+            this.list.forEach((item) => {
+                item.layoutList.forEach((item2) => {
+                    //将数值型转为字符型（软硬座）
+                    if (item2.softHardStatus) {
+                        item2.softHardStatus = item2.softHardStatus.toString();
+                    }
+                });
             });
         },
 
         //回显店铺卡座数量（行和列数量）
-        getShopSeat(seat) {
-            seat = seat.split('x');
-            this.x = seat[0];
-            this.y = seat[1];
+        getShopSeat(index) {
+            let seat = this.list[index].cassettes.split('x');
+            this.x = +seat[0];
+            this.y = +seat[1];
         },
 
         //座位属性回显
-        showSeatAtt() {
+        showSeatAtt(index) {
             this.$nextTick(() => {
                 if (this.$refs.seatSpan) {
                     //遍历所有座位
                     this.$refs.seatSpan.forEach((item) => {
                         let x = item.dataset.indexx; //行
                         let y = item.dataset.indexy; //列
-                        //根据返回的座位数组进行匹配，并替换当前座位的属性
-                        this.allSeatDetailInfo.forEach((item2) => {
-                            if (item2.seatRow == x && item2.seatColumn == y) {
+                        //根据返回的楼层对应的座位数组进行匹配，并替换当前座位的属性
+                        this.list[index].layoutList.forEach((item2) => {
+                            if (item2.floor == this.nowFloor && item2.seatRow == x && item2.seatColumn == y) {
                                 //不可预订
                                 if (item2.seatAttribute == 1) {
-                                    item.classList.add('notBook');
+                                    item.className = `seat notBook`;
                                 }
                                 //可预订
                                 if (item2.seatAttribute == 2) {
-                                    item.classList.add('canBook');
+                                    item.className = `seat canBook`;
                                 }
                                 //过道
                                 if (item2.seatType == 3) {
-                                    item.classList.add('aisleBook');
+                                    item.className = `seat aisleBook`;
                                 }
                                 //舞台
                                 if (item2.seatType == 4) {
-                                    item.classList.add('stageBook');
+                                    item.className = `seat stageBook`;
                                 }
                             }
                         });
@@ -777,6 +871,17 @@ export default {
                     this.$message.error(err.msg);
                 }
             })();
+        },
+         //回显每个座位号时，不要带上楼层号
+        substrSeatNum() {
+            this.list.forEach((item) => {
+                item.layoutList.forEach((item2) => {
+                    const index = item2.seatCode.indexOf('-');
+                    if (index !== -1) {
+                        item2.seatCode = item2.seatCode.substr(index + 1);
+                    }
+                });
+            });
         },
 
         //搜索操作
@@ -928,6 +1033,10 @@ export default {
 </script>
 
  <style scoped lang='less'>
+ .add-floor {
+    width: 60px;
+    margin-left: 10px;
+}
 .not-book {
     background-color: #e6a23c !important;
     border: 1px solid transparent !important;

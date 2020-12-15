@@ -222,21 +222,21 @@ export default {
                 //     index: 'i18n',
                 //     title: '国际化功能'
                 // },
-                {
-                    icon: 'el-icon-lx-warn',
-                    index: '7',
-                    title: '错误处理',
-                    subs: [
-                        {
-                            index: 'permission',
-                            title: '权限测试'
-                        },
-                        {
-                            index: '404',
-                            title: '404页面'
-                        }
-                    ]
-                },
+                // {
+                //     icon: 'el-icon-lx-warn',
+                //     index: '7',
+                //     title: '错误处理',
+                //     subs: [
+                //         {
+                //             index: 'permission',
+                //             title: '权限测试'
+                //         },
+                //         {
+                //             index: '404',
+                //             title: '404页面'
+                //         }
+                //     ]
+                // },
                 // {
                 //     icon: 'el-icon-lx-redpacket_fill',
                 //     index: '/donate',
@@ -259,7 +259,7 @@ export default {
         // 获取店铺类型
         this.$get('/merchant/store/getStoreInfo')
         .then(res=>{
-            console.log(res.data.storeLocation)
+            // console.log(res.data.storeLocation)
             if(res.data.storeLocation==3){
                 this.items[5].index='ktv'
             }
@@ -267,7 +267,7 @@ export default {
     },
     methods:{
         gowhere(e){
-            console.log(e)
+            // console.log(e)
         }
     }
 };
