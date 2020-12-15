@@ -1,21 +1,14 @@
 <template>
     <div id="app" @click="close">
-        <template v-if="$store.state.showChatRoom">
-            <chatRoom></chatRoom>
-        </template>
         <router-view></router-view>
     </div>
 </template>
 <script>
-import chatRoom from './components/common/ChatRoom';
 export default {
     data() {
         return {};
     },
     created() {
-    },
-    components: {
-        chatRoom
     },
     methods: {
         close() {
