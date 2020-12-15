@@ -267,7 +267,7 @@ export default {
     },
     methods:{
         gowhere(e){
-            console.log(e)
+            // console.log(e)
         }
     }
 };
