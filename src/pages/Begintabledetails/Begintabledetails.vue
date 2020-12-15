@@ -350,6 +350,17 @@ export default {
                 }
             });
         },
+        //回显每个座位号时，不要带上楼层号
+        substrSeatNum() {
+            this.list.forEach((item) => {
+                item.layoutList.forEach((item2) => {
+                    const index = item2.seatCode.indexOf('-');
+                    if (index !== -1) {
+                        item2.seatCode = item2.seatCode.substr(index + 1);
+                    }
+                });
+            });
+        },
         //回显店铺数据
         getStoreInfo() {
             this.wrapLoading = false;
@@ -364,15 +375,11 @@ export default {
                     this.getShopSeat(0);
                     //默认展示的楼层为第一楼
                     this.nowFloor = result.list[0].floor;
-                    // //对座位信息进行相关转换
-                    // this.changeLayoutList(this.allSeatDetailInfo);
 
                     //座位属性回显
                     this.showSeatAtt(0);
-
-                    // this.wrapLoading = false;
-
-                    console.log('当前店铺数据', res.data);
+                    //回显每个座位号时，不要带上楼层号
+                    this.substrSeatNum();
                 } else if (res.code === 600) {
                     this.$confirm(res.msg, '提示', {
                         confirmButtonText: '添加门店',
@@ -409,6 +416,7 @@ export default {
             this.nowFloor = item.floor; //当前操作的楼层
             this.getShopSeat(index);
             this.showSeatAtt(index);
+            this.clickFlag = false;
         },
         //回显店铺卡座数量（行和列数量）
         getShopSeat(index) {
