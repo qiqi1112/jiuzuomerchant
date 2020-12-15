@@ -1097,12 +1097,12 @@ export default {
             cassette: [], //所有楼层的座位数量
             list: [], //所有楼层中所有的座位
             floorName: '', //添加楼层名称的输入框
-            nowFloor: '', //当前正在操作的楼层
+            nowFloor: '', //当前正在操作的楼层名
             nowFloorIndex: -1, //当前正在操作的楼层的下标
             nowFloorPower: '', //当前正在操作的楼层的权重
             ktvList: [], //回显KTV楼层列表专用
-            nowKtvFloor: '', //当前正在操作的KTV楼层
-            nowKtvFloorIndex: 0 //当前正在操作的KTV楼层的下标
+            nowKtvFloor: '', //当前正在操作的KTV楼层名
+            nowKtvFloorIndex: -1 //当前正在操作的KTV楼层的下标
         };
     },
     methods: {
@@ -1934,7 +1934,7 @@ export default {
             this.seatStyle = style;
         },
 
-        //
+        //切换ktv楼层时，楼层对应的数据跟着切换
         changeShowKtvFloor(item, index) {
             this.nowKtvFloor = item.floor;
             this.nowKtvFloorIndex = index;
@@ -2040,6 +2040,16 @@ export default {
 
         //ktv里的相关字符串转换方法
         ktvStrTran() {
+            this.ktvList.forEach((item2) => {
+                item2.ktvRoomList.forEach((item) => {
+                    item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
+                    item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
+                    item.haveMahjong = item.haveMahjong === false ? 2 : 1;
+                    item.haveSwimming = item.haveSwimming === false ? 2 : 1;
+                    item.haveTableTennis = item.haveTableTennis === false ? 2 : 1;
+                });
+            });
+
             const newSeatArr = this.ktvRoomList.map((item) => {
                 item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
                 item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
@@ -2455,8 +2465,12 @@ export default {
                     this.$message.success('修改成功');
                     this.isUpdateKtvInfo = false;
                 } else {
-                    if (!this.ktvRoomList) {
-                        this.ktvRoomList = [];
+                    // if (!this.ktvRoomList) {
+                    //     this.ktvRoomList = [];
+                    // }
+
+                    if (!this.ktvList) {
+                        this.ktvList = [];
                     }
 
                     //获取时间段里的所有最低消费
@@ -2467,13 +2481,48 @@ export default {
                     this.presentKtvInfo.minConsumption = Math.min(...minConArr); //返回ktv包间最小值
 
                     //将当前用户添加的KTV信息存到上传数组中
-                    this.ktvRoomList.push(this.presentKtvInfo);
+                    // this.ktvRoomList.push(this.presentKtvInfo);
+
+                    for (let i = 0; i < this.ktvList.length; i++) {
+                        if (this.ktvList[i].floor === this.presentKtvInfo.floor) {
+                            this.ktvList[i].ktvRoomList.push(this.presentKtvInfo);
+                            break;
+                        } else {
+                            let ktvRoomList = [];
+                            ktvRoomList.push(this.presentKtvInfo);
+                            this.ktvList.push({
+                                cassettes: '',
+                                floor: this.presentKtvInfo.floor,
+                                floorPower: this.ktvList.length,
+                                ktvRoomList
+                            });
+
+                            break;
+                        }
+                    }
+
+                    // this.ktvList.forEach((item, i) => {
+                    //     if (item.floor === this.presentKtvInfo.floor) {
+                    //         this.ktvList[i].ktvRoomList.push(this.presentKtvInfo);
+                    //     } else {
+                    //         let ktvRoomList = [];
+                    //         ktvRoomList.push(this.presentKtvInfo);
+                    //         this.ktvList.push({
+                    //             cassettes: '',
+                    //             floor: this.presentKtvInfo.floor,
+                    //             floorPower: this.ktvList.length,
+                    //             ktvRoomList
+                    //         });
+                    //     }
+                    // });
+
                     this.$message.success('新增成功');
                 }
                 this.clearKtvInfo();
             }
 
-            console.log(this.ktvRoomList);
+            // console.log(this.ktvRoomList);
+            console.log(this.ktvList);
         },
 
         //回显每个座位号时，不要带上楼层号
@@ -2522,6 +2571,9 @@ export default {
                     this.ktvRoomList = result.ktvRoomList;
                     this.ktvList = result.list; //回显时根据楼层分类列表专用
                     this.list = result.list;
+
+                    //默认展示第一楼的ktv列表
+                    this.changeShowKtvFloor(this.ktvList[0], 0);
 
                     //获取店铺类型
                     this.getShopType(result.storeLocation);
