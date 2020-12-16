@@ -1,12 +1,12 @@
 <template>
     <div class="container" v-loading="wrapLoading">
         <div class="Begintabledetails">
-            <div class="crumbs">
-                <el-breadcrumb separator="/">
+            <el-breadcrumb separator="/">
                     <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
                 </el-breadcrumb>
+            <div class="crumbs">
                 <div>
-                    <b>楼层</b>
+                    <span>楼层</span>
                     <el-button
                         v-for="(item, index) in list"
                         :key="index"
@@ -318,7 +318,7 @@ export default {
                 }
             });
         },
-        //座位属性回显
+        //座位属性回显1
         showSeatAtt(index) {
             this.$nextTick(() => {
                 if (this.$refs.seatSpan) {
@@ -351,7 +351,7 @@ export default {
                 }
             });
         },
-        //回显每个座位号时，不要带上楼层号
+        //回显每个座位号时，不要带上楼层号1
         substrSeatNum() {
             this.list.forEach((item) => {
                 item.layoutList.forEach((item2) => {
@@ -411,7 +411,7 @@ export default {
                 }
             });
         },
-        //切换楼层，楼层对应的行列跟着切换
+        //切换楼层，楼层对应的行列跟着切换1
         changeShowFloor(item, index) {
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
@@ -419,7 +419,7 @@ export default {
             this.showSeatAtt(index);
             this.clickFlag = false;
         },
-        //回显店铺卡座数量（行和列数量）
+        //回显店铺卡座数量（行和列数量）1
         getShopSeat(index) {
             let seat = this.list[index].cassettes.split('x');
             this.x = +seat[0];
@@ -468,11 +468,14 @@ export default {
 }
 .crumbs {
     display: flex;
-    justify-content: space-between;
+    margin: 20px 0;
+    // justify-content: space-between;
+    align-items: center;
     .el-breadcrumb {
         display: inline-block;
     }
-    b {
+
+    span {
         font-size: 14px;
         margin: 0 auto;
     }
