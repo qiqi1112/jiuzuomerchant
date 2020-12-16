@@ -1,10 +1,10 @@
 <template>
     <div class="container" v-loading="wrapLoading">
         <div class="Begintabledetails">
-            <div class="crumbs">
-                <el-breadcrumb separator="/">
+            <el-breadcrumb separator="/">
                     <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
                 </el-breadcrumb>
+            <div class="crumbs">
                 <div>
                     <span>楼层</span>
                     <el-button
@@ -468,6 +468,7 @@ export default {
 }
 .crumbs {
     display: flex;
+    margin: 20px 0;
     // justify-content: space-between;
     align-items: center;
     .el-breadcrumb {
@@ -477,7 +478,6 @@ export default {
     span {
         font-size: 14px;
         margin: 0 auto;
-        margin-left: 10px;
     }
 }
 .el-input {
