@@ -345,11 +345,8 @@
                 <div v-if="dialogStatus == 2">
                     <div class="Begintabledetails">
                         <div class="crumbs">
-                            <el-breadcrumb separator="/" style="margin-bottom:10px">
-                                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
-                            </el-breadcrumb>
                             <div>
-                                <b>楼层</b>
+                                <span>楼层</span>
                                 <el-button
                                     v-for="(item, index) in list"
                                     :key="index"
