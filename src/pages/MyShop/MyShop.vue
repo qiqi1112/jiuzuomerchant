@@ -703,6 +703,7 @@
                                                 :value="item"
                                             ></el-option>
                                         </el-select>
+                                        （分钟）
                                     </div>
                                     <!-- 删除 -->
                                     <el-button v-if="!isReadonly" @click="delTimeQuan(item)" type="danger" style="float: right"
@@ -770,7 +771,9 @@
                                                 :value="item"
                                             ></el-option>
                                         </el-select>
+                                        （分钟）
                                     </div>
+                                    <span style="font-size: 12px; color: #f00">*输入完内容请点击添加按钮</span>
                                     <!-- 确定 -->
                                     <el-button v-if="!isReadonly" @click="addTimeQuan" type="primary" style="float: right">添加</el-button>
                                 </div>
@@ -853,8 +856,8 @@
                             </div>
                             <!-- 确定与取消 -->
                             <div v-if="!isReadonly">
-                                <el-button @click="ktvCancelSub" v-if="!isUpdateKtvInfo">取消</el-button>
-                                <el-button @click="ktvSureSub" type="primary">{{ isUpdateKtvInfo == false ? '新增' : '修改' }}</el-button>
+                                <el-button @click="ktvCancelSub" v-if="!isUpdateKtvInfo">清空</el-button>
+                                <el-button @click="ktvSureSub" type="primary">{{ isUpdateKtvInfo == false ? '新增' : '确定' }}</el-button>
                             </div>
                         </div>
                         <!-- ktv包间属性列表 -->
@@ -2466,11 +2469,11 @@ export default {
 
                     //将当前用户添加的KTV信息存到上传数组中
                     this.ktvRoomList.push(this.presentKtvInfo);
-                    this.ktvRoomList.map(item=>{
-                        this.$set(item,'roomAttribute', 0);
-                    })
-                    
-                    console.log(this.ktvRoomList)
+                    this.ktvRoomList.map((item) => {
+                        this.$set(item, 'roomAttribute', 0);
+                    });
+
+                    console.log(this.ktvRoomList);
                     // for (let i = 0; i < this.ktvList.length; i++) {
                     //     if (this.ktvList[i].floor === this.presentKtvInfo.floor) {
                     //         this.ktvList[i].ktvRoomList.push(this.presentKtvInfo);
