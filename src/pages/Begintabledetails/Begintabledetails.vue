@@ -318,7 +318,7 @@ export default {
                 }
             });
         },
-        //座位属性回显
+        //座位属性回显1
         showSeatAtt(index) {
             this.$nextTick(() => {
                 if (this.$refs.seatSpan) {
@@ -351,7 +351,7 @@ export default {
                 }
             });
         },
-        //回显每个座位号时，不要带上楼层号
+        //回显每个座位号时，不要带上楼层号1
         substrSeatNum() {
             this.list.forEach((item) => {
                 item.layoutList.forEach((item2) => {
@@ -411,7 +411,7 @@ export default {
                 }
             });
         },
-        //切换楼层，楼层对应的行列跟着切换
+        //切换楼层，楼层对应的行列跟着切换1
         changeShowFloor(item, index) {
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
@@ -419,7 +419,7 @@ export default {
             this.showSeatAtt(index);
             this.clickFlag = false;
         },
-        //回显店铺卡座数量（行和列数量）
+        //回显店铺卡座数量（行和列数量）1
         getShopSeat(index) {
             let seat = this.list[index].cassettes.split('x');
             this.x = +seat[0];
