@@ -23,7 +23,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="chat" v-if="now_user">
+                    <div class="chat" v-show="now_user">
                         <div class="record">
                             <div class="username">{{now_user.name}}</div>
                             <div class="chat_list"  ref='parTopDistance' @scroll="scrollEvent">
@@ -135,7 +135,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="chat" v-else></div>
+                    <div class="chat" v-show="!now_user"></div>
                     <!--  -->
                     <div class="quick" >
 
@@ -282,27 +282,16 @@ export default {
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
                 console.log(lastObj)
-
                 // 撤回
                 if(lastObj.messageType == 'RecallCommandMessage'){
-                    
-                    
                     for(let i=0;i<this.userList.length;i++){
                         if(lastObj.senderUserId == this.userList[i].senderUserId){
                             console.log(this.userList[i])
                         }
                         break
                     }
-
-
-
                     return
                 }
-
-
-
-
-
 
                 if(!lastObj.offLineMessage){
                     if(lastObj.messageType == 'TextMessage'){
@@ -310,21 +299,34 @@ export default {
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的消息',
-                            duration: 5000
+                            duration: 5000,
+                            customClass:'notify',
+                            onClick(){
+                                that.showChat()
+                            }
                         });
                     }else if(lastObj.messageType == 'OrderMessage'){
                         this.audioUrl = 'default/system/order.mp3'
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的订单',
-                            duration: 0
+                            duration: 0,
+                            customClass:'notify',
+                            onClick(){
+                                that.lookOrder()
+                                that.$notify.close()
+                            }
                         });
                     }else if(lastObj.messageType == 'SystemMessage'){
                         this.audioUrl = 'default/system/system.mp3'
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的官方消息',
-                            duration: 5000
+                            customClass:'notify',
+                            duration: 5000,
+                            onClick(){
+                                that.showChat()
+                            }
                         });
                     }
                 }
@@ -490,6 +492,7 @@ export default {
             if(isClick == 'true') {
                 return 
             }       
+            this.$nextTick(this.scrollEnd);
             this.showRoom = !this.showRoom
             // this.conversation()
         },
@@ -554,7 +557,6 @@ export default {
             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
                 onSuccess: function(){
                     // 清除未读消息成功
-                    console.log(11)
                     that.allUnreadMsg()
                 },
                 onError: function(error){
@@ -594,14 +596,12 @@ export default {
             }else{
                 timer = 0
             }
-            console.log(this.now_user.targetId)
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
             var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
                 onSuccess: function(list, hasMsg) {
-                    console.log(list)
                     that.hasHistoryMsg = hasMsg;
                     let html = "";
                     that.getAssignInfo(that.now_user.targetId,list,type)
@@ -826,11 +826,14 @@ export default {
             this.emojiShow = !this.emojiShow
         },
         scrollEnd: function() {
-            var list = document.querySelectorAll(".cmsg");
-            if (list.length > 1) {
-                var last = list[list.length - 1];
-                last.scrollIntoView();
-            }
+            var list =  this.$refs.cmsg
+            if(!list)return
+            this.$nextTick( () => {    
+                if (list.length > 1) {
+                    var last = list[list.length - 1];
+                    last.scrollIntoView();
+                }
+            })
         },
         handleClick(tab, event) {
             if(tab.name == 'service'){
@@ -1487,5 +1490,8 @@ export default {
 }
 /deep/.el-dialog{
     min-width:850px ;
+}
+/deep/.notify{
+    cursor: pointer;
 }
 </style>

@@ -23,6 +23,7 @@
                 
                 <div>
                     <el-button @click="call()" type="primary" icon="el-icon-dish">呼叫下一位</el-button>
+                    <el-button @click="RP()" type="primary" >设置参考价</el-button>
                     <!-- <el-button type="primary" icon="el-icon-download" class="handle-del mr10" @click="handleEdit()" >Excel导出</el-button> -->
                 </div>
             </div>
@@ -262,11 +263,12 @@ export default {
             successVieList:[],//成功抢座列表
             cancelList:[],//取消排号列表
             // cancelVieList:[],//取消抢座列表
-
+            maxPrice:0,//最高竞价
             showSuccess:[],//成功数组 显示抢座/排号
 
             suc_type:1,
             can_type:1,
+
         };
     },
     created(){
@@ -319,8 +321,9 @@ export default {
                         todayTotalLy:res.data.todayTotalLy,
                         todayTotalVie:res.data.todayTotalVie,
                         totalSuccessLy:res.data.totalSuccessLy,
-                        todaySuccessTotalVie:res.data.todaySuccessTotalVie
+                        todaySuccessTotalVie:res.data.todaySuccessTotalVie,
                     }
+                    this.maxPrice = res.data.money
                     this.robList = res.data.nowVieList
                     this.rowList = res.data.nowLyList
                     this.showSuccess = this.successList = res.data.successLyList
@@ -576,6 +579,25 @@ export default {
                     this.$message.error(res.data);
                 }
             })    
+        },
+        RP(){
+            this.$prompt('请设置最高竞价', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: this.maxPrice,
+                inputPattern: /^\d+(?=\.{0,1}\d+$|$)/,
+                inputErrorMessage: '请输入正数'
+            }).then(({ value }) => {
+                this.$post(`/merchant/store/ly/setMoney`,{money:value}).then(res=>{
+                    if(res.code == 0){
+                        this.maxPrice = value
+                        this.$message.success('保存成功');
+                    }else{
+                        this.$message.error(res.data);
+                    }
+                })  
+            }).catch(() => {
+            });        
         }
     }
 };
