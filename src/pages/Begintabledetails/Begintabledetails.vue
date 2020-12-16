@@ -6,7 +6,7 @@
                     <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
                 </el-breadcrumb>
                 <div>
-                    <b>楼层</b>
+                    <span>楼层</span>
                     <el-button
                         v-for="(item, index) in list"
                         :key="index"
@@ -468,13 +468,16 @@ export default {
 }
 .crumbs {
     display: flex;
-    justify-content: space-between;
+    // justify-content: space-between;
+    align-items: center;
     .el-breadcrumb {
         display: inline-block;
     }
-    b {
+
+    span {
         font-size: 14px;
         margin: 0 auto;
+        margin-left: 10px;
     }
 }
 .el-input {
