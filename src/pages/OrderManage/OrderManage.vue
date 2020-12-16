@@ -1030,6 +1030,9 @@ export default {
 </script>
 
  <style scoped lang='less'>
+ .crumbs{
+     margin: 20px 0;
+ }
  .add-floor {
     width: 60px;
     margin-left: 10px;
