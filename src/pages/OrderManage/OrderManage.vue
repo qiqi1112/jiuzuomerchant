@@ -346,7 +346,7 @@
                     <div class="Begintabledetails">
                         <div class="crumbs">
                             <div>
-                                <b>楼层</b>
+                                <span>楼层</span>
                                 <el-button
                                     v-for="(item, index) in list"
                                     :key="index"
