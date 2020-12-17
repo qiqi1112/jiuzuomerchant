@@ -60,9 +60,12 @@
                         <el-button v-if="scope.row.orderType === 2 && scope.row.status === 4" @click="editSeat(scope.row)" type="primary"
                             >设定座位</el-button
                         >
-                        <el-link v-else-if="scope.row.status == 4" @click="editSeat(scope.row)" type="primary">{{
-                            scope.row.seatCode
-                        }}</el-link>
+                        <el-link
+                            v-else-if="scope.row.status == 4 && scope.row.closedStatus !== 1"
+                            @click="editSeat(scope.row)"
+                            type="primary"
+                            >{{ scope.row.seatCode }}</el-link
+                        >
                         <span v-else>{{ scope.row.seatCode }}</span>
                     </template>
                 </el-table-column>
@@ -117,7 +120,7 @@
                         </template>
 
                         <!-- 如果顾客是已到店，但还未到店 -->
-                        <template v-else-if="scope.row.orderType === 2 && scope.row.status !== 4"></template>
+                        <!-- <template v-else-if="scope.row.orderType === 2 && scope.row.status !== 4"></template> -->
 
                         <!-- 其他订单 -->
                         <template v-else-if="scope.row.closedStatus === 0">
@@ -422,94 +425,94 @@
                                     </div>
                                 </div>
                                 <div class="right-box" v-if="list.length !== 0 && isClickSeat">
-                            <p class="seat-detail">座位详情</p>
-                            <!-- 座位属性 -->
-                            <div class="seat-prop" v-if="!isReadonly">
-                                <span>座位属性：</span>
-                                <div class="prop-box">
-                                    <span
-                                        :class="item.style"
-                                        v-for="(item, index) in seatAttOpt"
-                                        :key="index"
-                                        :title="item.name"
-                                        @click="changeStyle(item.style)"
-                                    ></span>
-                                </div>
-                            </div>
-                            <!-- 座位号 -->
-                            <div>
-                                <span>座位号：</span>
-                                <el-input
-                                    v-model="presentSeatInfo.seatCode"
-                                    placeholder="座位号"
-                                    style="width: 50%"
-                                    :readonly="isReadonly"
-                                    @blur="checkNull(presentSeatInfo.seatCode, '座位号')"
-                                ></el-input>
-                            </div>
-                            <!-- 座位类型 -->
-                            <div>
-                                <span>座位类型：</span>
-                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
-                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
-                            </div>
-                            <!-- 容纳人数 -->
-                            <div>
-                                <span>容纳人数：</span>
-                                <el-input-number
-                                    :step="1"
-                                    step-strictly
-                                    v-model="presentSeatInfo.numberOfPeople"
-                                    controls-position="right"
-                                    placeholder="容纳人数"
-                                    style="width: 50%; margin-right: 6px"
-                                    :disabled="isReadonly"
-                                    :min="1"
-                                    @blur="checkNull(presentSeatInfo.numberOfPeople, '容纳人数')"
-                                ></el-input-number>
-                            </div>
-                            <!-- 最晚保留时间 -->
-                            <div class="lon-retain">
-                                <span>保留最晚时间：</span>
-                                <el-time-select
-                                    @change="checkNull(presentSeatInfo.seatLatestReservationTime, '保留最晚时间')"
-                                    style="width: 50%"
-                                    placeholder="最晚保留时间"
-                                    v-model="presentSeatInfo.seatLatestReservationTime"
-                                    :readonly="isReadonly"
-                                    :picker-options="
-                                        startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
-                                            ? {
-                                                  start: startBussTime,
-                                                  step: '00:10',
-                                                  end: '23:50'
-                                              }
-                                            : {
-                                                  start: startBussTime,
-                                                  step: '00:10',
-                                                  end: endBussTime
-                                              }
-                                    "
-                                ></el-time-select>
-                            </div>
-                            <!-- 最低消费 -->
-                            <div class="min-charge">
-                                <span class="min-con">最低消费：</span>
-                                <div class="day-mincom">
-                                    <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                        <span>{{ item.weekIndex | dayOfWeek }}</span>
+                                    <p class="seat-detail">座位详情</p>
+                                    <!-- 座位属性 -->
+                                    <div class="seat-prop" v-if="!isReadonly">
+                                        <span>座位属性：</span>
+                                        <div class="prop-box">
+                                            <span
+                                                :class="item.style"
+                                                v-for="(item, index) in seatAttOpt"
+                                                :key="index"
+                                                :title="item.name"
+                                                @click="changeStyle(item.style)"
+                                            ></span>
+                                        </div>
+                                    </div>
+                                    <!-- 座位号 -->
+                                    <div>
+                                        <span>座位号：</span>
                                         <el-input
-                                            @blur="checkPrice(item.price)"
-                                            v-model="item.price"
-                                            style="width: 47%; margin-right: 6px"
+                                            v-model="presentSeatInfo.seatCode"
+                                            placeholder="座位号"
+                                            style="width: 50%"
                                             :readonly="isReadonly"
-                                        >
-                                            <template slot="append">￥</template>
-                                        </el-input>
-                                    </p>
+                                            @blur="checkNull(presentSeatInfo.seatCode, '座位号')"
+                                        ></el-input>
+                                    </div>
+                                    <!-- 座位类型 -->
+                                    <div>
+                                        <span>座位类型：</span>
+                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
+                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
+                                    </div>
+                                    <!-- 容纳人数 -->
+                                    <div>
+                                        <span>容纳人数：</span>
+                                        <el-input-number
+                                            :step="1"
+                                            step-strictly
+                                            v-model="presentSeatInfo.numberOfPeople"
+                                            controls-position="right"
+                                            placeholder="容纳人数"
+                                            style="width: 50%; margin-right: 6px"
+                                            :disabled="isReadonly"
+                                            :min="1"
+                                            @blur="checkNull(presentSeatInfo.numberOfPeople, '容纳人数')"
+                                        ></el-input-number>
+                                    </div>
+                                    <!-- 最晚保留时间 -->
+                                    <div class="lon-retain">
+                                        <span>保留最晚时间：</span>
+                                        <el-time-select
+                                            @change="checkNull(presentSeatInfo.seatLatestReservationTime, '保留最晚时间')"
+                                            style="width: 50%"
+                                            placeholder="最晚保留时间"
+                                            v-model="presentSeatInfo.seatLatestReservationTime"
+                                            :readonly="isReadonly"
+                                            :picker-options="
+                                                startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
+                                                    ? {
+                                                          start: startBussTime,
+                                                          step: '00:10',
+                                                          end: '23:50'
+                                                      }
+                                                    : {
+                                                          start: startBussTime,
+                                                          step: '00:10',
+                                                          end: endBussTime
+                                                      }
+                                            "
+                                        ></el-time-select>
+                                    </div>
+                                    <!-- 最低消费 -->
+                                    <div class="min-charge">
+                                        <span class="min-con">最低消费：</span>
+                                        <div class="day-mincom">
+                                            <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
+                                                <span>{{ item.weekIndex | dayOfWeek }}</span>
+                                                <el-input
+                                                    @blur="checkPrice(item.price)"
+                                                    v-model="item.price"
+                                                    style="width: 47%; margin-right: 6px"
+                                                    :readonly="isReadonly"
+                                                >
+                                                    <template slot="append">￥</template>
+                                                </el-input>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
                             </div>
                         </div>
                     </div>
@@ -733,7 +736,7 @@ export default {
             // this.clickFlag = false;
         },
         //查看当前座位信息
-         lookEditSeatInfo(e, seatType, stageCode) {
+        lookEditSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
@@ -775,7 +778,7 @@ export default {
         },
 
         //对座位信息进行相关转换
-          changeLayoutList() {
+        changeLayoutList() {
             this.list.forEach((item) => {
                 item.layoutList.forEach((item2) => {
                     //将数值型转为字符型（软硬座）
@@ -869,7 +872,7 @@ export default {
                 }
             })();
         },
-         //回显每个座位号时，不要带上楼层号
+        //回显每个座位号时，不要带上楼层号
         substrSeatNum() {
             this.list.forEach((item) => {
                 item.layoutList.forEach((item2) => {
@@ -1030,10 +1033,10 @@ export default {
 </script>
 
  <style scoped lang='less'>
- .crumbs{
-     margin: 20px 0;
- }
- .add-floor {
+.crumbs {
+    margin: 20px 0;
+}
+.add-floor {
     width: 60px;
     margin-left: 10px;
 }
