@@ -67,7 +67,7 @@
 
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="handleCancel">取 消</el-button>
-                    <el-button type="primary" @click="setGoodsInfo">确 定</el-button>
+                    <el-button type="primary" @click="submitSetGoodsInfo">确 定</el-button>
                 </span>
             </el-dialog>
 
@@ -178,13 +178,13 @@ export default {
                 //新增商品规格
                 dynamicValidateForm: {
                     domains: [
-                        {
-                            specName: '', //规格
-                            originalPrice: '', //规格原价
-                            presentPrice: '', //规格现价
-                            statisticalPrice: '', //新增的现价
-                            skuCode: '' //sku码
-                        }
+                        // {
+                        //     specName: '', //规格
+                        //     originalPrice: '', //规格原价
+                        //     presentPrice: '', //规格现价
+                        //     statisticalPrice: '', //新增的现价
+                        //     skuCode: '' //sku码
+                        // }
                     ]
                 },
                 skuCodeArr: [], //要删除的规格id数组
@@ -246,7 +246,9 @@ export default {
 
             wrapLoading: false, //加载开关
 
-            titleArrList: [] //标签页标题信息
+            titleArrList: [], //标签页标题信息
+
+            allRegRight: false //验证输入框输入内容的标杆
         };
     },
 
@@ -396,13 +398,13 @@ export default {
                 //新增商品规格
                 dynamicValidateForm: {
                     domains: [
-                        {
-                            specName: '', //规格
-                            originalPrice: '', //规格原价
-                            presentPrice: '', //规格现价
-                            statisticalPrice: '', //新增的现价
-                            skuCode: '' //sku码
-                        }
+                        // {
+                        //     specName: '', //规格
+                        //     originalPrice: '', //规格原价
+                        //     presentPrice: '', //规格现价
+                        //     statisticalPrice: '', //新增的现价
+                        //     skuCode: '' //sku码
+                        // }
                     ]
                 },
                 skuCodeArr: [] //要删除的规格id数组
@@ -460,6 +462,71 @@ export default {
             });
         },
 
+        //验证表单
+        checkFormInfo() {
+            if (!this.goodsForm.name) {
+                this.$message.error('请输入商品名称');
+                return;
+            } else if (this.goodsForm.checkedBanner === true && !this.goodsForm.bannerImageUrl) {
+                this.$message.error('请上传商店广告位图片');
+                return;
+            } else if (this.goodsForm.checkedReco === true && !this.goodsForm.recoImageUrl) {
+                this.$message.error('请上传商家推荐位图片');
+                return;
+            } else if (!this.goodsForm.thumImageUrl) {
+                if (this.activeNum == 11) {
+                    this.$message.error('请选择会员卡缩略图');
+                } else {
+                    this.$message.error('请上传商品缩略图');
+                }
+                return;
+            } else if (!this.goodsForm.detailImageUrl && this.activeNum != 11) {
+                this.$message.error('请上传商品详情图');
+                return;
+            } else {
+                if (this.activeNum == 1) {
+                    if (this.goodsForm.tableData.length === 0) {
+                        this.$message.error('请选择套餐内的商品');
+                        return;
+                    } else if (!this.goodsForm.comboNowPrice) {
+                        this.$message.error('请输入套餐现单价');
+                        return;
+                    } else {
+                        this.allRegRight = true;
+                    }
+                } else if (this.activeNum == 11) {
+                    if (!this.goodsForm.originPrice) {
+                        this.$message.error('请输入会员卡积分');
+                        return;
+                    } else if (!this.goodsForm.statisticalPrice) {
+                        this.$message.error('请输入会员卡原价');
+                        return;
+                    } else if (!this.goodsForm.nowPrice) {
+                        this.$message.error('请输入会员卡现价');
+                        return;
+                    } else {
+                        this.allRegRight = true;
+                    }
+                } else {
+                    if (this.goodsForm.dynamicValidateForm.domains.length === 0) {
+                        this.$message.error('请至少输入一种商品规格');
+                        return;
+                    } else {
+                        this.allRegRight = true;
+                    }
+                    console.log(this.goodsForm.dynamicValidateForm.domains);
+                }
+            }
+        },
+
+        //商品里的确认操作按钮
+        submitSetGoodsInfo() {
+            this.checkFormInfo();
+            if (this.allRegRight) {
+                this.setGoodsInfo();
+            }
+        },
+
         //添加/修改商品
         setGoodsInfo(active) {
             if (this.activeNum != 1 && this.activeNum != 11) {
@@ -470,7 +537,8 @@ export default {
                 listPicture: this.goodsForm.thumImageUrl,
                 name: this.goodsForm.name,
                 originalPrice: this.goodsForm.originPrice,
-                recommendAdStatus:this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
+                recommendAdStatus:
+                    this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
                 recommendStatus: this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2),
                 synopsis: this.goodsForm.desc,
                 type: this.activeNum,
@@ -486,114 +554,30 @@ export default {
                 recommendPictureSort: this.goodsForm.recoWeight,
                 setMealGoodsList: this.goodsForm.tableData,
                 skuList: this.goodsForm.dynamicValidateForm.domains,
-                statisticalPrice:this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
+                statisticalPrice:
+                    this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
                 year: this.goodsForm.year
             };
 
-            console.log(data);
             // 判断传商品价格开关
-            let commodityPrice = true;
-            let commodityPicture = true;
-            let skuSwitch = true;
-            // console.log(data)
-            if (data.name == '') {
-                this.$message.warning('请输入商品名称');
-                return;
-            }
-            if (this.goodsForm.checkedBanner == 1 && !data.recommendAdPicture) {
-                this.$message.warning('请添加广告图片');
-                this.goodsForm.checkedBanner = false;
-                return;
-            }
-            if (this.goodsForm.checkedReco == 1 && !data.recommendPicture) {
-                this.$message.warning('请添加推荐位图片');
-                this.goodsForm.checkedReco = false;
-                return;
-            }
-            if (this.activeNum == 1) {
-                if (!data.listPicture) {
-                    this.$message.warning('请添加商品缩略图');
-                    return;
-                }
-                if (!data.infoPicture) {
-                    this.$message.warning('请添加商品详情图');
-                    return;
-                }
-                if (data.setMealGoodsList.length == 0) {
-                    this.$message.warning('请至少选择一件商品');
-                    commodityPrice = false;
-                }
-                if (!this.$regular.money(data.statisticalPrice)) {
-                    this.$message.warning('请输入保留两位的数字的价格');
-                    return;
-                }
-                if (Number(data.statisticalPrice) > Number(data.originalPrice)) {
-                    this.$message.warning('商品现价大于原价');
-                    commodityPrice = false;
-                }
-                if (commodityPrice) {
-                    this.upCommodity(data);
-                }
-            } else if (this.activeNum == 11) {
-                if (!this.$regular.money(data.originalPrice)) {
-                    this.$message.warning('请输入纯数字积分');
-                    return;
-                }
-                if (!this.$regular.money(data.presentPrice)) {
-                    this.$message.warning('请输入保留两位的数字的价格');
-                    return;
-                }
-                if (!data.listPicture) {
-                    this.$message.warning('请至少选择一张商品缩略图');
-                    commodityPicture = false;
-                }
-                if (commodityPicture) {
-                    this.upCommodity(data);
-                }
-            } else {
-                // 判断传没传商品规格的开关;
-                if (!data.listPicture) {
-                    this.$message.warning('请添加商品缩略图');
-                    return;
-                }
-                if (!data.infoPicture) {
-                    this.$message.warning('请添加商品详情图');
-                    return;
-                }
-                if (!this.$regular.money(data.originalPrice)) {
-                    this.$message.warning('请输入保留两位的数字的价格');
-                    return;
-                }
-                data.skuList.map((item) => {
-                    if (!item.specName || !item.originalPrice || !item.statisticalPrice) {
-                        this.$message.warning('请输入正确的商品规格');
-                        skuSwitch = false;
-                        return;
-                    }
-                });
-                if (skuSwitch) {
-                    this.upCommodity(data);
-                }
-            }
-        },
-        upCommodity(result) {
             (async () => {
                 if (this.isUpdate) {
-                    const res = await this.$put('/merchant/store/goods/update', result);
+                    const res = await this.$put('/merchant/store/goods/update', data);
                     if (res.code === 0) {
                         this.getGoodsInfo();
                         this.handleCancel();
                         this.$message.success('修改成功');
+                        this.allRegRight = false;
                     } else {
                         this.$message.error(res.msg);
                     }
                 } else {
-                    const res = await this.$post('/merchant/store/goods/save', result);
-                    console.log(res);
+                    const res = await this.$post('/merchant/store/goods/save', data);
                     if (res.code === 0) {
                         this.getGoodsInfo();
                         this.handleCancel();
                         this.$message.success('添加成功');
+                        this.allRegRight = false;
                     } else {
                         this.$message.error(res.msg);
                     }
@@ -606,7 +590,6 @@ export default {
             this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((result) => {
                 if (result.code === 0) {
                     let res = result.data;
-
                     this.isUpdate = true; //启用编辑模式
                     this.dialogVisible = true; //对话框打开
                     this.goodId = id; //获取商品操作的ID
