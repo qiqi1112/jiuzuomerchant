@@ -99,7 +99,12 @@
                         </div>
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick">
-                                <el-tab-pane v-for="(item, i) in topList" :key="i" :label="item.typeName" :name="typeof(item.type)=='string'?item.type:item.type.toString()">
+                                <el-tab-pane
+                                    v-for="(item, i) in topList"
+                                    :key="i"
+                                    :label="item.typeName"
+                                    :name="typeof item.type == 'string' ? item.type : item.type.toString()"
+                                >
                                     <ul v-if="item.list != ''">
                                         <li class="top_li" v-for="(val, index) in item.list" :key="index">
                                             <div class="tl">
@@ -108,12 +113,18 @@
                                             <div class="tr">
                                                 <p class="tit">{{ val.name }}</p>
                                                 <!-- <p class="good_ifo">{{val.ml}}ml/瓶&nbsp;&nbsp; 昨日已售{{val.sold}}瓶</p> -->
-                                                <p class="good_ifo"><span>{{day_mon==1?'今日':'本月'}}</span>已售{{ val.sellNum }}瓶</p>
+                                                <p class="good_ifo">
+                                                    <span>{{ day_mon == 1 ? '今日' : '本月' }}</span
+                                                    >已售{{ val.sellNum }}瓶
+                                                </p>
                                                 <div class="pro" :style="{ width: val.sellNum / 100 + 'px' }"></div>
                                             </div>
                                         </li>
                                     </ul>
-                                    <div v-else>该类型<span>{{day_mon==1?'今日':'本月'}}</span>暂无销量</div>
+                                    <div v-else>
+                                        该类型<span>{{ day_mon == 1 ? '今日' : '本月' }}</span
+                                        >暂无销量
+                                    </div>
                                 </el-tab-pane>
                             </el-tabs>
                         </div>
@@ -288,7 +299,7 @@ export default {
                     // res.data.forEach((i) => {
                     //     i.type = i.type.toString();
                     // });
-                    this.activeName = typeof(res.data[0].type) == 'string'? res.data[0].type : res.data[0].type.toString()
+                    this.activeName = typeof res.data[0].type == 'string' ? res.data[0].type : res.data[0].type.toString();
                     this.topList = res.data;
                     // this.good_list = effective;
                 }
@@ -304,13 +315,13 @@ export default {
             this.$post('/merchant/store/getHomePage', data).then((res) => {
                 this.topThree();
                 if (res.code == 0) {
-                    res.data[0].score = Number(res.data[0].score)
+                    res.data[0].score = Number(res.data[0].score);
                     this.topData = res.data[0];
-                    
+
                     this.allGraph = res.data;
                     let yesterdayNewUser = '',
                         yesterdayVisitors = '';
-                        
+
                     if (res.data.length <= 1) {
                         yesterdayNewUser = res.data[0].newUserTimes;
                         yesterdayVisitors = res.data[0].visitTimes;
@@ -324,13 +335,13 @@ export default {
                     if (yesterdayVisitors >= 0) {
                         yesterdayVisitors = '+' + yesterdayVisitors;
                     }
-                    
+
                     this.$set(this.topData, 'yesterdayNewUser', yesterdayNewUser.toString().substring(1));
                     this.$set(this.topData, 'yesterdayVisitors', yesterdayVisitors.toString().substring(1));
                     this.$set(this.topData, 'newUserML', yesterdayNewUser.toString().substring(0, 1));
                     this.$set(this.topData, 'visitorsML', yesterdayVisitors.toString().substring(0, 1));
                     this.storeDate = res.data;
-                    
+
                     this.brokenChart();
                     this.breadChart();
                     this.columnarChart();
@@ -399,7 +410,7 @@ export default {
         // top类型切换
         handleClick(tab, event) {
             // this.topThree();
-            this.activeName = typeof(tab.name) == 'string'? tab.name : tab.name.toString()
+            this.activeName = typeof tab.name == 'string' ? tab.name : tab.name.toString();
         },
 
         // 导出
@@ -553,7 +564,7 @@ export default {
                 ]
             };
             breadLine.setOption(option);
-        },
+        }
     }
 };
 </script>
@@ -596,7 +607,7 @@ export default {
                 }
             }
             @media screen and (max-width: 1400px) {
-                .star{
+                .star {
                     margin-top: 14px;
                 }
             }

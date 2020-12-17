@@ -862,7 +862,7 @@
                         </div>
                         <!-- ktv包间属性列表 -->
                         <div class="ktv-right-box">
-                            <template v-if="isReadonly">
+                            <template v-if="isReadonly && ktvList.length !== 0">
                                 <div class="change-ktvFloor">
                                     <el-button
                                         v-for="(item, index) in list"
@@ -1728,6 +1728,7 @@ export default {
 
             //要传的值
             let data = {
+                source: 1,
                 appListBigPicture: this.appShopImageUrl,
                 city: this.city,
                 cassette: '6x6',
@@ -1767,6 +1768,8 @@ export default {
                 this.$put('/merchant/store/update', data).then((res) => {
                     if (res.code === 0) {
                         this.requestSuccessInit('修改成功');
+                    } else if (res.code === 500) {
+                        this.submitNoInput(res.msg);
                     } else {
                         this.floorName = '';
                         this.wrapLoading = false;
@@ -1781,6 +1784,8 @@ export default {
                         this.requestSuccessInit('新增成功');
                         localStorage.removeItem('storageInfo');
                         this.isUpdate = true;
+                    } else if (res.code === 500) {
+                        this.submitNoInput(res.msg);
                     } else {
                         this.floorName = '';
                         this.wrapLoading = false;
@@ -1788,6 +1793,18 @@ export default {
                     }
                 });
             }
+        },
+
+        //如果保存时，未添加楼层座位，KTV包间信息，就提示
+        submitNoInput(txt) {
+            this.wrapLoading = false;
+            if (this.shopLocaIndex != 3) {
+                this.getStoreInfo(); //重新获取商店数据
+                this.isReadonly = true;
+            } else {
+                this.isLookKtvInfo = true;
+            }
+            this.$message.error(txt);
         },
 
         //保存按钮
@@ -1906,28 +1923,6 @@ export default {
         //修改当前座位属性
         setSeatInfo(e, style) {
             e.target.className = style;
-
-            //修改四周的位置
-            // let row = Number(e.target.dataset.indexx); //行
-            // let col = Number(e.target.dataset.indexy); //列
-
-            // let allSeatSpan = document.querySelectorAll('.seat-box div div span');
-            // allSeatSpan.forEach((item) => {
-            //     let indexX = item.dataset.indexx;
-            //     let indexY = item.dataset.indexy;
-
-            //     if (row + 1 == indexX && col == indexY) {
-            //         item.className = style;
-            //     }
-
-            //     if (row == indexX && col + 1 == indexY) {
-            //         item.className = style;
-            //     }
-
-            //     if (row + 1 == indexX && col + 1 == indexY) {
-            //         item.className = style;
-            //     }
-            // });
         },
 
         //改变座位状态按钮（改变点击的座位颜色）
@@ -1953,9 +1948,11 @@ export default {
 
         //回显店铺卡座数量（行和列数量）
         getShopSeat(index) {
-            let seat = this.list[index].cassettes.split('x');
-            this.x = +seat[0];
-            this.y = +seat[1];
+            if (this.list.length !== 0) {
+                let seat = this.list[index].cassettes.split('x');
+                this.x = +seat[0];
+                this.y = +seat[1];
+            }
         },
 
         //获取经纬度
@@ -2145,7 +2142,7 @@ export default {
 
         //删除楼层
         deleteFloorList(item) {
-            if (this.list.length === 0) {
+            if (this.list.length <= 1) {
                 this.$message.error('楼层最低保留一层');
                 return;
             }
@@ -2368,34 +2365,37 @@ export default {
 
         //对ktv信息进行相关转换
         changeKtvList(arr) {
-            arr.forEach((item) => {
-                //赠品json字符串转为数组对象
-                if (item.snacks) {
-                    item.snacks = JSON.parse(item.snacks);
-                } else {
-                    item.snacks = [];
-                }
+            if (arr.length !== 0) {
+                console.log('vvvv', arr);
+                arr.forEach((item) => {
+                    //赠品json字符串转为数组对象
+                    if (item.snacks) {
+                        item.snacks = JSON.parse(item.snacks);
+                    } else {
+                        item.snacks = [];
+                    }
 
-                //ktv包间示意图转为数组
-                if (item.sketchMap) {
-                    item.sketchMap = item.sketchMap.split(',');
-                } else {
-                    item.sketchMap = [];
-                }
+                    //ktv包间示意图转为数组
+                    if (item.sketchMap) {
+                        item.sketchMap = item.sketchMap.split(',');
+                    } else {
+                        item.sketchMap = [];
+                    }
 
-                //将数值型转为字符型
-                if (item.haveToilet) {
-                    item.haveToilet = item.haveToilet.toString();
-                }
+                    //将数值型转为字符型
+                    if (item.haveToilet) {
+                        item.haveToilet = item.haveToilet.toString();
+                    }
 
-                //将配套设施转为布尔类型
-                if (item.haveDiningTable || item.haveMahjong || item.haveSwimming || item.haveTableTennis) {
-                    item.haveDiningTable = item.haveDiningTable === 1 ? true : false;
-                    item.haveMahjong = item.haveMahjong === 1 ? true : false;
-                    item.haveSwimming = item.haveSwimming === 1 ? true : false;
-                    item.haveTableTennis = item.haveTableTennis === 1 ? true : false;
-                }
-            });
+                    //将配套设施转为布尔类型
+                    if (item.haveDiningTable || item.haveMahjong || item.haveSwimming || item.haveTableTennis) {
+                        item.haveDiningTable = item.haveDiningTable === 1 ? true : false;
+                        item.haveMahjong = item.haveMahjong === 1 ? true : false;
+                        item.haveSwimming = item.haveSwimming === 1 ? true : false;
+                        item.haveTableTennis = item.haveTableTennis === 1 ? true : false;
+                    }
+                });
+            }
         },
 
         //清空ktv包间属性编辑区域的数据
@@ -2429,7 +2429,7 @@ export default {
             this.ktvBannerImgBox = [];
         },
 
-        //取消保存ktv包间信息
+        //清空新增输入框的ktv包间信息
         ktvCancelSub() {
             this.clearKtvInfo();
             // if (this.isUpdateKtvInfo) {
@@ -2546,11 +2546,11 @@ export default {
                     this.ktvList = result.list; //回显时根据楼层分类列表专用
                     this.list = result.list;
 
-                    //默认展示第一楼的ktv列表
-                    this.changeShowKtvFloor(this.ktvList[0], 0);
-
                     //获取店铺类型
                     this.getShopType(result.storeLocation);
+
+                    //获取经纬度
+                    this.getlonlat(lonlat);
 
                     //回显banner图集
                     this.showBannerImg();
@@ -2562,10 +2562,14 @@ export default {
                     this.getShopSeat(0);
 
                     //默认展示的楼层为第一楼
-                    this.nowFloor = result.list[0].floor;
+                    if (this.list.length !== 0) {
+                        this.nowFloor = result.list[0].floor;
+                    }
 
-                    //获取经纬度
-                    this.getlonlat(lonlat);
+                    //默认展示第一楼的ktv列表
+                    if (this.shopLocaIndex == 3 && this.list.length !== 0) {
+                        this.changeShowKtvFloor(this.ktvList[0], 0);
+                    }
 
                     //对座位信息进行相关转换
                     this.changeLayoutList();
@@ -2594,6 +2598,8 @@ export default {
                     this.substrSeatNum();
 
                     this.wrapLoading = false;
+
+                    console.log('qweqwe', this.ktvList);
 
                     console.log('当前店铺数据', res.data);
                 } else if (res.code === 600) {
