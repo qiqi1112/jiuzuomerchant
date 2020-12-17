@@ -304,6 +304,10 @@ export default {
             this.$post('/merchant/store/getHomePage', data).then((res) => {
                 this.topThree();
                 if (res.code == 0) {
+                    if(!res.data){
+                        return
+                    }
+
                     res.data[0].score = Number(res.data[0].score)
                     this.topData = res.data[0];
                     
