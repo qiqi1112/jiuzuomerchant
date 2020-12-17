@@ -2142,10 +2142,10 @@ export default {
 
         //删除楼层
         deleteFloorList(item) {
-            if (this.list.length <= 1) {
-                this.$message.error('楼层最低保留一层');
-                return;
-            }
+            // if (this.list.length === 0) {
+            //     this.$message.error('楼层最低保留一层');
+            //     return;
+            // }
 
             const index = this.list.indexOf(item);
             if (index !== -1) {
