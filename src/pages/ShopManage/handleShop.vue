@@ -73,6 +73,7 @@
                                     <i class="el-icon-plus"></i>
                                 </el-button>
                             </div>
+                            <span style="color: #f00">*输入完规格信息后，点击后面加号视为添加成功</span>
                         </div>
 
                         <!-- <el-form

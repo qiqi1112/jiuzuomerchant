@@ -114,10 +114,18 @@
                     </div>
 
                     <!-- 新增 -->
-                    <div v-if="!isReadonly && servicePhoneArr.length < 3">
-                        <el-input v-model="servicePhone" placeholder="客服电话" style="width: 30%; margin-right: 10px" clearable></el-input>
-                        <el-button type="primary" @click="addServicePhone">添加</el-button>
-                    </div>
+                    <template v-if="!isReadonly && servicePhoneArr.length < 3">
+                        <div style="margin-bottom: 10px">
+                            <el-input
+                                v-model="servicePhone"
+                                placeholder="客服电话"
+                                style="width: 30%; margin-right: 10px"
+                                clearable
+                            ></el-input>
+                            <el-button type="primary" @click="addServicePhone">添加</el-button>
+                        </div>
+                        <span style="font-size: 12px; color: #f00">*输入完电话后，点击添加按钮视为添加成功</span>
+                    </template>
                 </div>
 
                 <!-- 店铺营业时间，人均消费，类型 -->
@@ -223,7 +231,7 @@
                     </div>
 
                     <!-- 订单最晚保留时间 -->
-                    <div>
+                    <div v-if="shopLocaIndex != 3">
                         <span>晚于最晚到店时间订单的保留分钟数：</span>
                         <el-select clearable v-model="latestRetainTime" placeholder="最晚保留时间（分钟）" :disabled="isReadonly">
                             <el-option v-for="(item, index) in timeQuanArr" :key="index" :label="item" :value="item"></el-option>
@@ -687,7 +695,7 @@
                                         </el-input>
                                     </div>
                                     <!-- 最晚保留时间 -->
-                                    <div class="longRetain">
+                                    <!-- <div class="longRetain">
                                         <span>最晚保留时间：</span>
                                         <el-select
                                             clearable
@@ -704,7 +712,7 @@
                                             ></el-option>
                                         </el-select>
                                         （分钟）
-                                    </div>
+                                    </div> -->
                                     <!-- 删除 -->
                                     <el-button v-if="!isReadonly" @click="delTimeQuan(item)" type="danger" style="float: right"
                                         >删除</el-button
@@ -755,7 +763,7 @@
                                         </el-input>
                                     </div>
                                     <!-- 最晚保留时间 -->
-                                    <div class="longRetain">
+                                    <!-- <div class="longRetain">
                                         <span>最晚保留时间：</span>
                                         <el-select
                                             clearable
@@ -772,8 +780,8 @@
                                             ></el-option>
                                         </el-select>
                                         （分钟）
-                                    </div>
-                                    <span style="font-size: 12px; color: #f00">*输入完内容请点击添加按钮</span>
+                                    </div> -->
+                                    <span style="font-size: 12px; color: #f00">*输入完内容后，点击添加按钮视为添加成功</span>
                                     <!-- 确定 -->
                                     <el-button v-if="!isReadonly" @click="addTimeQuan" type="primary" style="float: right">添加</el-button>
                                 </div>
@@ -1068,7 +1076,7 @@ export default {
             timeQuanObj: {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
-                latestTime: '', //最晚保留时间
+                latestTime: '20', //最晚保留时间
                 minConsumption: 0 //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
@@ -1183,7 +1191,7 @@ export default {
             } else if (!this.goodsBrief) {
                 this.$message.error('请输入商品店名简介');
                 return;
-            } else if (!this.latestRetainTime) {
+            } else if (!this.latestRetainTime && this.shopLocaIndex != 3) {
                 this.$message.error('请选择晚于最晚到店时间订单的保留分钟数');
                 return;
             } else if (this.bannerShowBox.length == 0) {
@@ -1737,7 +1745,7 @@ export default {
                 districtCode: this.districtCode,
                 endTime: this.endBussTime,
                 goodsStoreSynopsis: this.goodsBrief,
-                latestRetainTime: this.latestRetainTime,
+                latestRetainTime: this.shopLocaIndex == 3 ? '20' : this.latestRetainTime,
                 labels: this.dynamicTags.join(','),
                 layoutPicture: this.overallImageUrl,
                 logo: this.logoImageUrl,
@@ -1968,9 +1976,11 @@ export default {
                 this.$message.error('开始时间不能为空');
             } else if (this.timeQuanObj.endTime === '' || this.timeQuanObj.endTime === null) {
                 this.$message.error('结束时间不能为空');
-            } else if (this.timeQuanObj.latestTime === '') {
-                this.$message.error('最晚保留时间不能为空');
-            } else if (this.timeQuanObj.minConsumption === '') {
+            }
+            // else if (this.timeQuanObj.latestTime === '') {
+            //     this.$message.error('最晚保留时间不能为空');
+            // }
+            else if (this.timeQuanObj.minConsumption === '') {
                 this.$message.error('最低消费不能为空');
             } else if (this.$regular.money(this.timeQuanObj.minConsumption) === false) {
                 this.$message.error('请输入正确格式的金额');
@@ -1980,7 +1990,7 @@ export default {
                 this.timeQuanObj = {
                     startTime: '', //开始时间
                     endTime: '', //结束时间
-                    latestTime: '', //最晚保留时间
+                    latestTime: '20', //最晚保留时间
                     minConsumption: '' //最低消费
                 };
             }
@@ -2423,7 +2433,7 @@ export default {
             this.timeQuanObj = {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
-                latestTime: '', //最晚保留时间
+                latestTime: '20', //最晚保留时间
                 minConsumption: 0 //最低消费
             };
             this.ktvBannerImgBox = [];
