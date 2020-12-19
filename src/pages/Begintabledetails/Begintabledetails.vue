@@ -126,7 +126,7 @@
                         <div class="inventory-details">
                             <span>清单详情:</span>
                             <div class="details">
-                                <span class="header"> 座位信息 </span>
+                                <span class="headers"> 座位信息 </span>
                                 <div style="display: flex">
                                     <div class="left">
                                         <p>座位号：</p>
@@ -143,7 +143,7 @@
                                 </div>
                             </div>
                             <div class="details-two">
-                                <span class="header" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
+                                <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
                                 <div style="display: flex" v-for="(item, index) in presentSeatInfo.goodsList" :key="index">
                                     <div class="left">
                                         <p>
@@ -162,7 +162,7 @@
                                 </div>
                             </div>
                             <div class="details-two">
-                                <span class="header" style="display: inline-block; margin-bottom: 5px"> 优惠卷 </span>
+                                <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠卷 </span>
                                 <div style="display: flex">
                                     <div class="left">
                                         <p>
@@ -298,9 +298,9 @@ export default {
                         if (item2.floor == item.floor && item2.seatRow == seatRow && item2.seatColumn == seatColumn) {
                             //查看当前座位信息
                             this.presentSeatInfo = item2;
-
                             let newObj = this.presentSeatInfo;
-                            let code = this.presentSeatInfo.seatCode;
+                            let code = this.nowFloor+'-'+this.presentSeatInfo.seatCode;
+                            console.log(code)
                             this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
                                 if (res.code == 0) {
                                     console.log(res);
@@ -463,7 +463,6 @@ export default {
 </script>
 <style scoped lang='less'>
 .add-floor {
-    width: 60px;
     margin-left: 10px;
 }
 .crumbs {
@@ -505,9 +504,8 @@ export default {
     flex-wrap: wrap;
     .details {
         margin-left: 57px;
-        .header {
+        .headers {
             color: #e6a23c;
-            background-color: #f0f0f0;
         }
         .left {
             p {
@@ -529,9 +527,8 @@ export default {
             width: 440px;
         }
         margin-left: 117px;
-        .header {
+        .headers {
             color: #e6a23c;
-            background-color: #f0f0f0;
         }
         .left {
             p {

@@ -20,9 +20,63 @@
 
                 <!-- 商品规格 -->
                 <template v-if="activeNum != 1 && activeNum != 11">
-                    <p class="drinks-spec">
-                        <span>*商品规格：</span>
-                        <el-form
+                    <div class="drinks-spec">
+                        <div class="title">
+                            <span>*商品规格：</span>
+                        </div>
+                        <div class="sku-list">
+                            <div v-for="(item, index) in goodsForm.dynamicValidateForm.domains" :key="index">
+                                <el-input
+                                    v-model="item.specName"
+                                    placeholder="规格（如：一瓶）"
+                                    style="width: 132px; margin-right: 10px"
+                                ></el-input>
+                                <el-input
+                                    v-model="item.originalPrice"
+                                    placeholder="原价（如：9.99）"
+                                    style="width: 170px; margin-right: 10px"
+                                >
+                                    <template slot="append">￥</template>
+                                </el-input>
+                                <el-input
+                                    v-model="item.statisticalPrice"
+                                    placeholder="现价（如：9.99）"
+                                    style="width: 170px; margin-right: 10px"
+                                >
+                                    <template slot="append">￥</template>
+                                </el-input>
+                                <el-button @click.prevent="removeDomain(item)">
+                                    <i class="el-icon-close"></i>
+                                </el-button>
+                            </div>
+                            <div>
+                                <el-input
+                                    v-model="skuObj.specName"
+                                    placeholder="规格（如：一瓶）"
+                                    style="width: 132px; margin-right: 10px"
+                                ></el-input>
+                                <el-input
+                                    v-model="skuObj.originalPrice"
+                                    placeholder="原价（如：9.99）"
+                                    style="width: 170px; margin-right: 10px"
+                                >
+                                    <template slot="append">￥</template>
+                                </el-input>
+                                <el-input
+                                    v-model="skuObj.statisticalPrice"
+                                    placeholder="现价（如：9.99）"
+                                    style="width: 170px; margin-right: 10px"
+                                >
+                                    <template slot="append">￥</template>
+                                </el-input>
+                                <el-button @click="addDomain">
+                                    <i class="el-icon-plus"></i>
+                                </el-button>
+                            </div>
+                            <span style="color: #f00">*输入完规格信息后，点击后面加号视为添加成功</span>
+                        </div>
+
+                        <!-- <el-form
                             :model="goodsForm.dynamicValidateForm"
                             ref="goodsForm.dynamicValidateForm"
                             label-width="100px"
@@ -55,8 +109,8 @@
                                     <i class="el-icon-close"></i>
                                 </el-button>
                             </el-form-item>
-                        </el-form>
-                    </p>
+                        </el-form> -->
+                    </div>
                 </template>
 
                 <!-- 酒水 -->
@@ -307,11 +361,17 @@ export default {
             options: [], //输入框请求到的商品信息数组
             goodName: '', //选中的商品对应的信息
 
-            antiStatus: true //防抖状态值
+            antiStatus: true, //防抖状态值
+
+            skuObj: {
+                specName: '', //规格
+                originalPrice: '', //规格原价
+                presentPrice: '', //规格现价
+                statisticalPrice: '', //新增的现价
+                skuCode: '' //sku码
+            }
         };
     },
-
-    created() {},
 
     watch: {
         //如果切换到会员卡页面就加载会员卡卡片列表
@@ -448,13 +508,30 @@ export default {
 
         //商品规格添加按钮
         addDomain() {
-            this.goodsForm.dynamicValidateForm.domains.push({
-                specName: '', //规格
-                originalPrice: '', //规格原价
-                presentPrice: '', //规格现价
-                statisticalPrice: '', //新增的现价
-                skuCode: '' //sku码
-            });
+            if (!this.skuObj.specName) {
+                this.$message.error('请输入商品规格名称');
+            } else if (!this.$regular.money(this.skuObj.originalPrice)) {
+                this.$message.error('请输入正确的规格原价');
+            } else if (!this.$regular.money(this.skuObj.statisticalPrice)) {
+                this.$message.error('请输入正确的规格现价');
+            } else {
+                this.goodsForm.dynamicValidateForm.domains.push(this.skuObj);
+                this.skuObj = {
+                    specName: '', //规格
+                    originalPrice: '', //规格原价
+                    presentPrice: '', //规格现价
+                    statisticalPrice: '', //新增的现价
+                    skuCode: '' //sku码
+                };
+            }
+
+            // this.goodsForm.dynamicValidateForm.domains.push({
+            //     specName: '', //规格
+            //     originalPrice: '', //规格原价
+            //     presentPrice: '', //规格现价
+            //     statisticalPrice: '', //新增的现价
+            //     skuCode: '' //sku码
+            // });
         },
 
         //商品规格删除按钮
@@ -685,17 +762,24 @@ export default {
         }
     }
 
-    p.drinks-spec {
-        align-items: flex-start;
+    div.drinks-spec {
+        display: flex;
+        margin-bottom: 30px;
 
-        > span {
+        // align-items: flex-start;
+
+        .title > span {
             margin-right: 10px;
             margin-top: 6px;
         }
 
-        .el-form-item {
+        .sku-list > div {
             margin-bottom: 10px;
         }
+
+        // .el-form-item {
+        //     margin-bottom: 10px;
+        // }
     }
 
     .good-name-box {

@@ -9,7 +9,7 @@
             active-text-color="#20a0ff"
             unique-opened
             router
-            @select = "gowhere"
+            @select="gowhere"
         >
             <template v-for="item in items">
                 <template v-if="item.subs">
@@ -131,7 +131,7 @@ export default {
                     icon: 'iconfont icon-caiwu side',
                     index: 'financeManage',
                     title: '财务管理'
-                },
+                }
                 // {
                 //     icon: 'el-icon-s-flag',
                 //     title: '广告活动',
@@ -257,16 +257,16 @@ export default {
             bus.$emit('collapse-content', msg);
         });
         // 获取店铺类型
-        this.$get('/merchant/store/getStoreInfo')
-        .then(res=>{
-            // console.log(res.data.storeLocation)
-            if(res.data.storeLocation==3){
-                this.items[5].index='ktv'
+        this.$get('/merchant/store/getStoreInfo').then((res) => {
+            if (res.data) {
+                if (res.data.storeLocation == 3) {
+                    this.items[5].index = 'ktv';
+                }
             }
-        })
+        });
     },
-    methods:{
-        gowhere(e){
+    methods: {
+        gowhere(e) {
             // console.log(e)
         }
     }
