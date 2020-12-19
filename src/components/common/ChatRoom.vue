@@ -40,8 +40,9 @@
                                             <div class="withdraw"  v-if="item.messageType == 'RecallCommandMessage'">
                                                 <div>对方撤回了一条消息</div>
                                             </div>
-                                            <div class="msg" v-if="item.messageType == 'TextMessage'">
-                                                <div>{{item.content.content}}</div>
+                                            <div class="msg" v-if="item.messageType == 'TextMessage'" >
+                                                <div v-html="item.content.content"></div>
+                                                <!-- {{item.content.content}} -->
                                             </div>
                                             <!-- 图片 -->
                                             <div class="msg" v-if="item.messageType == 'ImageMessage'">
@@ -77,7 +78,8 @@
 
                                         <div class="msg_list self" v-else>
                                             <div class="msg self_msg"  v-if="item.messageType == 'TextMessage'">
-                                                <div>{{item.content.content}}</div>
+                                                <!-- <div >{{item.content.content}}</div> -->
+                                                <div v-html="item.content.content"></div>
                                             </div>
                                             <div class="msg self_msg"  v-if="item.messageType == 'ImageMessage'">
                                                 <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
@@ -283,10 +285,10 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-                // console.log(lastObj)
+                console.log(lastObj)
+                lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
                 // if(lastObj.messageType == 'deteleMessage'){
                 //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
-                    
                 // }
                 // 撤回
                 if(lastObj.messageType == 'RecallCommandMessage'){
@@ -337,6 +339,7 @@ export default {
                     }
                 }
                 var audio=this.$refs.audio
+                console.log(audio)
                 audio.play()
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
@@ -662,7 +665,7 @@ export default {
                     let newArr = []
                     let userInfo = res.data
                     list.forEach((v,i)=>{
-                        // RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
+                        v.content.content = RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
                         // 调用历史记录
                         if(v.messageDirection == 2){
                             if(userInfo.id == "10001"){
@@ -857,6 +860,7 @@ export default {
 
         // 选择表情
         selectEmoji(emoji){
+            console.log(emoji)
             this.sendText += emoji.emoji;
             // this.emojiShow = false;
         },

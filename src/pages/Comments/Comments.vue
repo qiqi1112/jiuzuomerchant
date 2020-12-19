@@ -183,9 +183,9 @@ export default {
     methods: {
         getData() {
             let data = {
-                pageNo: this.pageIndex,
-                pageSize: this.pageSize,
-                keywords: this.text
+                pageNo: this.query.pageIndex,
+                pageSize: this.query.pageSize,
+                keywords: this.query.text
             };
             this.$post('/merchant/store/appraise/appraiseListByStoreId', data).then((res) => {
                 if (res.code == 0) {

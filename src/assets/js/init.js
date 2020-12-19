@@ -39,7 +39,6 @@ export default function init(userInfo,callbacks) {
     RongIMClient.setOnReceiveMessageListener({
         // 接收到的消息
         onReceived: function (message) {
-            console.log(message)
             // 判断消息类型
             switch(message.messageType){
                 case RongIMClient.MessageType.TextMessage:
