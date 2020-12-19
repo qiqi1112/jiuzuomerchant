@@ -101,7 +101,12 @@ export default function init(userInfo,callbacks) {
                     break;
 
                 case RongIMClient.MessageType.RecallCommandMessage:
-                    // 测回消息
+                    // 撤回消息
+                    num += 1
+                    store.commit('newMsg', message);
+                    store.commit('newMsgState',num)
+                    break
+                case RongIMClient.MessageType.deteleMessage:
                     num += 1
                     store.commit('newMsg', message);
                     store.commit('newMsgState',num)
@@ -158,6 +163,14 @@ export default function init(userInfo,callbacks) {
     var mesasgeTag1 = new RongIMLib.MessageTag(isCounted1, isPersited1); // 消息是否保存是否计数，true true 计数且保存，false false 不计数不保存
     var prototypes1 = ['content', 'extra', 'status', 'title']; // 消息类中的属性名
     RongIMClient.registerMessageType(messageName1, objectName1, mesasgeTag1, prototypes1);
+
+    var messageName = 'deteleMessage';  // 消息名称  用于删除消息会话 未读等
+    var objectName = 'JZ:MessageDel';  // 消息类型名，请按照此格式命名
+    var isCounted = true;  // 消息计数
+    var isPersited = true;  // 消息保存
+    var mesasgeTag = new RongIMLib.MessageTag(isCounted, isPersited);
+    var prototypes = ['content','extra','user'];  // 消息类中的属性名
+    RongIMClient.registerMessageType(messageName, objectName, mesasgeTag, prototypes);
 
 
     //开始链接

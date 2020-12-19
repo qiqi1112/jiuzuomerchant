@@ -9,7 +9,6 @@
             <span class="all_unread" v-show="$store.state.headerUnread>0">{{$store.state.headerUnread}}</span>
         </div>
 
-        <!-- <div ref="simulation">1111</div> -->
         <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close='closeDialog'>
             <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg">
                 <div class="box">
@@ -277,11 +276,18 @@ export default {
         },
         watchMsgNum: {
             handler(newValue, oldValue) {
+                if(!localStorage.getItem('userInfo')){
+                    return
+                }
                 let that = this
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-                console.log(lastObj)
+                // console.log(lastObj)
+                // if(lastObj.messageType == 'deteleMessage'){
+                //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
+                    
+                // }
                 // 撤回
                 if(lastObj.messageType == 'RecallCommandMessage'){
                     for(let i=0;i<this.userList.length;i++){
@@ -464,6 +470,7 @@ export default {
                                     that.now_user = ''
                                 }
                             }
+                            // that.insuranceDelete(item)
                         },
                         onError:function(error){
                             console.log(error)
@@ -475,6 +482,38 @@ export default {
                 }
             });
         },
+        // 删除会话时  发送自定义消息  用于判断  下次重新获取数据时  如果有这条自定义消息  则再次删除该会话
+
+        insuranceDelete(user){
+            console.log(user)
+
+            var conversationType = RongIMLib.ConversationType.PRIVATE;
+            var targetId = user.id;
+            var msg = new RongIMClient.RegisterMessage.deteleMessage(
+                { 
+                    content: '', 
+                    extra: '',
+                    user:{
+                        id:user.id,
+                        name:user.name,
+                        portrait:user.portrait
+                    }
+                }
+            );
+
+            var callback = {
+                onSuccess: function (message) {
+                    console.log('发送自定义消息成功');
+                },
+                onError: function (errorCode) {
+                    console.log('发送自定义消息失败');
+                }
+            };
+            RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, callback);
+
+        },
+
+
         // 监听聊天的关闭弹窗
         closeDialog(){
             this.$store.commit('headerClickMsgFun', false);
@@ -527,6 +566,7 @@ export default {
                     var userId = ''
                     let arr = []
                     if(result.length<=0)return
+                        
                     result.forEach(v=>{
                         userId = v.targetId 
                         that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
@@ -687,7 +727,6 @@ export default {
                         }
                         that.$regular.compress(base64, yasuo, 0.5).then(function (val) {
                             base64Str = val.split(',')[1]
-                            console.log(base64Str.length)
                             imageUri = that.joinUrl + v.name; // 上传到自己服务器的 URL。
                             msg = new RongIMLib.ImageMessage({content: base64Str, imageUri: imageUri});
                             conversationType = RongIMLib.ConversationType.PRIVATE; // 单聊, 其他会话选择相应的会话类型即可
@@ -1062,12 +1101,40 @@ export default {
         // // 获取会话列表
         var callbacks = {};
         init(userInfo, callbacks);
-
         setTimeout(()=>{
-            this.conversation()
-            this.emoji = RongIMLib.RongIMEmoji.list
-            this.allUnreadMsg()
-        },1000)
+                        that.conversation()
+                        that.emoji = RongIMLib.RongIMEmoji.list
+                        that.allUnreadMsg()
+                    },500)
+        // setTimeout(()=>{
+        //     RongIMClient.getInstance().clearConversations({
+        //         onSuccess: function() {
+        //             setTimeout(()=>{
+        //                 that.conversation()
+        //                 that.emoji = RongIMLib.RongIMEmoji.list
+        //                 that.allUnreadMsg()
+        //             },500)
+        //             // RongIMClient.getInstance().clearTotalUnreadCount({
+        //             //     onSuccess: function(){
+        //             //         // 清除未读消息成功
+        //             //         that.userList = []
+        //             //         that.now_user = ''
+        //             //         that.allUnreadMsg()
+                            
+        //             //     },
+        //             //     onError: function(error){
+        //             //         // error => 清除未读消息数错误码
+        //             //         console.log(error)
+        //             //     }
+        //             // });
+        //         },
+        //         onError: function(error) {
+        //             that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
+        //         }
+        //     });
+        // },500)
+
+        
         // this.scrollEnd();
     },
 };

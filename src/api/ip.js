@@ -52,8 +52,8 @@ api_request.interceptors.response.use(
       //如果未登录或者被禁用，就直接跳到登录页面
       localStorage.removeItem('userInfo');
       router.push("/login");
-      // RongIMClient.getInstance().logout();//退出登录
-      RongIMClient.getInstance().disconnect(); //断开链接
+      RongIMClient.getInstance().logout();//退出登录
+      // RongIMClient.getInstance().disconnect(); //断开链接
       // Message.error(response.data.msg);
       return Promise.reject(response.data);
     }

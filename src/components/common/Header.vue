@@ -150,11 +150,11 @@ export default {
             if (command == 'loginout') {
                 this.$get('/merchant/store/logout').then(
                     (res) => {
-                        // RongIMClient.getInstance().logout();//退出登录
                         localStorage.removeItem('userInfo');
                         this.$message.success('退出成功');
                         this.$router.push('/login');
-                        RongIMClient.getInstance().disconnect(); //断开链接
+                        RongIMClient.getInstance().logout();//退出登录
+                        // RongIMClient.getInstance().disconnect(); //断开链接
                     },
                     (err) => {
                         console.log(err);

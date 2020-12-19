@@ -43,7 +43,9 @@
                 <el-table-column prop="com_label" min-width="200" label="标签">
                     <template slot-scope="scope">
                         <div class="com_del_box">
-                            <span class="lab_span" v-for="(item, index) in scope.row.labels" :key="index">{{ item }}</span>
+                            <span v-for="(item, index) in scope.row.labels" :key="index">
+                                <span class="lab_span" v-if="item">{{ item }}</span>
+                            </span>
                         </div>
                     </template>
                 </el-table-column>
@@ -86,6 +88,7 @@
                             <el-form-item label="评论时间">
                                 <div>{{ form.createTime }}</div>
                             </el-form-item>
+                            
                             <el-form-item label="标签" v-if="form.labels">
                                 <div class="lab_list">
                                     <span v-for="(lab, index) in form.labels" :key="index">{{ lab }}</span>
@@ -94,11 +97,11 @@
                             <el-form-item label="评论内容">
                                 <div class="com_del">{{ form.content }}</div>
                             </el-form-item>
-                            <el-form-item label="配图/视频：" v-if="form.pictureList">
+                            <el-form-item label="配图/视频：" v-if="form.appraisePictureList">
                                 <div class="imgs">
-                                    <div v-for="(item, i) in form.pictureList" :key="i" style="display: inline-block">
+                                    <div v-for="(item, i) in form.appraisePictureList" :key="i">
                                         <img v-if="item.substr(item.length - 3) != 'mp4'" :src="imgHead + item" />
-                                        <video v-else width="320" height="240" controls class="video">
+                                        <video v-else width="320" height="200" controls class="video">
                                             <source :src="imgHead + item" type="video/mp4" />
                                             您的浏览器不支持 video 标签。
                                         </video>
@@ -187,10 +190,10 @@ export default {
             this.$post('/merchant/store/appraise/appraiseListByStoreId', data).then((res) => {
                 if (res.code == 0) {
                     let lab = '';
-                    // res.data.list.forEach((i) => {
-                    //     lab = i.labels.split(',');
-                    //     this.$set(i, 'labels', lab);
-                    // });
+                    res.data.list.forEach((i) => {
+                        lab = i.labels.split(',');
+                        this.$set(i, 'labels', lab);
+                    });
                     this.tableData = res.data.list;
                     this.pageTotal = res.data.total;
                 } else {
@@ -211,7 +214,9 @@ export default {
         handleEdit(index = '', row = '') {
             this.more = false;
             this.$get(`/merchant/store/appraise/getById/${row.id}`).then((res) => {
+                console.log(res)
                 if (res.code == 0) {
+                    res.data.labels = res.data.labels.split(',');
                     this.editVisible = true;
                     this.idx = index;
                     this.form = res.data;
@@ -283,6 +288,29 @@ export default {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+    }
+    // <el-form-item label="配图/视频：" v-if="form.appraisePictureList">
+    //                             <div class="imgs">
+    //                                 <div v-for="(item, i) in form.appraisePictureList" :key="i" style="display: inline-block;height:200px">
+    //                                     <img v-if="item.substr(item.length - 3) != 'mp4'" :src="imgHead + item" style="height:200px;width:auto;margin-right:12px" />
+    //                                     <video v-else width="320" height="240" controls class="video" style="height:200px;width:auto;margin-right:12px">
+    //                                         <source :src="imgHead + item" type="video/mp4" />
+    //                                         您的浏览器不支持 video 标签。
+    //                                     </video>
+    //                                 </div>
+    //                             </div>
+    //                         </el-form-item>
+    .imgs{
+        &>div{
+            display: inline-block;
+            height:200px;
+            img,.video{
+                height:200px;
+                width:auto;
+                margin-right:12px;
+                border-radius: 6px;
+            }
+        }
     }
     .lab_span {
         border: 1px solid #7a7a7a;
