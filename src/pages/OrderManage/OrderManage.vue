@@ -53,6 +53,7 @@
             <!-- 表格部分 -->
             <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
                 <el-table-column label="ID" fixed type="index"></el-table-column>
+                <el-table-column prop="" label="追加订单"></el-table-column>
                 <el-table-column prop="createBy" label="订单发起人" min-width="120"></el-table-column>
                 <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
                 <el-table-column label="座位号/包间号" min-width="120">
@@ -196,7 +197,17 @@
 
             <!-- 修改座位/包间号对话框 -->
             <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog" @close="handleCancel">
-                <el-input v-model="seatNum" placeholder="请输入座位号/包间号"></el-input>
+                <el-select
+                    style="width: 100%"
+                    v-model="seatNum"
+                    filterable
+                    remote
+                    clearable
+                    placeholder="请选择座位号/包间号"
+                    @change="selectGoodInfo"
+                >
+                    <el-option v-for="(item, index) in seatOrRoomList" :key="index" :label="item" :value="item"></el-option>
+                </el-select>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancel">取 消</el-button>
                     <el-button type="primary" @click="handleEditSeat">确 定</el-button>
@@ -559,6 +570,7 @@ export default {
             seatStyle: 'canBook', //默认的选座样式
             dialog: false, //查看订单详情弹窗开关
             seatDia: false, //修改座位号弹窗开关
+            seatOrRoomList: [], //修改座位号/包间号时，后台返回的选项列表
             tableData: [], //订单表格列表
             form: {}, //订单详情表单
             dialogStatus: 1, //根据操作显示不同的弹窗
@@ -671,8 +683,20 @@ export default {
 
         //修改座位号/包间号
         editSeat(row) {
-            this.seatDia = true;
             this.upSeatId = row.id;
+            let data = {
+                value: this.seatNum
+            };
+            this.$post('/merchant/store/order/seatOrRoomList', data).then((res) => {
+                if (res.code === 0) {
+                    this.seatOrRoomList = res.data;
+                    if (res.data.length === 0) {
+                        this.$message.error('暂无可修改的座位号/包间号');
+                    } else {
+                        this.seatDia = true;
+                    }
+                }
+            });
         },
 
         //确认修改座位号/包间号
@@ -691,7 +715,7 @@ export default {
                         this.getOrderInfo();
                         this.seatDia = false;
                     } else {
-                        this.$message.error('修改失败');
+                        this.$message.error(res.msg);
                     }
                 })();
             } else {
