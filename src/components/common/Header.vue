@@ -21,11 +21,11 @@
                     </el-tooltip>
                     <span class="btn-bell-badge" v-if="$store.state.headerUnread>0"></span>
                 </div>
-                <!-- <div class="btn-bell" @click="mute">
+                <div class="btn-bell" @click="mute">
                     <el-tooltip effect="dark" :content="$store.state.headerClickMute ? `已静音` : `静音`" placement="bottom">
                         <i style="font-size:20px" :class="$store.state.headerClickMute?'icon-jingyin':'icon-laba'" class="iconfont"></i>
                     </el-tooltip>
-                </div> -->
+                </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
                     <img :src="logo" />

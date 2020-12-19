@@ -3,6 +3,8 @@
         <!-- :muted="isMute" -->
         <audio ref="audio" >
             <source :src="joinUrl+audioUrl" type="audio/mp3">
+
+            
             您的浏览器不支持播放音频，请使用google或其它浏览器
         </audio>
         <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat">
@@ -285,7 +287,7 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-                console.log(lastObj)
+
                 lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
                 // if(lastObj.messageType == 'deteleMessage'){
                 //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
@@ -338,9 +340,11 @@ export default {
                         });
                     }
                 }
-                var audio=this.$refs.audio
-                console.log(audio)
-                audio.play()
+                    // document.createElement("audio")
+                var audio = new Audio() ;
+                audio.src = this.joinUrl + this.audioUrl;
+                this.isMute?audio.muted = true : audio.muted = false
+                audio.play();
                 // 自定义 更新会话列表 
                 let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
                 let time = this.userList.length>0? 0 : 1000
