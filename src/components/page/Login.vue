@@ -39,7 +39,8 @@ export default {
         submitForm() {
             let data = {
                 loginNameOrPhone: this.param.username,
-                loginPassword: this.param.password
+                loginPassword: this.param.password,
+                loginSource: 1
             };
             this.$post('/merchant/store/login', data)
                 .then((res) => {

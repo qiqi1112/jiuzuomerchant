@@ -858,8 +858,10 @@ export default {
 
             (async () => {
                 let res = await this.$get(`/merchant/store/order/${row.orderNo}/info`);
-                res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
-                this.form = res.data;
+                if (res.code === 0) {
+                    res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
+                    this.form = res.data;
+                }
                 console.log('详细信息', this.form);
             })();
         },
