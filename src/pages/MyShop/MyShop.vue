@@ -1077,7 +1077,7 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '20', //最晚保留时间
-                minConsumption: 0 //最低消费
+                minConsumption: 0.1 //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
 
@@ -1213,7 +1213,9 @@ export default {
 
         //验证金额
         checkPrice(price) {
-            if (this.$regular.money(price) === false) {
+            if (price == 0) {
+                this.$message.error('金额不能为0');
+            } else if (this.$regular.money(price) === false) {
                 this.$message.error('请输入正确格式的金额');
             }
         },
@@ -1980,8 +1982,8 @@ export default {
             // else if (this.timeQuanObj.latestTime === '') {
             //     this.$message.error('最晚保留时间不能为空');
             // }
-            else if (this.timeQuanObj.minConsumption === '') {
-                this.$message.error('最低消费不能为空');
+            else if (this.timeQuanObj.minConsumption == 0) {
+                this.$message.error('最低消费不能为0');
             } else if (this.$regular.money(this.timeQuanObj.minConsumption) === false) {
                 this.$message.error('请输入正确格式的金额');
             } else {
@@ -1991,7 +1993,7 @@ export default {
                     startTime: '', //开始时间
                     endTime: '', //结束时间
                     latestTime: '20', //最晚保留时间
-                    minConsumption: '' //最低消费
+                    minConsumption: 0.1 //最低消费
                 };
             }
         },
@@ -2434,7 +2436,7 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '20', //最晚保留时间
-                minConsumption: 0 //最低消费
+                minConsumption: 0.1 //最低消费
             };
             this.ktvBannerImgBox = [];
         },

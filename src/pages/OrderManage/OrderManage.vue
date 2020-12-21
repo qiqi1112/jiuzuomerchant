@@ -56,13 +56,16 @@
                 <el-table-column prop="" label="追加订单"></el-table-column>
                 <el-table-column prop="createBy" label="订单发起人" min-width="120"></el-table-column>
                 <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
-                <el-table-column label="座位号/包间号" min-width="120">
+                <el-table-column :label="storeLocation == 3 ? '包间类型' : '座位号'" min-width="120">
                     <template slot-scope="scope">
-                        <el-button v-if="scope.row.orderType === 2 && scope.row.seatCode == ''" @click="editSeat(scope.row)" type="primary"
+                        <el-button
+                            v-if="scope.row.orderType === 2 && scope.row.seatCode == '' && storeLocation != 3"
+                            @click="editSeat(scope.row)"
+                            type="primary"
                             >设定座位</el-button
                         >
                         <el-link
-                            v-else-if="scope.row.status == 4 && scope.row.closedStatus !== 1"
+                            v-else-if="scope.row.status == 4 && scope.row.closedStatus !== 1 && storeLocation != 3"
                             @click="editSeat(scope.row)"
                             type="primary"
                             >{{ scope.row.seatCode }}</el-link
@@ -197,15 +200,7 @@
 
             <!-- 修改座位/包间号对话框 -->
             <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog" @close="handleCancel">
-                <el-select
-                    style="width: 100%"
-                    v-model="seatNum"
-                    filterable
-                    remote
-                    clearable
-                    placeholder="请选择座位号/包间号"
-                    @change="selectGoodInfo"
-                >
+                <el-select style="width: 100%" v-model="seatNum" filterable remote clearable placeholder="请选择座位号/包间号">
                     <el-option v-for="(item, index) in seatOrRoomList" :key="index" :label="item" :value="item"></el-option>
                 </el-select>
                 <div slot="footer" class="dialog-footer">
@@ -691,7 +686,7 @@ export default {
                 if (res.code === 0) {
                     this.seatOrRoomList = res.data;
                     if (res.data.length === 0) {
-                        this.$message.error('暂无可修改的座位号/包间号');
+                        this.$message.error('暂无可修改的座位号');
                     } else {
                         this.seatDia = true;
                     }
@@ -719,7 +714,7 @@ export default {
                     }
                 })();
             } else {
-                this.$message.error('请输入要修改的座位号/包间号');
+                this.$message.error('请输入要修改的座位号');
             }
         },
 
@@ -751,6 +746,7 @@ export default {
                 }
             });
         },
+
         //切换楼层，楼层对应的行列跟着切换
         changeShowFloor(item, index) {
             this.isClickSeat = false;
@@ -759,6 +755,7 @@ export default {
             this.showSeatAtt(index);
             // this.clickFlag = false;
         },
+
         //查看当前座位信息
         lookEditSeatInfo(e, seatType, stageCode) {
             let seatRow = Number(e.target.dataset.indexx); //行
@@ -861,9 +858,8 @@ export default {
 
             (async () => {
                 let res = await this.$get(`/merchant/store/order/${row.orderNo}/info`);
-
+                res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
                 this.form = res.data;
-
                 console.log('详细信息', this.form);
             })();
         },
