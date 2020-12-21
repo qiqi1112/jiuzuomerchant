@@ -328,24 +328,22 @@ export default {
                         //根据返回的楼层对应的座位数组进行匹配，并替换当前座位的属性
                         this.list.forEach((item2) => {
                             if (item2.floor == this.nowFloor && item2.seatRow == x && item2.seatColumn == y) {
+                                item.className = `seat`;
                                 //已预订
                                 if (item2.seatAttribute == 4) {
                                     item.className = `seat notBook`;
                                 }
                                 //可预订
-                                else if (item2.seatAttribute == 2) {
+                                if (item2.seatAttribute == 2) {
                                     item.className = `seat canBook`;
                                 }
-                                //已到店
-                                else if (item2.to_Shop) {
-                                    item.className = `seat aisleBook`;
-                                }
                                 //舞台
-                                else if (item2.seatType == 4) {
+                                if (item2.seatType == 4) {
                                     item.className = `seat stageBook`;
                                 }
-                                else{
-                                    item.className = `seat`;
+                                //已到店
+                                if(item2.to_Shop==1) {
+                                    item.className = `seat aisleBook`;
                                 }
                             }
                         });
@@ -416,6 +414,7 @@ export default {
             this.nowFloor = item.floor; //当前操作的楼层
             this.$post('/merchant/store/getStoreSeat',{floor:this.nowFloor})
             .then(res=>{
+                console.log(res)
                  let result = res.data;
                     // this.floorList = result.storeSeatFloorDTOS
                     this.list = result.storeSeatDTOS;
