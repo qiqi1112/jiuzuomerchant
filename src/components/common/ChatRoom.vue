@@ -1,12 +1,12 @@
 <template>
     <div class="chat_room" id="chat_room">
         <!-- :muted="isMute" -->
-        <audio ref="audio" >
+        <!-- <audio ref="audio" >
             <source :src="joinUrl+audioUrl" type="audio/mp3">
 
             
-            您的浏览器不支持播放音频，请使用google或其它浏览器
-        </audio>
+           您的浏览器不支持播放音频，请使用google或其它浏览器 
+        </audio> -->
         <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat">
             <span class="all_unread" v-show="$store.state.headerUnread>0">{{$store.state.headerUnread}}</span>
         </div>
@@ -492,8 +492,6 @@ export default {
         // 删除会话时  发送自定义消息  用于判断  下次重新获取数据时  如果有这条自定义消息  则再次删除该会话
 
         insuranceDelete(user){
-            console.log(user)
-
             var conversationType = RongIMLib.ConversationType.PRIVATE;
             var targetId = user.id;
             var msg = new RongIMClient.RegisterMessage.deteleMessage(
@@ -899,7 +897,6 @@ export default {
         },
         // 创建客服
         createService(service){
-            console.log(service)
             let that = this;
             let lastObj={};
             let newUser = true;
@@ -920,13 +917,21 @@ export default {
                 RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
                     onSuccess: function(count){
                         lastObj['unreadMessageCount'] = count
-                        that.userList.unshift(lastObj)    
+                        that.userList.unshift(lastObj)
+                        that.getChat(lastObj,0)
                     },
                     onError: function(){
                         // that.$message({ message: res.msg, type: 'warning' });
                     }
                 });
                 return
+            }else{
+                for(let i=0;i<this.userList.length;i++){
+                    if(lastObj.targetId == this.userList[i].targetId){
+                        that.getChat(lastObj,i)
+                        break
+                    }
+                }
             }
         },
         // 点击快捷回复
