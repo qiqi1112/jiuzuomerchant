@@ -719,7 +719,7 @@
                                     >
                                 </div>
                                 <!-- 新增 -->
-                                <div class="date-dist clearfix" v-if="!isReadonly && presentKtvInfo.roomTimeIntervalList.length < 6">
+                                <div class="date-dist clearfix" v-if="!isReadonly">
                                     <!-- 时间段 -->
                                     <div class="data">
                                         <span>时间段分布：</span>

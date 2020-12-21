@@ -297,7 +297,7 @@
                                     <p class="title">座位信息</p>
                                     <div class="list-box">
                                         <p>
-                                            <span>座位号</span>
+                                            <span>{{ storeLocation == 3 ? '包间类型' : '座位号' }}</span>
                                             <span>{{ form.seatCode }}</span>
                                         </p>
                                         <p>
