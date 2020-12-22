@@ -41,6 +41,7 @@ const store = new Vuex.Store({
             state.newMsgNum = num
         },
         headerUnreadFun(state,num){
+            console.log(num,'未读')
             state.headerUnread = num
         },
         headerClickMsgFun(state,type){

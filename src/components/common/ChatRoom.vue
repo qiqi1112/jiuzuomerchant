@@ -287,7 +287,10 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-
+                
+                if(lastObj.offLineMessage){
+                    return
+                }
                 lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
                 // if(lastObj.messageType == 'deteleMessage'){
                 //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
@@ -309,11 +312,12 @@ export default {
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的消息',
-                            duration: 5000,
+                            duration: 2500,
                             customClass:'notify',
                             onClick(){
                                 that.showChat()
-                            }
+                                this.close()
+                            },
                         });
                     }else if(lastObj.messageType == 'OrderMessage'){
                         this.audioUrl = 'default/system/order.mp3'
@@ -324,7 +328,7 @@ export default {
                             customClass:'notify',
                             onClick(){
                                 that.lookOrder()
-                                that.$notify.close()
+                                this.close()
                             }
                         });
                     }else if(lastObj.messageType == 'SystemMessage'){
@@ -336,11 +340,14 @@ export default {
                             duration: 5000,
                             onClick(){
                                 that.showChat()
+                                this.close()
                             }
                         });
                     }
                 }
-                    // document.createElement("audio")
+
+                
+
                 var audio = new Audio() ;
                 audio.src = this.joinUrl + this.audioUrl;
                 this.isMute?audio.muted = true : audio.muted = false
@@ -393,7 +400,9 @@ export default {
                                 this.msgArr.push(lastObj)
                                 // this.$nextTick(this.scrollEnd);
                             }else{
-                                that.$store.state.headerUnread +=1
+                                if(!lastObj.offLineMessage){
+                                    that.$store.commit('headerUnreadFun',that.$store.state.headerUnread +=1)
+                                }
                                 // 当前聊天不是发送人
                             }
                         }else{
@@ -561,6 +570,7 @@ export default {
             RongIMClient.getInstance().getConversationList({
                 onSuccess: function(list) {
                     var result = [];
+                    console.log(list,3456)
                     var obj = {};
                     for(var i =0; i<list.length; i++){
                        if(!obj[list[i].targetId]){
@@ -585,6 +595,7 @@ export default {
                             }
                         });
                     })
+                    console.log(arr,11234)
                     that.userList = arr
                 },
                 onError: function(error) {
@@ -1092,7 +1103,7 @@ export default {
             let that = this
             RongIMClient.getInstance().getTotalUnreadCount({
                 onSuccess: function(count) {
-                    that.$store.state.headerUnread = count
+                    that.$store.commit('headerUnreadFun',count)
                 },
                 onError: function(error) {
                     // error => 获取总未读数错误码

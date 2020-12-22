@@ -1,4 +1,3 @@
-import request from '../utils/request';
 import axios from 'axios'
 
 import router from "../router";
