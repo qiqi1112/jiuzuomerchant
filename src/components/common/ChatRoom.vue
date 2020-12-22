@@ -51,7 +51,7 @@
                                                 <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
                                             </div>
                                             <!-- 订单消息 -->
-                                            <div class="msg" v-if="item.senderUserId == '10001'">
+                                            <div class="msg" v-if="item.targetId == '10001'">
                                                 <div class="orderinfo">
                                                     <!-- {{item.content.content}} -->
                                                     <div class="fx">
@@ -70,7 +70,7 @@
                                                 </div>
                                             </div>
                                             <!-- 官方消息 -->
-                                            <div class="msg" v-if="item.senderUserId == '10000'">
+                                            <div class="msg" v-if="item.targetId == '10000'">
                                                 <div class="official">
                                                     <div>{{item.content.title}}</div>        
                                                     <div>{{item.content.content}}</div>
@@ -298,7 +298,7 @@ export default {
                 // 撤回
                 if(lastObj.messageType == 'RecallCommandMessage'){
                     for(let i=0;i<this.userList.length;i++){
-                        if(lastObj.senderUserId == this.userList[i].senderUserId){
+                        if(lastObj.targetId == this.userList[i].targetId){
                             console.log(this.userList[i])
                         }
                         break
@@ -358,7 +358,7 @@ export default {
                 let timer = setTimeout(()=>{
                     clearTimeout(timer)
                     for(let i=0;i<this.userList.length;i++){
-                        if(this.userList[i].targetId == lastObj.senderUserId){
+                        if(this.userList[i].targetId == lastObj.targetId){
                             newUser = false   //找到一个相同  证明是已出现过
                             break
                         }
@@ -387,7 +387,7 @@ export default {
                         });
                         return
                     }
-                    this.$get(`/merchant/store/im/getUserById/${lastObj.senderUserId}`).then((res) => {
+                    this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
                         if(res.code == 0){
                             lastObj.content['id'] = res.data.userId
                             lastObj.content['name'] = res.data.nickname
@@ -395,7 +395,7 @@ export default {
                             // this.msgArr.push(lastObj)
                             // this.$nextTick(this.scrollEnd);
                             // 当前聊天等于消息发送人  清空未读
-                            if(lastObj.senderUserId == this.now_user.targetId){
+                            if(lastObj.targetId == this.now_user.targetId){
                                 this.clearUnreadNum(lastObj.targetId)
                                 this.msgArr.push(lastObj)
                                 // this.$nextTick(this.scrollEnd);
@@ -611,6 +611,7 @@ export default {
             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
                 onSuccess: function(){
                     // 清除未读消息成功
+                    that.$set(that.now_user,'unreadMessageCount',0)
                     that.allUnreadMsg()
                 },
                 onError: function(error){
