@@ -53,7 +53,11 @@
             <!-- 表格部分 -->
             <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
                 <el-table-column label="ID" fixed type="index"></el-table-column>
-                <el-table-column prop="" label="追加订单"></el-table-column>
+                <el-table-column prop="addGoodsDesc" label="追加订单" min-width="100">
+                    <template slot-scope="scope">
+                        <el-link @click="handleLookInfo(scope.row.orderNo)" type="primary">{{ scope.row.addGoodsDesc }}</el-link>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="createBy" label="订单发起人" min-width="120"></el-table-column>
                 <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
                 <el-table-column :label="storeLocation == 3 ? '包间类型' : '座位号'" min-width="120">
@@ -105,7 +109,7 @@
                 <el-table-column prop="paidTime" label="订单支付时间" min-width="140"></el-table-column>
                 <el-table-column prop="storeName" label="订单信息" min-width="100">
                     <template slot-scope="scope">
-                        <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row)">查看订单</el-link>
+                        <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row.orderNo)">查看订单</el-link>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="smsCode" label="验证码"></el-table-column> -->
@@ -314,18 +318,81 @@
                                         </p>
                                     </div>
                                 </div>
+                                <!-- 默认下的酒水订单 -->
                                 <div>
                                     <p class="title">酒水清单</p>
                                     <div class="list-box">
                                         <div class="drink-list" v-for="(item, index) in form.goodsList" :key="index">
                                             <div class="good-box">
-                                                <div class="good-name">{{ item.goodsName }}</div>
-                                                <span>x{{ item.quantity }}</span>
+                                                <div class="good-name">
+                                                    <span>{{ item.goodsName }}</span>
+                                                    <span class="num">x{{ item.quantity }}</span>
+                                                </div>
                                             </div>
                                             <div>
                                                 <span>￥{{ item.activityPrice }}</span>
                                                 <span class="unline">￥{{ item.originalPrice }}</span>
                                             </div>
+                                        </div>
+                                        <div class="drink-list" v-for="(item, index) in form.snacks" :key="index">
+                                            <div class="good-box">
+                                                <div class="good-name">
+                                                    <span>{{ item.name }}</span>
+                                                    <span class="num">x{{ item.num }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 追加的酒水订单 -->
+                                <div>
+                                    <p class="title">追加酒水清单</p>
+                                    <div class="list-box add-drinks">
+                                        <div class="add-drink-list" v-for="(item, index) in form.groupGoods" :key="index">
+                                            <div class="order-title">
+                                                <span>{{ item.groupName }}</span>
+                                                <span>{{ item.createTime }}</span>
+                                            </div>
+
+                                            <div class="drink-list" v-for="(item, index) in item.goodsList" :key="index">
+                                                <div class="good-box">
+                                                    <div class="good-name">
+                                                        <span>{{ item.goodsName }}</span>
+                                                        <span class="num">x{{ item.quantity }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span>￥{{ item.activityPrice }}</span>
+                                                    <span class="unline">￥{{ item.originalPrice }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <el-button
+                                                    @click="getTable(item.id, form.orderNo, 1)"
+                                                    v-if="item.servedStatus == 0"
+                                                    type="primary"
+                                                    >上桌</el-button
+                                                >
+                                                <el-button
+                                                    @click="getTable(item.id, form.orderNo, 2)"
+                                                    v-if="item.servedStatus == 0"
+                                                    type="primary"
+                                                    >售罄</el-button
+                                                >
+                                            </div>
+
+                                            <!-- <div class="good-box">
+                                                <div class="good-name">{{ item.groupName }}</div>
+
+                                                <div class="good-name">{{ item.goodsName }}</div>
+                                                <span>x{{ item.quantity }}</span>
+                                            </div>
+                                            <div>
+                                                <span>{{ item.createTime }}</span>
+                                                <span>￥{{ item.activityPrice }}</span>
+                                                <span class="unline">￥{{ item.originalPrice }}</span>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -852,14 +919,15 @@ export default {
         },
 
         //查看订单信息
-        handleLookInfo(row) {
+        handleLookInfo(orderNo) {
             this.dialogStatus = 1;
             this.dialog = true;
 
             (async () => {
-                let res = await this.$get(`/merchant/store/order/${row.orderNo}/info`);
+                let res = await this.$get(`/merchant/store/order/${orderNo}/info`);
                 if (res.code === 0) {
                     res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
+                    res.data.snacks = JSON.parse(res.data.snacks);
                     this.form = res.data;
                 }
                 console.log('详细信息', this.form);
@@ -1029,6 +1097,34 @@ export default {
                 .catch((action) => {
                     // action === 'cancel' && this.isHandleRequest(row.id, 5); //未消费
                 });
+        },
+
+        //追加订单上桌操作
+        getTable(id, orderNo, index) {
+            let txt = '';
+            if (index == 1) {
+                txt = '是否确认上桌?';
+            }
+
+            if (index == 2) {
+                txt = '是否确认售罄?';
+            }
+
+            this.$confirm(txt, '提示', {
+                distinguishCancelAndClose: true,
+                type: 'warning'
+            })
+                .then(() => {
+                    this.$put(`/merchant/store/order/updateServedStatus/${id}/${index}`).then((res) => {
+                        if (res.code === 0) {
+                            this.$message.success('操作成功');
+                            this.handleLookInfo(orderNo);
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    });
+                })
+                .catch((action) => {});
         }
 
         //是否到店确认
@@ -1356,6 +1452,10 @@ export default {
                     }
                 }
 
+                .list-box.add-drinks {
+                    border-bottom: none;
+                }
+
                 .drink-list {
                     display: flex;
                     margin-bottom: 18px;
@@ -1365,6 +1465,13 @@ export default {
 
                         .good-name {
                             margin-bottom: 6px;
+                            display: flex;
+                            justify-content: space-between;
+                            padding-right: 20px;
+
+                            .num {
+                                min-width: 20px;
+                            }
                         }
                     }
 
@@ -1372,6 +1479,20 @@ export default {
                         text-decoration: line-through;
                         color: #bcbcbc;
                         margin-left: 10px;
+                    }
+                }
+
+                .add-drink-list {
+                    margin-bottom: 20px;
+                    border: 1px solid #c0c4cc;
+                    border-radius: 6px;
+                    padding: 20px;
+
+                    .order-title {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 20px;
+                        color: #409eff;
                     }
                 }
 
