@@ -287,7 +287,7 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-                
+                console.log(lastObj)
                 if(lastObj.offLineMessage){
                     return
                 }
@@ -570,7 +570,6 @@ export default {
             RongIMClient.getInstance().getConversationList({
                 onSuccess: function(list) {
                     var result = [];
-                    console.log(list,3456)
                     var obj = {};
                     for(var i =0; i<list.length; i++){
                        if(!obj[list[i].targetId]){
@@ -581,7 +580,6 @@ export default {
                     var userId = ''
                     let arr = []
                     if(result.length<=0)return
-                        
                     result.forEach(v=>{
                         userId = v.targetId 
                         that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
@@ -1100,14 +1098,28 @@ export default {
 
         // 获取所有未读消息
         allUnreadMsg(){
+            console.log('哈哈')
             let that = this
             RongIMClient.getInstance().getTotalUnreadCount({
                 onSuccess: function(count) {
-                    that.$store.commit('headerUnreadFun',count)
+                    if(count>10000000){
+                        setTimeout(()=>{
+                            var conversationTypes = [RongIMLib.ConversationType.PRIVATE, RongIMLib.ConversationType.DISCUSSION];
+                            RongIMClient.getInstance().getConversationUnreadCount(conversationTypes, {
+                                onSuccess: function(count){
+                                    hat.$store.commit('headerUnreadFun',count)
+                                },
+                                onError: function(error){
+                                    that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
+                                }
+                            });
+                        },1000)
+                    }else{
+                        that.$store.commit('headerUnreadFun',count)
+                    }
                 },
                 onError: function(error) {
-                    // error => 获取总未读数错误码
-                    console.log(error)
+                    that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
                 }
             });
         }
@@ -1126,10 +1138,10 @@ export default {
         var callbacks = {};
         init(userInfo, callbacks);
         setTimeout(()=>{
-                        that.conversation()
-                        that.emoji = RongIMLib.RongIMEmoji.list
-                        that.allUnreadMsg()
-                    },500)
+            that.conversation()
+            that.emoji = RongIMLib.RongIMEmoji.list
+            that.allUnreadMsg()
+        },500)
         // setTimeout(()=>{
         //     RongIMClient.getInstance().clearConversations({
         //         onSuccess: function() {
