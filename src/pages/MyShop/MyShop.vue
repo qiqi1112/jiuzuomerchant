@@ -719,7 +719,7 @@
                                     >
                                 </div>
                                 <!-- 新增 -->
-                                <div class="date-dist clearfix" v-if="!isReadonly && presentKtvInfo.roomTimeIntervalList.length < 6">
+                                <div class="date-dist clearfix" v-if="!isReadonly">
                                     <!-- 时间段 -->
                                     <div class="data">
                                         <span>时间段分布：</span>
@@ -1077,7 +1077,7 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '20', //最晚保留时间
-                minConsumption: 0 //最低消费
+                minConsumption: 0.1 //最低消费
             },
             timeQuanArr: ['10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '120'],
 
@@ -1140,7 +1140,10 @@ export default {
         //取消编辑楼层
         handleCancelEditFloor() {
             this.seatFloorDialog = false;
-            this.changeShowFloor(this.list[0], 0);
+            if (this.list.length !== 0) {
+                this.changeShowFloor(this.list[0], 0);
+            }
+            // this.changeShowFloor(this.list[0], 0);
         },
 
         //更改楼层名称，内部的座位的相关信息也要跟着改变
@@ -1213,8 +1216,12 @@ export default {
 
         //验证金额
         checkPrice(price) {
-            if (this.$regular.money(price) === false) {
+            if (price == 0) {
+                this.$message.error('金额不能为0');
+                return;
+            } else if (this.$regular.money(price) === false) {
                 this.$message.error('请输入正确格式的金额');
+                return;
             }
         },
 
@@ -1778,6 +1785,11 @@ export default {
                         this.requestSuccessInit('修改成功');
                     } else if (res.code === 500) {
                         this.submitNoInput(res.msg);
+                    } else if (res.code === 741) {
+                        this.wrapLoading = false;
+                        this.isReadonly = true;
+                        this.getStoreInfo();
+                        this.$message.error(res.msg);
                     } else {
                         this.floorName = '';
                         this.wrapLoading = false;
@@ -1794,6 +1806,11 @@ export default {
                         this.isUpdate = true;
                     } else if (res.code === 500) {
                         this.submitNoInput(res.msg);
+                    } else if (res.code === 741) {
+                        this.wrapLoading = false;
+                        // this.isReadonly = true;
+                        // this.getStoreInfo();
+                        this.$message.error(res.msg);
                     } else {
                         this.floorName = '';
                         this.wrapLoading = false;
@@ -1980,8 +1997,8 @@ export default {
             // else if (this.timeQuanObj.latestTime === '') {
             //     this.$message.error('最晚保留时间不能为空');
             // }
-            else if (this.timeQuanObj.minConsumption === '') {
-                this.$message.error('最低消费不能为空');
+            else if (this.timeQuanObj.minConsumption == 0) {
+                this.$message.error('最低消费不能为0');
             } else if (this.$regular.money(this.timeQuanObj.minConsumption) === false) {
                 this.$message.error('请输入正确格式的金额');
             } else {
@@ -1991,7 +2008,7 @@ export default {
                     startTime: '', //开始时间
                     endTime: '', //结束时间
                     latestTime: '20', //最晚保留时间
-                    minConsumption: '' //最低消费
+                    minConsumption: 0.1 //最低消费
                 };
             }
         },
@@ -2048,6 +2065,7 @@ export default {
 
         //ktv里的相关字符串转换方法
         ktvStrTran() {
+            console.log(this.ktvRoomList);
             const newSeatArr = this.ktvRoomList.map((item) => {
                 item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
                 item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
@@ -2434,7 +2452,7 @@ export default {
                 startTime: '', //开始时间
                 endTime: '', //结束时间
                 latestTime: '20', //最晚保留时间
-                minConsumption: 0 //最低消费
+                minConsumption: 0.1 //最低消费
             };
             this.ktvBannerImgBox = [];
         },
@@ -2462,6 +2480,21 @@ export default {
             } else if (this.presentKtvInfo.sketchMap.length == 0) {
                 this.$message.error('至少上传一张包间示意图');
             } else {
+                //最低消费不能输入0
+                let arr = this.presentKtvInfo.roomTimeIntervalList;
+                let flag = false;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i].minConsumption == 0 || arr[i].minConsumption == 0.0 || arr[i].minConsumption == 0.0) {
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if (flag) {
+                    this.$message.error('最低消费不能为0');
+                    return;
+                }
+
                 if (this.isUpdateKtvInfo) {
                     this.$message.success('修改成功');
                     this.isUpdateKtvInfo = false;

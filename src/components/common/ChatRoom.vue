@@ -51,7 +51,7 @@
                                                 <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
                                             </div>
                                             <!-- 订单消息 -->
-                                            <div class="msg" v-if="item.senderUserId == '10001'">
+                                            <div class="msg" v-if="item.targetId == '10001'">
                                                 <div class="orderinfo">
                                                     <!-- {{item.content.content}} -->
                                                     <div class="fx">
@@ -70,7 +70,7 @@
                                                 </div>
                                             </div>
                                             <!-- 官方消息 -->
-                                            <div class="msg" v-if="item.senderUserId == '10000'">
+                                            <div class="msg" v-if="item.targetId == '10000'">
                                                 <div class="official">
                                                     <div>{{item.content.title}}</div>        
                                                     <div>{{item.content.content}}</div>
@@ -287,7 +287,10 @@ export default {
                 let arr = [],lastObj=''
                 arr = this.$store.state.newMsgArr
                 lastObj = arr[arr.length-1]
-
+                console.log(lastObj)
+                if(lastObj.offLineMessage){
+                    return
+                }
                 lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
                 // if(lastObj.messageType == 'deteleMessage'){
                 //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
@@ -295,7 +298,7 @@ export default {
                 // 撤回
                 if(lastObj.messageType == 'RecallCommandMessage'){
                     for(let i=0;i<this.userList.length;i++){
-                        if(lastObj.senderUserId == this.userList[i].senderUserId){
+                        if(lastObj.targetId == this.userList[i].targetId){
                             console.log(this.userList[i])
                         }
                         break
@@ -309,11 +312,12 @@ export default {
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的消息',
-                            duration: 5000,
+                            duration: 2500,
                             customClass:'notify',
                             onClick(){
                                 that.showChat()
-                            }
+                                this.close()
+                            },
                         });
                     }else if(lastObj.messageType == 'OrderMessage'){
                         this.audioUrl = 'default/system/order.mp3'
@@ -324,7 +328,7 @@ export default {
                             customClass:'notify',
                             onClick(){
                                 that.lookOrder()
-                                that.$notify.close()
+                                this.close()
                             }
                         });
                     }else if(lastObj.messageType == 'SystemMessage'){
@@ -336,11 +340,14 @@ export default {
                             duration: 5000,
                             onClick(){
                                 that.showChat()
+                                this.close()
                             }
                         });
                     }
                 }
-                    // document.createElement("audio")
+
+                
+
                 var audio = new Audio() ;
                 audio.src = this.joinUrl + this.audioUrl;
                 this.isMute?audio.muted = true : audio.muted = false
@@ -351,7 +358,7 @@ export default {
                 let timer = setTimeout(()=>{
                     clearTimeout(timer)
                     for(let i=0;i<this.userList.length;i++){
-                        if(this.userList[i].targetId == lastObj.senderUserId){
+                        if(this.userList[i].targetId == lastObj.targetId){
                             newUser = false   //找到一个相同  证明是已出现过
                             break
                         }
@@ -380,7 +387,7 @@ export default {
                         });
                         return
                     }
-                    this.$get(`/merchant/store/im/getUserById/${lastObj.senderUserId}`).then((res) => {
+                    this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
                         if(res.code == 0){
                             lastObj.content['id'] = res.data.userId
                             lastObj.content['name'] = res.data.nickname
@@ -388,12 +395,14 @@ export default {
                             // this.msgArr.push(lastObj)
                             // this.$nextTick(this.scrollEnd);
                             // 当前聊天等于消息发送人  清空未读
-                            if(lastObj.senderUserId == this.now_user.targetId){
+                            if(lastObj.targetId == this.now_user.targetId){
                                 this.clearUnreadNum(lastObj.targetId)
                                 this.msgArr.push(lastObj)
                                 // this.$nextTick(this.scrollEnd);
                             }else{
-                                that.$store.state.headerUnread +=1
+                                if(!lastObj.offLineMessage){
+                                    that.$store.commit('headerUnreadFun',that.$store.state.headerUnread +=1)
+                                }
                                 // 当前聊天不是发送人
                             }
                         }else{
@@ -571,7 +580,6 @@ export default {
                     var userId = ''
                     let arr = []
                     if(result.length<=0)return
-                        
                     result.forEach(v=>{
                         userId = v.targetId 
                         that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
@@ -585,6 +593,7 @@ export default {
                             }
                         });
                     })
+                    console.log(arr,11234)
                     that.userList = arr
                 },
                 onError: function(error) {
@@ -602,6 +611,7 @@ export default {
             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
                 onSuccess: function(){
                     // 清除未读消息成功
+                    that.$set(that.now_user,'unreadMessageCount',0)
                     that.allUnreadMsg()
                 },
                 onError: function(error){
@@ -1089,14 +1099,22 @@ export default {
 
         // 获取所有未读消息
         allUnreadMsg(){
+            console.log('哈哈1')
             let that = this
-            RongIMClient.getInstance().getTotalUnreadCount({
-                onSuccess: function(count) {
-                    that.$store.state.headerUnread = count
+            var conversationTypes = [RongIMLib.ConversationType.PRIVATE, RongIMLib.ConversationType.DISCUSSION];
+            RongIMClient.getInstance().getConversationUnreadCount(conversationTypes, {
+                onSuccess: function(count){
+                    that.$store.commit('headerUnreadFun',count)
                 },
-                onError: function(error) {
-                    // error => 获取总未读数错误码
-                    console.log(error)
+                onError: function(error){
+                    RongIMClient.getInstance().getTotalUnreadCount({
+                        onSuccess: function(count) {
+                            that.$store.commit('headerUnreadFun',count)
+                        },
+                        onError: function(error) {
+                            that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
+                        }
+                    });
                 }
             });
         }
@@ -1115,10 +1133,10 @@ export default {
         var callbacks = {};
         init(userInfo, callbacks);
         setTimeout(()=>{
-                        that.conversation()
-                        that.emoji = RongIMLib.RongIMEmoji.list
-                        that.allUnreadMsg()
-                    },500)
+            that.conversation()
+            that.emoji = RongIMLib.RongIMEmoji.list
+            that.allUnreadMsg()
+        },500)
         // setTimeout(()=>{
         //     RongIMClient.getInstance().clearConversations({
         //         onSuccess: function() {

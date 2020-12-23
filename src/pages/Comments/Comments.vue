@@ -289,17 +289,6 @@ export default {
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
     }
-    // <el-form-item label="配图/视频：" v-if="form.appraisePictureList">
-    //                             <div class="imgs">
-    //                                 <div v-for="(item, i) in form.appraisePictureList" :key="i" style="display: inline-block;height:200px">
-    //                                     <img v-if="item.substr(item.length - 3) != 'mp4'" :src="imgHead + item" style="height:200px;width:auto;margin-right:12px" />
-    //                                     <video v-else width="320" height="240" controls class="video" style="height:200px;width:auto;margin-right:12px">
-    //                                         <source :src="imgHead + item" type="video/mp4" />
-    //                                         您的浏览器不支持 video 标签。
-    //                                     </video>
-    //                                 </div>
-    //                             </div>
-    //                         </el-form-item>
     .imgs{
         &>div{
             display: inline-block;
