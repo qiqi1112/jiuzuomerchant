@@ -1099,27 +1099,22 @@ export default {
 
         // 获取所有未读消息
         allUnreadMsg(){
-            console.log('哈哈')
+            console.log('哈哈1')
             let that = this
-            RongIMClient.getInstance().getTotalUnreadCount({
-                onSuccess: function(count) {
-                    if(count>10000000){
-                        var conversationTypes = [RongIMLib.ConversationType.PRIVATE, RongIMLib.ConversationType.DISCUSSION];
-                        RongIMClient.getInstance().getConversationUnreadCount(conversationTypes, {
-                            onSuccess: function(count){
-                                console.log('总未读失败，获取多个消息')
-                                that.$store.commit('headerUnreadFun',count)
-                            },
-                            onError: function(error){
-                                that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
-                            }
-                        });
-                    }else{
-                        that.$store.commit('headerUnreadFun',count)
-                    }
+            var conversationTypes = [RongIMLib.ConversationType.PRIVATE, RongIMLib.ConversationType.DISCUSSION];
+            RongIMClient.getInstance().getConversationUnreadCount(conversationTypes, {
+                onSuccess: function(count){
+                    that.$store.commit('headerUnreadFun',count)
                 },
-                onError: function(error) {
-                    that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
+                onError: function(error){
+                    RongIMClient.getInstance().getTotalUnreadCount({
+                        onSuccess: function(count) {
+                            that.$store.commit('headerUnreadFun',count)
+                        },
+                        onError: function(error) {
+                            that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
+                        }
+                    });
                 }
             });
         }
