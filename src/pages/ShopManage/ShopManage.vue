@@ -175,6 +175,14 @@ export default {
                 detailImageUrl: '', //详情图
                 tableData: [], //套餐中渲染单品数据
 
+                skuObj: {
+                    specName: '', //规格
+                    originalPrice: '', //规格原价
+                    presentPrice: '', //规格现价
+                    statisticalPrice: '', //新增的现价
+                    skuCode: '' //sku码
+                },
+
                 //新增商品规格
                 dynamicValidateForm: {
                     domains: [
@@ -279,6 +287,8 @@ export default {
                 if (res.code === 0) {
                     this.$message.success('修改成功');
                     this.showTypeDialog = false;
+                } else {
+                    this.$message.error(res.msg);
                 }
             });
         },
@@ -394,6 +404,14 @@ export default {
                 detailImageUrl: '', //详情图
                 tableData: [], //套餐中渲染单品数据
                 goodsIdList: [], //所有已选择的商品对应的id
+
+                skuObj: {
+                    specName: '', //规格
+                    originalPrice: '', //规格原价
+                    presentPrice: '', //规格现价
+                    statisticalPrice: '', //新增的现价
+                    skuCode: '' //sku码
+                },
 
                 //新增商品规格
                 dynamicValidateForm: {
@@ -621,6 +639,14 @@ export default {
                         thumImageUrl: res.listPicture, //缩略图
                         detailImageUrl: res.infoPicture, //详情图
                         tableData: res.setMealGoodsList, //套餐中渲染单品数据
+
+                        skuObj: {
+                            specName: '', //规格
+                            originalPrice: '', //规格原价
+                            presentPrice: '', //规格现价
+                            statisticalPrice: '', //新增的现价
+                            skuCode: '' //sku码
+                        },
 
                         //新增商品规格
                         dynamicValidateForm: {

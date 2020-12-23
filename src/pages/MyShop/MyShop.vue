@@ -162,7 +162,7 @@
                         <div class="per-con">
                             <p>店铺人均消费</p>
                             <el-input
-                                @blur="checkPrice(perCon)"
+                                @blur="checkPrice(perCon, 1)"
                                 v-model="perCon"
                                 placeholder="人均消费"
                                 style="width: 70%; margin-right: 6px"
@@ -538,7 +538,7 @@
                                     <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
                                         <span>{{ item.weekIndex | dayOfWeek }}</span>
                                         <el-input
-                                            @blur="checkPrice(item.price)"
+                                            @blur="checkPrice(item.price, 2, index)"
                                             v-model="item.price"
                                             style="width: 47%; margin-right: 6px"
                                             :readonly="isReadonly"
@@ -684,7 +684,7 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
-                                            @blur="checkPrice(item.minConsumption)"
+                                            @blur="checkPrice(item.minConsumption, 4, index)"
                                             v-model="item.minConsumption"
                                             placeholder="最低消费"
                                             style="width: 50%"
@@ -753,6 +753,7 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
+                                            @blur="checkPrice(timeQuanObj.minConsumption, 3)"
                                             v-model="timeQuanObj.minConsumption"
                                             placeholder="最低消费"
                                             style="width: 50%"
@@ -1215,13 +1216,30 @@ export default {
         },
 
         //验证金额
-        checkPrice(price) {
-            if (price == 0) {
-                this.$message.error('金额不能为0');
-                return;
-            } else if (this.$regular.money(price) === false) {
-                this.$message.error('请输入正确格式的金额');
-                return;
+        checkPrice(price, opt, index) {
+            if (!this.isReadonly) {
+                if (price < 0.1 || this.$regular.money(price) === false) {
+                    switch (opt) {
+                        case 1:
+                            this.perCon = 0.1;
+                            break;
+                        case 2:
+                            this.presentSeatInfo.weekPriceList[index].price = 0.1;
+                            break;
+                        case 3:
+                            this.timeQuanObj.minConsumption = 0.1;
+                            break;
+                        case 4:
+                            this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
+                            break;
+                    }
+
+                    if (price < 0.1) {
+                        this.$message.error('消费金额不能低于0.1元');
+                    } else if (this.$regular.money(price) === false) {
+                        this.$message.error('请输入正确格式的金额');
+                    }
+                }
             }
         },
 
@@ -1499,8 +1517,10 @@ export default {
             this.ktvBannerImgBox = [];
 
             //给每张图片加上前缀
-            // if (this.presentKtvInfo) {
-            // }
+            if (typeof this.presentKtvInfo.sketchMap === 'string') {
+                this.presentKtvInfo.sketchMap = this.presentKtvInfo.sketchMap.split(',');
+            }
+
             let ktvBannerArr = this.presentKtvInfo.sketchMap.map((item) => {
                 return (item = this.showImgPrefix + item);
             });
@@ -2067,7 +2087,9 @@ export default {
         ktvStrTran() {
             console.log(this.ktvRoomList);
             const newSeatArr = this.ktvRoomList.map((item) => {
-                item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
+                if (item.sketchMap instanceof Array) {
+                    item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
+                }
                 item.haveDiningTable = item.haveDiningTable === false ? 2 : 1;
                 item.haveMahjong = item.haveMahjong === false ? 2 : 1;
                 item.haveSwimming = item.haveSwimming === false ? 2 : 1;

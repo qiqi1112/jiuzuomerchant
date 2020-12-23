@@ -32,6 +32,7 @@
                                     style="width: 132px; margin-right: 10px"
                                 ></el-input>
                                 <el-input
+                                    @blur="checkPrice(item.originalPrice, 1, index)"
                                     v-model="item.originalPrice"
                                     placeholder="原价（如：9.99）"
                                     style="width: 170px; margin-right: 10px"
@@ -39,6 +40,7 @@
                                     <template slot="append">￥</template>
                                 </el-input>
                                 <el-input
+                                    @blur="checkPrice(item.statisticalPrice, 2, index)"
                                     v-model="item.statisticalPrice"
                                     placeholder="现价（如：9.99）"
                                     style="width: 170px; margin-right: 10px"
@@ -51,19 +53,21 @@
                             </div>
                             <div>
                                 <el-input
-                                    v-model="skuObj.specName"
+                                    v-model="goodsForm.skuObj.specName"
                                     placeholder="规格（如：一瓶）"
                                     style="width: 132px; margin-right: 10px"
                                 ></el-input>
                                 <el-input
-                                    v-model="skuObj.originalPrice"
+                                    @blur="checkPrice(goodsForm.skuObj.originalPrice, 3)"
+                                    v-model="goodsForm.skuObj.originalPrice"
                                     placeholder="原价（如：9.99）"
                                     style="width: 170px; margin-right: 10px"
                                 >
                                     <template slot="append">￥</template>
                                 </el-input>
                                 <el-input
-                                    v-model="skuObj.statisticalPrice"
+                                    @blur="checkPrice(goodsForm.skuObj.statisticalPrice, 4)"
+                                    v-model="goodsForm.skuObj.statisticalPrice"
                                     placeholder="现价（如：9.99）"
                                     style="width: 170px; margin-right: 10px"
                                 >
@@ -361,15 +365,15 @@ export default {
             options: [], //输入框请求到的商品信息数组
             goodName: '', //选中的商品对应的信息
 
-            antiStatus: true, //防抖状态值
+            antiStatus: true //防抖状态值
 
-            skuObj: {
-                specName: '', //规格
-                originalPrice: '', //规格原价
-                presentPrice: '', //规格现价
-                statisticalPrice: '', //新增的现价
-                skuCode: '' //sku码
-            }
+            // skuObj: {
+            //     specName: '', //规格
+            //     originalPrice: '', //规格原价
+            //     presentPrice: '', //规格现价
+            //     statisticalPrice: '', //新增的现价
+            //     skuCode: '' //sku码
+            // }
         };
     },
 
@@ -383,6 +387,34 @@ export default {
     },
 
     methods: {
+        //验证金额
+        checkPrice(price, opt, index) {
+            if (price !== '') {
+                if (price < 0.1 || this.$regular.money(price) === false) {
+                    switch (opt) {
+                        case 1:
+                            this.goodsForm.dynamicValidateForm.domains[index].originalPrice = 0.1;
+                            break;
+                        case 2:
+                            this.goodsForm.dynamicValidateForm.domains[index].statisticalPrice = 0.1;
+                            break;
+                        case 3:
+                            this.goodsForm.skuObj.originalPrice = 0.1;
+                            break;
+                        case 4:
+                            this.goodsForm.skuObj.statisticalPrice = 0.1;
+                            break;
+                    }
+
+                    if (price < 0.1) {
+                        this.$message.error('消费金额不能低于0.1元');
+                    } else if (this.$regular.money(price) === false) {
+                        this.$message.error('请输入正确格式的金额');
+                    }
+                }
+            }
+        },
+
         //关闭广告位操作
         removeBanner() {
             if (!this.goodsForm.checkedBanner) {
@@ -508,15 +540,15 @@ export default {
 
         //商品规格添加按钮
         addDomain() {
-            if (!this.skuObj.specName) {
+            if (!this.goodsForm.skuObj.specName) {
                 this.$message.error('请输入商品规格名称');
-            } else if (!this.$regular.money(this.skuObj.originalPrice)) {
+            } else if (!this.$regular.money(this.goodsForm.skuObj.originalPrice)) {
                 this.$message.error('请输入正确的规格原价');
-            } else if (!this.$regular.money(this.skuObj.statisticalPrice)) {
+            } else if (!this.$regular.money(this.goodsForm.skuObj.statisticalPrice)) {
                 this.$message.error('请输入正确的规格现价');
             } else {
-                this.goodsForm.dynamicValidateForm.domains.push(this.skuObj);
-                this.skuObj = {
+                this.goodsForm.dynamicValidateForm.domains.push(this.goodsForm.skuObj);
+                this.goodsForm.skuObj = {
                     specName: '', //规格
                     originalPrice: '', //规格原价
                     presentPrice: '', //规格现价

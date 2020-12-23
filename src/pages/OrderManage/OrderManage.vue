@@ -310,7 +310,7 @@
                                         </p>
                                         <p>
                                             <span>保留时间</span>
-                                            <span>最晚至{{ form.retentionTime }}</span>
+                                            <span>{{ form.retentionTime }}</span>
                                         </p>
                                         <p>
                                             <span>低消金额</span>
@@ -921,14 +921,13 @@ export default {
         //查看订单信息
         handleLookInfo(orderNo) {
             this.dialogStatus = 1;
-            this.dialog = true;
 
             (async () => {
                 let res = await this.$get(`/merchant/store/order/${orderNo}/info`);
                 if (res.code === 0) {
                     res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
-                    res.data.snacks = JSON.parse(res.data.snacks);
                     this.form = res.data;
+                    this.dialog = true;
                 }
                 console.log('详细信息', this.form);
             })();
@@ -1450,10 +1449,6 @@ export default {
                             width: 160px;
                         }
                     }
-                }
-
-                .list-box.add-drinks {
-                    border-bottom: none;
                 }
 
                 .drink-list {
