@@ -216,6 +216,11 @@ export default {
                     name: '已到店',
                     style: 'aisleBook',
                     class: 'aisle-book'
+                },
+                {
+                    name: '不可预定',
+                    style: 'aisleBooks',
+                    class: 'aisle-books'
                 }
             ],
             floorList:[],
@@ -329,13 +334,17 @@ export default {
                         this.list.forEach((item2) => {
                             if (item2.floor == this.nowFloor && item2.seatRow == x && item2.seatColumn == y) {
                                 item.className = `seat`;
-                                //已预订
-                                if (item2.seatAttribute == 4) {
-                                    item.className = `seat notBook`;
-                                }
                                 //可预订
                                 if (item2.seatAttribute == 2) {
                                     item.className = `seat canBook`;
+                                }
+                                //过道与不可预定
+                                if(item2.seatAttribute==1 || item2.seatType ==3){
+                                     item.className = `seat aisleBooks`;
+                                }
+                                //已预订
+                                if (item2.seatAttribute == 4) {
+                                    item.className = `seat notBook`;
                                 }
                                 //舞台
                                 if (item2.seatType == 4) {
@@ -682,6 +691,10 @@ export default {
     border: 1px solid transparent !important;
 }
 
+.aisle-books {
+    background-color:#999 !important;
+    border: 1px solid transparent !important;
+}
 .aisle-book {
     background-color:#87CEFA !important;
     border: 1px solid transparent !important;
@@ -720,6 +733,10 @@ export default {
     border: 1px solid transparent;
     background-color: #008000 !important;
     cursor: pointer;
+}
+.aisleBooks {
+    background-color: #999 !important;
+    border: 1px solid transparent !important;
 }
 
 .aisleBook {
