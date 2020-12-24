@@ -63,7 +63,12 @@
                 <el-table-column :label="storeLocation == 3 ? '包间类型' : '座位号'" min-width="120">
                     <template slot-scope="scope">
                         <el-button
-                            v-if="scope.row.orderType === 2 && scope.row.seatCode == '' && storeLocation != 3"
+                            v-if="
+                                scope.row.orderType === 2 &&
+                                scope.row.seatCode == '' &&
+                                scope.row.closedStatus != 1 &&
+                                scope.row.status == 4
+                            "
                             @click="editSeat(scope.row)"
                             type="primary"
                             >设定座位</el-button
@@ -203,10 +208,36 @@
             </el-dialog>
 
             <!-- 修改座位/包间号对话框 -->
-            <el-dialog title="修改座位号/包间号" :visible.sync="seatDia" class="seat-dialog" @close="handleCancel">
-                <el-select style="width: 100%" v-model="seatNum" filterable remote clearable placeholder="请选择座位号/包间号">
+            <el-dialog
+                :title="storeLocation != 3 ? '修改座位号' : '修改包间号'"
+                :visible.sync="seatDia"
+                class="seat-dialog"
+                @close="handleCancel"
+            >
+                <el-select
+                    style="width: 100%"
+                    v-model="seatNum"
+                    filterable
+                    remote
+                    clearable
+                    placeholder="请选择座位号"
+                    v-if="storeLocation != 3"
+                >
                     <el-option v-for="(item, index) in seatOrRoomList" :key="index" :label="item" :value="item"></el-option>
                 </el-select>
+
+                <el-select v-model="seatNum" placeholder="请选择包间号" v-if="storeLocation == 3" style="width: 100%">
+                    <el-option-group v-for="item in seatOrRoomList" :key="item.roomTypeId" :label="item.roomTypeName">
+                        <el-option
+                            v-for="item in item.roomTimeIntervalList"
+                            :key="item.roomTimeId"
+                            :label="item.startTime + '-' + item.endTime"
+                            :value="item.roomTimeId"
+                        >
+                        </el-option>
+                    </el-option-group>
+                </el-select>
+
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancel">取 消</el-button>
                     <el-button type="primary" @click="handleEditSeat">确 定</el-button>
@@ -751,11 +782,26 @@ export default {
             };
             this.$post('/merchant/store/order/seatOrRoomList', data).then((res) => {
                 if (res.code === 0) {
-                    this.seatOrRoomList = res.data.seatName;
-                    if (res.data.length === 0) {
-                        this.$message.error('暂无可修改的座位号');
-                    } else {
-                        this.seatDia = true;
+                    //如果是非KTV
+                    if (this.storeLocation != 3) {
+                        if (res.data.seatName.length === 0) {
+                            this.$message.error('暂无可修改的座位号');
+                            return;
+                        } else {
+                            this.seatOrRoomList = res.data.seatName;
+                            this.seatDia = true;
+                        }
+                    }
+
+                    //如果是KTV店铺
+                    if (this.storeLocation == 3) {
+                        if (res.data.esKtvRoomDTOS.length === 0) {
+                            this.$message.error('暂无可修改的包间号');
+                            return;
+                        } else {
+                            this.seatOrRoomList = res.data.esKtvRoomDTOS;
+                            this.seatDia = true;
+                        }
                     }
                 }
             });
@@ -781,7 +827,11 @@ export default {
                     }
                 })();
             } else {
-                this.$message.error('请输入要修改的座位号');
+                if (this.storeLocation == 3) {
+                    this.$message.error('请输入要修改的包间号');
+                } else {
+                    this.$message.error('请输入要修改的座位号');
+                }
             }
         },
 

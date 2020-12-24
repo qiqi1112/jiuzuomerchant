@@ -1996,8 +1996,13 @@ export default {
             this.nowFloor = item.floor; //当前操作的楼层
             this.nowFloorIndex = index; //当前操作的楼层的下标
             this.nowFloorPower = item.floorPower; //当前操作的楼层的权重
-            this.getShopSeat(index);
-            this.showSeatAtt(index);
+
+            if (item.floor == this.list[index].layoutList[0].floor && item.floorPower == this.list[index].layoutList[0].floorPower) {
+                this.getShopSeat(index);
+                this.showSeatAtt(index);
+            } else {
+                this.$message.error('楼层数据异常，请联系平台');
+            }
         },
 
         //回显店铺卡座数量（行和列数量）
@@ -2213,9 +2218,9 @@ export default {
 
             //删除一楼就将剩余楼层权重减一
             this.list.forEach((item) => {
-                item.floorPower = item.floorPower - 1;
+                item.floorPower =  this.list.length - 1;
                 item.layoutList.forEach((item2) => {
-                    item2.floorPower = item2.floorPower - 1;
+                    item2.floorPower = this.list.length - 1;
                 });
             });
         },
