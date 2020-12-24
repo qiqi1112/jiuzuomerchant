@@ -1,17 +1,17 @@
 /*
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
- * @Last Modified by: xu.xiao
- * @Last Modified time: 2020-12-07 09:23:57
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2020-12-24 14:59:04
  */
 
 import Message from "element-ui/packages/message/index.js";
 // 
 // 手机号码验证
 function phone(val) {
-    if (!(/(^0\d{2,3}\-\d{7,8}$)|(^1[3|4|5|6|7|8][0-9]{9}$)/.test(val))) {
+    if (!(/(^0\d{2,3}\d{7,8}$)|(^1[3|4|5|6|7|8][0-9]{9}$)/.test(val))) {
         return false;
-    }else{
+    } else {
         return true
     }
 }
@@ -19,7 +19,7 @@ function phone(val) {
 function pureNumber(val) {
     if (!(/^\d{1,}$/.test(val))) {
         return false;
-    }else{
+    } else {
         return true
     }
 }
@@ -28,7 +28,7 @@ function pureNumber(val) {
 function money(val) {
     if (!/^\d+(\.\d{1,2})?$/.test(val)) {
         return false;
-    }else{
+    } else {
         return true
     }
 }

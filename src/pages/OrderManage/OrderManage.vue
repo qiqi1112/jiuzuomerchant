@@ -115,8 +115,11 @@
                 <!-- <el-table-column prop="smsCode" label="验证码"></el-table-column> -->
                 <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
+                        <!-- 如果订单有误，就报相关错误 -->
+                        <template v-if="scope.row.closedStatus === 1">{{ scope.row.closedReason }}</template>
+
                         <!-- 如果顾客是抢座，且已到店 -->
-                        <template v-if="scope.row.orderType === 2 && scope.row.status === 4">
+                        <template v-else-if="scope.row.orderType === 2 && scope.row.status === 4">
                             <el-button disabled type="success">已接单</el-button>
                             <el-button disabled type="success">已到店</el-button>
                             <el-button
@@ -185,9 +188,6 @@
                                 }}</el-button
                             >
                         </template>
-
-                        <!-- 如果订单有误，就报相关错误 -->
-                        <template v-else-if="scope.row.closedStatus === 1">{{ scope.row.closedReason }}</template>
                     </template>
                 </el-table-column>
             </el-table>
@@ -751,7 +751,7 @@ export default {
             };
             this.$post('/merchant/store/order/seatOrRoomList', data).then((res) => {
                 if (res.code === 0) {
-                    this.seatOrRoomList = res.data;
+                    this.seatOrRoomList = res.data.seatName;
                     if (res.data.length === 0) {
                         this.$message.error('暂无可修改的座位号');
                     } else {

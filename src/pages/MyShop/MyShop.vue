@@ -104,6 +104,7 @@
                     <!-- 回显 -->
                     <div class="show-box" v-for="(item, index) in servicePhoneArr" :key="index">
                         <el-input
+                            :onkeyup="(servicePhoneArr[index] = servicePhoneArr[index].replace(/^(-1+)|[^\d]+/g, ''))"
                             v-model="servicePhoneArr[index]"
                             placeholder="客服电话"
                             style="width: 30%; margin-right: 10px"
@@ -117,6 +118,7 @@
                     <template v-if="!isReadonly && servicePhoneArr.length < 3">
                         <div style="margin-bottom: 10px">
                             <el-input
+                                :onkeyup="(servicePhone = servicePhone.replace(/^(-1+)|[^\d]+/g, ''))"
                                 v-model="servicePhone"
                                 placeholder="客服电话"
                                 style="width: 30%; margin-right: 10px"
@@ -1351,10 +1353,17 @@ export default {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
             const isMP4 = file.type === 'video/mp4';
+            const isLt2M = file.size / 1024 / 1024 <= 2; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG && !isMP4) {
                 this.$message.error('上传文件只能是 JPG / PNG / MP4 格式');
+                return false;
+            }
+
+            //限制上传文件大小
+            if (!isLt2M) {
+                this.$message.error('图片大小不能超过 2MB');
                 return false;
             }
 
@@ -2202,7 +2211,7 @@ export default {
                 this.list.splice(index, 1);
             }
 
-            //删除一楼就将楼层权重减一
+            //删除一楼就将剩余楼层权重减一
             this.list.forEach((item) => {
                 item.floorPower = item.floorPower - 1;
                 item.layoutList.forEach((item2) => {
@@ -3529,10 +3538,6 @@ export default {
                 .snacks-form {
                     display: flex;
                     align-items: center;
-
-                    /deep/.el-input__inner {
-                        padding: 0 8px;
-                    }
                 }
             }
 
