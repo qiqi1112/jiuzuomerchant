@@ -1219,30 +1219,29 @@ export default {
 
         //验证金额
         checkPrice(price, opt, index) {
-            if (!this.isReadonly) {
-                if (price < 0.1 || this.$regular.money(price) === false) {
-                    switch (opt) {
-                        case 1:
-                            this.perCon = 0.1;
-                            break;
-                        case 2:
-                            this.presentSeatInfo.weekPriceList[index].price = 0.1;
-                            break;
-                        case 3:
-                            this.timeQuanObj.minConsumption = 0.1;
-                            break;
-                        case 4:
-                            this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
-                            break;
-                    }
-
-                    if (price < 0.1) {
-                        this.$message.error('消费金额不能低于0.1元');
-                    } else if (this.$regular.money(price) === false) {
-                        this.$message.error('请输入正确格式的金额');
-                    }
-                }
-            }
+            // if (!this.isReadonly) {
+            //     if (price < 0.1 || this.$regular.money(price) === false) {
+            //         switch (opt) {
+            //             case 1:
+            //                 this.perCon = 0.1;
+            //                 break;
+            //             case 2:
+            //                 this.presentSeatInfo.weekPriceList[index].price = 0.1;
+            //                 break;
+            //             case 3:
+            //                 this.timeQuanObj.minConsumption = 0.1;
+            //                 break;
+            //             case 4:
+            //                 this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
+            //                 break;
+            //         }
+            //         if (price < 0.1) {
+            //             this.$message.error('消费金额不能低于0.1元');
+            //         } else if (this.$regular.money(price) === false) {
+            //             this.$message.error('请输入正确格式的金额');
+            //         }
+            //     }
+            // }
         },
 
         //非空验证
@@ -2218,7 +2217,7 @@ export default {
 
             //删除一楼就将剩余楼层权重减一
             this.list.forEach((item) => {
-                item.floorPower =  this.list.length - 1;
+                item.floorPower = this.list.length - 1;
                 item.layoutList.forEach((item2) => {
                     item2.floorPower = this.list.length - 1;
                 });

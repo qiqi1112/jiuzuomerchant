@@ -389,30 +389,29 @@ export default {
     methods: {
         //验证金额
         checkPrice(price, opt, index) {
-            if (price !== '') {
-                if (price < 0.1 || this.$regular.money(price) === false) {
-                    switch (opt) {
-                        case 1:
-                            this.goodsForm.dynamicValidateForm.domains[index].originalPrice = 0.1;
-                            break;
-                        case 2:
-                            this.goodsForm.dynamicValidateForm.domains[index].statisticalPrice = 0.1;
-                            break;
-                        case 3:
-                            this.goodsForm.skuObj.originalPrice = 0.1;
-                            break;
-                        case 4:
-                            this.goodsForm.skuObj.statisticalPrice = 0.1;
-                            break;
-                    }
-
-                    if (price < 0.1) {
-                        this.$message.error('消费金额不能低于0.1元');
-                    } else if (this.$regular.money(price) === false) {
-                        this.$message.error('请输入正确格式的金额');
-                    }
-                }
-            }
+            // if (price !== '') {
+            //     if (price < 0.1 || this.$regular.money(price) === false) {
+            //         switch (opt) {
+            //             case 1:
+            //                 this.goodsForm.dynamicValidateForm.domains[index].originalPrice = 0.1;
+            //                 break;
+            //             case 2:
+            //                 this.goodsForm.dynamicValidateForm.domains[index].statisticalPrice = 0.1;
+            //                 break;
+            //             case 3:
+            //                 this.goodsForm.skuObj.originalPrice = 0.1;
+            //                 break;
+            //             case 4:
+            //                 this.goodsForm.skuObj.statisticalPrice = 0.1;
+            //                 break;
+            //         }
+            //         if (price < 0.1) {
+            //             this.$message.error('消费金额不能低于0.1元');
+            //         } else if (this.$regular.money(price) === false) {
+            //             this.$message.error('请输入正确格式的金额');
+            //         }
+            //     }
+            // }
         },
 
         //关闭广告位操作

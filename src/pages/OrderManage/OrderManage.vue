@@ -55,7 +55,9 @@
                 <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="addGoodsDesc" label="追加订单" min-width="100">
                     <template slot-scope="scope">
-                        <el-link @click="handleLookInfo(scope.row.orderNo)" type="primary">{{ scope.row.addGoodsDesc }}</el-link>
+                        <el-link v-if="scope.row.status == 4" @click="handleLookInfo(scope.row.orderNo)" type="primary">{{
+                            scope.row.addGoodsDesc
+                        }}</el-link>
                     </template>
                 </el-table-column>
                 <el-table-column prop="createBy" label="订单发起人" min-width="120"></el-table-column>
@@ -365,7 +367,7 @@
                                                 <span class="unline">￥{{ item.originalPrice }}</span>
                                             </div>
                                         </div>
-                                        <div class="drink-list" v-for="(item, index) in form.snacks" :key="index">
+                                        <div class="drink-list" v-for="(item, index) in form.snacksList" :key="index">
                                             <div class="good-box">
                                                 <div class="good-name">
                                                     <span>{{ item.name }}</span>
@@ -1148,14 +1150,14 @@ export default {
                 });
         },
 
-        //追加订单上桌操作
+        //追加订单上桌/售罄操作
         getTable(id, orderNo, index) {
             let txt = '';
-            if (index == 1) {
+            if (index === 1) {
                 txt = '是否确认上桌?';
             }
 
-            if (index == 2) {
+            if (index === 2) {
                 txt = '是否确认售罄?';
             }
 
