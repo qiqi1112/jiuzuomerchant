@@ -1219,29 +1219,29 @@ export default {
 
         //验证金额
         checkPrice(price, opt, index) {
-            // if (!this.isReadonly) {
-            //     if (price < 0.1 || this.$regular.money(price) === false) {
-            //         switch (opt) {
-            //             case 1:
-            //                 this.perCon = 0.1;
-            //                 break;
-            //             case 2:
-            //                 this.presentSeatInfo.weekPriceList[index].price = 0.1;
-            //                 break;
-            //             case 3:
-            //                 this.timeQuanObj.minConsumption = 0.1;
-            //                 break;
-            //             case 4:
-            //                 this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
-            //                 break;
-            //         }
-            //         if (price < 0.1) {
-            //             this.$message.error('消费金额不能低于0.1元');
-            //         } else if (this.$regular.money(price) === false) {
-            //             this.$message.error('请输入正确格式的金额');
-            //         }
-            //     }
-            // }
+            if (!this.isReadonly) {
+                if (price < 0.1 || this.$regular.money(price) === false) {
+                    switch (opt) {
+                        case 1:
+                            this.perCon = 0.1;
+                            break;
+                        case 2:
+                            this.presentSeatInfo.weekPriceList[index].price = 0.1;
+                            break;
+                        case 3:
+                            this.timeQuanObj.minConsumption = 0.1;
+                            break;
+                        case 4:
+                            this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
+                            break;
+                    }
+                    if (price < 0.1) {
+                        this.$message.error('消费金额不能低于0.1元');
+                    } else if (this.$regular.money(price) === false) {
+                        this.$message.error('请输入正确格式的金额');
+                    }
+                }
+            }
         },
 
         //非空验证
@@ -1361,9 +1361,11 @@ export default {
             }
 
             //限制上传文件大小
-            if (!isLt2M) {
-                this.$message.error('图片大小不能超过 2MB');
-                return false;
+            if (isJPG || isPNG) {
+                if (!isLt2M) {
+                    this.$message.error('图片大小不能超过 2MB');
+                    return false;
+                }
             }
 
             if (file.type === 'video/mp4') {
@@ -1375,6 +1377,7 @@ export default {
                         return;
                     }
                 });
+
                 if (isVideo) {
                     this.$message.error('最多只能上传1个短视频');
                     return false;
@@ -1411,11 +1414,20 @@ export default {
         beforeImgUpload(file) {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
+            const isLt2M = file.size / 1024 / 1024 <= 2; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG) {
                 this.$message.error('上传图片只能是 JPG / PNG 格式');
                 return false;
+            }
+
+            //限制上传文件大小
+            if (isJPG || isPNG) {
+                if (!isLt2M) {
+                    this.$message.error('图片大小不能超过 2MB');
+                    return false;
+                }
             }
         },
 

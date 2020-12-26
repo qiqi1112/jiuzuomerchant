@@ -221,6 +221,7 @@
                     v-if="goodsForm.checkedBanner && goodsForm.checkedBanner !== 2"
                     class="avatar-uploader banner-img-box"
                     action="1"
+                    :before-upload="beforeImgUpload"
                     :show-file-list="false"
                     :http-request="uploadBannerFiles"
                     :on-error="uploadError"
@@ -248,6 +249,7 @@
                                 v-if="goodsForm.checkedBanner && goodsForm.checkedBanner !== 2"
                                 class="avatar-uploader banner-img-box"
                                 action="1"
+                                :before-upload="beforeImgUpload"
                                 :show-file-list="false"
                                 :http-request="uploadBannerFiles"
                                 :on-error="uploadError"
@@ -281,6 +283,7 @@
                                 v-if="goodsForm.checkedReco && goodsForm.checkedReco !== 2"
                                 class="avatar-uploader reco-img-box"
                                 action="1"
+                                :before-upload="beforeImgUpload"
                                 :show-file-list="false"
                                 :http-request="uploadRecoFiles"
                                 :on-error="uploadError"
@@ -303,6 +306,7 @@
                         <el-upload
                             class="avatar-uploader"
                             action="1"
+                            :before-upload="beforeImgUpload"
                             :show-file-list="false"
                             :http-request="uploadThumFiles"
                             :on-error="uploadError"
@@ -321,6 +325,7 @@
                         <el-upload
                             class="avatar-uploader detail-img-box"
                             action="1"
+                            :before-upload="beforeImgUpload"
                             :show-file-list="false"
                             :http-request="uploadDetailFiles"
                             :on-error="uploadError"
@@ -366,14 +371,6 @@ export default {
             goodName: '', //选中的商品对应的信息
 
             antiStatus: true //防抖状态值
-
-            // skuObj: {
-            //     specName: '', //规格
-            //     originalPrice: '', //规格原价
-            //     presentPrice: '', //规格现价
-            //     statisticalPrice: '', //新增的现价
-            //     skuCode: '' //sku码
-            // }
         };
     },
 
@@ -389,29 +386,50 @@ export default {
     methods: {
         //验证金额
         checkPrice(price, opt, index) {
-            // if (price !== '') {
-            //     if (price < 0.1 || this.$regular.money(price) === false) {
-            //         switch (opt) {
-            //             case 1:
-            //                 this.goodsForm.dynamicValidateForm.domains[index].originalPrice = 0.1;
-            //                 break;
-            //             case 2:
-            //                 this.goodsForm.dynamicValidateForm.domains[index].statisticalPrice = 0.1;
-            //                 break;
-            //             case 3:
-            //                 this.goodsForm.skuObj.originalPrice = 0.1;
-            //                 break;
-            //             case 4:
-            //                 this.goodsForm.skuObj.statisticalPrice = 0.1;
-            //                 break;
-            //         }
-            //         if (price < 0.1) {
-            //             this.$message.error('消费金额不能低于0.1元');
-            //         } else if (this.$regular.money(price) === false) {
-            //             this.$message.error('请输入正确格式的金额');
-            //         }
-            //     }
-            // }
+            if (price !== '') {
+                if (price < 0.1 || this.$regular.money(price) === false) {
+                    switch (opt) {
+                        case 1:
+                            this.goodsForm.dynamicValidateForm.domains[index].originalPrice = 0.1;
+                            break;
+                        case 2:
+                            this.goodsForm.dynamicValidateForm.domains[index].statisticalPrice = 0.1;
+                            break;
+                        case 3:
+                            this.goodsForm.skuObj.originalPrice = 0.1;
+                            break;
+                        case 4:
+                            this.goodsForm.skuObj.statisticalPrice = 0.1;
+                            break;
+                    }
+                    if (price < 0.1) {
+                        this.$message.error('消费金额不能低于0.1元');
+                    } else if (this.$regular.money(price) === false) {
+                        this.$message.error('请输入正确格式的金额');
+                    }
+                }
+            }
+        },
+
+        // 上传单图之前的验证
+        beforeImgUpload(file) {
+            const isJPG = file.type === 'image/jpeg';
+            const isPNG = file.type === 'image/png';
+            const isLt2M = file.size / 1024 / 1024 <= 2; //限制文件大小
+
+            //限制上传文件格式
+            if (!isJPG && !isPNG) {
+                this.$message.error('上传图片只能是 JPG / PNG 格式');
+                return false;
+            }
+
+            //限制上传文件大小
+            if (isJPG || isPNG) {
+                if (!isLt2M) {
+                    this.$message.error('图片大小不能超过 2MB');
+                    return false;
+                }
+            }
         },
 
         //关闭广告位操作
@@ -545,6 +563,8 @@ export default {
                 this.$message.error('请输入正确的规格原价');
             } else if (!this.$regular.money(this.goodsForm.skuObj.statisticalPrice)) {
                 this.$message.error('请输入正确的规格现价');
+            } else if (+this.goodsForm.skuObj.statisticalPrice > +this.goodsForm.skuObj.originalPrice) {
+                this.$message.error('规格现价不能大于原价');
             } else {
                 this.goodsForm.dynamicValidateForm.domains.push(this.goodsForm.skuObj);
                 this.goodsForm.skuObj = {
@@ -555,14 +575,6 @@ export default {
                     skuCode: '' //sku码
                 };
             }
-
-            // this.goodsForm.dynamicValidateForm.domains.push({
-            //     specName: '', //规格
-            //     originalPrice: '', //规格原价
-            //     presentPrice: '', //规格现价
-            //     statisticalPrice: '', //新增的现价
-            //     skuCode: '' //sku码
-            // });
         },
 
         //商品规格删除按钮

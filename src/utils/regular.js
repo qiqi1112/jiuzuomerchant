@@ -2,14 +2,13 @@
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2020-12-24 14:59:04
+ * @Last Modified time: 2020-12-26 13:16:16
  */
 
 import Message from "element-ui/packages/message/index.js";
-// 
 // 手机号码验证
 function phone(val) {
-    if (!(/(^0\d{2,3}\d{7,8}$)|(^1[3|4|5|6|7|8][0-9]{9}$)/.test(val))) {
+    if (!(/(^0\d{2,3}\d{7,8}$)|(^400[016789]\d{6}$)|(^1[3|4|5|6|7|8][0-9]{9}$)/.test(val))) {
         return false;
     } else {
         return true

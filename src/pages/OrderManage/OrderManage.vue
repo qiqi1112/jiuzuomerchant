@@ -248,7 +248,7 @@
 
             <!-- 到店输入验证码 -->
             <el-dialog title="验证码" :visible.sync="reachStoreDialog" class="seat-dialog" @close="handleCancelCode">
-                <el-input v-model="reachStoreCode" placeholder="请输入验证码"></el-input>
+                <el-input v-model="reachStoreCode" placeholder="请输入验证码" autofocus></el-input>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancelCode">取 消</el-button>
                     <el-button type="primary" @click="reachStore">确 定</el-button>
@@ -402,16 +402,18 @@
 
                                             <div>
                                                 <el-button
-                                                    @click="getTable(item.id, form.orderNo, 1)"
-                                                    v-if="item.servedStatus == 0"
+                                                    @click="getTable(item.servedStatus, item.id, form.orderNo, 1)"
+                                                    v-if="item.servedStatus == 0 || item.servedStatus == 1"
+                                                    :disabled="item.servedStatus != 0"
                                                     type="primary"
-                                                    >上桌</el-button
+                                                    >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
                                                 >
                                                 <el-button
-                                                    @click="getTable(item.id, form.orderNo, 2)"
-                                                    v-if="item.servedStatus == 0"
+                                                    @click="getTable(item.servedStatus, item.id, form.orderNo, 2)"
+                                                    v-if="item.servedStatus == 0 || item.servedStatus == 2"
+                                                    :disabled="item.servedStatus != 0"
                                                     type="primary"
-                                                    >售罄</el-button
+                                                    >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
                                                 >
                                             </div>
 
@@ -1151,31 +1153,33 @@ export default {
         },
 
         //追加订单上桌/售罄操作
-        getTable(id, orderNo, index) {
-            let txt = '';
-            if (index === 1) {
-                txt = '是否确认上桌?';
-            }
+        getTable(status, id, orderNo, index) {
+            if (status === 0) {
+                let txt = '';
+                if (index === 1) {
+                    txt = '是否确认上桌?';
+                }
 
-            if (index === 2) {
-                txt = '是否确认售罄?';
-            }
+                if (index === 2) {
+                    txt = '是否确认售罄?';
+                }
 
-            this.$confirm(txt, '提示', {
-                distinguishCancelAndClose: true,
-                type: 'warning'
-            })
-                .then(() => {
-                    this.$put(`/merchant/store/order/updateServedStatus/${id}/${index}`).then((res) => {
-                        if (res.code === 0) {
-                            this.$message.success('操作成功');
-                            this.handleLookInfo(orderNo);
-                        } else {
-                            this.$message.error(res.msg);
-                        }
-                    });
+                this.$confirm(txt, '提示', {
+                    distinguishCancelAndClose: true,
+                    type: 'warning'
                 })
-                .catch((action) => {});
+                    .then(() => {
+                        this.$put(`/merchant/store/order/updateServedStatus/${id}/${index}`).then((res) => {
+                            if (res.code === 0) {
+                                this.$message.success('操作成功');
+                                this.handleLookInfo(orderNo);
+                            } else {
+                                this.$message.error(res.msg);
+                            }
+                        });
+                    })
+                    .catch((action) => {});
+            }
         }
 
         //是否到店确认
