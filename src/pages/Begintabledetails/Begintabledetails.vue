@@ -97,7 +97,7 @@
                             <el-input
                                 class="smallInpss"
                                 :disabled="isReadonly"
-                                v-model="presentSeatInfos.orderAmount"
+                                v-model="presentSeatInfos.paidAmount"
                                 placeholder="实付金额"
                             ></el-input>
                             <span class="smallSpan">商品原价:</span>
@@ -117,7 +117,7 @@
                         </div>
                         <div class="moneyTime time-margin">
                             <span>下单时间:</span>
-                            <span>{{ presentSeatInfos.paidTime }}</span>
+                            <span>{{ presentSeatInfos.createTime }}</span>
                         </div>
                         <div class="moneyTime">
                             <span>支付时间:</span>
@@ -178,7 +178,7 @@
                                         <p>换座时间：</p>
                                     </div>
                                     <div class="right">
-                                        <p>{{ presentSeatInfos.changeSeatStatus }}座</p>
+                                        <p>{{ presentSeatInfos.replaceSeatCode }}座</p>
                                         <p>{{ presentSeatInfos.changeSeatTime }}</p>
                                     </div>
                                 </div>
