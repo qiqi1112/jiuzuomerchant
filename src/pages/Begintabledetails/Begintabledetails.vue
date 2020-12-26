@@ -138,7 +138,7 @@
                                         <p>{{ presentSeatInfo.seatCode }}座</p>
                                         <p>{{ presentSeatInfo.numberOfPeople }}人</p>
                                         <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
-                                        <p>{{ presentSeatInfo.minAmount | returnFloat }}</p>
+                                        <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -313,6 +313,7 @@ export default {
                                     res.data.couponAmount = this.price(res.data.couponAmount);
                                     (this.presentSeatInfos = res.data), newObj;
                                     this.clickFlag = true;
+                                    // console.log(this.presentSeatInfos)
                                 } else {
                                     this.$message.error(res.msg);
                                 }
