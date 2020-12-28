@@ -292,7 +292,7 @@ export default {
                     this.readOnly = false;
                     this.editRead = true;
                 }
-                this.form.region = row.category;
+                this.form.region = row.category.toString();
                 this.dynamicValidateForm = {
                     domains: [
                         {
