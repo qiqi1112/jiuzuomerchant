@@ -331,7 +331,7 @@
                             </div>
                             <div class="right-list">
                                 <div>
-                                    <p class="title">座位信息</p>
+                                    <p class="title">{{ storeLocation == 3 ? '包间信息' : '座位信息' }}</p>
                                     <div class="list-box">
                                         <p>
                                             <span>{{ storeLocation == 3 ? '包间类型' : '座位号' }}</span>
@@ -367,7 +367,7 @@
                                                 <span class="unline">￥{{ item.originalPrice }}</span>
                                             </div>
                                         </div>
-                                        <div class="drink-list" v-for="(item, index) in form.snacksList" :key="index">
+                                        <div class="drink-list" v-for="(item, index) in form.snacksList" :key="item.name + index">
                                             <div class="good-box">
                                                 <div class="good-name">
                                                     <span>{{ item.name }}</span>
@@ -387,16 +387,16 @@
                                                 <span>{{ item.createTime }}</span>
                                             </div>
 
-                                            <div class="drink-list" v-for="(item, index) in item.goodsList" :key="index">
+                                            <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
                                                 <div class="good-box">
                                                     <div class="good-name">
-                                                        <span>{{ item.goodsName }}</span>
-                                                        <span class="num">x{{ item.quantity }}</span>
+                                                        <span>{{ item2.goodsName }}</span>
+                                                        <span class="num">x{{ item2.quantity }}</span>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <span>￥{{ item.activityPrice }}</span>
-                                                    <span class="unline">￥{{ item.originalPrice }}</span>
+                                                    <span>￥{{ item2.activityPrice }}</span>
+                                                    <span class="unline">￥{{ item2.originalPrice }}</span>
                                                 </div>
                                             </div>
 
@@ -416,18 +416,6 @@
                                                     >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
                                                 >
                                             </div>
-
-                                            <!-- <div class="good-box">
-                                                <div class="good-name">{{ item.groupName }}</div>
-
-                                                <div class="good-name">{{ item.goodsName }}</div>
-                                                <span>x{{ item.quantity }}</span>
-                                            </div>
-                                            <div>
-                                                <span>{{ item.createTime }}</span>
-                                                <span>￥{{ item.activityPrice }}</span>
-                                                <span class="unline">￥{{ item.originalPrice }}</span>
-                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -1181,22 +1169,6 @@ export default {
                     .catch((action) => {});
             }
         }
-
-        //是否到店确认
-        // isReachStore(row) {
-        //     this.$confirm('是否确认到店?', '提示', {
-        //         distinguishCancelAndClose: true,
-        //         confirmButtonText: '已到店',
-        //         cancelButtonText: '未到店',
-        //         type: 'warning'
-        //     })
-        //         .then(() => {
-        //             this.isHandleRequest(row.id, 4); //已到店
-        //         })
-        //         .catch((action) => {
-        //             action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
-        //         });
-        // },
     },
 
     mounted() {

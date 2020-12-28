@@ -513,7 +513,7 @@
                             <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
-                                    @change="checkNull(presentSeatInfo.seatLatestReservationTime, '保留最晚时间')"
+                                    @change="checkLateTime(presentSeatInfo.seatLatestReservationTime)"
                                     style="width: 50%"
                                     placeholder="最晚保留时间"
                                     v-model="presentSeatInfo.seatLatestReservationTime"
@@ -800,6 +800,7 @@
                                     <ul>
                                         <li v-for="(item, index) in presentKtvInfo.snacks" :key="index">
                                             <el-input
+                                                @blur="checkSnacks(item.name)"
                                                 style="width: 170px"
                                                 v-model="item.name"
                                                 placeholder="名称"
@@ -810,6 +811,7 @@
                                                 <i class="el-icon-close"></i>
                                             </span>
                                             <el-input
+                                                @blur="checkSnacks(item.num)"
                                                 :onkeyup="(item.num = item.num.replace(/^(0+)|[^\d]+/g, ''))"
                                                 style="width: 70px; margin-right: 10px"
                                                 v-model="item.num"
@@ -1219,7 +1221,7 @@ export default {
 
         //验证金额
         checkPrice(price, opt, index) {
-            if (!this.isReadonly) {
+            if (!this.isReadonly && price !== '') {
                 if (price < 0.1 || this.$regular.money(price) === false) {
                     switch (opt) {
                         case 1:
@@ -1241,6 +1243,23 @@ export default {
                         this.$message.error('请输入正确格式的金额');
                     }
                 }
+            }
+        },
+
+        //零嘴输入框失去焦点验证
+        checkSnacks(item) {
+            if (!item) {
+                this.$message.error('零嘴不能为空');
+            }
+        },
+
+        //最晚保留时间失去焦点验证
+        checkLateTime(item) {
+            if (!item) {
+                this.$message.error('保留最晚时间不能为空，默认将置为开始营业时间');
+                setTimeout(() => {
+                    this.presentSeatInfo.seatLatestReservationTime = this.startBussTime;
+                }, 300);
             }
         },
 
@@ -2256,7 +2275,7 @@ export default {
                         floorPower: this.list.length,
                         seatColumn: i,
                         seatRow: j,
-                        seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
+                        seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [

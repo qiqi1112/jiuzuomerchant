@@ -530,9 +530,17 @@ export default {
                         this.$message.error('请至少输入一种商品规格');
                         return;
                     } else {
-                        this.allRegRight = true;
+                        let arr = this.goodsForm.dynamicValidateForm.domains;
+                        for (let i = 0; i < arr.length; i++) {
+                            if (arr[i].statisticalPrice > arr[i].originalPrice) {
+                                this.$message.error('规格现价不能大于原价');
+                                this.allRegRight = false;
+                                break;
+                            } else {
+                                this.allRegRight = true;
+                            }
+                        }
                     }
-                    console.log(this.goodsForm.dynamicValidateForm.domains);
                 }
             }
         },

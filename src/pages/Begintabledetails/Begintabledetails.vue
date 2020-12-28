@@ -2,8 +2,8 @@
     <div class="container" v-loading="wrapLoading">
         <div class="Begintabledetails">
             <el-breadcrumb separator="/">
-                    <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
-                </el-breadcrumb>
+                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
+            </el-breadcrumb>
             <div class="crumbs">
                 <div>
                     <span>楼层</span>
@@ -107,12 +107,12 @@
                                 v-model="presentSeatInfos.payableAmount"
                                 placeholder="商品原价"
                             ></el-input>
-                            <span class="small_span">优惠卷优惠:</span>
+                            <span class="small_span">优惠券优惠:</span>
                             <el-input
                                 class="smallInp"
                                 :disabled="isReadonly"
                                 v-model="presentSeatInfos.couponAmount"
-                                placeholder="优惠卷优惠"
+                                placeholder="优惠券优惠"
                             ></el-input>
                         </div>
                         <div class="moneyTime time-margin">
@@ -132,7 +132,7 @@
                                         <p>座位号：</p>
                                         <p>容纳人数：</p>
                                         <p>保留时间：</p>
-                                        <p>抵消金额：</p>
+                                        <p>低消金额：</p>
                                     </div>
                                     <div class="right">
                                         <p>{{ presentSeatInfo.seatCode }}座</p>
@@ -144,7 +144,11 @@
                             </div>
                             <div class="details-two">
                                 <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
-                                <div style="display: flex;justify-content: space-between;" v-for="(item, index) in presentSeatInfos.goodsList" :key="index">
+                                <div
+                                    style="display: flex; justify-content: space-between"
+                                    v-for="(item, index) in presentSeatInfos.goodsList"
+                                    :key="index"
+                                >
                                     <div class="left">
                                         <p>
                                             <span>{{ item.goodsName }}</span>
@@ -152,7 +156,7 @@
                                         </p>
                                     </div>
                                     <div class="right">
-                                        <p style="margin-left:-165px">
+                                        <p style="margin-left: -165px">
                                             <span>{{ item.activityPrice | returnFloat }}</span>
                                             <span style="text-decoration: line-through; color: #888; margin-left: 10px">{{
                                                 item.originalPrice | returnFloat
@@ -162,7 +166,7 @@
                                 </div>
                             </div>
                             <div class="details-two">
-                                <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠卷 </span>
+                                <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠券 </span>
                                 <div style="display: flex">
                                     <div class="left">
                                         <p>
@@ -223,7 +227,7 @@ export default {
                     class: 'aisle-books'
                 }
             ],
-            floorList:[],
+            floorList: [],
             list: [],
             seatStyle: 'canBook', //默认的选座样式
             allSeatDetailInfo: [], //所有座位详细信息
@@ -235,8 +239,8 @@ export default {
             endBussTime: '', //结束营业时间
             input: '',
             clickFlag: false,
-            nowFloor: '',//当前正在操作的楼层
-            wrapLoading:true
+            nowFloor: '', //当前正在操作的楼层
+            wrapLoading: true
         };
     },
     created() {
@@ -301,24 +305,24 @@ export default {
             this.list.forEach((item) => {
                 if (item.floor === this.nowFloor) {
                     // item.layoutList.forEach((item2) => {
-                        if (item.floor == item.floor && item.seatRow == seatRow && item.seatColumn == seatColumn) {
-                            //查看当前座位信息
-                            this.presentSeatInfo = item;
-                            let newObj = this.presentSeatInfo;
-                            let code = this.nowFloor+'-'+this.presentSeatInfo.seatCode;
-                            this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
-                                if (res.code == 0) {
-                                    res.data.orderAmount = this.price(res.data.orderAmount);
-                                    res.data.payableAmount = this.price(res.data.payableAmount);
-                                    res.data.couponAmount = this.price(res.data.couponAmount);
-                                    (this.presentSeatInfos = res.data), newObj;
-                                    this.clickFlag = true;
-                                    // console.log(this.presentSeatInfos)
-                                } else {
-                                    this.$message.error(res.msg);
-                                }
-                            });
-                        }
+                    if (item.floor == item.floor && item.seatRow == seatRow && item.seatColumn == seatColumn) {
+                        //查看当前座位信息
+                        this.presentSeatInfo = item;
+                        let newObj = this.presentSeatInfo;
+                        let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
+                        this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
+                            if (res.code == 0) {
+                                res.data.orderAmount = this.price(res.data.orderAmount);
+                                res.data.payableAmount = this.price(res.data.payableAmount);
+                                res.data.couponAmount = this.price(res.data.couponAmount);
+                                (this.presentSeatInfos = res.data), newObj;
+                                this.clickFlag = true;
+                                // console.log(this.presentSeatInfos)
+                            } else {
+                                this.$message.error(res.msg);
+                            }
+                        });
+                    }
                     // });
                 }
             });
@@ -340,8 +344,8 @@ export default {
                                     item.className = `seat canBook`;
                                 }
                                 //过道与不可预定
-                                if(item2.seatAttribute==1 || item2.seatType ==3){
-                                     item.className = `seat aisleBooks`;
+                                if (item2.seatAttribute == 1 || item2.seatType == 3) {
+                                    item.className = `seat aisleBooks`;
                                 }
                                 //已预订
                                 if (item2.seatAttribute == 4) {
@@ -352,7 +356,7 @@ export default {
                                     item.className = `seat stageBook`;
                                 }
                                 //已到店
-                                if(item2.to_Shop==1) {
+                                if (item2.to_Shop == 1) {
                                     item.className = `seat aisleBook`;
                                 }
                             }
@@ -364,10 +368,10 @@ export default {
         //回显每个座位号时，不要带上楼层号1
         substrSeatNum() {
             this.list.forEach((item) => {
-                    const index = item.seatCode.indexOf('-');
-                    if (index !== -1) {
-                        item.seatCode = item.seatCode.substr(index + 1);
-                    }
+                const index = item.seatCode.indexOf('-');
+                if (index !== -1) {
+                    item.seatCode = item.seatCode.substr(index + 1);
+                }
             });
         },
         //回显店铺数据
@@ -377,13 +381,13 @@ export default {
                     console.log(res);
                     this.wrapLoading = false;
                     let result = res.data;
-                    this.floorList = result.storeSeatFloorDTOS
+                    this.floorList = result.storeSeatFloorDTOS;
                     this.list = result.storeSeatDTOS;
                     //回显第一楼店铺卡座数量
                     this.getShopSeat(0);
                     //默认展示的楼层为第一楼
                     this.nowFloor = this.list[0].floor;
-                    console.log(this.nowFloor)
+                    console.log(this.nowFloor);
                     //座位属性回显
                     this.showSeatAtt(0);
                     //回显每个座位号时，不要带上楼层号
@@ -422,30 +426,29 @@ export default {
         changeShowFloor(item, index) {
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
-            this.$post('/merchant/store/getStoreSeat',{floor:this.nowFloor})
-            .then(res=>{
-                console.log(res)
-                 let result = res.data;
-                    // this.floorList = result.storeSeatFloorDTOS
-                    this.list = result.storeSeatDTOS;
-                    //回显第一楼店铺卡座数量
-                     this.getShopSeat(index);
-                    //默认展示的楼层为第一楼
-                    this.nowFloor = this.list[0].floor;
-                    // console.log(this.nowFloor)
-                    //座位属性回显
-                     this.showSeatAtt(index);
-                    //回显每个座位号时，不要带上楼层号
-                    this.substrSeatNum();
-            })
+            this.$post('/merchant/store/getStoreSeat', { floor: this.nowFloor }).then((res) => {
+                console.log(res);
+                let result = res.data;
+                // this.floorList = result.storeSeatFloorDTOS
+                this.list = result.storeSeatDTOS;
+                //回显第一楼店铺卡座数量
+                this.getShopSeat(index);
+                //默认展示的楼层为第一楼
+                this.nowFloor = this.list[0].floor;
+                // console.log(this.nowFloor)
+                //座位属性回显
+                this.showSeatAtt(index);
+                //回显每个座位号时，不要带上楼层号
+                this.substrSeatNum();
+            });
             // this.getShopSeat(index);
             // this.showSeatAtt(index);
             this.clickFlag = false;
         },
         //回显店铺卡座数量（行和列数量）1
         getShopSeat(index) {
-            this.x = this.list[this.list.length-1].seatRow
-            this.y = this.list[this.list.length-1].seatColumn
+            this.x = this.list[this.list.length - 1].seatRow;
+            this.y = this.list[this.list.length - 1].seatColumn;
         },
         //对座位信息进行相关转换
         changeLayoutList(arr) {
@@ -565,7 +568,7 @@ export default {
         }
     }
 }
-.container{
+.container {
     // width: 100%;
     height: auto;
 }
@@ -693,11 +696,11 @@ export default {
 }
 
 .aisle-books {
-    background-color:#999 !important;
+    background-color: #999 !important;
     border: 1px solid transparent !important;
 }
 .aisle-book {
-    background-color:#87CEFA !important;
+    background-color: #87cefa !important;
     border: 1px solid transparent !important;
 }
 .notBook {
@@ -748,7 +751,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     border: 1px solid transparent;
-    background-color:	#87CEFA !important;
+    background-color: #87cefa !important;
     cursor: pointer;
 }
 </style>
