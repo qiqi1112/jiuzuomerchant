@@ -535,7 +535,7 @@
                             </div>
                             <!-- 最低消费 -->
                             <div class="min-charge">
-                                <span class="min-con">最低消费：</span>
+                                <span class="min-con" style="margin-bottom:10px">最低消费：</span>
                                 <div class="day-mincom">
                                     <div v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
                                         <div style="width: 40%;">
@@ -543,17 +543,17 @@
                                         <el-input
                                             @blur="checkPrice(item.price, 2, index)"
                                             v-model="item.price"
-                                            style="width: 100%; margin-right: 6px; padding: 0 ;"
+                                            style="width: 100%; margin-right: 6px;"
                                             :readonly="isReadonly"
                                         >
                                             <template slot="append">￥</template>
                                         </el-input>
                                         </div>
-                                       <div style="width: 40%;">
+                                       <div style="width: 50%;">
                                           <span>最晚保留时间</span><br/>
                                         <el-time-select
                                             @change="checkLateTime(item.seatLatestReservationTime,index)"
-                                            style="width: 100%"
+                                            style="width: 80%;"
                                             placeholder="最晚保留时间"
                                             v-model="item.seatLatestReservationTime"
                                             :readonly="isReadonly"
@@ -2973,6 +2973,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 @media screen and (min-width: 1300px) {
     .container {
         box-sizing: border-box;
@@ -2981,7 +2982,7 @@ export default {
     }
 
     .left-wrap {
-        width: 25%;
+        width: 35%;
         height: 100%;
         margin-right: 50px;
 
@@ -3133,7 +3134,6 @@ export default {
             margin-bottom: 10px;
         }
     }
-
     .shop-div {
         display: flex;
         margin-bottom: 30px;
@@ -3448,8 +3448,9 @@ export default {
                     border: 1px solid #dcdfe6;
                     border-radius: 4px;
                     padding: 16px 0;
-                    width: 80%;
-
+                    width: 100%;
+                    white-space: nowrap;
+                    
                     > div {
                         margin-bottom: 16px;
                         font-size: 14px;
@@ -3470,13 +3471,12 @@ export default {
             }
 
             > div {
-                display: flex;
-                align-items: center;
                 margin-bottom: 30px;
 
                 > span {
                     margin-right: 0;
                     width: 120px;
+                    display: block;
                 }
 
                 > span.snacks {
@@ -3732,7 +3732,10 @@ export default {
     }
 
     .el-input__inner {
-        // padding: 0 0 0 25px;
+        padding: 0 0 0 5px;
+    }
+    .el-input__prefix{
+        left: 100%;
     }
 }
 
