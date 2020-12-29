@@ -478,7 +478,7 @@
                                 </div>
                             </div>
                             <!-- 座位号 -->
-                            <div>
+                            <div style="display: flex">
                                 <span>座位号：</span>
                                 <el-input
                                     v-model="presentSeatInfo.seatCode"
@@ -489,13 +489,13 @@
                                 ></el-input>
                             </div>
                             <!-- 座位类型 -->
-                            <div>
+                            <div style="display: flex">
                                 <span>座位类型：</span>
                                 <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
                             </div>
                             <!-- 容纳人数 -->
-                            <div>
+                            <div style="display: flex">
                                 <span>容纳人数：</span>
                                 <el-input-number
                                     :step="1"
@@ -510,7 +510,7 @@
                                 ></el-input-number>
                             </div>
                             <!-- 最晚保留时间 -->
-                            <div class="lon-retain">
+                            <!-- <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
                                     @change="checkLateTime(presentSeatInfo.seatLatestReservationTime)"
@@ -532,47 +532,47 @@
                                               }
                                     "
                                 ></el-time-select>
-                            </div>
+                            </div> -->
                             <!-- 最低消费 -->
                             <div class="min-charge">
-                                <span class="min-con" style="margin-bottom:10px">最低消费：</span>
+                                <span class="min-con" style="margin-bottom: 10px">最低消费：</span>
                                 <div class="day-mincom">
                                     <div v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                        <div style="width: 40%;">
-                                             <span>{{ item.weekIndex | dayOfWeek }}</span><br/>
-                                        <el-input
-                                            @blur="checkPrice(item.price, 2, index)"
-                                            v-model="item.price"
-                                            style="width: 100%; margin-right: 6px;"
-                                            :readonly="isReadonly"
-                                        >
-                                            <template slot="append">￥</template>
-                                        </el-input>
+                                        <div style="width: 40%">
+                                            <span>{{ item.weekIndex | dayOfWeek }}</span
+                                            ><br />
+                                            <el-input
+                                                @blur="checkPrice(item.price, 2, index)"
+                                                v-model="item.price"
+                                                style="width: 100%; margin-right: 6px"
+                                                :readonly="isReadonly"
+                                            >
+                                                <template slot="append">￥</template>
+                                            </el-input>
                                         </div>
-                                       <div style="width: 50%;">
-                                          <span>最晚保留时间</span><br/>
-                                        <el-time-select
-                                            @change="checkLateTime(item.seatLatestReservationTime,index)"
-                                            style="width: 80%;"
-                                            placeholder="最晚保留时间"
-                                            v-model="item.seatLatestReservationTime"
-                                            :readonly="isReadonly"
-                                            :picker-options="
-                                                startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
-                                                    ? {
-                                                          start: startBussTime,
-                                                          step: '00:10',
-                                                          end: '23:50'
-                                                      }
-                                                    : {
-                                                          start: startBussTime,
-                                                          step: '00:10',
-                                                          end: endBussTime
-                                                      }
-                                            "
-                                        ></el-time-select> 
-                                       </div>
-                                        
+                                        <div style="width: 50%">
+                                            <span>最晚保留时间</span><br />
+                                            <el-time-select
+                                                @change="checkLateTime(item.seatLatestReservationTime, index)"
+                                                style="width: 80%"
+                                                placeholder="最晚保留时间"
+                                                v-model="item.seatLatestReservationTime"
+                                                :readonly="isReadonly"
+                                                :picker-options="
+                                                    startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
+                                                        ? {
+                                                              start: startBussTime,
+                                                              step: '00:10',
+                                                              end: '23:50'
+                                                          }
+                                                        : {
+                                                              start: startBussTime,
+                                                              step: '00:10',
+                                                              end: endBussTime
+                                                          }
+                                                "
+                                            ></el-time-select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1280,8 +1280,8 @@ export default {
         },
 
         //最晚保留时间失去焦点验证
-        checkLateTime(item,ind) {
-            console.log(item)
+        checkLateTime(item, ind) {
+            console.log(item);
             if (!item) {
                 this.$message.error('保留最晚时间不能为空，默认将置为开始营业时间');
                 setTimeout(() => {
@@ -2312,7 +2312,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 1,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2320,7 +2320,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 2,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2328,7 +2328,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 3,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2336,7 +2336,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 4,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2344,7 +2344,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 5,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2352,7 +2352,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 6,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2360,7 +2360,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 7,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             }
                         ]
                     });
@@ -2404,7 +2404,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 1,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2412,7 +2412,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 2,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2420,7 +2420,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 3,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2428,7 +2428,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 4,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2436,7 +2436,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 5,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2444,7 +2444,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 6,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             },
                             {
                                 id: '',
@@ -2452,7 +2452,7 @@ export default {
                                 seatCode: '',
                                 storeId: '',
                                 weekIndex: 7,
-                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime
                             }
                         ]
                     });
@@ -2973,7 +2973,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 @media screen and (min-width: 1300px) {
     .container {
         box-sizing: border-box;
@@ -3443,14 +3442,13 @@ export default {
         .right-box {
             .min-charge {
                 align-items: flex-start;
-
                 .day-mincom {
                     border: 1px solid #dcdfe6;
                     border-radius: 4px;
                     padding: 16px 0;
                     width: 100%;
                     white-space: nowrap;
-                    
+
                     > div {
                         margin-bottom: 16px;
                         font-size: 14px;
@@ -3460,7 +3458,7 @@ export default {
 
                         > span {
                             margin-right: 10px;
-                            white-space: nowrap
+                            white-space: nowrap;
                         }
                     }
 
@@ -3734,7 +3732,7 @@ export default {
     .el-input__inner {
         padding: 0 0 0 5px;
     }
-    .el-input__prefix{
+    .el-input__prefix {
         left: 100%;
     }
 }
