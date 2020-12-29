@@ -1221,7 +1221,7 @@ export default {
 
         //验证金额
         checkPrice(price, opt, index) {
-            if (!this.isReadonly && price !== '') {
+            if ((!this.isReadonly && price !== '') || opt == 2) {
                 if (price < 0.1 || this.$regular.money(price) === false) {
                     switch (opt) {
                         case 1:
