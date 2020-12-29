@@ -2302,7 +2302,7 @@ export default {
                         floorPower: this.list.length,
                         seatColumn: i,
                         seatRow: j,
-                        // seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                        seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [
@@ -2394,7 +2394,7 @@ export default {
                         floorPower: this.nowFloorPower,
                         seatColumn: i,
                         seatRow: j,
-                        // seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
+                        seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [
