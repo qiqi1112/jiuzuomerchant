@@ -510,7 +510,7 @@
                                 ></el-input-number>
                             </div>
                             <!-- 最晚保留时间 -->
-                            <!-- <div class="lon-retain">
+                            <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
                                     @change="checkLateTime(presentSeatInfo.seatLatestReservationTime)"
@@ -532,7 +532,7 @@
                                               }
                                     "
                                 ></el-time-select>
-                            </div> -->
+                            </div>
                             <!-- 最低消费 -->
                             <div class="min-charge">
                                 <span class="min-con">最低消费：</span>
@@ -1247,7 +1247,7 @@ export default {
 
         //验证金额
         checkPrice(price, opt, index) {
-            if (!this.isReadonly && price !== '') {
+            if ((!this.isReadonly && price !== '') || opt == 2) {
                 if (price < 0.1 || this.$regular.money(price) === false) {
                     switch (opt) {
                         case 1:
