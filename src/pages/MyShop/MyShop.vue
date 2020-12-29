@@ -3448,7 +3448,6 @@ export default {
                     padding: 16px 0;
                     width: 100%;
                     white-space: nowrap;
-
                     > div {
                         margin-bottom: 16px;
                         font-size: 14px;
