@@ -537,17 +537,43 @@
                             <div class="min-charge">
                                 <span class="min-con">最低消费：</span>
                                 <div class="day-mincom">
-                                    <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                        <span>{{ item.weekIndex | dayOfWeek }}</span>
+                                    <div v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
+                                        <div style="width: 40%;">
+                                             <span>{{ item.weekIndex | dayOfWeek }}</span><br/>
                                         <el-input
                                             @blur="checkPrice(item.price, 2, index)"
                                             v-model="item.price"
-                                            style="width: 47%; margin-right: 6px"
+                                            style="width: 100%; margin-right: 6px; padding: 0 ;"
                                             :readonly="isReadonly"
                                         >
                                             <template slot="append">￥</template>
                                         </el-input>
-                                    </p>
+                                        </div>
+                                       <div style="width: 40%;">
+                                          <span>最晚保留时间</span><br/>
+                                        <el-time-select
+                                            @change="checkLateTime(item.seatLatestReservationTime)"
+                                            style="width: 100%"
+                                            placeholder="最晚保留时间"
+                                            v-model="item.seatLatestReservationTime"
+                                            :readonly="isReadonly"
+                                            :picker-options="
+                                                startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
+                                                    ? {
+                                                          start: startBussTime,
+                                                          step: '00:10',
+                                                          end: '23:50'
+                                                      }
+                                                    : {
+                                                          start: startBussTime,
+                                                          step: '00:10',
+                                                          end: endBussTime
+                                                      }
+                                            "
+                                        ></el-time-select> 
+                                       </div>
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1255,6 +1281,7 @@ export default {
 
         //最晚保留时间失去焦点验证
         checkLateTime(item) {
+            console.log(item)
             if (!item) {
                 this.$message.error('保留最晚时间不能为空，默认将置为开始营业时间');
                 setTimeout(() => {
@@ -2275,7 +2302,7 @@ export default {
                         floorPower: this.list.length,
                         seatColumn: i,
                         seatRow: j,
-                        seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
+                        // seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [
@@ -2284,49 +2311,56 @@ export default {
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 1
+                                weekIndex: 1,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 2
+                                weekIndex: 2,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 3
+                                weekIndex: 3,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 4
+                                weekIndex: 4,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 5
+                                weekIndex: 5,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 6
+                                weekIndex: 6,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 7
+                                weekIndex: 7,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             }
                         ]
                     });
@@ -2360,7 +2394,7 @@ export default {
                         floorPower: this.nowFloorPower,
                         seatColumn: i,
                         seatRow: j,
-                        seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
+                        // seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
                         seatType: 1,
                         softHardStatus: '1',
                         weekPriceList: [
@@ -2369,49 +2403,56 @@ export default {
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 1
+                                weekIndex: 1,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 2
+                                weekIndex: 2,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 3
+                                weekIndex: 3,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 4
+                                weekIndex: 4,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 5
+                                weekIndex: 5,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 6
+                                weekIndex: 6,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             },
                             {
                                 id: '',
                                 price: 0.1,
                                 seatCode: '',
                                 storeId: '',
-                                weekIndex: 7
+                                weekIndex: 7,
+                                seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
                             }
                         ]
                     });
@@ -2940,7 +2981,7 @@ export default {
     }
 
     .left-wrap {
-        width: 35%;
+        width: 25%;
         height: 100%;
         margin-right: 50px;
 
@@ -3409,19 +3450,20 @@ export default {
                     padding: 16px 0;
                     width: 80%;
 
-                    > p {
+                    > div {
                         margin-bottom: 16px;
                         font-size: 14px;
                         display: flex;
-                        justify-content: center;
+                        justify-content: space-around;
                         align-items: center;
 
                         > span {
                             margin-right: 10px;
+                            white-space: nowrap
                         }
                     }
 
-                    > p:last-child {
+                    > div:last-child {
                         margin-bottom: 0;
                     }
                 }
@@ -3690,7 +3732,7 @@ export default {
     }
 
     .el-input__inner {
-        padding: 0 5px;
+        // padding: 0 0 0 25px;
     }
 }
 
