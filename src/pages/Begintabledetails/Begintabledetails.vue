@@ -145,14 +145,15 @@
                             <div class="details-two">
                                 <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
                                 <div
-                                    style="display: flex; justify-content: space-between"
+                                    style="display: flex; justify-content: space-between;flex-wrap: nowrap;"
                                     v-for="(item, index) in presentSeatInfos.goodsList"
                                     :key="index"
                                 >
                                     <div class="left">
                                         <p>
-                                            <span>{{ item.goodsName }}</span>
-                                            <span>{{ item.quantity }}</span>
+                                            <span>{{ item.goodsName }}</span><br/>
+
+                                            <span>× {{ item.quantity }}</span>
                                         </p>
                                     </div>
                                     <div class="right">
@@ -182,7 +183,7 @@
                                         <p>换座时间：</p>
                                     </div>
                                     <div class="right">
-                                        <p>{{ presentSeatInfos.replaceSeatCode }}座</p>
+                                        <p>{{ presentSeatInfos.replaceSeatCode }}</p>
                                         <p>{{ presentSeatInfos.changeSeatTime }}</p>
                                     </div>
                                 </div>
@@ -545,6 +546,10 @@ export default {
         }
     }
     .details-two {
+        &:nth-child(3){
+            border-top:1px solid  #000;
+            border-bottom:1px solid  #000;
+        }
         &:nth-child(3) {
             width: 440px;
         }
