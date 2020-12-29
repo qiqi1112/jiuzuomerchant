@@ -555,12 +555,14 @@ export default {
         .left {
             p {
                 margin-bottom: 10px;
+                white-space: nowrap;
             }
         }
         .right {
             margin-left: 70px;
             p {
                 margin-bottom: 10px;
+                white-space: nowrap;
             }
         }
     }
@@ -625,7 +627,7 @@ export default {
     }
 
     .right-box {
-        width: 440px;
+        width: 455px;
         // border: 1px solid #000;
         .title {
             border-left: 3px solid #409eff;
@@ -657,7 +659,7 @@ export default {
             margin-top: 20px;
         }
         .smallInps {
-            width: 90px;
+            width: 100px;
             margin-right: 20px;
         }
         .small_span {

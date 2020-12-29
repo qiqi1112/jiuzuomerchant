@@ -510,7 +510,7 @@
                                 ></el-input-number>
                             </div>
                             <!-- 最晚保留时间 -->
-                            <div class="lon-retain">
+                            <!-- <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
                                     @change="checkNull(presentSeatInfo.seatLatestReservationTime, '保留最晚时间')"
@@ -532,7 +532,7 @@
                                               }
                                     "
                                 ></el-time-select>
-                            </div>
+                            </div> -->
                             <!-- 最低消费 -->
                             <div class="min-charge">
                                 <span class="min-con">最低消费：</span>
