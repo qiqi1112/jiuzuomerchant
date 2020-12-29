@@ -292,7 +292,7 @@ export default {
                     this.readOnly = false;
                     this.editRead = true;
                 }
-                this.form.region = row.category;
+                this.form.region = row.category.toString();
                 this.dynamicValidateForm = {
                     domains: [
                         {
@@ -402,7 +402,7 @@ export default {
                     category: this.form.region,
                     contentMoney: Number(i.full),
                     details: str,
-                    discountMoney: Number(i.minus),
+                    discountMoney: Number(i.minus) || 0,
                     id: id,
                     overTime: this.$regular.timeData(i.start_end[1], 1),
                     remainder: Number(i.give),
@@ -431,9 +431,9 @@ export default {
                     this.editVisible = false;
                 } else {
                        if (id) {
-                        this.$message({ message: '修改失败', type: 'error' });
+                        this.$message({ message: res.msg, type: 'error' });
                     } else {
-                        this.$message({ message: '新增失败', type: 'error' });
+                        this.$message({ message: res.msg, type: 'error' });
                     }
                 }
             });
@@ -449,29 +449,31 @@ export default {
             let addModificationFlag = true
             for (let i in arr) {
                 if (this.form.region == 1) {
-                    if (!arr[i].minus) {
-                        this.$message({ message: '请输入抵扣金额', type: 'warning' });
+                    if (!arr[i].minus || !(/(^[1-9]\d*$)/.test(arr[i].minus))) {
+                        this.$message({ message: '抵扣金额必须为正整数', type: 'warning' });
                         addModificationFlag = false
                         break;
                     }
-                    if (!arr[i].give) {
-                        this.$message({ message: '请输入优惠券张数', type: 'warning' });
+                    if (!arr[i].give || !(/(^[1-9]\d*$)/.test(arr[i].give))) {
+                        this.$message({ message: '优惠券张数必须为正整数', type: 'warning' });
                         addModificationFlag = false
                         break;
                     }
                 } else {
-                    if (!arr[i].full) {
-                        this.$message({ message: '请输入满减金额', type: 'warning' });
+                    if (!arr[i].full || !(/(^[1-9]\d*$)/.test(arr[i].full))) {
+                        this.$message({ message: '满减金额必须为正整数', type: 'warning' });
                         addModificationFlag = false
                         break;
                     }
-                    if (!arr[i].minus) {
-                        this.$message({ message: '请输入抵扣金额', type: 'warning' });
-                        addModificationFlag = false
-                        break;
+                    if(this.form.region == 2){
+                        if (!arr[i].minus || !(/(^[1-9]\d*$)/.test(arr[i].minus))) {
+                            this.$message({ message: '抵扣金额必须为正整数', type: 'warning' });
+                            addModificationFlag = false
+                            break;
+                        }
                     }
-                    if (!arr[i].give) {
-                        this.$message({ message: '请输入优惠券张数', type: 'warning' });
+                    if (!arr[i].give || !(/(^[1-9]\d*$)/.test(arr[i].give))) {
+                        this.$message({ message: '优惠券张数必须为正整数', type: 'warning' });
                         addModificationFlag = false
                         break;
                     }

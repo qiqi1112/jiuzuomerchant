@@ -248,7 +248,7 @@
 
             <!-- 到店输入验证码 -->
             <el-dialog title="验证码" :visible.sync="reachStoreDialog" class="seat-dialog" @close="handleCancelCode">
-                <el-input v-model="reachStoreCode" placeholder="请输入验证码"></el-input>
+                <el-input v-model="reachStoreCode" placeholder="请输入验证码" autofocus></el-input>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleCancelCode">取 消</el-button>
                     <el-button type="primary" @click="reachStore">确 定</el-button>
@@ -331,7 +331,7 @@
                             </div>
                             <div class="right-list">
                                 <div>
-                                    <p class="title">座位信息</p>
+                                    <p class="title">{{ storeLocation == 3 ? '包间信息' : '座位信息' }}</p>
                                     <div class="list-box">
                                         <p>
                                             <span>{{ storeLocation == 3 ? '包间类型' : '座位号' }}</span>
@@ -367,7 +367,7 @@
                                                 <span class="unline">￥{{ item.originalPrice }}</span>
                                             </div>
                                         </div>
-                                        <div class="drink-list" v-for="(item, index) in form.snacksList" :key="index">
+                                        <div class="drink-list" v-for="(item, index) in form.snacksList" :key="item.name + index">
                                             <div class="good-box">
                                                 <div class="good-name">
                                                     <span>{{ item.name }}</span>
@@ -387,45 +387,35 @@
                                                 <span>{{ item.createTime }}</span>
                                             </div>
 
-                                            <div class="drink-list" v-for="(item, index) in item.goodsList" :key="index">
+                                            <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
                                                 <div class="good-box">
                                                     <div class="good-name">
-                                                        <span>{{ item.goodsName }}</span>
-                                                        <span class="num">x{{ item.quantity }}</span>
+                                                        <span>{{ item2.goodsName }}</span>
+                                                        <span class="num">x{{ item2.quantity }}</span>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <span>￥{{ item.activityPrice }}</span>
-                                                    <span class="unline">￥{{ item.originalPrice }}</span>
+                                                    <span>￥{{ item2.activityPrice }}</span>
+                                                    <span class="unline">￥{{ item2.originalPrice }}</span>
                                                 </div>
                                             </div>
 
                                             <div>
                                                 <el-button
-                                                    @click="getTable(item.id, form.orderNo, 1)"
-                                                    v-if="item.servedStatus == 0"
+                                                    @click="getTable(item.servedStatus, item.id, form.orderNo, 1)"
+                                                    v-if="item.servedStatus == 0 || item.servedStatus == 1"
+                                                    :disabled="item.servedStatus != 0"
                                                     type="primary"
-                                                    >上桌</el-button
+                                                    >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
                                                 >
                                                 <el-button
-                                                    @click="getTable(item.id, form.orderNo, 2)"
-                                                    v-if="item.servedStatus == 0"
+                                                    @click="getTable(item.servedStatus, item.id, form.orderNo, 2)"
+                                                    v-if="item.servedStatus == 0 || item.servedStatus == 2"
+                                                    :disabled="item.servedStatus != 0"
                                                     type="primary"
-                                                    >售罄</el-button
+                                                    >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
                                                 >
                                             </div>
-
-                                            <!-- <div class="good-box">
-                                                <div class="good-name">{{ item.groupName }}</div>
-
-                                                <div class="good-name">{{ item.goodsName }}</div>
-                                                <span>x{{ item.quantity }}</span>
-                                            </div>
-                                            <div>
-                                                <span>{{ item.createTime }}</span>
-                                                <span>￥{{ item.activityPrice }}</span>
-                                                <span class="unline">￥{{ item.originalPrice }}</span>
-                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -1151,48 +1141,34 @@ export default {
         },
 
         //追加订单上桌/售罄操作
-        getTable(id, orderNo, index) {
-            let txt = '';
-            if (index === 1) {
-                txt = '是否确认上桌?';
-            }
+        getTable(status, id, orderNo, index) {
+            if (status === 0) {
+                let txt = '';
+                if (index === 1) {
+                    txt = '是否确认上桌?';
+                }
 
-            if (index === 2) {
-                txt = '是否确认售罄?';
-            }
+                if (index === 2) {
+                    txt = '是否确认售罄?';
+                }
 
-            this.$confirm(txt, '提示', {
-                distinguishCancelAndClose: true,
-                type: 'warning'
-            })
-                .then(() => {
-                    this.$put(`/merchant/store/order/updateServedStatus/${id}/${index}`).then((res) => {
-                        if (res.code === 0) {
-                            this.$message.success('操作成功');
-                            this.handleLookInfo(orderNo);
-                        } else {
-                            this.$message.error(res.msg);
-                        }
-                    });
+                this.$confirm(txt, '提示', {
+                    distinguishCancelAndClose: true,
+                    type: 'warning'
                 })
-                .catch((action) => {});
+                    .then(() => {
+                        this.$put(`/merchant/store/order/updateServedStatus/${id}/${index}`).then((res) => {
+                            if (res.code === 0) {
+                                this.$message.success('操作成功');
+                                this.handleLookInfo(orderNo);
+                            } else {
+                                this.$message.error(res.msg);
+                            }
+                        });
+                    })
+                    .catch((action) => {});
+            }
         }
-
-        //是否到店确认
-        // isReachStore(row) {
-        //     this.$confirm('是否确认到店?', '提示', {
-        //         distinguishCancelAndClose: true,
-        //         confirmButtonText: '已到店',
-        //         cancelButtonText: '未到店',
-        //         type: 'warning'
-        //     })
-        //         .then(() => {
-        //             this.isHandleRequest(row.id, 4); //已到店
-        //         })
-        //         .catch((action) => {
-        //             action === 'cancel' && this.isHandleRequest(row.id, 3); //未到店
-        //         });
-        // },
     },
 
     mounted() {
