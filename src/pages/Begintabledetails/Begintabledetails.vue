@@ -561,9 +561,11 @@ export default {
             color: #e6a23c;
         }
         .left {
+            width: 48%;
+            overflow: hidden;
             p {
                 margin-bottom: 10px;
-                white-space: nowrap;
+                // white-space: nowrap;
             }
         }
         .right {
