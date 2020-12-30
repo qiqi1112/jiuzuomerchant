@@ -342,7 +342,7 @@
                                             <span>{{ form.seatCapacity }}人</span>
                                         </p>
                                         <p>
-                                            <span>保留时间</span>
+                                            <span>占座时间</span>
                                             <span>{{ form.retentionTime }}</span>
                                         </p>
                                         <p>
@@ -422,7 +422,8 @@
                                 <div>
                                     <p class="title">优惠券</p>
                                     <div class="list-box">
-                                        <p>{{ form.details }}</p>
+                                        <p>商家优惠券：{{ form.storeDetails == '' ? '无' : form.storeDetails }}</p>
+                                        <p>平台优惠券：{{ form.appDetails == '' ? '无' : form.appDetails }}</p>
                                     </div>
                                 </div>
                                 <div class="change-seat" v-if="form.changeSeat && form.changeSeatTime">
