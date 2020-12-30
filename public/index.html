@@ -11,13 +11,107 @@
   <!--引入Javascript API GL，参数说明参见下文-->
   <script src="https://map.qq.com/api/gljs?v=1.exp&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ"></script>
   <script src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
+  <style>
+    #caseVerteClaire {
+    background-color : #30bf82;
+    height : 140px;
+    width : 150px;
+    padding-top : 10px;
+    float : left;
+    position : relative;
+    top: calc(46vh - 140px/2);
+    left: calc(50% - 150px/2);
+  }
+  #caseVerteClaire #load {
+    color : #444444;
+    font-family : calibri;
+    text-align : center;
+    position : absolute;
+    top : 42px;
+    left :42px;
+  }
+  #tranform {
+    position : absolute;
+    top : 85px;
+    left : 30px;
+  }
 
+  #transform1 {
+    height : 30px;
+    width : 30px;
+    border-radius : 50%; 
+    background-color : #444444;
+    position : absolute;
+    top : 85px;
+    left : 15px;
+    opacity : 0;
+    animation : transform 4s infinite;
+    -webkit-animation : transform 4s infinite;
+  }
+
+  #transform2 {
+    height : 30px;
+    width : 30px;
+    border-radius : 50%; 
+    background-color : #444444;
+    position : absolute;
+    top : 85px;
+    left : 54px;
+    opacity : 0;
+    animation : transform 4s infinite;
+    -webkit-animation : transform 4s infinite;
+    animation-delay : 0.5s;
+    -webkit-animation-delay : 0.5s;
+  }
+
+  #transform3 {
+    height : 30px;
+    width : 30px;
+    border-radius : 50%; 
+    background-color : #444444;
+    position : absolute;
+    top : 85px;
+    left : 94px;
+    opacity : 0;
+    animation : transform 4s infinite;
+    -webkit-animation : transform 4s infinite;
+    animation-delay : 1s;
+    -webkit-animation-delay : 1s;
+  }
+
+  @-webkit-keyframes transform {
+    0% {opacity : 0;}
+    25% {opacity : 1;}
+    50% {opacity : 0;}
+    75% {opacity : 1;}
+    100% {opacity : 0;}
+  }
+
+  @keyframes transform {
+    0% {border-radius : 0px; opacity : 0;}
+    20% {border-radius : 0px; opacity : 1;}
+    40% {border-radius : 0px; opacity : 0;}
+    60% {border-radius : 50%; opacity : 0;}
+    80% {border-radius : 50%; opacity : 1;}
+    100% {border-radius : 50%; opacity : 0;}
+  }
+  </style>
 </head>
 
 <body>
   
   <div id="app">
-    <div>加载中...</div>
+    <!-- <div>加载中...</div> -->
+    <div id="caseVerteClaire">
+      <div id="transform">
+        <div id="transform1"></div>
+        <div id="transform2"></div>
+        <div id="transform3"></div>
+      </div>
+       <div id="load">
+        <p>loading</p>
+      </div>
+    </div>
   </div>
   <!-- built files will be auto injected -->
 
