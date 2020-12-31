@@ -257,8 +257,8 @@ export default {
             bus.$emit('collapse-content', msg);
         });
         // 获取店铺类型
-        this.$get('/merchant/store/getStoreInfo').then((res) => {
-            if (res.data) {
+        this.$get('/merchant/store/getStoreBasic').then((res) => {
+            if (res.code === 0) {
                 if (res.data.storeLocation == 3) {
                     this.items[5].index = 'ktv';
                 }

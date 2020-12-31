@@ -24,7 +24,7 @@
                 <!-- 店铺基本信息 -->
                 <div class="shop-info clearfix">
                     <div class="left-info" v-loading="imgLoading.loading2">
-                        <p>店铺招牌logo</p>
+                        <p>店铺logo</p>
                         <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + logoImageUrl" class="avatar" />
                         <el-upload
                             v-else
@@ -220,7 +220,7 @@
                 <div class="shop-desc">
                     <!-- 商品店面简介 -->
                     <div>
-                        <span>商品店面简介：</span>
+                        <span>商城简介：</span>
                         <el-input
                             type="textarea"
                             :rows="3"
@@ -303,7 +303,7 @@
                         </div>
                         <!-- 店铺长图 -->
                         <div class="botm" v-loading="imgLoading.loading4">
-                            <p>店铺长图</p>
+                            <p>店铺logo-列表大图</p>
                             <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + appShopImageUrl" class="avatar" />
                             <el-upload
                                 v-else
@@ -359,7 +359,7 @@
                                 ></el-input>
                                 <el-button type="danger" @click="deleteFloorList(item)">删除</el-button>
                             </div>
-                            <div>
+                            <div v-if="list.length < 5">
                                 <span>楼层名称：</span>
                                 <el-input
                                     v-model="floorName"

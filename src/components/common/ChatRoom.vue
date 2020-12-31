@@ -534,8 +534,10 @@ export default {
         },
         lookOrder(){
             if(this.$route.path != '/ordermanage'){
+                this.$store.commit('onloadOrderFun', this.$store.state.onloadOrder+=1);
                 this.$router.push('/ordermanage')
             }else{
+                this.$store.commit('onloadOrderFun', this.$store.state.onloadOrder+=1);
                 this.$store.commit('onloadOrderFun', true);
             }
             this.showRoom = false
