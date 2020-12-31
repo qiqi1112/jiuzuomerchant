@@ -359,7 +359,7 @@
                                 ></el-input>
                                 <el-button type="danger" @click="deleteFloorList(item)">删除</el-button>
                             </div>
-                            <div>
+                            <div v-if="list.length < 5">
                                 <span>楼层名称：</span>
                                 <el-input
                                     v-model="floorName"

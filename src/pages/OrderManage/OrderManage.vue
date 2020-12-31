@@ -342,7 +342,7 @@
                                             <span>{{ form.seatCapacity }}人</span>
                                         </p>
                                         <p>
-                                            <span>占座时间</span>
+                                            <span>保留时间</span>
                                             <span>{{ form.retentionTime }}</span>
                                         </p>
                                         <p>
@@ -412,7 +412,7 @@
                                                     @click="getTable(item.servedStatus, item.id, form.orderNo, 2)"
                                                     v-if="item.servedStatus == 0 || item.servedStatus == 2"
                                                     :disabled="item.servedStatus != 0"
-                                                    type="primary"
+                                                    type="danger"
                                                     >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
                                                 >
                                             </div>
@@ -426,14 +426,18 @@
                                         <p>平台优惠券：{{ form.appDetails == '' ? '无' : form.appDetails }}</p>
                                     </div>
                                 </div>
-                                <div class="change-seat" v-if="form.changeSeat && form.changeSeatTime">
-                                    <p>
+                                <div class="change-seat">
+                                    <p v-if="form.changeSeat">
                                         <span>经商家换座：</span>
                                         <span>{{ form.changeSeat }}</span>
                                     </p>
-                                    <p>
+                                    <p v-if="form.changeSeatTime">
                                         <span>换座时间：</span>
                                         <span>{{ form.changeSeatTime }}</span>
+                                    </p>
+                                    <p v-if="form.occupySeatTime">
+                                        <span>占座时间：</span>
+                                        <span>{{ form.occupySeatTime }}分钟</span>
                                     </p>
                                 </div>
                             </div>
