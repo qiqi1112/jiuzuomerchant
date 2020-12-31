@@ -179,7 +179,7 @@
                             <div class="details-two">
                                 <div style="display: flex; margin-top: 30px">
                                     <div class="left">
-                                        <p>经商家换座：</p>
+                                        <p style="white-space:nowrap">经商家换座：</p>
                                         <p>换座时间：</p>
                                     </div>
                                     <div class="right">

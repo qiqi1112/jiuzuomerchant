@@ -595,17 +595,43 @@
                                     <div class="min-charge">
                                         <span class="min-con">最低消费：</span>
                                         <div class="day-mincom">
-                                            <p v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
-                                                <span>{{ item.weekIndex | dayOfWeek }}</span>
-                                                <el-input
-                                                    @blur="checkPrice(item.price)"
-                                                    v-model="item.price"
-                                                    style="width: 47%; margin-right: 6px"
-                                                    :readonly="isReadonly"
-                                                >
-                                                    <template slot="append">￥</template>
-                                                </el-input>
-                                            </p>
+                                            <div v-for="(item, index) in presentSeatInfo.weekPriceList" :key="index">
+                                                <div style="width: 40%">
+                                                    <span>{{ item.weekIndex | dayOfWeek }}</span
+                                                    ><br />
+                                                    <el-input
+                                                        @blur="checkPrice(item.price, 2, index)"
+                                                        v-model="item.price"
+                                                        style="width: 100%; margin-right: 6px"
+                                                        :readonly="isReadonly"
+                                                    >
+                                                        <template slot="append">￥</template>
+                                                    </el-input>
+                                                </div>
+                                                <div style="width: 50%">
+                                                    <span>最晚保留时间</span><br />
+                                                    <el-time-select
+                                                        @change="checkLateTime(item.seatLatestReservationTime, index)"
+                                                        style="width: 80%"
+                                                        placeholder="最晚保留时间"
+                                                        v-model="item.seatLatestReservationTime"
+                                                        :readonly="isReadonly"
+                                                        :picker-options="
+                                                            startBussTime.slice(0, 2) > endBussTime.slice(0, 2)
+                                                                ? {
+                                                                      start: startBussTime,
+                                                                      step: '00:10',
+                                                                      end: '23:50'
+                                                                  }
+                                                                : {
+                                                                      start: startBussTime,
+                                                                      step: '00:10',
+                                                                      end: endBussTime
+                                                                  }
+                                                        "
+                                                    ></el-time-select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -614,8 +640,8 @@
                     </div>
                 </div>
 
-                <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="dialog = false">确 定</el-button>
+                <div slot="footer" class="dialog-footer" @click="dialog= false">
+                    <el-button type="primary">确 定</el-button>
                 </div>
             </el-dialog>
 
@@ -836,6 +862,7 @@ export default {
         //查看座位信息
         seeSeatInfo() {
             this.dialogStatus = 2;
+            this.isClickSeat = false
             this.$get('/merchant/store/getStoreInfo').then((result) => {
                 console.log(result);
                 if (result.code == 0) {
@@ -1328,15 +1355,15 @@ export default {
 
             .day-mincom {
                 border: 1px solid #dcdfe6;
-                border-radius: 4px;
-                padding: 16px 20px;
-                width: 80%;
-
-                > p {
+                    border-radius: 4px;
+                    padding: 16px 0;
+                    width: 80%;
+                    white-space: nowrap;
+                > div {
                     margin-bottom: 16px;
                     font-size: 14px;
                     display: flex;
-                    justify-content: center;
+                    justify-content: space-around;
                     align-items: center;
 
                     > span {
@@ -1344,7 +1371,7 @@ export default {
                     }
                 }
 
-                > p:last-child {
+                > div:last-child {
                     margin-bottom: 0;
                 }
             }
