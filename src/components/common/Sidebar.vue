@@ -256,14 +256,15 @@ export default {
             this.collapse = msg;
             bus.$emit('collapse-content', msg);
         });
+
         // 获取店铺类型
-        this.$get('/merchant/store/getStoreBasic').then((res) => {
-            if (res.code === 0) {
-                if (res.data.storeLocation == 3) {
-                    this.items[5].index = 'ktv';
-                }
+        const userInfo = localStorage.getItem('userInfo');
+        if (userInfo) {
+            const storeLocation = JSON.parse(userInfo).storeLocation;
+            if (storeLocation === 3) {
+                this.items[5].index = 'ktv';
             }
-        });
+        }
     },
     methods: {
         gowhere(e) {

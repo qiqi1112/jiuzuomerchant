@@ -1,17 +1,11 @@
 <template>
-    <div class="error-page">
-    </div>
-</template>
-
-  </div>
+    <div class="error-page"></div>
 </template>
 
 <script>
 export default {
     data() {
-        return {
-           
-        };
+        return {};
     },
     methods: {
         open() {

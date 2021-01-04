@@ -456,7 +456,7 @@ export default {
                             this.wrapLoading = false;
                         })
                         .catch(() => {
-                            this.$router.push('/index');
+                            this.$router.push('/myshop');
                         });
                 } else if (res.code === 660 || res.code === 700) {
                     this.wrapLoading = false;
