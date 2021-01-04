@@ -145,13 +145,14 @@
                             <div class="details-two">
                                 <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
                                 <div
-                                    style="display: flex; justify-content: space-between;flex-wrap: nowrap;"
+                                    style="display: flex; justify-content: space-between; flex-wrap: nowrap"
                                     v-for="(item, index) in presentSeatInfos.goodsList"
                                     :key="index"
                                 >
                                     <div class="left">
                                         <p>
-                                            <span>{{ item.goodsName }}</span><br/>
+                                            <span>{{ item.goodsName }}</span
+                                            ><br />
 
                                             <span>× {{ item.quantity }}</span>
                                         </p>
@@ -163,6 +164,44 @@
                                                 item.originalPrice | returnFloat
                                             }}</span>
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="details-two">
+                                <span class="headers" style="display: inline-block; margin-bottom: 15px"> 追加酒水清单 </span>
+                                <div class="list-box add-drinks">
+                                    <div class="add-drink-list" v-for="(item, index) in presentSeatInfos.groupGoods" :key="index">
+                                        <div class="order-title">
+                                            <span>{{ item.groupName }}</span>
+                                            <span>{{ item.createTime }}</span>
+                                        </div>
+
+                                        <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
+                                            <div class="good-box">
+                                                <div class="good-name">
+                                                    <span>{{ item2.goodsName }}</span>
+                                                    <span class="num">x{{ item2.quantity }}</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span>￥{{ item2.activityPrice }}</span>
+                                                <span class="unline">￥{{ item2.originalPrice }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <el-button
+                                                :disabled="true"
+                                                v-if="item.servedStatus == 0 || item.servedStatus == 1"
+                                                type="primary"
+                                                >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
+                                            >
+                                            <el-button
+                                                :disabled="true"
+                                                v-if="item.servedStatus == 0 || item.servedStatus == 2"
+                                                type="danger"
+                                                >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -179,7 +218,7 @@
                             <div class="details-two">
                                 <div style="display: flex; margin-top: 30px">
                                     <div class="left">
-                                        <p style="white-space:nowrap">经商家换座：</p>
+                                        <p style="white-space: nowrap">经商家换座：</p>
                                         <p>换座时间：</p>
                                     </div>
                                     <div class="right">
@@ -313,12 +352,16 @@ export default {
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
                         this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
                             if (res.code == 0) {
-                                res.data.orderAmount = this.price(res.data.orderAmount);
-                                res.data.payableAmount = this.price(res.data.payableAmount);
-                                res.data.couponAmount = this.price(res.data.couponAmount);
-                                (this.presentSeatInfos = res.data), newObj;
-                                this.clickFlag = true;
-                                // console.log(this.presentSeatInfos)
+                                if (res.data) {
+                                    res.data.orderAmount = this.price(res.data.orderAmount);
+                                    res.data.payableAmount = this.price(res.data.payableAmount);
+                                    res.data.couponAmount = this.price(res.data.couponAmount);
+                                    (this.presentSeatInfos = res.data), newObj;
+                                    this.clickFlag = true;
+                                    console.log(this.presentSeatInfos.servedStatus);
+                                } else {
+                                    this.presentSeatInfos = [];
+                                }
                             } else {
                                 this.$message.error(res.msg);
                             }
@@ -546,9 +589,10 @@ export default {
         }
     }
     .details-two {
-        &:nth-child(3){
-            border-top:1px solid  #000;
-            border-bottom:1px solid  #000;
+        width: 450px;
+        &:nth-child(3) {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
         }
         &:nth-child(3) {
             width: 440px;
@@ -575,11 +619,64 @@ export default {
                 white-space: nowrap;
             }
         }
+        .list-box {
+            margin-bottom: 18px;
+
+            p {
+                display: flex;
+                margin-bottom: 18px;
+
+                :first-child {
+                    width: 160px;
+                }
+            }
+        }
+        .drink-list {
+            display: flex;
+            margin-bottom: 18px;
+
+            .good-box {
+                width: 160px;
+
+                .good-name {
+                    margin-bottom: 6px;
+                    display: flex;
+                    justify-content: space-between;
+                    padding-right: 20px;
+
+                    .num {
+                        min-width: 20px;
+                    }
+                }
+            }
+
+            .unline {
+                text-decoration: line-through;
+                color: #bcbcbc;
+                margin-left: 10px;
+            }
+        }
+        .add-drink-list {
+            margin-bottom: 20px;
+            border: 1px solid #c0c4cc;
+            border-radius: 6px;
+            padding: 20px;
+
+            .order-title {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                color: #409eff;
+            }
+        }
     }
 }
 .container {
     // width: 100%;
     height: auto;
+}
+::-webkit-scrollbar {
+    width: 1px; /*对垂直流动条有效*/
 }
 .shop-seat {
     width: 100%;
@@ -638,6 +735,8 @@ export default {
 
     .right-box {
         width: 455px;
+        height: 70vh;
+        overflow: auto;
         // border: 1px solid #000;
         .title {
             border-left: 3px solid #409eff;
