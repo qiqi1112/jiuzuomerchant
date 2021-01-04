@@ -510,7 +510,7 @@
                                 ></el-input-number>
                             </div>
                             <!-- 最晚保留时间 -->
-                            <!-- <div class="lon-retain">
+                            <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
                                     @change="checkLateTime(presentSeatInfo.seatLatestReservationTime)"
@@ -532,7 +532,7 @@
                                               }
                                     "
                                 ></el-time-select>
-                            </div> -->
+                            </div>
                             <!-- 最低消费 -->
                             <div class="min-charge">
                                 <span class="min-con" style="margin-bottom: 10px">最低消费：</span>
@@ -550,7 +550,7 @@
                                                 <template slot="append">￥</template>
                                             </el-input>
                                         </div>
-                                        <div style="width: 50%">
+                                        <!-- <div style="width: 50%">
                                             <span>最晚保留时间</span><br />
                                             <el-time-select
                                                 @change="checkLateTime(item.seatLatestReservationTime, index)"
@@ -572,7 +572,7 @@
                                                           }
                                                 "
                                             ></el-time-select>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
