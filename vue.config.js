@@ -8,9 +8,9 @@ module.exports = {
         open: true,
         proxy: {
             '/api': {
-                // target: "http://192.168.31.100:8077",
-                // target: "http://192.168.31.195:8077",
-                target: 'https://storetest.cdhqht.com',
+                target: "http://192.168.31.100:8077",
+                // target: "http://192.168.31.194:8077",
+                // target: 'https://storetest.cdhqht.com',
                 // target: 'https://store.cdhqht.com',
                 changeOrigin: true,
                 pathRewrite: {
