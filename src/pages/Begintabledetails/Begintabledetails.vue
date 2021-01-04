@@ -621,7 +621,7 @@ export default {
         }
         .list-box {
             margin-bottom: 18px;
-
+            border-bottom: 1px solid #000;
             p {
                 display: flex;
                 margin-bottom: 18px;
@@ -676,7 +676,16 @@ export default {
     height: auto;
 }
 ::-webkit-scrollbar {
-    width: 1px; /*对垂直流动条有效*/
+    width: 5px; /*对垂直流动条有效*/
+}
+::-webkit-scrollbar-track{
+-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+background-color: #fff;
+}
+::-webkit-scrollbar-thumb{
+border-radius: 3px;
+-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+background-color: rgb(109, 63, 63);
 }
 .shop-seat {
     width: 100%;
@@ -737,6 +746,7 @@ export default {
         width: 455px;
         height: 70vh;
         overflow: auto;
+        padding-right: 5px;
         // border: 1px solid #000;
         .title {
             border-left: 3px solid #409eff;
