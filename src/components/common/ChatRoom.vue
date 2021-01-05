@@ -323,7 +323,7 @@ export default {
                         this.audioUrl = 'default/system/order.mp3'
                         this.$notify.info({
                             title: '提示',
-                            message: '您有一条新的订单',
+                            message: '您有一条新的订单消息',
                             duration: 0,
                             customClass:'notify',
                             onClick(){
