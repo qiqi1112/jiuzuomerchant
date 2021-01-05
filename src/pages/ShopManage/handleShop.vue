@@ -212,7 +212,7 @@
                     <el-checkbox
                         @change="removeBanner"
                         v-model="goodsForm.checkedBanner"
-                        label="放至商店广告位"
+                        label="放至店铺宣传图"
                         border
                         style="margin-right: 20px"
                     ></el-checkbox>
@@ -240,7 +240,7 @@
                         <el-checkbox
                             @change="removeBanner"
                             v-model="goodsForm.checkedBanner"
-                            label="放至商店广告位"
+                            label="放至店铺宣传图"
                             border
                             style="margin-right: 20px"
                         ></el-checkbox>
@@ -268,7 +268,7 @@
                             <el-checkbox
                                 @change="removeReco"
                                 v-model="goodsForm.checkedReco"
-                                label="放至商家推荐位"
+                                label="放至商品推荐位"
                                 border
                                 style="margin-right: 20px"
                             ></el-checkbox>
@@ -299,10 +299,10 @@
         </div>
         <div class="right-box">
             <template v-if="activeNum != 11">
-                <!-- 缩略图 -->
+                <!-- 商品图 -->
                 <div class="thum-img-box">
                     <p>
-                        <span>*商品缩略图：</span>
+                        <span>*商品图：</span>
                         <el-upload
                             class="avatar-uploader"
                             action="1"
@@ -341,7 +341,7 @@
             <!-- 会员卡卡片列表 -->
             <template>
                 <div class="vip-card-wrap" v-if="activeNum == 11">
-                    <span>*会员卡缩略图：</span>
+                    <span>*会员卡商品图：</span>
                     <div class="image-box" v-if="thumImageBox">
                         <img
                             ref="thumImg"
@@ -608,7 +608,7 @@ export default {
             });
         },
 
-        //上传缩略图
+        //上传商品图
         uploadThumFiles(file) {
             let formData = new FormData();
             formData.append('file', file.file);

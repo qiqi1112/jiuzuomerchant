@@ -51,7 +51,8 @@ export default {
                             logo: res.data.logo,
                             rToken: res.data.rongToken,
                             storeName: res.data.storeName,
-                            storeId: res.data.storeId
+                            storeId: res.data.storeId,
+                            storeLocation: res.data.storeLocation
                         };
 
                         localStorage.setItem('userInfo', JSON.stringify(obj));

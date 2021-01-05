@@ -8,90 +8,109 @@
            您的浏览器不支持播放音频，请使用google或其它浏览器 
         </audio> -->
         <div v-drag class="floating" v-if="$store.state.showChatRoom" @click="showChat">
-            <span class="all_unread" v-show="$store.state.headerUnread>0">{{$store.state.headerUnread}}</span>
+            <span class="all_unread" v-show="$store.state.headerUnread > 0">{{ $store.state.headerUnread }}</span>
         </div>
 
-        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close='closeDialog'>
+        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close="closeDialog">
             <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg">
                 <div class="box">
                     <div class="people_list">
                         <ul>
-                            <li class="userList" :class="active==i?'active':''" @click="getChat(item,i)" v-for="(item,i) in userList" :key="i" @mouseenter="mouseover(item,i)" @mouseleave="mouseLeave(item,i)">
-                                <img class="head_portrait"  :src="item.portrait" alt="">
-                                <span>{{item.name}}</span>
-                                <span class="not_read" v-show="item.unreadMessageCount>0 && active != i">{{item.unreadMessageCount}}</span>
-                                <span v-show="item.showClear" class="close_x"><i @click.stop="closeX(item,i)" class="el-icon-error"></i></span>
+                            <li
+                                class="userList"
+                                :class="active == i ? 'active' : ''"
+                                @click="getChat(item, i)"
+                                v-for="(item, i) in userList"
+                                :key="i"
+                                @mouseenter="mouseover(item, i)"
+                                @mouseleave="mouseLeave(item, i)"
+                            >
+                                <img class="head_portrait" :src="item.portrait" alt="" />
+                                <span>{{ item.name }}</span>
+                                <span class="not_read" v-show="item.unreadMessageCount > 0 && active != i">{{
+                                    item.unreadMessageCount
+                                }}</span>
+                                <span v-show="item.showClear" class="close_x"
+                                    ><i @click.stop="closeX(item, i)" class="el-icon-error"></i
+                                ></span>
                             </li>
                         </ul>
                     </div>
                     <div class="chat" v-show="now_user">
                         <div class="record">
-                            <div class="username">{{now_user.name}}</div>
-                            <div class="chat_list"  ref='parTopDistance' @scroll="scrollEvent">
+                            <div class="username">{{ now_user.name }}</div>
+                            <div class="chat_list" ref="parTopDistance" @scroll="scrollEvent">
                                 <div class="getMore" v-show="getMore">加载中...</div>
                                 <div class="getMore" v-show="!hasHistoryMsg">没有更多了</div>
-                                <div class="cli" ref='topDistance' >
-                                    <div class="cmsg" v-for="(item,i) in msgArr" :key="i" ref="cmsg">
-                                        <div class="send_or_rece">{{item.sentTime | formatTime(that)}}</div>
-                                        <div class="msg_list" v-if="item.messageDirection==2">
-                                            
+                                <div class="cli" ref="topDistance">
+                                    <div class="cmsg" v-for="(item, i) in msgArr" :key="i" ref="cmsg">
+                                        <div class="send_or_rece">{{ item.sentTime | formatTime(that) }}</div>
+                                        <div class="msg_list" v-if="item.messageDirection == 2">
                                             <div class="headImg">
-                                                <img v-if="item.content" :src="imgHead+item.content.portrait" alt="">
+                                                <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
                                             </div>
                                             <!-- 文本消息 -->
-                                            <div class="withdraw"  v-if="item.messageType == 'RecallCommandMessage'">
+                                            <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">
                                                 <div>对方撤回了一条消息</div>
                                             </div>
-                                            <div class="msg" v-if="item.messageType == 'TextMessage'" >
+                                            <div class="msg" v-if="item.messageType == 'TextMessage'">
                                                 <div v-html="item.content.content"></div>
                                                 <!-- {{item.content.content}} -->
                                             </div>
                                             <!-- 图片 -->
                                             <div class="msg" v-if="item.messageType == 'ImageMessage'">
-                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
+                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="" />
                                             </div>
                                             <!-- 订单消息 -->
                                             <div class="msg" v-if="item.targetId == '10001'">
                                                 <div class="orderinfo">
                                                     <!-- {{item.content.content}} -->
                                                     <div class="fx">
-                                                        <div style="flex:.3">内容:</div>
-                                                        <div style="flex:.7">{{item.content.content}}</div>
+                                                        <div style="flex: 0.3">内容:</div>
+                                                        <div style="flex: 0.7">{{ item.content.content }}</div>
                                                     </div>
                                                     <div class="fx">
-                                                        <div style="flex:.3">时间:</div>
-                                                        <div style="flex:.7">{{$regular.timeData(item.sentTime,3)}}</div>
+                                                        <div style="flex: 0.3">时间:</div>
+                                                        <div style="flex: 0.7">{{ $regular.timeData(item.sentTime, 3) }}</div>
                                                     </div>
                                                     <div class="fx">
-                                                        <div style="flex:.3">用户名:</div>
-                                                        <div style="flex:.7">{{item.content.title}}</div>
+                                                        <div style="flex: 0.3">用户名:</div>
+                                                        <div style="flex: 0.7">{{ item.content.title }}</div>
                                                     </div>
-                                                    <div @click="lookOrder" style="text-align:center;padding-top:10px;border-top:1px solid white;cursor: pointer;">查看详情</div>
+                                                    <div
+                                                        @click="lookOrder"
+                                                        style="
+                                                            text-align: center;
+                                                            padding-top: 10px;
+                                                            border-top: 1px solid white;
+                                                            cursor: pointer;
+                                                        "
+                                                    >
+                                                        查看详情
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!-- 官方消息 -->
                                             <div class="msg" v-if="item.targetId == '10000'">
                                                 <div class="official">
-                                                    <div>{{item.content.title}}</div>        
-                                                    <div>{{item.content.content}}</div>
+                                                    <div>{{ item.content.title }}</div>
+                                                    <div>{{ item.content.content }}</div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="msg_list self" v-else>
-                                            <div class="msg self_msg"  v-if="item.messageType == 'TextMessage'">
+                                            <div class="msg self_msg" v-if="item.messageType == 'TextMessage'">
                                                 <!-- <div >{{item.content.content}}</div> -->
                                                 <div v-html="item.content.content"></div>
                                             </div>
-                                            <div class="msg self_msg"  v-if="item.messageType == 'ImageMessage'">
-                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="">
+                                            <div class="msg self_msg" v-if="item.messageType == 'ImageMessage'">
+                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="" />
                                             </div>
                                             <div class="headImg self_img">
-                                                <img v-if="item.content" :src="imgHead + item.content.portrait" alt="">
+                                                <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
                                             </div>
-                                            <div class="withdraw "  v-if="item.messageType == 'RecallCommandMessage'">
-                                                你撤回了一条消息
-                                            </div>
+                                            <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">你撤回了一条消息</div>
                                         </div>
                                     </div>
                                 </div>
@@ -100,13 +119,25 @@
                         <div class="text_box" v-show="unInput">
                             <div class="icons">
                                 <div class="flexo">
-                                    <img class="send_icon" @click="showEmoji" style="height:20px" src="../../assets/img/emoji.png" alt="">
+                                    <img
+                                        class="send_icon"
+                                        @click="showEmoji"
+                                        style="height: 20px"
+                                        src="../../assets/img/emoji.png"
+                                        alt=""
+                                    />
                                     <div class="emoji_box" v-show="emojiShow">
-                                        <div class="emojiItem" v-for="emList in emoji" :key="emList.unicode" v-html="emList.node.outerHTML" @click="selectEmoji(emList)"></div>
+                                        <div
+                                            class="emojiItem"
+                                            v-for="emList in emoji"
+                                            :key="emList.unicode"
+                                            v-html="emList.node.outerHTML"
+                                            @click="selectEmoji(emList)"
+                                        ></div>
                                     </div>
                                 </div>
                                 <div class="flexo">
-                                    <img class="send_icon" style="height:20px" src="../../assets/img/tupian.png" alt="">
+                                    <img class="send_icon" style="height: 20px" src="../../assets/img/tupian.png" alt="" />
                                     <el-upload
                                         v-loading="loading"
                                         action="fakeaction"
@@ -122,17 +153,23 @@
                                     >
                                     </el-upload>
 
-                                    <ul v-if="form.list.length>0" class="imgs">
-                                        <li v-for="(item,i) in form.list" :key="i">
-                                            <img :src="item.url" alt="">
+                                    <ul v-if="form.list.length > 0" class="imgs">
+                                        <li v-for="(item, i) in form.list" :key="i">
+                                            <img :src="item.url" alt="" />
                                             <span class="del" @click="handleRemove(item)">x</span>
                                         </li>
                                         <li></li>
                                     </ul>
-
                                 </div>
                             </div>
-                            <textarea ref="focusTextarea" @keyup.ctrl.enter='send()'  class="textarea"  v-html="selectEmojiHtml" v-model="sendText" id=""></textarea>
+                            <textarea
+                                ref="focusTextarea"
+                                @keyup.ctrl.enter="send()"
+                                class="textarea"
+                                v-html="selectEmojiHtml"
+                                v-model="sendText"
+                                id=""
+                            ></textarea>
                             <div class="btn_oper">
                                 <el-button type="primary" @click="send()">发送</el-button>
                             </div>
@@ -140,19 +177,18 @@
                     </div>
                     <div class="chat" v-show="!now_user"></div>
                     <!--  -->
-                    <div class="quick" >
-
+                    <div class="quick">
                         <div class="goods_list">
                             <el-tabs v-model="activeName" @tab-click="handleClick" v-show="unInput">
                                 <el-tab-pane label="快捷回答" name="first">
                                     <ul class="one">
-                                        <li @click="quickRrep(item)" v-for="(item,i) in oneList" :key="i">{{item}}</li>
+                                        <li @click="quickRrep(item)" v-for="(item, i) in oneList" :key="i">{{ item }}</li>
                                     </ul>
                                 </el-tab-pane>
                                 <el-tab-pane label="联系官方" name="service">
-                                    <div class="sves" v-for="(item,i) in service" :key="i" @click="createService(item)">
-                                        <img :src="imgHead+item.headPortrait" alt="">
-                                        <span>{{item.nickname}}</span>
+                                    <div class="sves" v-for="(item, i) in service" :key="i" @click="createService(item)">
+                                        <img :src="imgHead + item.headPortrait" alt="" />
+                                        <span>{{ item.nickname }}</span>
                                     </div>
                                 </el-tab-pane>
                                 <!-- <el-tab-pane label="啤酒" name="third">KTV</el-tab-pane> -->
@@ -163,24 +199,24 @@
                                     <el-button type="primary" @click="clearConversation" class="btn">清空所有会话列表</el-button>
                                 </div>
                                 <div>
-                                    <el-button type="primary" v-show="now_user" @click="clearConverHisMsg" class="btn">清除当前会话历史记录</el-button>
+                                    <el-button type="primary" v-show="now_user" @click="clearConverHisMsg" class="btn"
+                                        >清除当前会话历史记录</el-button
+                                    >
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </el-dialog>
-
     </div>
 </template>
 <script>
-import init from "../../assets/js/init";
+import init from '../../assets/js/init';
 export default {
     data() {
         return {
-            loading:false,
+            loading: false,
             formData: [],
             dialogImageUrl: '',
             dialogVisible: false,
@@ -191,236 +227,232 @@ export default {
             joinUrl: this.$imgHead,
             uplodeImg: [],
             // 以上图片上传
-            that:this,
-            getMore:true,
+            that: this,
+            getMore: true,
             imgHead: this.$imgHead,
-            showRoom:false,
+            showRoom: false,
             activeName: 'first',
-            selectEmojiHtml: "",
-            now_user: "",
-            mySelf: { //我的信息
+            selectEmojiHtml: '',
+            now_user: '',
+            mySelf: {
+                //我的信息
                 // {userId,name,onlineTime,offlineTime}
             },
             // active:null,//默认需要点击
             active: null,
-            sendText: '',//发送的消息
-            msgArr: [ //历史消息
+            sendText: '', //发送的消息
+            msgArr: [
+                //历史消息
                 // { userId, msgType, sender, receiver,bodyType,body{txt,imgIndex,jsonObj,url,lng,lat,address} }
             ],
-            moreHistory:true,
+            moreHistory: true,
             userList: [],
-            oneList: [
-                '你好，请问有什么问题呢？', "You're welcome", 'OK'
-            ],
-            selfInfo:'',
-            emoji:[],
+            oneList: ['你好，请问有什么问题呢？', "You're welcome", 'OK'],
+            selfInfo: '',
+            emoji: [],
             emojiShow: false,
-            hasHistoryMsg:true,
+            hasHistoryMsg: true,
             // firstDomHeight:null,
             // twoDomHeight:null,
-            scorllFalse:false,//用于判断 切换会话时 停止监听 滚动条
-            audioUrl:"",
-            unInput:true,
-            isMute:false,
-            service:[],//客服
+            scorllFalse: false, //用于判断 切换会话时 停止监听 滚动条
+            audioUrl: '',
+            unInput: true,
+            isMute: false,
+            service: [] //客服
         };
     },
 
-
-    directives:{
-        drag(el,bindings){
-            let firstTime = ''
-            let lastTime = ''
-            el.onmousedown = function(e){
-                document.querySelector('.chat_room').setAttribute('drag-flag', false)
-                firstTime = new Date().getTime()
+    directives: {
+        drag(el, bindings) {
+            let firstTime = '';
+            let lastTime = '';
+            el.onmousedown = function (e) {
+                document.querySelector('.chat_room').setAttribute('drag-flag', false);
+                firstTime = new Date().getTime();
                 var disx = e.pageX - el.offsetLeft;
                 var disy = e.pageY - el.offsetTop;
-                document.onmousemove = function (e){
-                    el.style.left = e.pageX - disx+'px';
-                    el.style.top = e.pageY - disx+'px';
-                    lastTime = new Date().getTime()
+                document.onmousemove = function (e) {
+                    el.style.left = e.pageX - disx + 'px';
+                    el.style.top = e.pageY - disx + 'px';
+                    lastTime = new Date().getTime();
                     if (lastTime - firstTime > 200) {
                         // console.log('拖拽')
-                        document.querySelector('.chat_room').setAttribute('drag-flag', true)
-                    }else{
+                        document.querySelector('.chat_room').setAttribute('drag-flag', true);
+                    } else {
                     }
-                }
-                document.onmouseup = function(){
+                };
+                document.onmouseup = function () {
                     document.onmousemove = document.onmouseup = null;
-                }
-            }
+                };
+            };
         }
     },
-    created(){
-        this.selfInfo = JSON.parse(localStorage.getItem('userInfo')) 
+    created() {
+        this.selfInfo = JSON.parse(localStorage.getItem('userInfo'));
     },
 
-    computed:{
-        watchMsgNum(){
-            return this.$store.state.newMsgNum
+    computed: {
+        watchMsgNum() {
+            return this.$store.state.newMsgNum;
         },
-        headClick(){
-            return this.$store.state.headerClickMsg
+        headClick() {
+            return this.$store.state.headerClickMsg;
         },
-        mute(){
-            return this.$store.state.headerClickMute
+        mute() {
+            return this.$store.state.headerClickMute;
         }
     },
     watch: {
-        headClick:{
-            handler(val){
-                val?this.showRoom = true : this.showRoom = false
+        headClick: {
+            handler(val) {
+                val ? (this.showRoom = true) : (this.showRoom = false);
             }
         },
-        mute:{
-            handler(val){
-                val?this.isMute = true : this.isMute = false
+        mute: {
+            handler(val) {
+                val ? (this.isMute = true) : (this.isMute = false);
             }
         },
         watchMsgNum: {
             handler(newValue, oldValue) {
-                if(!localStorage.getItem('userInfo')){
-                    return
+                if (!localStorage.getItem('userInfo')) {
+                    return;
                 }
-                let that = this
-                let arr = [],lastObj=''
-                arr = this.$store.state.newMsgArr
-                lastObj = arr[arr.length-1]
-                console.log(lastObj)
-                if(lastObj.offLineMessage){
-                    return
+                let that = this;
+                let arr = [],
+                    lastObj = '';
+                arr = this.$store.state.newMsgArr;
+                lastObj = arr[arr.length - 1];
+                console.log(lastObj);
+                if (lastObj.offLineMessage) {
+                    return;
                 }
                 lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
                 // if(lastObj.messageType == 'deteleMessage'){
                 //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
                 // }
                 // 撤回
-                if(lastObj.messageType == 'RecallCommandMessage'){
-                    for(let i=0;i<this.userList.length;i++){
-                        if(lastObj.targetId == this.userList[i].targetId){
-                            console.log(this.userList[i])
+                if (lastObj.messageType == 'RecallCommandMessage') {
+                    for (let i = 0; i < this.userList.length; i++) {
+                        if (lastObj.targetId == this.userList[i].targetId) {
+                            console.log(this.userList[i]);
                         }
-                        break
+                        break;
                     }
-                    return
+                    return;
                 }
 
-                if(!lastObj.offLineMessage){
-                    if(lastObj.messageType == 'TextMessage'){
-                        this.audioUrl = 'default/system/message.mp3'
+                if (!lastObj.offLineMessage) {
+                    if (lastObj.messageType == 'TextMessage') {
+                        this.audioUrl = 'default/system/message.mp3';
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的消息',
                             duration: 2500,
-                            customClass:'notify',
-                            onClick(){
-                                that.showChat()
-                                this.close()
-                            },
+                            customClass: 'notify',
+                            onClick() {
+                                that.showChat();
+                                this.close();
+                            }
                         });
-                    }else if(lastObj.messageType == 'OrderMessage'){
-                        this.audioUrl = 'default/system/order.mp3'
+                    } else if (lastObj.messageType == 'OrderMessage') {
+                        this.audioUrl = 'default/system/order.mp3';
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的订单消息',
                             duration: 0,
-                            customClass:'notify',
-                            onClick(){
-                                that.lookOrder()
-                                this.close()
+                            customClass: 'notify',
+                            onClick() {
+                                that.lookOrder();
+                                this.close();
                             }
                         });
-                    }else if(lastObj.messageType == 'SystemMessage'){
-                        this.audioUrl = 'default/system/system.mp3'
+                    } else if (lastObj.messageType == 'SystemMessage') {
+                        this.audioUrl = 'default/system/system.mp3';
                         this.$notify.info({
                             title: '提示',
                             message: '您有一条新的官方消息',
-                            customClass:'notify',
+                            customClass: 'notify',
                             duration: 5000,
-                            onClick(){
-                                that.showChat()
-                                this.close()
+                            onClick() {
+                                that.showChat();
+                                this.close();
                             }
                         });
                     }
                 }
 
-                
-
-                var audio = new Audio() ;
+                var audio = new Audio();
                 audio.src = this.joinUrl + this.audioUrl;
-                this.isMute?audio.muted = true : audio.muted = false
+                this.isMute ? (audio.muted = true) : (audio.muted = false);
                 audio.play();
-                // 自定义 更新会话列表 
-                let newUser = true  //如果是true   则 是新用户  会话列表中 还没有出现
-                let time = this.userList.length>0? 0 : 1000
-                let timer = setTimeout(()=>{
-                    clearTimeout(timer)
-                    for(let i=0;i<this.userList.length;i++){
-                        if(this.userList[i].targetId == lastObj.targetId){
-                            newUser = false   //找到一个相同  证明是已出现过
-                            break
+                // 自定义 更新会话列表
+                let newUser = true; //如果是true   则 是新用户  会话列表中 还没有出现
+                let time = this.userList.length > 0 ? 0 : 1000;
+                let timer = setTimeout(() => {
+                    clearTimeout(timer);
+                    for (let i = 0; i < this.userList.length; i++) {
+                        if (this.userList[i].targetId == lastObj.targetId) {
+                            newUser = false; //找到一个相同  证明是已出现过
+                            break;
                         }
                     }
-                    if(newUser){
+                    if (newUser) {
                         this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
-                            if(res.code == 0){
-                                lastObj['id'] = res.data.userId
-                                lastObj['name'] = res.data.nickname
-                                lastObj['portrait'] = this.imgHead + res.data.headPortrait
+                            if (res.code == 0) {
+                                lastObj['id'] = res.data.userId;
+                                lastObj['name'] = res.data.nickname;
+                                lastObj['portrait'] = this.imgHead + res.data.headPortrait;
                                 // 获取未读消息条数
                                 var conversationType = RongIMLib.ConversationType.PRIVATE;
                                 var targetId = lastObj.targetId;
                                 RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
-                                    onSuccess: function(count){
-                                        lastObj['unreadMessageCount'] = count
-                                        that.userList.unshift(lastObj)    
+                                    onSuccess: function (count) {
+                                        lastObj['unreadMessageCount'] = count;
+                                        that.userList.unshift(lastObj);
                                     },
-                                    onError: function(){
+                                    onError: function () {
                                         // that.$message({ message: res.msg, type: 'warning' });
                                     }
                                 });
-                            }else{
+                            } else {
                                 this.$message({ message: res.msg, type: 'warning' });
                             }
                         });
-                        return
+                        return;
                     }
                     this.$get(`/merchant/store/im/getUserById/${lastObj.targetId}`).then((res) => {
-                        if(res.code == 0){
-                            lastObj.content['id'] = res.data.userId
-                            lastObj.content['name'] = res.data.nickname
-                            lastObj.content['portrait'] = res.data.headPortrait
+                        if (res.code == 0) {
+                            lastObj.content['id'] = res.data.userId;
+                            lastObj.content['name'] = res.data.nickname;
+                            lastObj.content['portrait'] = res.data.headPortrait;
                             // this.msgArr.push(lastObj)
                             // this.$nextTick(this.scrollEnd);
                             // 当前聊天等于消息发送人  清空未读
-                            if(lastObj.targetId == this.now_user.targetId){
-                                this.clearUnreadNum(lastObj.targetId)
-                                this.msgArr.push(lastObj)
+                            if (lastObj.targetId == this.now_user.targetId) {
+                                this.clearUnreadNum(lastObj.targetId);
+                                this.msgArr.push(lastObj);
                                 // this.$nextTick(this.scrollEnd);
-                            }else{
-                                if(!lastObj.offLineMessage){
-                                    that.$store.commit('headerUnreadFun',that.$store.state.headerUnread +=1)
+                            } else {
+                                if (!lastObj.offLineMessage) {
+                                    that.$store.commit('headerUnreadFun', (that.$store.state.headerUnread += 1));
                                 }
                                 // 当前聊天不是发送人
                             }
-                        }else{
+                        } else {
                             this.$message({ message: res.msg, type: 'warning' });
                         }
-                       
                     });
-                },time)
-
+                }, time);
             },
-            deep:true
+            deep: true
         }
     },
-    filters:{
-        formatTime(time,that){
+    filters: {
+        formatTime(time, that) {
             var s1 = new Date(time),
-            s2 = new Date(),
-            runTime = parseInt((s2.getTime() - s1.getTime()) / 1000);
+                s2 = new Date(),
+                runTime = parseInt((s2.getTime() - s1.getTime()) / 1000);
             var year = Math.floor(runTime / 86400 / 365);
             runTime = runTime % (86400 * 365);
             var month = Math.floor(runTime / 86400 / 30);
@@ -433,87 +465,85 @@ export default {
             runTime = runTime % 60;
             var second = runTime;
 
-            if(year>0 || month>0){
-                return that.$regular.timeData(time,3)
+            if (year > 0 || month > 0) {
+                return that.$regular.timeData(time, 3);
             }
 
-            if(day>0){
-                return that.$regular.timeData(time,3)
+            if (day > 0) {
+                return that.$regular.timeData(time, 3);
             }
 
-            if(hour>0 && hour<=3){
-                return hour + '小时前'
+            if (hour > 0 && hour <= 3) {
+                return hour + '小时前';
             }
 
-            if(hour>3){
-                return that.$regular.timeData(time,4)
+            if (hour > 3) {
+                return that.$regular.timeData(time, 4);
             }
 
-            if(minute>0 && minute<=10){
-                return minute + '分钟前'
+            if (minute > 0 && minute <= 10) {
+                return minute + '分钟前';
             }
 
-            if(minute>10){
-                return that.$regular.timeData(time,4)
+            if (minute > 10) {
+                return that.$regular.timeData(time, 4);
             }
 
-            if(second>0){
-                return '刚刚'
+            if (second > 0) {
+                return '刚刚';
             }
         }
     },
 
     methods: {
-        mouseover(val,index){
-            this.$set(this.userList[index],'showClear',true)
+        mouseover(val, index) {
+            this.$set(this.userList[index], 'showClear', true);
         },
-        mouseLeave(val,index){
-            this.$set(this.userList[index],'showClear',false)
+        mouseLeave(val, index) {
+            this.$set(this.userList[index], 'showClear', false);
         },
-        closeX(item,index){
-            let that = this
+        closeX(item, index) {
+            let that = this;
             let conversationType = RongIMLib.ConversationType.PRIVATE;
-            let targetId = item.targetId
-            RongIMClient.getInstance().removeConversation(conversationType,targetId,{
-                onSuccess: function() {
-                    RongIMClient.getInstance().clearUnreadCount(conversationType,targetId,{
-                        onSuccess:function(){
-                            that.allUnreadMsg()
-                            that.userList.splice(index,1)  
-                            if(that.now_user){
+            let targetId = item.targetId;
+            RongIMClient.getInstance().removeConversation(conversationType, targetId, {
+                onSuccess: function () {
+                    RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
+                        onSuccess: function () {
+                            that.allUnreadMsg();
+                            that.userList.splice(index, 1);
+                            if (that.now_user) {
                                 // 删除的会话  是当前的聊天会话
-                                if(that.now_user.targetId == targetId){
-                                    that.now_user = ''
+                                if (that.now_user.targetId == targetId) {
+                                    that.now_user = '';
                                 }
                             }
                             // that.insuranceDelete(item)
                         },
-                        onError:function(error){
-                            console.log(error)
+                        onError: function (error) {
+                            console.log(error);
                         }
                     });
                 },
-                onError: function(error) {
+                onError: function (error) {
                     that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
                 }
             });
         },
         // 删除会话时  发送自定义消息  用于判断  下次重新获取数据时  如果有这条自定义消息  则再次删除该会话
 
-        insuranceDelete(user){
+        insuranceDelete(user) {
             var conversationType = RongIMLib.ConversationType.PRIVATE;
             var targetId = user.id;
-            var msg = new RongIMClient.RegisterMessage.deteleMessage(
-                { 
-                    content: '', 
-                    extra: '',
-                    user:{
-                        id:user.id,
-                        name:user.name,
-                        portrait:user.portrait
-                    }
+            var msg = new RongIMClient.RegisterMessage.deteleMessage({
+                content: '',
+                extra: '',
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    portrait: user.portrait
                 }
-            );
+            });
 
             var callback = {
                 onSuccess: function (message) {
@@ -524,228 +554,229 @@ export default {
                 }
             };
             RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, callback);
-
         },
-
 
         // 监听聊天的关闭弹窗
-        closeDialog(){
+        closeDialog() {
             this.$store.commit('headerClickMsgFun', false);
         },
-        lookOrder(){
-            if(this.$route.path != '/ordermanage'){
-                this.$store.commit('onloadOrderFun', this.$store.state.onloadOrder+=1);
-                this.$router.push('/ordermanage')
-            }else{
-                this.$store.commit('onloadOrderFun', this.$store.state.onloadOrder+=1);
+        lookOrder() {
+            if (this.$route.path != '/ordermanage') {
+                this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                this.$router.push('/ordermanage');
+            } else {
+                this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                 this.$store.commit('onloadOrderFun', true);
             }
-            this.showRoom = false
+            this.showRoom = false;
         },
-        showChat(){
+        showChat() {
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
-            if(isClick == 'true') {
-                return 
-            }       
+            if (isClick == 'true') {
+                return;
+            }
             this.$nextTick(this.scrollEnd);
-            this.showRoom = !this.showRoom
+            this.showRoom = !this.showRoom;
             // this.conversation()
         },
         getChat(val, i) {
-            if(val.targetId == '10000' || val.targetId == '10001'){
-                this.unInput = false
-            }else{
-                this.unInput = true
+            if (val.targetId == '10000' || val.targetId == '10001') {
+                this.unInput = false;
+            } else {
+                this.unInput = true;
             }
-            this.scorllFalse = true    
+            this.scorllFalse = true;
             this.now_user = val;
             this.active = i;
             this.emojiShow = false;
-            this.getMore = true
-            this.hasHistoryMsg = true
-            this.getAssignHis(1)
+            this.getMore = true;
+            this.hasHistoryMsg = true;
+            this.getAssignHis(1);
             this.$nextTick(this.scrollEnd);
         },
         // 会话列表
-        conversation(){
-            let that = this
-            RongIMClient.getInstance().getConversationList({
-                onSuccess: function(list) {
-                    var result = [];
-                    var obj = {};
-                    for(var i =0; i<list.length; i++){
-                       if(!obj[list[i].targetId]){
-                          result.push(list[i]);
-                          obj[list[i].targetId] = true;
-                       }
-                    }
-                    var userId = ''
-                    let arr = []
-                    if(result.length<=0)return
-                    result.forEach(v=>{
-                        userId = v.targetId 
-                        that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
-                            if(res.code == 0){
-                                v['id'] = res.data.userId
-                                v['name'] = res.data.nickname
-                                v['portrait'] = that.imgHead + res.data.headPortrait
-                                arr.push(v)
-                            }else{
-                                that.$message({ message: '获取会话列表失败，请刷新', type: 'warning' });
+        conversation() {
+            let that = this;
+            RongIMClient.getInstance().getConversationList(
+                {
+                    onSuccess: function (list) {
+                        var result = [];
+                        var obj = {};
+                        for (var i = 0; i < list.length; i++) {
+                            if (!obj[list[i].targetId]) {
+                                result.push(list[i]);
+                                obj[list[i].targetId] = true;
                             }
+                        }
+                        var userId = '';
+                        let arr = [];
+                        if (result.length <= 0) return;
+                        result.forEach((v) => {
+                            userId = v.targetId;
+                            that.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
+                                if (res.code == 0) {
+                                    v['id'] = res.data.userId;
+                                    v['name'] = res.data.nickname;
+                                    v['portrait'] = that.imgHead + res.data.headPortrait;
+                                    arr.push(v);
+                                } else {
+                                    that.$message({ message: '获取会话列表失败，请刷新', type: 'warning' });
+                                }
+                            });
                         });
-                    })
-                    console.log(arr,11234)
-                    that.userList = arr
+                        console.log(arr, 11234);
+                        that.userList = arr;
+                    },
+                    onError: function (error) {
+                        // do something
+                        console.log(error);
+                    }
                 },
-                onError: function(error) {
-                    // do something
-                    console.log(error)
-                }
-            }, null);
+                null
+            );
         },
         // 清除 未读消息条数
-        clearUnreadNum(userId){
-            let that = this
+        clearUnreadNum(userId) {
+            let that = this;
             // 成功获取对话历史后 清空 未读条数
             var conversationType = RongIMLib.ConversationType.PRIVATE;
             var targetId = userId;
             RongIMClient.getInstance().clearUnreadCount(conversationType, targetId, {
-                onSuccess: function(){
+                onSuccess: function () {
                     // 清除未读消息成功
-                    that.$set(that.now_user,'unreadMessageCount',0)
-                    that.allUnreadMsg()
+                    that.$set(that.now_user, 'unreadMessageCount', 0);
+                    that.allUnreadMsg();
                 },
-                onError: function(error){
-                    console.log(error)
+                onError: function (error) {
+                    console.log(error);
                     // that.$message({ message: res.msg, type: 'warning' });
                     // error => 清除未读消息数错误码
                 }
             });
         },
 
-        scrollEvent(event){
-            if(this.scorllFalse)return
-            let parent_scroll = this.$refs.parTopDistance.getBoundingClientRect().top
-            let child_scroll = this.$refs.topDistance.getBoundingClientRect().top
-            if(parent_scroll<=child_scroll){
+        scrollEvent(event) {
+            if (this.scorllFalse) return;
+            let parent_scroll = this.$refs.parTopDistance.getBoundingClientRect().top;
+            let child_scroll = this.$refs.topDistance.getBoundingClientRect().top;
+            if (parent_scroll <= child_scroll) {
                 // this.firstDomHeight = this.$refs.topDistance.getBoundingClientRect().height
-                this.debounce(this.getAssignHis,500);
+                this.debounce(this.getAssignHis, 500);
             }
         },
-        debounce:function(fn,wait){
-            if (this.fun!==null){
-                clearTimeout(this.fun)
+        debounce: function (fn, wait) {
+            if (this.fun !== null) {
+                clearTimeout(this.fun);
             }
-            this.fun = setTimeout(fn,wait)
+            this.fun = setTimeout(fn, wait);
         },
 
         // 获取指定用户的 会话历史
-        getAssignHis(type=''){
-            let that = this,timer=0
-            if(!that.hasHistoryMsg)return
-            this.getMore = true
-            if(type == 1){
-                that.msgArr = []
+        getAssignHis(type = '') {
+            let that = this,
+                timer = 0;
+            if (!that.hasHistoryMsg) return;
+            this.getMore = true;
+            if (type == 1) {
+                that.msgArr = [];
             }
-            if(this.msgArr.length>0){
-                timer = this.msgArr[0].sentTime
-            }else{
-                timer = 0
+            if (this.msgArr.length > 0) {
+                timer = this.msgArr[0].sentTime;
+            } else {
+                timer = 0;
             }
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
-            var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;    
+            var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;
             var count = 20; // 每次获取的历史消息条数，范围 0-20 条，可以多次获取
             RongIMLib.RongIMClient.getInstance().getHistoryMessages(conversationType, targetId, timestrap, count, {
-                onSuccess: function(list, hasMsg) {
+                onSuccess: function (list, hasMsg) {
                     that.hasHistoryMsg = hasMsg;
-                    let html = "";
-                    that.getAssignInfo(that.now_user.targetId,list,type)
-                    that.clearUnreadNum(that.now_user.targetId)
+                    let html = '';
+                    that.getAssignInfo(that.now_user.targetId, list, type);
+                    that.clearUnreadNum(that.now_user.targetId);
                     // list => Message 数组。
                     // hasMsg => 是否还有历史消息可以获取。
                 },
-                onError: function(error) {
+                onError: function (error) {
                     console.log('GetHistoryMessages, errorcode:' + error);
                 }
             });
         },
 
         // 获取指定用户信息
-        getAssignInfo(userId,list,type){
+        getAssignInfo(userId, list, type) {
             this.$get(`/merchant/store/im/getUserById/${userId}`).then((res) => {
-                if(res.code == 0){
-                    let newArr = []
-                    let userInfo = res.data
-                    list.forEach((v,i)=>{
+                if (res.code == 0) {
+                    let newArr = [];
+                    let userInfo = res.data;
+                    list.forEach((v, i) => {
                         v.content.content = RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
                         // 调用历史记录
-                        if(v.messageDirection == 2){
-                            if(userInfo.id == "10001"){
+                        if (v.messageDirection == 2) {
+                            if (userInfo.id == '10001') {
                                 // 如果是订单消息
-                                v.content['id'] = userInfo.id
-                                v.content['name'] = userInfo.nickname
-                                v.content['portrait'] = v.content.headerImageUrl
-                            }else{
-                                v.content['id'] = userInfo.id
-                                v.content['name'] = userInfo.nickname
-                                v.content['portrait'] = userInfo.headPortrait
+                                v.content['id'] = userInfo.id;
+                                v.content['name'] = userInfo.nickname;
+                                v.content['portrait'] = v.content.headerImageUrl;
+                            } else {
+                                v.content['id'] = userInfo.id;
+                                v.content['name'] = userInfo.nickname;
+                                v.content['portrait'] = userInfo.headPortrait;
                             }
-                        }else if(v.messageDirection == 1){
-                            v.content['id'] = this.selfInfo.storeId
-                            v.content['name'] = this.selfInfo.storeName
-                            v.content['portrait'] = this.selfInfo.logo
+                        } else if (v.messageDirection == 1) {
+                            v.content['id'] = this.selfInfo.storeId;
+                            v.content['name'] = this.selfInfo.storeName;
+                            v.content['portrait'] = this.selfInfo.logo;
                         }
-                        newArr.unshift(v)
-                    })
-                    newArr.forEach(v=>{
-                        this.msgArr.unshift(v)
-                    })
-                    if(type == 1){
+                        newArr.unshift(v);
+                    });
+                    newArr.forEach((v) => {
+                        this.msgArr.unshift(v);
+                    });
+                    if (type == 1) {
                         this.$nextTick(this.scrollEnd);
-                    }else{
-                        this.$nextTick( () => {    
-                            this.$refs.cmsg[list.length-1].scrollIntoView()
-                        })
+                    } else {
+                        this.$nextTick(() => {
+                            this.$refs.cmsg[list.length - 1].scrollIntoView();
+                        });
                     }
-                    this.scorllFalse = false
-                    this.getMore = false
-                }else{
+                    this.scorllFalse = false;
+                    this.getMore = false;
+                } else {
                     this.$message({ message: res.msg, type: 'warning' });
                 }
-                
             });
         },
 
         send() {
             this.emojiShow = false;
-            let that = this
-            if (!this.sendText && this.form.list.length<=0) {
+            let that = this;
+            if (!this.sendText && this.form.list.length <= 0) {
                 this.$message('发送消息不能为空');
                 return;
             }
-            if(this.form.list.length>0){
-                this.form.list.forEach(v=>{
-                    let base64Str,imageUri,msg,conversationType,targetId,image,base64,yasuo
-                    image = new Image();  
+            if (this.form.list.length > 0) {
+                this.form.list.forEach((v) => {
+                    let base64Str, imageUri, msg, conversationType, targetId, image, base64, yasuo;
+                    image = new Image();
                     image.crossOrigin = '';
-                    image.src = this.joinUrl + v.name;  
-                    image.onload = function(){  
-                        base64 = that.$regular.getBase64Image(image); 
-                        if(base64.length>=600000){
-                            yasuo = 400
-                        }else if(base64.length>=400000){
-                            yasuo = 500
-                        }else if(base64.length>=200000){
-                            yasuo = 800
-                        }else{
-                            yasuo = 1000
+                    image.src = this.joinUrl + v.name;
+                    image.onload = function () {
+                        base64 = that.$regular.getBase64Image(image);
+                        if (base64.length >= 600000) {
+                            yasuo = 400;
+                        } else if (base64.length >= 400000) {
+                            yasuo = 500;
+                        } else if (base64.length >= 200000) {
+                            yasuo = 800;
+                        } else {
+                            yasuo = 1000;
                         }
                         that.$regular.compress(base64, yasuo, 0.5).then(function (val) {
-                            base64Str = val.split(',')[1]
+                            base64Str = val.split(',')[1];
                             imageUri = that.joinUrl + v.name; // 上传到自己服务器的 URL。
-                            msg = new RongIMLib.ImageMessage({content: base64Str, imageUri: imageUri});
+                            msg = new RongIMLib.ImageMessage({ content: base64Str, imageUri: imageUri });
                             conversationType = RongIMLib.ConversationType.PRIVATE; // 单聊, 其他会话选择相应的会话类型即可
                             targetId = that.now_user.targetId; // 目标 Id
                             RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
@@ -753,8 +784,8 @@ export default {
                                     // message 为发送的消息对象并且包含服务器返回的消息唯一 Id 和发送消息时间戳
                                     that.form.list = [];
                                     message.content['id'] = that.selfInfo.storeId;
-                                    message.content['name'] = that.selfInfo.storeName
-                                    message.content['portrait'] = that.selfInfo.logo
+                                    message.content['name'] = that.selfInfo.storeName;
+                                    message.content['portrait'] = that.selfInfo.logo;
                                     that.msgArr.push(message);
                                     that.$nextTick(that.scrollEnd);
                                 },
@@ -784,13 +815,11 @@ export default {
                                 }
                             });
                         });
-
-                       
-                    }      
-                })
+                    };
+                });
             }
-           
-            if(!this.sendText)return
+
+            if (!this.sendText) return;
             // var msg = new RongIMLib.TextMessage({
             //     content: this.sendText,
             //     extra: "附加信息"
@@ -801,29 +830,27 @@ export default {
             var isCounted = true; // 消息计数
             var isPersited = true; // 消息保存
             var mesasgeTag = new RongIMLib.MessageTag(isCounted, isPersited); // 消息是否保存是否计数，true true 计数且保存，false false 不计数不保存
-            var prototypes = ['content', 'extra', 'messageName','user']; // 消息类中的属性名
+            var prototypes = ['content', 'extra', 'messageName', 'user']; // 消息类中的属性名
             RongIMClient.registerMessageType(messageName, objectName, mesasgeTag, prototypes);
 
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
-            var msg = new RongIMClient.RegisterMessage.PersonMessage(
-                { 
-                    content: this.sendText, 
-                    extra: '',
-                    messageName:'TextMessage',
-                    user:{
-                        id:this.selfInfo.storeId,
-                        name:this.selfInfo.storeName,
-                        portrait:this.selfInfo.logo,
-                    }
+            var msg = new RongIMClient.RegisterMessage.PersonMessage({
+                content: this.sendText,
+                extra: '',
+                messageName: 'TextMessage',
+                user: {
+                    id: this.selfInfo.storeId,
+                    name: this.selfInfo.storeName,
+                    portrait: this.selfInfo.logo
                 }
-            );
+            });
             RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
                 onSuccess: function (message) {
                     that.sendText = '';
-                    message.content['id'] = message.content.user.id
-                    message.content['name'] = message.content.user.name
-                    message.content['portrait'] = message.content.user.portrait
+                    message.content['id'] = message.content.user.id;
+                    message.content['name'] = message.content.user.name;
+                    message.content['portrait'] = message.content.user.portrait;
                     that.msgArr.push(message);
                     that.$nextTick(that.scrollEnd);
                 },
@@ -848,7 +875,7 @@ export default {
                         case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
                             info = '不在聊天室中';
                             break;
-                        default :
+                        default:
                             info = x;
                             break;
                     }
@@ -856,7 +883,7 @@ export default {
                 }
             });
             // 自定义消息 end
-            return
+            return;
             // var conversationType = RongIMLib.ConversationType.PRIVATE;
             // var targetId = this.now_user.userId;
             // RongIMClient.getInstance().sendMessage(conversationType, targetId, msg, {
@@ -873,75 +900,77 @@ export default {
         },
 
         // 选择表情
-        selectEmoji(emoji){
-            console.log(emoji)
+        selectEmoji(emoji) {
+            console.log(emoji);
             this.sendText += emoji.emoji;
             // this.emojiShow = false;
         },
         // 展示表情
-        showEmoji(){
-            this.emojiShow = !this.emojiShow
+        showEmoji() {
+            this.emojiShow = !this.emojiShow;
         },
-        scrollEnd: function() {
-            var list =  this.$refs.cmsg
-            if(!list)return
-            this.$nextTick( () => {    
+        scrollEnd: function () {
+            var list = this.$refs.cmsg;
+            if (!list) return;
+            this.$nextTick(() => {
                 if (list.length > 1) {
                     var last = list[list.length - 1];
                     last.scrollIntoView();
                 }
-            })
+            });
         },
         handleClick(tab, event) {
-            if(tab.name == 'service'){
+            if (tab.name == 'service') {
                 // if(this.service)return
-                this.$get('/merchant/store/im/getSystemId').then((res) => {
-                    console.log(res)
-                    if (res.code == 0) {
-                        this.service = res.data
-                    } else {
-                        this.$message.error(res.msg);
-                    }
-                }).catch(error=>{
-                    console.log(error)
-                });
+                this.$get('/merchant/store/im/getSystemId')
+                    .then((res) => {
+                        console.log(res);
+                        if (res.code == 0) {
+                            this.service = res.data;
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
             }
         },
         // 创建客服
-        createService(service){
+        createService(service) {
             let that = this;
-            let lastObj={};
+            let lastObj = {};
             let newUser = true;
-            for(let i=0;i<this.userList.length;i++){
-                if(this.userList[i].targetId == service.id){
-                    newUser = false   //找到一个相同  证明是已出现过
-                    break
+            for (let i = 0; i < this.userList.length; i++) {
+                if (this.userList[i].targetId == service.id) {
+                    newUser = false; //找到一个相同  证明是已出现过
+                    break;
                 }
             }
-            lastObj['id'] = service.id
-            lastObj['targetId'] = service.id
-            lastObj['name'] = service.nickname
-            lastObj['portrait'] = this.imgHead +service.headPortrait
-            if(newUser){
+            lastObj['id'] = service.id;
+            lastObj['targetId'] = service.id;
+            lastObj['name'] = service.nickname;
+            lastObj['portrait'] = this.imgHead + service.headPortrait;
+            if (newUser) {
                 // 获取未读消息条数
                 var conversationType = RongIMLib.ConversationType.PRIVATE;
                 var targetId = lastObj.id;
                 RongIMLib.RongIMClient.getInstance().getUnreadCount(conversationType, targetId, {
-                    onSuccess: function(count){
-                        lastObj['unreadMessageCount'] = count
-                        that.userList.unshift(lastObj)
-                        that.getChat(lastObj,0)
+                    onSuccess: function (count) {
+                        lastObj['unreadMessageCount'] = count;
+                        that.userList.unshift(lastObj);
+                        that.getChat(lastObj, 0);
                     },
-                    onError: function(){
+                    onError: function () {
                         // that.$message({ message: res.msg, type: 'warning' });
                     }
                 });
-                return
-            }else{
-                for(let i=0;i<this.userList.length;i++){
-                    if(lastObj.targetId == this.userList[i].targetId){
-                        that.getChat(lastObj,i)
-                        break
+                return;
+            } else {
+                for (let i = 0; i < this.userList.length; i++) {
+                    if (lastObj.targetId == this.userList[i].targetId) {
+                        that.getChat(lastObj, i);
+                        break;
                     }
                 }
             }
@@ -951,8 +980,8 @@ export default {
             this.$refs.focusTextarea.focus();
             this.sendText = val;
         },
-        clearConversation(){
-            let that = this
+        clearConversation() {
+            let that = this;
             this.$confirm('确认清空所有会话', '提示', {
                 type: 'warning'
             })
@@ -963,21 +992,21 @@ export default {
                         clearConversations// 删除所有会话
                     */
                     RongIMClient.getInstance().clearConversations({
-                        onSuccess: function() {
+                        onSuccess: function () {
                             RongIMClient.getInstance().clearTotalUnreadCount({
-                                onSuccess: function(){
+                                onSuccess: function () {
                                     // 清除未读消息成功
-                                    that.userList = []
-                                    that.now_user = ''
-                                    that.allUnreadMsg()
+                                    that.userList = [];
+                                    that.now_user = '';
+                                    that.allUnreadMsg();
                                 },
-                                onError: function(error){
+                                onError: function (error) {
                                     // error => 清除未读消息数错误码
-                                    console.log(error)
+                                    console.log(error);
                                 }
                             });
                         },
-                        onError: function(error) {
+                        onError: function (error) {
                             that.$message({ message: '系统繁忙，请刷新后重试', type: 'warning' });
                         }
                     });
@@ -1010,10 +1039,9 @@ export default {
                 })
                 .catch(() => {});
         },
-        
 
-        clearConverHisMsg(){
-            let that = this
+        clearConverHisMsg() {
+            let that = this;
             // if(that.msgArr = []){
             //     this.$message({ message: '当前会话没有历史记录', type: 'warning' });
             //     return
@@ -1028,10 +1056,10 @@ export default {
                         timestamp: 0 // 清除时间点
                     };
                     RongIMLib.RongIMClient.getInstance().clearRemoteHistoryMessages(params, {
-                        onSuccess: function() {
-                            that.msgArr = []
+                        onSuccess: function () {
+                            that.msgArr = [];
                         },
-                        onError: function(error) {
+                        onError: function (error) {
                             // 请排查：单群聊消息云存储是否开通
                             console.log(error);
                         }
@@ -1068,52 +1096,50 @@ export default {
             });
         },
         beforeAvatarUpload(file) {
-            
             const isJPG = file.type === 'image/jpeg';
             const isLt2M = file.size / 1024 / 1024 < 0.4;
-            console.log(isLt2M)
+            console.log(isLt2M);
             if (!isJPG) {
-            this.$message.error('上传头像图片只能是 JPG 格式!');
+                this.$message.error('上传头像图片只能是 JPG 格式!');
             }
             if (!isLt2M) {
-            this.$message.error('上传头像图片大小不能超过 2MB!');
+                this.$message.error('上传头像图片大小不能超过 2MB!');
             }
             return isJPG && isLt2M;
         },
         handleChange(file, fileList) {
-            if(file.size / 1024 / 1024 > .4){
+            if (file.size / 1024 / 1024 > 0.4) {
                 this.$message({ message: '请压缩图片大小', type: 'warning' });
-                return
+                return;
             }
             this.formData = file.raw;
             this.loading = true;
             this.uploadImg();
         },
-        uploadSectionFile(file) {
-        },
+        uploadSectionFile(file) {},
         handlePictureCardPreview(file) {
             this.dialogImageUrl = file.url;
             this.dialogVisible = true;
         },
-        exceed(files, fileList){
+        exceed(files, fileList) {
             this.$message({ message: '一次最多支持发送4张图片', type: 'warning' });
         },
 
         // 获取所有未读消息
-        allUnreadMsg(){
-            console.log('哈哈1')
-            let that = this
+        allUnreadMsg() {
+            console.log('哈哈1');
+            let that = this;
             var conversationTypes = [RongIMLib.ConversationType.PRIVATE, RongIMLib.ConversationType.DISCUSSION];
             RongIMClient.getInstance().getConversationUnreadCount(conversationTypes, {
-                onSuccess: function(count){
-                    that.$store.commit('headerUnreadFun',count)
+                onSuccess: function (count) {
+                    that.$store.commit('headerUnreadFun', count);
                 },
-                onError: function(error){
+                onError: function (error) {
                     RongIMClient.getInstance().getTotalUnreadCount({
-                        onSuccess: function(count) {
-                            that.$store.commit('headerUnreadFun',count)
+                        onSuccess: function (count) {
+                            that.$store.commit('headerUnreadFun', count);
                         },
-                        onError: function(error) {
+                        onError: function (error) {
                             that.$message({ message: '获取会话消息失败，请刷新', type: 'warning' });
                         }
                     });
@@ -1122,23 +1148,23 @@ export default {
         }
     },
     mounted() {
-        if(!localStorage.getItem('userInfo')){
-            return
+        if (!localStorage.getItem('userInfo')) {
+            return;
         }
-        let that = this
-        let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken 
+        let that = this;
+        let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken;
         var userInfo = {
             appKey: this.$rongyunKey,
-            token:rToken
+            token: rToken
         };
         // // 获取会话列表
         var callbacks = {};
         init(userInfo, callbacks);
-        setTimeout(()=>{
-            that.conversation()
-            that.emoji = RongIMLib.RongIMEmoji.list
-            that.allUnreadMsg()
-        },500)
+        setTimeout(() => {
+            that.conversation();
+            that.emoji = RongIMLib.RongIMEmoji.list;
+            that.allUnreadMsg();
+        }, 500);
         // setTimeout(()=>{
         //     RongIMClient.getInstance().clearConversations({
         //         onSuccess: function() {
@@ -1153,7 +1179,7 @@ export default {
         //             //         that.userList = []
         //             //         that.now_user = ''
         //             //         that.allUnreadMsg()
-                            
+
         //             //     },
         //             //     onError: function(error){
         //             //         // error => 清除未读消息数错误码
@@ -1167,14 +1193,13 @@ export default {
         //     });
         // },500)
 
-        
         // this.scrollEnd();
-    },
+    }
 };
 </script>
 <style scoped lang='less'>
-.chat_room{
-    .floating{
+.chat_room {
+    .floating {
         height: 65px;
         width: 65px;
         border-radius: 50%;
@@ -1185,7 +1210,7 @@ export default {
         top: 80%;
         z-index: 20;
         cursor: pointer;
-        .all_unread{
+        .all_unread {
             position: absolute;
             right: 0;
             top: 0;
@@ -1196,7 +1221,7 @@ export default {
             font-size: 12px;
         }
     }
-    .msg_picture{
+    .msg_picture {
         width: 200px;
         height: auto;
         border-radius: 4px;
@@ -1204,12 +1229,12 @@ export default {
 }
 @border-color: #e2e2e2;
 #service {
-    .userList{
+    .userList {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         position: relative;
-        .not_read{
+        .not_read {
             position: absolute;
             right: 8px;
             background: #ff4e4e;
@@ -1222,7 +1247,7 @@ export default {
             color: white;
             top: calc(50% - 8px);
         }
-        .head_portrait{
+        .head_portrait {
             height: 40px;
             width: 40px;
             object-fit: cover;
@@ -1231,7 +1256,7 @@ export default {
             font-size: 0;
             vertical-align: middle;
         }
-        .close_x{
+        .close_x {
             position: absolute;
             right: 0px;
             top: -15px;
@@ -1242,7 +1267,7 @@ export default {
         display: flex;
         background: white;
         .people_list {
-            flex: .2;
+            flex: 0.2;
             border-right: 1px solid @border-color;
             box-sizing: border-box;
             background: #f5f5f5;
@@ -1259,7 +1284,7 @@ export default {
                 }
             }
             &::-webkit-scrollbar {
-                display: none
+                display: none;
             }
             & {
                 scrollbar-width: none;
@@ -1269,7 +1294,7 @@ export default {
             }
         }
         .chat {
-            flex: .52;
+            flex: 0.52;
             .record {
                 height: 72%;
                 border-bottom: 1px solid @border-color;
@@ -1293,24 +1318,24 @@ export default {
                     // & {
                     //     -ms-overflow-style: none;
                     // }
-                    &::-webkit-scrollbar{ 
-                        width:4px;
+                    &::-webkit-scrollbar {
+                        width: 4px;
                     }
-                    &::-webkit-scrollbar-track{
+                    &::-webkit-scrollbar-track {
                         background: rgb(230, 230, 230);
-                        border-radius:2px;
+                        border-radius: 2px;
                     }
-                    &::-webkit-scrollbar-thumb{
+                    &::-webkit-scrollbar-thumb {
                         background: #999;
-                        border-radius:10px;
+                        border-radius: 10px;
                     }
-                    &::-webkit-scrollbar-thumb:hover{
+                    &::-webkit-scrollbar-thumb:hover {
                         background: rgb(187, 187, 187);
                     }
-                    &::-webkit-scrollbar-corner{
+                    &::-webkit-scrollbar-corner {
                         background: #179a16;
                     }
-                    .getMore{
+                    .getMore {
                         text-align: center;
                         font-size: 12px;
                         padding: 10px 0px;
@@ -1319,7 +1344,7 @@ export default {
                 .cli {
                     padding: 10px 20px;
                     .cmsg {
-                        .send_or_rece{
+                        .send_or_rece {
                             text-align: center;
                             line-height: 25px;
                             font-size: 12px;
@@ -1334,7 +1359,7 @@ export default {
                             text-align: right;
                         }
                         .headImg {
-                            flex: .08;
+                            flex: 0.08;
                             min-width: 50px;
                             img {
                                 height: 35px;
@@ -1343,9 +1368,9 @@ export default {
                             }
                         }
                         .msg {
-                            flex: .92;
+                            flex: 0.92;
                             width: 200px;
-                            &>div {
+                            & > div {
                                 padding: 10px;
                                 border-radius: 10px;
                                 color: #f3f3f3;
@@ -1354,14 +1379,14 @@ export default {
                                 background: #de6200;
                             }
                         }
-                        .withdraw{
-                            &>div {
+                        .withdraw {
+                            & > div {
                                 padding: 10px;
                                 border-radius: 10px;
                                 color: white;
                                 max-width: 400px;
                                 display: inline-block;
-                                background:#dadada;
+                                background: #dadada;
                             }
                         }
                         .self_img {
@@ -1375,9 +1400,9 @@ export default {
                                 background: #39b54a;
                             }
                         }
-                        .orderinfo{
+                        .orderinfo {
                             min-width: 220px;
-                            .fx{
+                            .fx {
                                 display: flex;
                                 margin-bottom: 12px;
                             }
@@ -1389,16 +1414,16 @@ export default {
             .text_box {
                 height: 28%;
                 padding: 0 10px;
-                .icons{
+                .icons {
                     padding-top: 10px;
                     font-size: 0;
-                    .flexo{
+                    .flexo {
                         display: inline-block;
                         margin-right: 10px;
                         position: relative;
                         height: 20px;
                         width: 20px;
-                        .up_file{
+                        .up_file {
                             position: absolute;
                             width: 20px;
                             height: 20px;
@@ -1407,7 +1432,7 @@ export default {
                             opacity: 0;
                             cursor: pointer;
                         }
-                        .emoji_box{
+                        .emoji_box {
                             background: #fff;
                             z-index: 20;
                             border-radius: 4px;
@@ -1420,7 +1445,7 @@ export default {
                             overflow-y: scroll;
                             font-size: 14px;
                             padding: 12px;
-                            .emojiItem{
+                            .emojiItem {
                                 display: inline-block;
                                 cursor: pointer;
                                 margin: 0 2px;
@@ -1436,7 +1461,7 @@ export default {
                             -ms-overflow-style: none;
                         }
 
-                        /deep/.el-upload--picture-card{
+                        /deep/.el-upload--picture-card {
                             background: none;
                             border: none;
                             position: absolute;
@@ -1445,7 +1470,7 @@ export default {
                             width: 20px;
                             height: 20px;
                         }
-                        .imgs{
+                        .imgs {
                             position: absolute;
                             width: 296px;
                             left: 30px;
@@ -1455,18 +1480,18 @@ export default {
                             box-shadow: 0 0 5px #6d6d6d;
                             border-radius: 4px;
                             padding: 5px;
-                            .del{
+                            .del {
                                 color: red;
                                 font-size: 20px;
                                 right: 8px;
                                 position: absolute;
                                 cursor: pointer;
                             }
-                            li{
+                            li {
                                 display: inline-block;
                                 position: relative;
                             }
-                            img{
+                            img {
                                 width: 148px;
                                 height: 148px;
                                 object-fit: cover;
@@ -1475,13 +1500,12 @@ export default {
                                 box-sizing: border-box;
                             }
                         }
-                        /deep/ .el-upload-list{
-                            
+                        /deep/ .el-upload-list {
                             display: none;
                         }
                     }
                 }
-                .send_icon{
+                .send_icon {
                     height: 20px;
                     width: 20px;
                     object-fit: cover;
@@ -1502,29 +1526,29 @@ export default {
             }
         }
         /deep/ .quick {
-            flex: .28;
+            flex: 0.28;
             background: #f9f9f9;
             border-left: 1px solid @border-color;
             box-sizing: border-box;
             .goods_list {
                 height: 100%;
-                .sves{
+                .sves {
                     height: 50px;
-                    padding:0 10px;
+                    padding: 0 10px;
                     line-height: 50px;
                     cursor: pointer;
-                    img{
+                    img {
                         height: 40px;
                         width: 40px;
                         border-radius: 50%;
                         margin-right: 12px;
                         vertical-align: middle;
                     }
-                    span{
+                    span {
                         font-size: 14px;
                     }
                 }
-                .sves:hover{
+                .sves:hover {
                     background: #e2e2e2;
                 }
                 .one {
@@ -1537,10 +1561,10 @@ export default {
                         }
                     }
                 }
-                .operating_btn{
-                    padding-left:10px ;
+                .operating_btn {
+                    padding-left: 10px;
                     padding-top: 10px;
-                    button{
+                    button {
                         margin-bottom: 12px;
                         margin-left: 0;
                     }
@@ -1552,7 +1576,7 @@ export default {
                 overflow-y: scroll;
             }
             .el-tab-pane::-webkit-scrollbar {
-                display: none
+                display: none;
             }
             .el-tab-pane {
                 scrollbar-width: none;
@@ -1569,7 +1593,6 @@ export default {
             }
             .el-date-editor {
                 width: 120px;
-
             }
             .el-input__prefix {
                 display: none;
@@ -1581,17 +1604,16 @@ export default {
             .el-tabs__nav-wrap {
                 padding: 0 10px;
             }
-            
         }
         .active {
             background: @border-color;
         }
     }
 }
-/deep/.el-dialog{
-    min-width:850px ;
+/deep/.el-dialog {
+    min-width: 850px;
 }
-/deep/.notify{
+/deep/.notify {
     cursor: pointer;
 }
 </style>
