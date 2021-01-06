@@ -30,6 +30,7 @@ export default function init(userInfo,callbacks) {
                     break;
                 case RongIMLib.ConnectionStatus.NETWORK_UNAVAILABLE:
                     console.log('网络不可用');
+                    alert('网络不可用,请刷新后连接聊天服务')
                     break;
             }
         }
@@ -39,7 +40,6 @@ export default function init(userInfo,callbacks) {
     RongIMClient.setOnReceiveMessageListener({
         // 接收到的消息
         onReceived: function (message) {
-            console.log(message)
             // 判断消息类型
             switch(message.messageType){
                 case RongIMClient.MessageType.TextMessage:
@@ -153,7 +153,7 @@ export default function init(userInfo,callbacks) {
     var isCounted = true; // 消息计数
     var isPersited = true; // 消息保存
     var mesasgeTag = new RongIMLib.MessageTag(isCounted, isPersited); // 消息是否保存是否计数，true true 计数且保存，false false 不计数不保存
-    var prototypes = ['content', 'extra', 'headerImageUrl', 'status', 'title','TYPE']; // 消息类中的属性名  extra 是订单号
+    var prototypes = ['content', 'extra', 'headerImageUrl', 'status', 'title','kind']; // 消息类中的属性名  extra 是订单号
     RongIMClient.registerMessageType(messageName, objectName, mesasgeTag, prototypes);
 
     var messageName1 = 'SystemMessage'; // 消息名称  官方消息
@@ -161,7 +161,7 @@ export default function init(userInfo,callbacks) {
     var isCounted1 = true; // 消息计数
     var isPersited1 = true; // 消息保存
     var mesasgeTag1 = new RongIMLib.MessageTag(isCounted1, isPersited1); // 消息是否保存是否计数，true true 计数且保存，false false 不计数不保存
-    var prototypes1 = ['content', 'extra', 'status', 'title','TYPE']; // 消息类中的属性名
+    var prototypes1 = ['content', 'extra', 'status', 'title','kind']; // 消息类中的属性名
     RongIMClient.registerMessageType(messageName1, objectName1, mesasgeTag1, prototypes1);
 
     var messageName = 'deteleMessage';  // 消息名称  用于删除消息会话 未读等

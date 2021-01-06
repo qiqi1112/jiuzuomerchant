@@ -275,7 +275,18 @@ export default {
         this.getData()
         this.time_now_no = this.time_now = new Date()
     },
+    computed: {
+        watchOnloadOrder() {
+            return this.$store.state.onloadOrder;
+        }
+    },
     watch:{
+        watchOnloadOrder: {
+            handler(val) {
+                this.getData()
+                this.time_now_no = this.time_now = new Date()
+            }
+        },
         suc_type(val){
             val==1?this.showSuccess = this.successList : this.showSuccess = this.successVieList
         },

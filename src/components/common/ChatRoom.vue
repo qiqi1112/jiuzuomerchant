@@ -64,7 +64,6 @@
                                             <!-- 订单消息 -->
                                             <div class="msg" v-if="item.targetId == '10001'">
                                                 <div class="orderinfo">
-                                                    <!-- {{item.content.content}} -->
                                                     <div class="fx">
                                                         <div style="flex: 0.3">内容:</div>
                                                         <div style="flex: 0.7">{{ item.content.content }}</div>
@@ -78,7 +77,7 @@
                                                         <div style="flex: 0.7">{{ item.content.title }}</div>
                                                     </div>
                                                     <div
-                                                        @click="lookOrder"
+                                                        @click="lookOrder(item)"
                                                         style="
                                                             text-align: center;
                                                             padding-top: 10px;
@@ -356,17 +355,64 @@ export default {
                             }
                         });
                     } else if (lastObj.messageType == 'OrderMessage') {
-                        this.audioUrl = 'default/system/order.mp3';
-                        this.$notify.info({
-                            title: '提示',
-                            message: '您有一条新的订单消息',
-                            duration: 0,
-                            customClass: 'notify',
-                            onClick() {
-                                that.lookOrder();
-                                this.close();
-                            }
-                        });
+                        switch(lastObj.content.kind){
+                            case 'JZ:MessageCustomOrder' : //预约
+                                this.audioUrl = 'default/system/order.mp3';
+                                this.$notify.info({
+                                    title: '提示',
+                                    message: '您有一条新的订单消息',
+                                    duration: 0,
+                                    customClass: 'notify',
+                                    onClick() {
+                                        that.lookOrder(lastObj);
+                                        this.close();
+                                    }
+                                });
+                                break;
+                            case 'JZ:MessageCancelOrder' : //取消
+                                this.audioUrl = 'default/system/system.mp3';
+                                this.$notify.info({
+                                    title: '提示',
+                                    message: '您有一条订单已被取消',
+                                    duration: 2500,
+                                    customClass: 'notify',
+                                    onClick() {
+                                        that.lookOrder(lastObj);
+                                        this.close();
+                                    }
+                                });
+                                break;
+                            // case 'JZ:MessageOccupyOrder' : //占座
+                            //     this.audioUrl = 'default/system/system.mp3';
+                            //     break;
+                            case 'JZ:MessageReminderOrder' : //催单
+                                this.audioUrl = 'default/system/system.mp3';
+                                this.$notify.info({
+                                    title: '提示',
+                                    message: '您有一条新的催单消息',
+                                    duration: 2500,
+                                    customClass: 'notify',
+                                    onClick() {
+                                        that.lookOrder(lastObj);
+                                        this.close();
+                                    }
+                                });
+                                break;
+                            case 'JZ:MessageVieOrder' : //抢座
+                                this.audioUrl = 'default/system/order.mp3';
+                                this.$notify.info({
+                                    title: '提示',
+                                    message: '您有一条新的抢座订单',
+                                    duration: 0,
+                                    customClass: 'notify',
+                                    onClick() {
+                                        that.lookOrder(lastObj);
+                                        this.close();
+                                    }
+                                });
+                                break;
+                        }
+                        
                     } else if (lastObj.messageType == 'SystemMessage') {
                         this.audioUrl = 'default/system/system.mp3';
                         this.$notify.info({
@@ -560,13 +606,24 @@ export default {
         closeDialog() {
             this.$store.commit('headerClickMsgFun', false);
         },
-        lookOrder() {
-            if (this.$route.path != '/ordermanage') {
-                this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                this.$router.push('/ordermanage');
-            } else {
-                this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                this.$store.commit('onloadOrderFun', true);
+         // 查看订单
+        lookOrder(val) {
+            if(val.content.kind == 'JZ:MessageVieOrder'){
+                if (this.$route.path != '/nummanage') {
+                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    this.$router.push('/nummanage');
+                } else {
+                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    this.$store.commit('onloadOrderFun', true);
+                }
+            }else{
+                if (this.$route.path != '/ordermanage') {
+                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    this.$router.push('/ordermanage');
+                } else {
+                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    this.$store.commit('onloadOrderFun', true);
+                }
             }
             this.showRoom = false;
         },
@@ -1127,7 +1184,6 @@ export default {
 
         // 获取所有未读消息
         allUnreadMsg() {
-            console.log('哈哈1');
             let that = this;
             var conversationTypes = [RongIMLib.ConversationType.PRIVATE, RongIMLib.ConversationType.DISCUSSION];
             RongIMClient.getInstance().getConversationUnreadCount(conversationTypes, {
