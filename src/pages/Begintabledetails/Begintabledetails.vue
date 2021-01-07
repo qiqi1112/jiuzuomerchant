@@ -351,6 +351,7 @@ export default {
                         let newObj = this.presentSeatInfo;
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
                         this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
+                            console.log(res)
                             if (res.code == 0) {
                                 if (res.data) {
                                     res.data.orderAmount = this.price(res.data.orderAmount);
