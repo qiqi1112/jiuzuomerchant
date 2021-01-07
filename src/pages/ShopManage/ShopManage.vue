@@ -532,7 +532,7 @@ export default {
                     } else {
                         let arr = this.goodsForm.dynamicValidateForm.domains;
                         for (let i = 0; i < arr.length; i++) {
-                            if (arr[i].statisticalPrice > arr[i].originalPrice) {
+                            if (+arr[i].statisticalPrice > +arr[i].originalPrice) {
                                 this.$message.error('规格现价不能大于原价');
                                 this.allRegRight = false;
                                 break;

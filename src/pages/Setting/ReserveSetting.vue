@@ -1,8 +1,15 @@
 <template>
     <div>
-        <div class="switch-box" v-for="(item, index) in switchList" :key="index">
-            <span>{{ item.title }}</span>
-            <el-switch v-model="item.value" active-color="#13ce66" inactive-color="#ff4949"> </el-switch>
+        <div class="crumbs">
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item> <i class="el-icon-lx-calendar"></i> 预定权限 </el-breadcrumb-item>
+            </el-breadcrumb>
+        </div>
+        <div class="container">
+            <div class="switch-box" v-for="(item, index) in switchList" :key="index">
+                <span>{{ item.title }}</span>
+                <el-switch v-model="item.value" active-color="#13ce66" inactive-color="#ff4949"> </el-switch>
+            </div>
         </div>
     </div>
 </template>

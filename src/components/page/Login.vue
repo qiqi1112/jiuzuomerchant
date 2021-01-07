@@ -46,6 +46,7 @@ export default {
                 .then((res) => {
                     if (res.code === 0) {
                         let obj = {
+                            phone: res.data.phone,
                             loginName: res.data.loginName,
                             token: res.data.token,
                             logo: res.data.logo,

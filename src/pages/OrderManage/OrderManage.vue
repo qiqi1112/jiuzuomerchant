@@ -36,18 +36,18 @@
                 <!-- <el-select clearable v-model="searchObj.searchPayStatus" placeholder="支付状态" class="handle-input mr10">
                     <el-option v-for="(item, index) in payStatusArr" :key="index" :label="item.label" :value="item.value"></el-option>
                 </el-select> -->
-                <el-input
+                <!-- <el-input
                     clearable
                     @keydown.13.native="handleSearch"
                     v-model="searchObj.smsCode"
                     placeholder="验证码"
                     class="handle-input mr10"
-                ></el-input>
+                ></el-input> -->
 
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-view" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
+                <!-- <el-button type="success" icon="el-icon-view" @click="seeSeatInfo" v-if="storeLocation !== 3 && storeLocation !== -1"
                     >查看座位</el-button
-                >
+                > -->
             </div>
 
             <!-- 表格部分 -->
@@ -114,7 +114,7 @@
                 <el-table-column prop="remarks" label="备注信息"></el-table-column>
                 <el-table-column prop="createTime" label="订单发起时间" min-width="140"></el-table-column>
                 <el-table-column prop="paidTime" label="订单支付时间" min-width="140"></el-table-column>
-                <el-table-column prop="storeName" label="订单信息" min-width="100">
+                <el-table-column prop="storeName" label="订单信息" min-width="100" fixed="right">
                     <template slot-scope="scope">
                         <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row.orderNo)">查看订单</el-link>
                     </template>
@@ -645,7 +645,7 @@
                     </div>
                 </div>
 
-                <div slot="footer" class="dialog-footer" @click="dialog= false">
+                <div slot="footer" class="dialog-footer" @click="dialog = false">
                     <el-button type="primary">确 定</el-button>
                 </div>
             </el-dialog>
@@ -867,7 +867,7 @@ export default {
         //查看座位信息
         seeSeatInfo() {
             this.dialogStatus = 2;
-            this.isClickSeat = false
+            this.isClickSeat = false;
             this.$get('/merchant/store/getStoreInfo').then((result) => {
                 console.log(result);
                 if (result.code == 0) {
@@ -1360,10 +1360,10 @@ export default {
 
             .day-mincom {
                 border: 1px solid #dcdfe6;
-                    border-radius: 4px;
-                    padding: 16px 0;
-                    width: 80%;
-                    white-space: nowrap;
+                border-radius: 4px;
+                padding: 16px 0;
+                width: 80%;
+                white-space: nowrap;
                 > div {
                     margin-bottom: 16px;
                     font-size: 14px;
