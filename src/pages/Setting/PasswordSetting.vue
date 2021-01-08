@@ -77,6 +77,18 @@ export default {
                     clearInterval(timer);
                 }
             }, 1000);
+            this.getAuthCode();
+        },
+
+        //获取验证码操作
+        getAuthCode() {
+            this.$get('/merchant/store/settled/sendCode').then((res) => {
+                if (res.code === 0) {
+                    this.$message.success('发送成功');
+                } else {
+                    this.$message.error(res.msg);
+                }
+            });
         },
 
         //关闭弹窗操作
@@ -107,9 +119,18 @@ export default {
 
         //请求操作
         requestSubmit() {
-            const phone = JSON.parse(localStorage.getItem('userInfo')).phone;
-            if (phone) {
-            }
+            let data = {
+                code: this.form.authCode,
+                password: this.form.password
+            };
+            this.$post('/merchant/store/settled/updatePassword', data).then((res) => {
+                if (res.code === 0) {
+                    this.$message.success('设置成功');
+                    this.dialogVisible = false;
+                } else {
+                    this.$message.error(res.msg);
+                }
+            });
         }
     }
 };

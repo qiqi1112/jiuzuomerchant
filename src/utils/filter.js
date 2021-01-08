@@ -228,6 +228,50 @@ Vue.filter("orderStatus", function (oldVal) {
     return newVal;
 })
 
+//审核财务里的订单状态
+Vue.filter("TradeOrderStatus", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 1:
+            newVal = '待使用';
+            break;
+        case 2:
+            newVal = '待付款';
+            break;
+        case 3:
+            newVal = '已完成';
+            break;
+        case 4:
+            newVal = '已作废';
+            break;
+        case 5:
+            newVal = '待接单';
+            break;
+    }
+    return newVal;
+})
+
+//审核财务里的审核状态
+Vue.filter("auditExamine", function (oldVal) {
+    let newVal = '';
+    switch (oldVal) {
+        case 0:
+            newVal = '未审核';
+            break;
+        case 1:
+            newVal = '审核中';
+            break;
+        case 2:
+            newVal = '再次提交';
+            break;
+        case 4:
+            newVal = '审核通过';
+            break;
+    }
+    return newVal;
+})
+
+
 //申请商家推荐状态
 Vue.filter("recoType", function (oldVal) {
     let newVal = '';
