@@ -358,7 +358,7 @@
                                         <div class="drink-list" v-for="(item, index) in form.goodsList" :key="index">
                                             <div class="good-box">
                                                 <div class="good-name">
-                                                    <span>{{ item.goodsName }}</span>
+                                                    <span style="margin-right: 10px">{{ item.goodsName }}</span>
                                                     <span class="num">x{{ item.quantity }}</span>
                                                 </div>
                                             </div>
@@ -370,7 +370,7 @@
                                         <div class="drink-list" v-for="(item, index) in form.snacksList" :key="item.name + index">
                                             <div class="good-box">
                                                 <div class="good-name">
-                                                    <span>{{ item.name }}</span>
+                                                    <span style="margin-right: 10px">{{ item.name }}</span>
                                                     <span class="num">x{{ item.num }}</span>
                                                 </div>
                                             </div>
@@ -390,7 +390,7 @@
                                             <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
                                                 <div class="good-box">
                                                     <div class="good-name">
-                                                        <span>{{ item2.goodsName }}</span>
+                                                        <span style="margin-right: 10px">{{ item2.goodsName }}</span>
                                                         <span class="num">x{{ item2.quantity }}</span>
                                                     </div>
                                                 </div>
@@ -778,7 +778,7 @@ export default {
             }
         }
     },
-    
+
     computed: {
         watchOnloadOrder() {
             return this.$store.state.onloadOrder;

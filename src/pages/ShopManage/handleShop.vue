@@ -760,7 +760,7 @@ export default {
 
         .vip-card-wrap {
             > span {
-                min-width: 100px;
+                min-width: 110px;
             }
 
             display: flex;
