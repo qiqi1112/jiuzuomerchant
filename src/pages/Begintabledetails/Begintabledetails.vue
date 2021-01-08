@@ -78,7 +78,8 @@
                         </div>
                     </div>
                     <!-- 座位属性 -->
-                    <div class="right-box" v-if="clickFlag">
+                    <!-- v-if="clickFlag" -->
+                    <div class="right-box" >
                         <h4 class="title">开台详情</h4>
                         <div class="padd">
                             <span>预定用户:</span>
@@ -278,7 +279,7 @@ export default {
             startBussTime: '', //开始营业时间
             endBussTime: '', //结束营业时间
             input: '',
-            clickFlag: false,
+            // clickFlag: false,
             nowFloor: '', //当前正在操作的楼层
             wrapLoading: true
         };
@@ -347,6 +348,7 @@ export default {
                     // item.layoutList.forEach((item2) => {
                     if (item.floor == item.floor && item.seatRow == seatRow && item.seatColumn == seatColumn) {
                         //查看当前座位信息
+                        console.log(item)
                         this.presentSeatInfo = item;
                         let newObj = this.presentSeatInfo;
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
@@ -358,7 +360,7 @@ export default {
                                     res.data.payableAmount = this.price(res.data.payableAmount);
                                     res.data.couponAmount = this.price(res.data.couponAmount);
                                     (this.presentSeatInfos = res.data), newObj;
-                                    this.clickFlag = true;
+                                    // this.clickFlag = true;
                                     console.log(this.presentSeatInfos.servedStatus);
                                 } else {
                                     this.presentSeatInfos = [];
@@ -488,7 +490,8 @@ export default {
             });
             // this.getShopSeat(index);
             // this.showSeatAtt(index);
-            this.clickFlag = false;
+            // this.clickFlag = false;
+            this.presentSeatInfo=''
         },
         //回显店铺卡座数量（行和列数量）1
         getShopSeat(index) {
@@ -586,6 +589,7 @@ export default {
             margin-left: 70px;
             p {
                 margin-bottom: 10px;
+                height: 19px;
             }
         }
     }

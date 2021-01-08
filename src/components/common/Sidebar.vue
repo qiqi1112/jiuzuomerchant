@@ -100,7 +100,21 @@ export default {
                 {
                     icon: 'el-icon-lx-redpacket_fill',
                     index: 'financialAudit',
-                    title: '财务审核'
+                    title: '财务审核',
+                    subs: [
+                        {
+                            index: 'tradeOrder',
+                            title: '交易订单'
+                        },
+                        // {
+                        //     index: 'tradeRecord',
+                        //     title: '交易记录'
+                        // },
+                        {
+                            index: 'myAccount',
+                            title: '我的账户'
+                        }
+                    ]
                 },
                 // {
                 //     icon: 'el-icon-lx-text',
@@ -115,7 +129,17 @@ export default {
                 {
                     icon: 'iconfont icon-shezhi side',
                     index: 'setting',
-                    title: '设置'
+                    title: '设置',
+                    subs: [
+                        // {
+                        //     index: 'reserveSetting',
+                        //     title: '预定权限'
+                        // },
+                        {
+                            index: 'passwordSetting',
+                            title: '收款密码设置'
+                        }
+                    ]
                 },
                 {
                     icon: 'iconfont icon-cangku side',
