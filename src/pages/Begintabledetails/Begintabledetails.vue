@@ -79,153 +79,174 @@
                     </div>
                     <!-- 座位属性 -->
                     <!-- v-if="clickFlag" -->
-                    <div class="right-box" >
-                        <h4 class="title">开台详情</h4>
-                        <div class="padd">
-                            <span>预定用户:</span>
-                            <el-input :disabled="isReadonly" v-model="presentSeatInfos.contactName" placeholder="预定用户"></el-input>
-                        </div>
-                        <div class="padd">
-                            <span>预定手机:</span>
-                            <el-input :disabled="isReadonly" v-model="presentSeatInfos.contactTel" placeholder="预定手机"></el-input>
-                        </div>
-                        <div class="padd">
-                            <span>预定类型:</span>
-                            <span>{{ presentSeatInfos.orderType | orderType }}</span>
-                        </div>
-                        <div class="padd">
-                            <span class="small-span">实付金额:</span>
-                            <el-input
-                                class="smallInpss"
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfos.paidAmount"
-                                placeholder="实付金额"
-                            ></el-input>
-                            <span class="smallSpan">商品原价:</span>
-                            <el-input
-                                class="smallInps"
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfos.payableAmount"
-                                placeholder="商品原价"
-                            ></el-input>
-                            <span class="small_span">优惠券优惠:</span>
-                            <el-input
-                                class="smallInp"
-                                :disabled="isReadonly"
-                                v-model="presentSeatInfos.couponAmount"
-                                placeholder="优惠券优惠"
-                            ></el-input>
-                        </div>
-                        <div class="moneyTime time-margin">
-                            <span>下单时间:</span>
-                            <span>{{ presentSeatInfos.createTime }}</span>
-                        </div>
-                        <div class="moneyTime">
-                            <span>支付时间:</span>
-                            <span>{{ presentSeatInfos.payTime }}</span>
-                        </div>
-                        <div class="inventory-details">
-                            <span>清单详情:</span>
-                            <div class="details">
-                                <span class="headers"> 座位信息 </span>
-                                <div style="display: flex">
-                                    <div class="left">
-                                        <p>座位号：</p>
-                                        <p>容纳人数：</p>
-                                        <p>保留时间：</p>
-                                        <p>低消金额：</p>
+                    <div class="right-box">
+                        <h4 class="title">开台详情:</h4>
+                        <div class="middleBox">
+                            <div class="newLeft">
+                                <div class="padd">
+                                    <span>预定用户:</span>
+                                    <el-input
+                                        :disabled="isReadonly"
+                                        v-model="presentSeatInfos.contactName"
+                                        placeholder="预定用户"
+                                    ></el-input>
+                                </div>
+                                <div class="padd">
+                                    <span>预定手机:</span>
+                                    <el-input
+                                        :disabled="isReadonly"
+                                        v-model="presentSeatInfos.contactTel"
+                                        placeholder="预定手机"
+                                    ></el-input>
+                                </div>
+                                <div class="padd">
+                                    <span>预定类型:</span>
+                                    <span>{{ presentSeatInfos.orderType | orderType }}</span>
+                                </div>
+                                <div class="padd">
+                                    <div>
+                                        <span class="small-span">实付金额:</span>
+                                        <el-input
+                                            class="smallInpss"
+                                            :disabled="isReadonly"
+                                            v-model="presentSeatInfos.paidAmount"
+                                            placeholder="实付金额"
+                                        ></el-input>
                                     </div>
-                                    <div class="right">
-                                        <p>{{ presentSeatInfo.seatCode }}座</p>
-                                        <p>{{ presentSeatInfo.numberOfPeople }}人</p>
-                                        <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
-                                        <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
+                                    <div>
+                                        <span class="small-span">商品原价:</span>
+                                        <el-input
+                                            class="smallInps"
+                                            :disabled="isReadonly"
+                                            v-model="presentSeatInfos.payableAmount"
+                                            placeholder="商品原价"
+                                        ></el-input>
+                                    </div>
+                                    <div>
+                                        <span class="small_span">优惠券优惠:</span>
+                                        <el-input
+                                            class="smallInp"
+                                            :disabled="isReadonly"
+                                            v-model="presentSeatInfos.couponAmount"
+                                            placeholder="优惠券优惠"
+                                        ></el-input>
                                     </div>
                                 </div>
+                                <div class="moneyTime time-margin">
+                                    <span>下单时间:</span>
+                                    <span>{{ presentSeatInfos.createTime }}</span>
+                                </div>
+                                <div class="moneyTime">
+                                    <span>支付时间:</span>
+                                    <span>{{ presentSeatInfos.payTime }}</span>
+                                </div>
                             </div>
-                            <div class="details-two">
-                                <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
-                                <div
-                                    style="display: flex; justify-content: space-between; flex-wrap: nowrap"
-                                    v-for="(item, index) in presentSeatInfos.goodsList"
-                                    :key="index"
-                                >
-                                    <div class="left">
-                                        <p>
-                                            <span>{{ item.goodsName }}</span
-                                            ><br />
 
-                                            <span>× {{ item.quantity }}</span>
-                                        </p>
-                                    </div>
-                                    <div class="right">
-                                        <p style="margin-left: -165px">
-                                            <span>{{ item.activityPrice | returnFloat }}</span>
-                                            <span style="text-decoration: line-through; color: #888; margin-left: 10px">{{
-                                                item.originalPrice | returnFloat
-                                            }}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="details-two">
-                                <span class="headers" style="display: inline-block; margin-bottom: 15px"> 追加酒水清单 </span>
-                                <div class="list-box add-drinks">
-                                    <div class="add-drink-list" v-for="(item, index) in presentSeatInfos.groupGoods" :key="index">
-                                        <div class="order-title">
-                                            <span>{{ item.groupName }}</span>
-                                            <span>{{ item.createTime }}</span>
+                            <div class="inventory-details">
+                                <h3>清单详情:</h3>
+                                <div class="right-details">
+                                <div class="details">
+                                    <span class="headers"> 座位信息 </span>
+                                    <div style="display: flex">
+                                        <div class="left">
+                                            <p>座位号：</p>
+                                            <p>容纳人数：</p>
+                                            <p>保留时间：</p>
+                                            <p>低消金额：</p>
                                         </div>
+                                        <div class="right">
+                                            <p>{{ presentSeatInfo.seatCode }}座</p>
+                                            <p>{{ presentSeatInfo.numberOfPeople }}人</p>
+                                            <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
+                                            <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="details-two">
+                                    <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
+                                    <div
+                                        style="display: flex; justify-content: space-between; flex-wrap: nowrap"
+                                        v-for="(item, index) in presentSeatInfos.goodsList"
+                                        :key="index"
+                                    >
+                                        <div class="left">
+                                            <p>
+                                                <span>{{ item.goodsName }}</span
+                                                ><br />
 
-                                        <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
-                                            <div class="good-box">
-                                                <div class="good-name">
-                                                    <span>{{ item2.goodsName }}</span>
-                                                    <span class="num">x{{ item2.quantity }}</span>
+                                                <span>× {{ item.quantity }}</span>
+                                            </p>
+                                        </div>
+                                        <div class="right">
+                                            <p style="margin-left: -165px">
+                                                <span>{{ item.activityPrice | returnFloat }}</span>
+                                                <span style="text-decoration: line-through; color: #888; margin-left: 10px">{{
+                                                    item.originalPrice | returnFloat
+                                                }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="details-two">
+                                    <span class="headers" style="display: inline-block; margin: 15px 0"> 追加酒水清单 </span>
+                                    <div class="list-box add-drinks">
+                                        <div class="add-drink-list" v-for="(item, index) in presentSeatInfos.groupGoods" :key="index">
+                                            <div class="order-title">
+                                                <span>{{ item.groupName }}</span>
+                                                <span>{{ item.createTime }}</span>
+                                            </div>
+
+                                            <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
+                                                <div class="good-box">
+                                                    <div class="good-name">
+                                                        <span>{{ item2.goodsName }}</span><br />
+                                                        <span class="num">x{{ item2.quantity }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span>￥{{ item2.activityPrice }}</span>
+                                                    <span class="unline">￥{{ item2.originalPrice }}</span>
                                                 </div>
                                             </div>
                                             <div>
-                                                <span>￥{{ item2.activityPrice }}</span>
-                                                <span class="unline">￥{{ item2.originalPrice }}</span>
+                                                <el-button
+                                                    :disabled="true"
+                                                    v-if="item.servedStatus == 0 || item.servedStatus == 1"
+                                                    type="primary"
+                                                    >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
+                                                >
+                                                <el-button
+                                                    :disabled="true"
+                                                    v-if="item.servedStatus == 0 || item.servedStatus == 2"
+                                                    type="danger"
+                                                    >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
+                                                >
                                             </div>
                                         </div>
-                                        <div>
-                                            <el-button
-                                                :disabled="true"
-                                                v-if="item.servedStatus == 0 || item.servedStatus == 1"
-                                                type="primary"
-                                                >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
-                                            >
-                                            <el-button
-                                                :disabled="true"
-                                                v-if="item.servedStatus == 0 || item.servedStatus == 2"
-                                                type="danger"
-                                                >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
-                                            >
+                                    </div>
+                                </div>
+                                <div class="details-two">
+                                    <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠券 </span>
+                                    <div style="display: flex">
+                                        <div class="left">
+                                            <p>
+                                                <span>{{ presentSeatInfos.details }}</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="details-two">
-                                <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠券 </span>
-                                <div style="display: flex">
-                                    <div class="left">
-                                        <p>
-                                            <span>{{ presentSeatInfos.details }}</span>
-                                        </p>
+                                <div class="details-two">
+                                    <div style="display: flex; margin-top: 30px">
+                                        <div class="left">
+                                            <p style="white-space: nowrap">经商家换座：</p>
+                                            <p>换座时间：</p>
+                                        </div>
+                                        <div class="right">
+                                            <p>{{ presentSeatInfos.replaceSeatCode }}</p>
+                                            <p>{{ presentSeatInfos.changeSeatTime }}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="details-two">
-                                <div style="display: flex; margin-top: 30px">
-                                    <div class="left">
-                                        <p style="white-space: nowrap">经商家换座：</p>
-                                        <p>换座时间：</p>
-                                    </div>
-                                    <div class="right">
-                                        <p>{{ presentSeatInfos.replaceSeatCode }}</p>
-                                        <p>{{ presentSeatInfos.changeSeatTime }}</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -348,20 +369,20 @@ export default {
                     // item.layoutList.forEach((item2) => {
                     if (item.floor == item.floor && item.seatRow == seatRow && item.seatColumn == seatColumn) {
                         //查看当前座位信息
-                        console.log(item)
+                        console.log(item);
                         this.presentSeatInfo = item;
                         let newObj = this.presentSeatInfo;
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
                         this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
-                            console.log(res)
+                            console.log(res);
                             if (res.code == 0) {
                                 if (res.data) {
-                                    res.data.orderAmount = this.price(res.data.orderAmount);
+                                    res.data.paidAmount = this.price(res.data.paidAmount);
                                     res.data.payableAmount = this.price(res.data.payableAmount);
                                     res.data.couponAmount = this.price(res.data.couponAmount);
                                     (this.presentSeatInfos = res.data), newObj;
                                     // this.clickFlag = true;
-                                    console.log(this.presentSeatInfos.servedStatus);
+                                    console.log(this.presentSeatInfos);
                                 } else {
                                     this.presentSeatInfos = [];
                                 }
@@ -491,7 +512,7 @@ export default {
             // this.getShopSeat(index);
             // this.showSeatAtt(index);
             // this.clickFlag = false;
-            this.presentSeatInfo=''
+            this.presentSeatInfo = '';
         },
         //回显店铺卡座数量（行和列数量）1
         getShopSeat(index) {
@@ -553,7 +574,7 @@ export default {
     }
 }
 .el-input {
-    width: 160px;
+    width: 115px;
     height: 20px;
 }
 .time-margin {
@@ -572,11 +593,17 @@ export default {
 .inventory-details {
     font-size: 14px;
     padding-left: 19px;
-    display: flex;
-    margin-top: 35px;
-    flex-wrap: wrap;
+    width: 435px;
+    margin-top: -20px;
+    h3{
+        display: inline-block;
+        height: 18px;
+    }
+    .right-details{
+        margin-top: 10px;
+    }
     .details {
-        margin-left: 57px;
+        // margin-left: 57px;
         .headers {
             color: #e6a23c;
         }
@@ -594,18 +621,18 @@ export default {
         }
     }
     .details-two {
-        width: 450px;
+        width: 315px;
         &:nth-child(3) {
             border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
+            // border-bottom: 1px solid #000;
         }
         &:nth-child(3) {
-            width: 440px;
+            width: 315px;
         }
         &:nth-child(4) {
-            width: 440px;
+            width: 315px;
         }
-        margin-left: 117px;
+        // margin-left: 117px;
         .headers {
             color: #e6a23c;
         }
@@ -639,7 +666,6 @@ export default {
         .drink-list {
             display: flex;
             margin-bottom: 18px;
-
             .good-box {
                 width: 160px;
 
@@ -648,7 +674,6 @@ export default {
                     display: flex;
                     justify-content: space-between;
                     padding-right: 20px;
-
                     .num {
                         min-width: 20px;
                     }
@@ -677,21 +702,24 @@ export default {
     }
 }
 .container {
-    // width: 100%;
+    // width: 100vw;
     height: auto;
 }
 ::-webkit-scrollbar {
     width: 5px; /*对垂直流动条有效*/
+    height: 10px;
 }
-::-webkit-scrollbar-track{
--webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-background-color: #fff;
+::-webkit-scrollbar-track {
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
 }
-::-webkit-scrollbar-thumb{
-border-radius: 3px;
--webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-background-color: rgb(109, 63, 63);
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: rgb(109, 63, 63);
 }
+
 .shop-seat {
     width: 100%;
     height: 100%;
@@ -748,12 +776,21 @@ background-color: rgb(109, 63, 63);
     }
 
     .right-box {
-        width: 455px;
-        height: 70vh;
+        height: 74vh;
         overflow: auto;
         padding-right: 5px;
         // border: 1px solid #000;
+        // display: flex;
+        .middleBox {
+            display: flex;
+        }
+        .newLeft {
+            margin-top: 10px;
+            display: block;
+            width: 310px;
+        }
         .title {
+            height: 25px;
             border-left: 3px solid #409eff;
             padding-left: 16px;
         }
@@ -761,12 +798,13 @@ background-color: rgb(109, 63, 63);
     .padd {
         margin-top: 20px;
         padding-left: 19px;
+        width: 250px;
         span {
             font-size: 14px;
             margin-right: 60px;
         }
         .small-span {
-            margin-right: 30px;
+            margin-right: 60px;
         }
         .smallSpan {
             margin: 0 30px 0 0;
@@ -787,7 +825,7 @@ background-color: rgb(109, 63, 63);
             margin-right: 20px;
         }
         .small_span {
-            margin-right: 16px;
+            margin-right: 46px;
         }
     }
 }
