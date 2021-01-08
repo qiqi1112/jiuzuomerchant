@@ -228,9 +228,12 @@
                                 <div class="details-two">
                                     <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠券 </span>
                                     <div style="display: flex">
-                                        <div class="left">
+                                        <div class="left" style="width:100%">
                                             <p>
-                                                <span>{{ presentSeatInfos.details }}</span>
+                                                平台优惠券：<span>{{ presentSeatInfos.appDetails }}</span>
+                                            </p>
+                                            <p>
+                                                商家优惠券：<span>{{ presentSeatInfos.storeDetails }}</span>
                                             </p>
                                         </div>
                                     </div>
@@ -664,6 +667,7 @@ export default {
             }
         }
         .drink-list {
+            
             display: flex;
             margin-bottom: 18px;
             .good-box {
