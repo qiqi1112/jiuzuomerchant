@@ -2,7 +2,7 @@
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2021-01-04 18:41:39
+ * @Last Modified time: 2021-01-08 15:06:24
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -26,6 +26,15 @@ function pureNumber(val) {
 //验证金额
 function money(val) {
     if (!/^\d+(\.\d{1,2})?$/.test(val)) {
+        return false;
+    } else {
+        return true
+    }
+}
+
+//银行卡卡号验证
+function bankAcountNum(val) {
+    if (!/^([1-9]{1})(\d{15}|\d{16}|\d{17}|\d{18})$/.test(val)) {
         return false;
     } else {
         return true
@@ -178,5 +187,6 @@ export default {
     deep,
     pureNumber,
     getBase64Image,
-    compress
+    compress,
+    bankAcountNum
 }

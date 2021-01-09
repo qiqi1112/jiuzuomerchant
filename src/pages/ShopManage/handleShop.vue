@@ -415,7 +415,7 @@ export default {
         beforeImgUpload(file) {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
-            const isLt2M = file.size / 1024 / 1024 <= 2; //限制文件大小
+            const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG) {
@@ -426,7 +426,7 @@ export default {
             //限制上传文件大小
             if (isJPG || isPNG) {
                 if (!isLt2M) {
-                    this.$message.error('图片大小不能超过 2MB');
+                    this.$message.error('图片大小不能超过 1MB');
                     return false;
                 }
             }
@@ -760,7 +760,7 @@ export default {
 
         .vip-card-wrap {
             > span {
-                min-width: 100px;
+                min-width: 110px;
             }
 
             display: flex;

@@ -16,14 +16,22 @@
                 </div>
                 <!-- 消息中心 -->
                 <div class="btn-bell" @click="information">
-                    <el-tooltip effect="dark" :content="$store.state.headerUnread ? `有${$store.state.headerUnread}条未读消息` : `消息中心`" placement="bottom">
+                    <el-tooltip
+                        effect="dark"
+                        :content="$store.state.headerUnread ? `有${$store.state.headerUnread}条未读消息` : `消息中心`"
+                        placement="bottom"
+                    >
                         <i class="el-icon-bell"></i>
                     </el-tooltip>
-                    <span class="btn-bell-badge" v-if="$store.state.headerUnread>0"></span>
+                    <span class="btn-bell-badge" v-if="$store.state.headerUnread > 0"></span>
                 </div>
                 <div class="btn-bell" @click="mute">
                     <el-tooltip effect="dark" :content="$store.state.headerClickMute ? `已静音` : `静音`" placement="bottom">
-                        <i style="font-size:20px" :class="$store.state.headerClickMute?'icon-jingyin':'icon-laba'" class="iconfont"></i>
+                        <i
+                            style="font-size: 20px"
+                            :class="$store.state.headerClickMute ? 'icon-jingyin' : 'icon-laba'"
+                            class="iconfont"
+                        ></i>
                     </el-tooltip>
                 </div>
                 <!-- 用户头像 -->
@@ -46,13 +54,13 @@
                 <el-dialog title="修改密码" :visible.sync="dialogVisible" width="30%" @close="handleCloseDialog">
                     <el-form :model="form">
                         <el-form-item label="原密码" label-width="100px">
-                            <el-input v-model="form.oldPass"></el-input>
+                            <el-input v-model="form.oldPass" show-password></el-input>
                         </el-form-item>
                         <el-form-item label="新密码" label-width="100px">
-                            <el-input v-model="form.newPass" type="password"></el-input>
+                            <el-input v-model="form.newPass" show-password></el-input>
                         </el-form-item>
                         <el-form-item label="重复新密码" label-width="100px">
-                            <el-input v-model="form.sureNewPass" type="password"></el-input>
+                            <el-input v-model="form.sureNewPass" show-password></el-input>
                         </el-form-item>
                     </el-form>
                     <span slot="footer" class="dialog-footer">
@@ -96,20 +104,20 @@ export default {
             return logo ? this.$imgHead + logo : require('../../assets/favicon.png');
         }
     },
-    created(){
-        if(localStorage.getItem('mute')){
-            this.$store.commit('headerClickMuteFun', localStorage.getItem('mute')==1?false:true);
-        }else{
+    created() {
+        if (localStorage.getItem('mute')) {
+            this.$store.commit('headerClickMuteFun', localStorage.getItem('mute') == 1 ? false : true);
+        } else {
             this.$store.commit('headerClickMuteFun', false);
         }
     },
     methods: {
-        information(){
+        information() {
             this.$store.commit('headerClickMsgFun', !this.$store.state.headerClickMsg);
         },
-        mute(){
+        mute() {
             this.$store.commit('headerClickMuteFun', !this.$store.state.headerClickMute);
-            localStorage.setItem('mute',this.$store.state.headerClickMute==true?2:1)
+            localStorage.setItem('mute', this.$store.state.headerClickMute == true ? 2 : 1);
         },
         //对话框里的确认操作
         handleConfrim() {
@@ -153,7 +161,7 @@ export default {
                         localStorage.removeItem('userInfo');
                         this.$message.success('退出成功');
                         this.$router.push('/login');
-                        RongIMClient.getInstance().logout();//退出登录
+                        RongIMClient.getInstance().logout(); //退出登录
                         // RongIMClient.getInstance().disconnect(); //断开链接
                     },
                     (err) => {
