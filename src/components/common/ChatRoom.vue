@@ -11,8 +11,12 @@
             <span class="all_unread" v-show="$store.state.headerUnread > 0">{{ $store.state.headerUnread }}</span>
         </div>
 
-        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close="closeDialog">
-            <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg">
+        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close="closeDialog" >
+            <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg" 
+            v-loading="loadingChat"
+            element-loading-text="拼命加载中"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.8)">
                 <div class="box">
                     <div class="people_list">
                         <ul>
@@ -257,7 +261,8 @@ export default {
             audioUrl: '',
             unInput: true,
             isMute: false,
-            service: [] //客服
+            service: [], //客服
+            loadingChat:false
         };
     },
 
@@ -637,6 +642,7 @@ export default {
             // this.conversation()
         },
         getChat(val, i) {
+            this.loadingChat = true
             if (val.targetId == '10000' || val.targetId == '10001') {
                 this.unInput = false;
             } else {
@@ -800,6 +806,7 @@ export default {
                     }
                     this.scorllFalse = false;
                     this.getMore = false;
+                    this.loadingChat = false
                 } else {
                     this.$message({ message: res.msg, type: 'warning' });
                 }
