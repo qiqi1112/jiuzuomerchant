@@ -48,73 +48,80 @@
                                 <div class="getMore" v-show="!hasHistoryMsg">没有更多了</div>
                                 <div class="cli" ref="topDistance">
                                     <div class="cmsg" v-for="(item, i) in msgArr" :key="i" ref="cmsg">
-                                        <div class="send_or_rece">{{ item.sentTime | formatTime(that) }}</div>
-                                        <div class="msg_list" v-if="item.messageDirection == 2">
-                                            <div class="headImg">
-                                                <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
+                                        <template v-if="item.messageType == 'UnknownMessage'">
+                                            <div class="withdraw notMsgType">
+                                                <div>不支持的消息类型</div>
                                             </div>
-                                            <!-- 文本消息 -->
-                                            <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">
-                                                <div>对方撤回了一条消息</div>
-                                            </div>
-                                            <div class="msg" v-if="item.messageType == 'TextMessage'">
-                                                <div v-html="item.content.content"></div>
-                                                <!-- {{item.content.content}} -->
-                                            </div>
-                                            <!-- 图片 -->
-                                            <div class="msg" v-if="item.messageType == 'ImageMessage'">
-                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="" />
-                                            </div>
-                                            <!-- 订单消息 -->
-                                            <div class="msg" v-if="item.targetId == '10001'">
-                                                <div class="orderinfo">
-                                                    <div class="fx">
-                                                        <div style="flex: 0.3">内容:</div>
-                                                        <div style="flex: 0.7">{{ item.content.content }}</div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="send_or_rece">{{ item.sentTime | formatTime(that) }}</div>
+                                            <div class="msg_list" v-if="item.messageDirection == 2">
+                                                <div class="headImg">
+                                                    <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
+                                                </div>
+                                                <!-- 文本消息 -->
+                                                <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">
+                                                    <div>对方撤回了一条消息</div>
+                                                </div>
+                                                <div class="msg" v-if="item.messageType == 'TextMessage'">
+                                                    <div v-html="item.content.content"></div>
+                                                    <!-- {{item.content.content}} -->
+                                                </div>
+                                                <!-- 图片 -->
+                                                <div class="msg" v-if="item.messageType == 'ImageMessage'">
+                                                    <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="" />
+                                                </div>
+                                                <!-- 订单消息 -->
+                                                <div class="msg" v-if="item.targetId == '10001'">
+                                                    <div class="orderinfo">
+                                                        <div class="fx">
+                                                            <div style="flex: 0.3">内容:</div>
+                                                            <div style="flex: 0.7">{{ item.content.content }}</div>
+                                                        </div>
+                                                        <div class="fx">
+                                                            <div style="flex: 0.3">时间:</div>
+                                                            <div style="flex: 0.7">{{ $regular.timeData(item.sentTime, 3) }}</div>
+                                                        </div>
+                                                        <div class="fx">
+                                                            <div style="flex: 0.3">用户名:</div>
+                                                            <div style="flex: 0.7">{{ item.content.title }}</div>
+                                                        </div>
+                                                        <div
+                                                            @click="lookOrder(item)"
+                                                            style="
+                                                                text-align: center;
+                                                                padding-top: 10px;
+                                                                border-top: 1px solid white;
+                                                                cursor: pointer;
+                                                            "
+                                                        >
+                                                            查看详情
+                                                        </div>
                                                     </div>
-                                                    <div class="fx">
-                                                        <div style="flex: 0.3">时间:</div>
-                                                        <div style="flex: 0.7">{{ $regular.timeData(item.sentTime, 3) }}</div>
-                                                    </div>
-                                                    <div class="fx">
-                                                        <div style="flex: 0.3">用户名:</div>
-                                                        <div style="flex: 0.7">{{ item.content.title }}</div>
-                                                    </div>
-                                                    <div
-                                                        @click="lookOrder(item)"
-                                                        style="
-                                                            text-align: center;
-                                                            padding-top: 10px;
-                                                            border-top: 1px solid white;
-                                                            cursor: pointer;
-                                                        "
-                                                    >
-                                                        查看详情
+                                                </div>
+                                                <!-- 官方消息 -->
+                                                <div class="msg" v-if="item.targetId == '10000'">
+                                                    <div class="official">
+                                                        <div>{{ item.content.title }}</div>
+                                                        <div>{{ item.content.content }}</div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- 官方消息 -->
-                                            <div class="msg" v-if="item.targetId == '10000'">
-                                                <div class="official">
-                                                    <div>{{ item.content.title }}</div>
-                                                    <div>{{ item.content.content }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        <div class="msg_list self" v-else>
-                                            <div class="msg self_msg" v-if="item.messageType == 'TextMessage'">
-                                                <!-- <div >{{item.content.content}}</div> -->
-                                                <div v-html="item.content.content"></div>
+                                            <div class="msg_list self" v-else>
+                                                <div class="msg self_msg" v-if="item.messageType == 'TextMessage'">
+                                                    <!-- <div >{{item.content.content}}</div> -->
+                                                    <div v-html="item.content.content"></div>
+                                                </div>
+                                                <div class="msg self_msg" v-if="item.messageType == 'ImageMessage'">
+                                                    <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="" />
+                                                </div>
+                                                <div class="headImg self_img">
+                                                    <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
+                                                </div>
+                                                <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">你撤回了一条消息</div>
                                             </div>
-                                            <div class="msg self_msg" v-if="item.messageType == 'ImageMessage'">
-                                                <img class="msg_picture" v-if="item.content" :src="item.content.imageUri" alt="" />
-                                            </div>
-                                            <div class="headImg self_img">
-                                                <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
-                                            </div>
-                                            <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">你撤回了一条消息</div>
-                                        </div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -331,20 +338,37 @@ export default {
                 if (lastObj.offLineMessage) {
                     return;
                 }
-                lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
+                try{
+                    if(lastObj.messageType != 'RecallCommandMessage' && lastObj.messageType != 'UnknownMessage' ){
+                        lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
+                    }else{
+                        if (lastObj.messageType == 'RecallCommandMessage') {
+                            if (lastObj.targetId == this.now_user.targetId) {
+                                for (let i = 0; i < this.msgArr.length; i++) {
+                                    if(this.msgArr[i].messageUId == lastObj.messageUId){
+                                        this.msgArr.splice(i,1)
+                                        // break;
+                                    }
+                                }
+                            }
+                        }
+                    } 
+                }catch{
+                    if (lastObj.messageType == 'RecallCommandMessage') {
+                        if (lastObj.targetId == this.now_user.targetId) {
+                            for (let i = 0; i < this.msgArr.length; i++) {
+                                if(this.msgArr[i].messageUId == lastObj.messageUId){
+                                    this.msgArr = this.msgArr.splice(i,1)
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
                 // if(lastObj.messageType == 'deteleMessage'){
                 //     // 如果收到  自定义 删除类型的消息  则删除会话和未读
                 // }
                 // 撤回
-                if (lastObj.messageType == 'RecallCommandMessage') {
-                    for (let i = 0; i < this.userList.length; i++) {
-                        if (lastObj.targetId == this.userList[i].targetId) {
-                            console.log(this.userList[i]);
-                        }
-                        break;
-                    }
-                    return;
-                }
 
                 if (!lastObj.offLineMessage) {
                     if (lastObj.messageType == 'TextMessage') {
@@ -773,9 +797,18 @@ export default {
                 if (res.code == 0) {
                     let newArr = [];
                     let userInfo = res.data;
+
                     list.forEach((v, i) => {
-                        v.content.content = RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
-                        // 调用历史记录
+                        try{
+                            if(v.messageType != 'UnknownMessage' && v.messageType != 'RecallCommandMessage' ){
+                                v.content.content = RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
+                            } 
+                        }catch{
+                        }
+                        // if(v.messageType == 'UnknownMessage' || v.messageType == 'RecallCommandMessage'){
+                        // }else{
+                        // }
+                            // 调用历史记录
                         if (v.messageDirection == 2) {
                             if (userInfo.id == '10001') {
                                 // 如果是订单消息
@@ -794,6 +827,8 @@ export default {
                         }
                         newArr.unshift(v);
                     });
+            
+                    
                     newArr.forEach((v) => {
                         this.msgArr.unshift(v);
                     });
@@ -808,6 +843,7 @@ export default {
                     this.getMore = false;
                     this.loadingChat = false
                 } else {
+                    this.loadingChat = false
                     this.$message({ message: res.msg, type: 'warning' });
                 }
             });
@@ -1451,6 +1487,10 @@ export default {
                                 display: inline-block;
                                 background: #dadada;
                             }
+                        }
+                        .notMsgType{
+                            text-align: center;
+                            margin-bottom: 12px;
                         }
                         .self_img {
                             text-align: right;
