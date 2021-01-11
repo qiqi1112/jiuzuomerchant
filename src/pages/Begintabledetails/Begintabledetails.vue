@@ -524,10 +524,17 @@ export default {
         },
         //切换楼层，楼层对应的行列跟着切换1
         changeShowFloor(item, index) {
+            this.wrapLoading = true;
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
             this.$post('/merchant/store/getStoreSeat', { floor: this.nowFloor }).then((res) => {
                 console.log(res);
+                if(res.code===0){
+                    this.wrapLoading = false;
+                }else{
+                    this.wrapLoading = false;
+                    this.$message.error(res.msg);
+                }
                 let result = res.data;
                 // this.floorList = result.storeSeatFloorDTOS
                 this.list = result.storeSeatDTOS;
@@ -828,7 +835,6 @@ export default {
             width: 310px;
         }
         .title {
-            height: 25px;
             border-left: 3px solid #409eff;
             padding-left: 16px;
         }
