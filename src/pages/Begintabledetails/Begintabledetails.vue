@@ -99,9 +99,36 @@
                                         placeholder="预定手机"
                                     ></el-input>
                                 </div>
+                                <div class="order-num">
+                                    <span>订单号:</span>
+                                    <el-input
+                                        :disabled="isReadonly"
+                                        v-model="presentSeatInfos.orderNo"
+                                        placeholder="订单号"
+                                    ></el-input>
+                                </div>
+                                <div class="order-num">
+                                    <span>预定备注信息:</span>
+                                    <el-input
+                                        :disabled="isReadonly"
+                                        v-model="presentSeatInfos.remarks"
+                                        placeholder="预定备注信息"
+                                        type="textarea"
+                                        resize="none"
+                                        :rows="4"
+                                    ></el-input>
+                                </div>
                                 <div class="padd">
                                     <span>预定类型:</span>
                                     <span>{{ presentSeatInfos.orderType | orderType }}</span>
+                                </div>
+                                <div class="padd">
+                                    <span>支付状态:</span>
+                                    <span>{{ presentSeatInfos.payStatus | payStatus }}</span>
+                                </div>
+                                <div class="padd">
+                                    <span>支付方式:</span>
+                                    <span>{{ presentSeatInfos.payWay | payWay }}</span>
                                 </div>
                                 <div class="padd">
                                     <div>
@@ -169,7 +196,7 @@
                                         v-for="(item, index) in presentSeatInfos.goodsList"
                                         :key="index"
                                     >
-                                        <div class="left">
+                                        <div class="left water-left">
                                             <p>
                                                 <span>{{ item.goodsName }}</span
                                                 ><br />
@@ -243,10 +270,12 @@
                                         <div class="left">
                                             <p style="white-space: nowrap">经商家换座：</p>
                                             <p>换座时间：</p>
+                                            <p>占座时间：</p>
                                         </div>
                                         <div class="right">
                                             <p>{{ presentSeatInfos.replaceSeatCode }}</p>
                                             <p>{{ presentSeatInfos.changeSeatTime }}</p>
+                                            <p>{{ presentSeatInfos.occupySeatTime }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -582,7 +611,7 @@ export default {
 }
 .time-margin {
     margin-top: 45px;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
 }
 .moneyTime {
     padding-left: 19px;
@@ -625,6 +654,9 @@ export default {
     }
     .details-two {
         width: 315px;
+        .water-left{
+            height: 35px;
+        }
         &:nth-child(3) {
             border-top: 1px solid #000;
             // border-bottom: 1px solid #000;
@@ -644,6 +676,7 @@ export default {
             overflow: hidden;
             p {
                 margin-bottom: 10px;
+                height: 19px;
                 // white-space: nowrap;
             }
         }
@@ -652,6 +685,7 @@ export default {
             p {
                 margin-bottom: 10px;
                 white-space: nowrap;
+                height: 19px;
             }
         }
         .list-box {
@@ -830,6 +864,14 @@ export default {
         }
         .small_span {
             margin-right: 46px;
+        }
+    }
+    .order-num{
+         margin-top: 20px;
+        padding-left: 19px;
+        width: 280px;
+        .el-input{
+            width: 280px;
         }
     }
 }
