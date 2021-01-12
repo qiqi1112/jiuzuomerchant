@@ -275,7 +275,7 @@
                                         <div class="right">
                                             <p>{{ presentSeatInfos.replaceSeatCode }}</p>
                                             <p>{{ presentSeatInfos.changeSeatTime }}</p>
-                                            <p>{{ presentSeatInfos.occupySeatTime }}</p>
+                                            <p v-if="presentSeatInfos.occupySeatTime==0">{{ presentSeatInfos.occupySeatTime }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -406,7 +406,7 @@ export default {
                         let newObj = this.presentSeatInfo;
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
                         this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
-                            console.log(res);
+                            // console.log(res);
                             if (res.code == 0) {
                                 if (res.data) {
                                     res.data.paidAmount = this.price(res.data.paidAmount);
@@ -824,8 +824,6 @@ export default {
         height: 74vh;
         overflow: auto;
         padding-right: 5px;
-        // border: 1px solid #000;
-        // display: flex;
         .middleBox {
             display: flex;
         }
