@@ -334,7 +334,7 @@ export default {
                     lastObj = '';
                 arr = this.$store.state.newMsgArr;
                 lastObj = arr[arr.length - 1];
-                console.log(lastObj);
+                // console.log(lastObj);
                 if (lastObj.offLineMessage) {
                     return;
                 }
@@ -345,7 +345,7 @@ export default {
                         if (lastObj.messageType == 'RecallCommandMessage') {
                             if (lastObj.targetId == this.now_user.targetId) {
                                 for (let i = 0; i < this.msgArr.length; i++) {
-                                    if(this.msgArr[i].messageUId == lastObj.messageUId){
+                                    if(this.msgArr[i].messageUId == lastObj.content.messageUId){
                                         this.msgArr.splice(i,1)
                                         // break;
                                     }
@@ -357,7 +357,7 @@ export default {
                     if (lastObj.messageType == 'RecallCommandMessage') {
                         if (lastObj.targetId == this.now_user.targetId) {
                             for (let i = 0; i < this.msgArr.length; i++) {
-                                if(this.msgArr[i].messageUId == lastObj.messageUId){
+                                if(this.msgArr[i].messageUId == lastObj.content.messageUId){
                                     this.msgArr = this.msgArr.splice(i,1)
                                 }
                                 break;
@@ -678,6 +678,9 @@ export default {
             this.emojiShow = false;
             this.getMore = true;
             this.hasHistoryMsg = true;
+            setTimeout(()=>{
+                this.loadingChat = false
+            },12000)
             this.getAssignHis(1);
             this.$nextTick(this.scrollEnd);
         },
@@ -711,7 +714,6 @@ export default {
                                 }
                             });
                         });
-                        console.log(arr, 11234);
                         that.userList = arr;
                     },
                     onError: function (error) {
