@@ -38,7 +38,7 @@
                             <img v-if="logoImageUrl" :src="showImgPrefix + logoImageUrl" class="avatar" />
                             <i class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
-                        <span>（*正方形，1MB以内）</span>
+                        <span>（154X154）</span>
                     </div>
                     <div class="right-info">
                         <p class="shop-name">
@@ -2054,7 +2054,7 @@ export default {
             this.nowFloorIndex = index; //当前操作的楼层的下标
             this.nowFloorPower = item.floorPower; //当前操作的楼层的权重
 
-            if (item.floor == this.list[index].layoutList[0].floor && item.floorPower == this.list[index].layoutList[0].floorPower) {
+            if (item.floor == this.list[index].layoutList[0].floor) {
                 this.getShopSeat(index);
                 this.showSeatAtt(index);
             } else {
@@ -2274,10 +2274,10 @@ export default {
             }
 
             //删除一楼就将剩余楼层权重减一
-            this.list.forEach((item) => {
-                item.floorPower = this.list.length - 1;
+            this.list.forEach((item, i) => {
+                item.floorPower = i;
                 item.layoutList.forEach((item2) => {
-                    item2.floorPower = this.list.length - 1;
+                    item2.floorPower = i;
                 });
             });
         },
