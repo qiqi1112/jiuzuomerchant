@@ -11,57 +11,61 @@
             router
             @select="gowhere"
         >
-            <template v-for="item in items">
-                <template v-if="item.subs">
-                    <el-submenu :index="item.index" :key="item.index">
-                        <template slot="title">
+            <template v-if="itemIndex === 1">
+                <template v-for="item in items">
+                    <template v-if="item.subs">
+                        <el-submenu :index="item.index" :key="item.index">
+                            <template slot="title">
+                                <i :class="item.icon"></i>
+                                <span slot="title">{{ item.title }}</span>
+                            </template>
+                            <template v-for="subItem in item.subs">
+                                <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
+                                    <template slot="title">{{ subItem.title }}</template>
+                                    <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
+                                        threeItem.title
+                                    }}</el-menu-item>
+                                </el-submenu>
+                                <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
+                            </template>
+                        </el-submenu>
+                    </template>
+                    <template v-else>
+                        <el-menu-item :index="item.index" :key="item.index">
                             <i :class="item.icon"></i>
                             <span slot="title">{{ item.title }}</span>
-                        </template>
-                        <template v-for="subItem in item.subs">
-                            <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
-                                <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
-                                    threeItem.title
-                                }}</el-menu-item>
-                            </el-submenu>
-                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
-                        </template>
-                    </el-submenu>
-                </template>
-                <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index">
-                        <i :class="item.icon"></i>
-                        <span slot="title">{{ item.title }}</span>
-                    </el-menu-item>
+                        </el-menu-item>
+                    </template>
                 </template>
             </template>
 
-            <!-- <template v-for="item in carItems">
-                <template v-if="item.subs">
-                    <el-submenu :index="item.index" :key="item.index">
-                        <template slot="title">
+            <template v-if="itemIndex === 2">
+                <template v-for="item in carItems">
+                    <template v-if="item.subs">
+                        <el-submenu :index="item.index" :key="item.index">
+                            <template slot="title">
+                                <i :class="item.icon"></i>
+                                <span slot="title">{{ item.title }}</span>
+                            </template>
+                            <template v-for="subItem in item.subs">
+                                <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
+                                    <template slot="title">{{ subItem.title }}</template>
+                                    <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
+                                        threeItem.title
+                                    }}</el-menu-item>
+                                </el-submenu>
+                                <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
+                            </template>
+                        </el-submenu>
+                    </template>
+                    <template v-else>
+                        <el-menu-item :index="item.index" :key="item.index">
                             <i :class="item.icon"></i>
                             <span slot="title">{{ item.title }}</span>
-                        </template>
-                        <template v-for="subItem in item.subs">
-                            <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
-                                <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
-                                    threeItem.title
-                                }}</el-menu-item>
-                            </el-submenu>
-                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
-                        </template>
-                    </el-submenu>
+                        </el-menu-item>
+                    </template>
                 </template>
-                <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index">
-                        <i :class="item.icon"></i>
-                        <span slot="title">{{ item.title }}</span>
-                    </el-menu-item>
-                </template>
-            </template> -->
+            </template>
         </el-menu>
     </div>
 </template>
@@ -71,6 +75,7 @@ import bus from '../common/bus';
 export default {
     data() {
         return {
+            itemIndex: 2,
             collapse: false,
             items: [
                 {

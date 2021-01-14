@@ -5,7 +5,7 @@
             <div class="left-wrap">
                 <h4>
                     <span>店铺信息</span>
-                    <el-button
+                    <!-- <el-button
                         :disabled="recoType != 1"
                         :type="recoType == 1 ? 'primary' : recoType == 2 ? 'info' : 'success'"
                         @click="storeRecommend"
@@ -14,7 +14,7 @@
                     </el-button>
                     <el-button :disabled="putawayStatus === 3" type="primary" @click="putawayStore" v-if="isReadonly && putawayStatus">{{
                         putawayStatus | putawayStatus
-                    }}</el-button>
+                    }}</el-button> -->
                     <el-button type="primary" v-if="isReadonly && putawayStatus == 2" @click="editShopInfo">编辑</el-button>
                     <el-button type="success" @click="submitShopInfo" v-if="!isReadonly">保存</el-button>
                     <el-button type="info" @click="storageInfo" v-if="!isReadonly && !isUpdate">暂存数据</el-button>
@@ -24,7 +24,7 @@
                 <!-- 店铺基本信息 -->
                 <div class="shop-info clearfix">
                     <div class="left-info" v-loading="imgLoading.loading2">
-                        <p>店铺logo</p>
+                        <p>车行logo</p>
                         <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + logoImageUrl" class="avatar" />
                         <el-upload
                             v-else
@@ -42,35 +42,26 @@
                     </div>
                     <div class="right-info">
                         <p class="shop-name">
-                            <span>店名：</span>
+                            <span>车行名称：</span>
                             <el-input v-model="shopName" placeholder="请输入店名" :readonly="isReadonly" clearable></el-input>
                         </p>
-                        <p class="shop-brief">
-                            <span>店铺简介：</span>
-                            <el-input
-                                type="textarea"
-                                :rows="3"
-                                placeholder="请输入店铺简介"
-                                v-model="shopBrief"
-                                :readonly="isReadonly"
-                                maxlength="120"
-                                show-word-limit
-                            ></el-input>
+                        <p class="shop-loca">
+                            <span>车行定位：</span>
+                            <span class="shop-loca-span">租车行</span>
                         </p>
                     </div>
                 </div>
 
                 <!-- 店铺定位 -->
-                <div class="shop-loca">
-                    <p>店铺定位</p>
-                    <!-- <p>店铺定位（注：选择夜店/清吧就没有“独立卫生间、机麻、赠品”）</p> -->
+                <!-- <div class="shop-loca">
+                    <p>车行定位</p>
                     <div v-if="!isUpdate">
                         <span v-for="(item, index) in shopLoca" :key="index" ref="shopLoca" @click="changeShopLoca">{{ item }}</span>
                     </div>
                     <div v-else>
                         <span class="shop-loca-span">{{ shopLocaIndex | shopLocaShow }}</span>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- 店铺标签 -->
                 <!-- <div class="shop-label">
@@ -99,9 +90,8 @@
                 </div> -->
 
                 <!-- 客服电话 -->
-                <div class="service-phone">
+                <!-- <div class="service-phone">
                     <p>客服电话</p>
-                    <!-- 回显 -->
                     <div class="show-box" v-for="(item, index) in servicePhoneArr" :key="index">
                         <el-input
                             :onkeyup="(servicePhoneArr[index] = servicePhoneArr[index].replace(/^(-1+)|[^\d]+/g, ''))"
@@ -114,7 +104,6 @@
                         <el-button v-if="!isReadonly" type="danger" @click="deleteServicePhone(item)">删除</el-button>
                     </div>
 
-                    <!-- 新增 -->
                     <template v-if="!isReadonly && servicePhoneArr.length < 3">
                         <div style="margin-bottom: 10px">
                             <el-input
@@ -128,14 +117,14 @@
                         </div>
                         <span style="font-size: 12px; color: #f00">*输入完电话后，点击添加按钮视为添加成功</span>
                     </template>
-                </div>
+                </div> -->
 
                 <!-- 店铺营业时间，人均消费，类型 -->
                 <div class="shop-div">
                     <div class="shop-div1">
                         <!-- 店铺营业时间 -->
                         <div class="bussiness-hours">
-                            <p>店铺营业时间</p>
+                            <p>车行营业时间</p>
                             <div class="time-select">
                                 <el-time-select
                                     v-model="startBussTime"
@@ -160,41 +149,11 @@
                                 ></el-time-select>
                             </div>
                         </div>
-                        <!-- 店铺人均消费 -->
-                        <div class="per-con">
-                            <p>店铺人均消费</p>
-                            <el-input
-                                @blur="checkPrice(perCon, 1)"
-                                v-model="perCon"
-                                placeholder="人均消费"
-                                style="width: 70%; margin-right: 6px"
-                                :readonly="isReadonly"
-                            >
-                                <template slot="append">￥/人</template>
-                            </el-input>
-                        </div>
                     </div>
                     <div class="shop-div2">
                         <!-- 店铺类型 -->
                         <div class="shop-type">
-                            <p>
-                                店铺类型
-                                <span>（用于客户筛选出本店）</span>
-                            </p>
-                            <div class="type-box">
-                                <div v-if="isReadonly">
-                                    <span v-for="(item, index) in shopTypeOptStrArr" :key="index" class="shop-type-span">{{ item }}</span>
-                                </div>
-                                <div v-else>
-                                    <span
-                                        ref="shopTypeSpan"
-                                        v-for="(item, index) in shopTypeOpt"
-                                        :key="index"
-                                        @click="checkType($event, item.id)"
-                                        >{{ item.recommendBrand }}</span
-                                    >
-                                </div>
-                            </div>
+                            <p>我的营业执照</p>
                         </div>
                     </div>
                 </div>
@@ -231,31 +190,19 @@
                             show-word-limit
                         ></el-input>
                     </div>
-
-                    <!-- 订单最晚保留时间 -->
-                    <div v-if="shopLocaIndex != 3">
-                        <span>晚于最晚到店时间订单的保留分钟数：</span>
-                        <el-select clearable v-model="latestRetainTime" placeholder="最晚保留时间（分钟）" :disabled="isReadonly">
-                            <el-option v-for="(item, index) in timeQuanArr" :key="index" :label="item" :value="item"></el-option>
-                        </el-select>
-                    </div>
                 </div>
             </div>
 
             <!-- 右边区域 -->
-            <div class="right-wrap">
+            <!-- <div class="right-wrap">
                 <h4>店铺展示图</h4>
-                <!-- 店铺所有展示图 -->
                 <div class="shop-info">
-                    <!-- banner展示图 -->
                     <div class="banner-box" v-loading="imgLoading.loading">
                         <p>店铺顶部展示图</p>
                         <div v-if="isReadonly">
                             <div v-for="(item, index) in bannerShowBox" :key="index">
-                                <!-- 如果匹配到mp4的视频就不回显到图片标签里 -->
                                 <img :src="showImgPrefix + item" v-if="item.search(/.mp4/i) == -1" />
                             </div>
-                            <!-- 回显视频 -->
                             <video controls v-for="item in bannerVideo" :key="item">
                                 <source :src="showImgPrefix + item" />
                                 您的浏览器版本太低，请升级。
@@ -281,7 +228,6 @@
                     </div>
 
                     <div class="rowNum-box">
-                        <!-- 排号横幅图 -->
                         <div class="top" v-loading="imgLoading.loading3">
                             <p>排号横幅图</p>
                             <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + rowNumImageUrl" class="avatar" />
@@ -301,7 +247,6 @@
                                 >(*请上传尺寸大小为351*181，格式为jpg/jpeg/png的图片）</span
                             >
                         </div>
-                        <!-- 店铺长图 -->
                         <div class="botm" v-loading="imgLoading.loading4">
                             <p>店铺logo-列表大图</p>
                             <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + appShopImageUrl" class="avatar" />
@@ -323,7 +268,6 @@
                         </div>
                     </div>
 
-                    <!-- 商家布局图 -->
                     <div class="overall-box" v-loading="imgLoading.loading5" v-if="shopLocaIndex != 3">
                         <p>商家布局图</p>
                         <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + overallImageUrl" class="avatar" />
@@ -343,9 +287,7 @@
                     </div>
                 </div>
 
-                <!-- 店铺卡座 -->
                 <div v-if="shopLocaIndex == 1 || shopLocaIndex == 2">
-                    <!-- 新增/编辑楼层对话框 -->
                     <el-dialog title="新增/编辑楼层" :visible.sync="seatFloorDialog" class="floor-dialog" @close="handleCancelEditFloor">
                         <div class="input-box">
                             <div v-for="(item, index) in list" :key="index">
@@ -378,13 +320,11 @@
 
                     <h4>店铺卡座</h4>
                     <div class="shop-seat">
-                        <!-- 左边座位展示 -->
                         <div class="left-box">
                             <el-button v-if="isReadonly || !isUpdate" type="primary" @click="addFloor" class="add-floor"
                                 >编辑楼层</el-button
                             >
 
-                            <!-- 回显楼层切换的按钮 -->
                             <div>
                                 <el-button
                                     v-for="(item, index) in list"
@@ -397,7 +337,6 @@
                             </div>
 
                             <template v-if="list.length !== 0 && !seatFloorDialog">
-                                <!-- 座位行数和列数 -->
                                 <p class="input-seat">
                                     <label style="margin-right: 30px">
                                         座位行数：
@@ -429,7 +368,6 @@
                                     </label>
                                 </p>
 
-                                <!-- 座位属性标题 -->
                                 <div class="seat-title">
                                     <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
                                         <span :class="item.class"></span>
@@ -437,7 +375,6 @@
                                     </p>
                                 </div>
 
-                                <!-- 回显的座位图 -->
                                 <div
                                     v-if="x && y"
                                     class="seat-box"
@@ -461,10 +398,8 @@
                                 </div>
                             </template>
                         </div>
-                        <!-- 座位属性 -->
                         <div class="right-box" v-if="list.length !== 0 && !seatFloorDialog && isClickSeat">
                             <p class="seat-detail">座位详情</p>
-                            <!-- 座位属性 -->
                             <div class="seat-prop" v-if="!isReadonly">
                                 <span>座位属性：</span>
                                 <div class="prop-box">
@@ -477,7 +412,6 @@
                                     ></span>
                                 </div>
                             </div>
-                            <!-- 座位号 -->
                             <div style="display: flex">
                                 <span>座位号：</span>
                                 <el-input
@@ -488,13 +422,11 @@
                                     @blur="checkNull(presentSeatInfo.seatCode, '座位号')"
                                 ></el-input>
                             </div>
-                            <!-- 座位类型 -->
                             <div style="display: flex">
                                 <span>座位类型：</span>
                                 <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
                             </div>
-                            <!-- 容纳人数 -->
                             <div style="display: flex">
                                 <span>容纳人数：</span>
                                 <el-input-number
@@ -509,7 +441,6 @@
                                     @blur="checkNull(presentSeatInfo.numberOfPeople, '容纳人数')"
                                 ></el-input-number>
                             </div>
-                            <!-- 最晚保留时间 -->
                             <div class="lon-retain">
                                 <span>保留最晚时间：</span>
                                 <el-time-select
@@ -533,7 +464,6 @@
                                     "
                                 ></el-time-select>
                             </div>
-                            <!-- 最低消费 -->
                             <div class="min-charge">
                                 <span class="min-con" style="margin-bottom: 10px">最低消费：</span>
                                 <div class="day-mincom">
@@ -550,7 +480,7 @@
                                                 <template slot="append">￥</template>
                                             </el-input>
                                         </div>
-                                        <!-- <div style="width: 50%">
+                                        <div style="width: 50%">
                                             <span>最晚保留时间</span><br />
                                             <el-time-select
                                                 @change="checkLateTime(item.seatLatestReservationTime, index)"
@@ -572,20 +502,17 @@
                                                           }
                                                 "
                                             ></el-time-select>
-                                        </div> -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- ktv包间 -->
                 <div v-if="shopLocaIndex == 3">
                     <h4>KTV包间</h4>
-                    <!-- 当选择ktv时展示的座位属性 -->
                     <div class="ktv-wrap">
                         <div class="ktv-left-box" v-if="isLookKtvInfo">
-                            <!-- 所属楼层 -->
                             <div>
                                 <span>所属楼层：</span>
                                 <el-input
@@ -596,7 +523,6 @@
                                 ></el-input>
                             </div>
 
-                            <!-- 包间类型 -->
                             <div>
                                 <span>包间类型：</span>
                                 <el-select
@@ -609,13 +535,11 @@
                                     <el-option v-for="item in ktvTypeOpt" :key="item.id" :label="item.name" :value="item.id"></el-option>
                                 </el-select>
                             </div>
-                            <!-- 包间所属 -->
-                            <!-- <div>
+                            <div>
                                 <span>包间所属：</span>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.roomAttribute" label="1">预定桌</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.roomAttribute" label="2">AA拼单桌</el-radio>
-                            </div> -->
-                            <!-- 包间数量 -->
+                            </div>
                             <div>
                                 <span>包间数量：</span>
                                 <el-input-number
@@ -629,14 +553,13 @@
                                     style="width: 50%"
                                     :disabled="isReadonly"
                                 ></el-input-number>
-                                <!-- <el-input
+                                <el-input
                                     v-model="presentKtvInfo.roomNumber"
                                     placeholder="包间数量"
                                     style="width: 50%"
                                     :readonly="isReadonly"
-                                ></el-input> -->
+                                ></el-input>
                             </div>
-                            <!-- 容纳人数 -->
                             <div>
                                 <span>容纳人数：</span>
                                 <el-input-number
@@ -650,20 +573,18 @@
                                     style="width: 50%"
                                     :disabled="isReadonly"
                                 ></el-input-number>
-                                <!-- <el-input
+                                <el-input
                                     v-model="presentKtvInfo.capacity"
                                     placeholder="容纳人数"
                                     style="width: 50%"
                                     :readonly="isReadonly"
-                                ></el-input> -->
+                                ></el-input>
                             </div>
-                            <!-- 独立卫生间 -->
                             <div>
                                 <span>独立卫生间：</span>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.haveToilet" label="1">有</el-radio>
                                 <el-radio :disabled="isReadonly" v-model="presentKtvInfo.haveToilet" label="2">无</el-radio>
                             </div>
-                            <!-- 配套设施 -->
                             <div>
                                 <span>配套设施：</span>
                                 <template>
@@ -673,11 +594,8 @@
                                     <el-checkbox :disabled="isReadonly" v-model="presentKtvInfo.haveTableTennis">桌球</el-checkbox>
                                 </template>
                             </div>
-                            <!-- 时间段分布 -->
                             <div class="time-quan">
-                                <!-- 回显 -->
                                 <div class="date-dist clearfix" v-for="(item, index) in presentKtvInfo.roomTimeIntervalList" :key="index">
-                                    <!-- 时间段 -->
                                     <div class="data">
                                         <span>时间段分布：</span>
                                         <div>
@@ -708,7 +626,6 @@
                                             ></el-time-select>
                                         </div>
                                     </div>
-                                    <!-- 最低消费 -->
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
@@ -722,8 +639,7 @@
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </div>
-                                    <!-- 最晚保留时间 -->
-                                    <!-- <div class="longRetain">
+                                    <div class="longRetain">
                                         <span>最晚保留时间：</span>
                                         <el-select
                                             clearable
@@ -740,15 +656,12 @@
                                             ></el-option>
                                         </el-select>
                                         （分钟）
-                                    </div> -->
-                                    <!-- 删除 -->
+                                    </div>
                                     <el-button v-if="!isReadonly" @click="delTimeQuan(item)" type="danger" style="float: right"
                                         >删除</el-button
                                     >
                                 </div>
-                                <!-- 新增 -->
                                 <div class="date-dist clearfix" v-if="!isReadonly">
-                                    <!-- 时间段 -->
                                     <div class="data">
                                         <span>时间段分布：</span>
                                         <div>
@@ -777,7 +690,6 @@
                                             ></el-time-select>
                                         </div>
                                     </div>
-                                    <!-- 最低消费 -->
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
@@ -791,8 +703,7 @@
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </div>
-                                    <!-- 最晚保留时间 -->
-                                    <!-- <div class="longRetain">
+                                    <div class="longRetain">
                                         <span>最晚保留时间：</span>
                                         <el-select
                                             clearable
@@ -809,20 +720,17 @@
                                             ></el-option>
                                         </el-select>
                                         （分钟）
-                                    </div> -->
+                                    </div>
                                     <span style="font-size: 12px; color: #f00">*输入完内容后，点击添加按钮视为添加成功</span>
-                                    <!-- 确定 -->
                                     <el-button v-if="!isReadonly" @click="addTimeQuan" type="primary" style="float: right">添加</el-button>
                                 </div>
                             </div>
-                            <!-- 赠品 -->
                             <div class="snacks">
                                 <p>
                                     赠品：
                                     <span v-if="isReadonly && presentKtvInfo.snacks.length == 0">无</span>
                                 </p>
                                 <div class="snacks-detail">
-                                    <!-- 回显 -->
                                     <ul>
                                         <li v-for="(item, index) in presentKtvInfo.snacks" :key="index">
                                             <el-input
@@ -847,7 +755,6 @@
                                             <el-button v-if="!isReadonly" @click="deleteSnacks(item)" type="danger">删除</el-button>
                                         </li>
                                     </ul>
-                                    <!-- 新增 -->
                                     <div class="snacks-form" v-if="!isReadonly">
                                         <el-input
                                             style="width: 170px"
@@ -870,7 +777,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- ktv包间示意图 -->
                             <div class="ktv-banner" v-loading="imgLoading.loading6">
                                 <p>包间示意图：</p>
                                 <div v-if="isReadonly && presentKtvInfo.sketchMap.length > 0">
@@ -893,13 +799,11 @@
                                     <i class="el-icon-plus"></i>
                                 </el-upload>
                             </div>
-                            <!-- 确定与取消 -->
                             <div v-if="!isReadonly">
                                 <el-button @click="ktvCancelSub" v-if="!isUpdateKtvInfo">清空</el-button>
                                 <el-button @click="ktvSureSub" type="primary">{{ isUpdateKtvInfo == false ? '新增' : '确定' }}</el-button>
                             </div>
                         </div>
-                        <!-- ktv包间属性列表 -->
                         <div class="ktv-right-box">
                             <template v-if="isReadonly && ktvList.length !== 0">
                                 <div class="change-ktvFloor">
@@ -979,7 +883,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -2973,6 +2877,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.shop-brief {
+    > span {
+        min-width: 80px;
+    }
+
+    display: flex;
+    align-items: center;
+}
+
 @media screen and (min-width: 1300px) {
     .container {
         box-sizing: border-box;
@@ -3074,13 +2987,21 @@ export default {
                 align-items: center;
             }
 
-            .shop-brief {
-                > span {
-                    min-width: 80px;
+            .shop-loca {
+                .shop-loca-span {
+                    display: inline-block;
+                    height: 32px;
+                    padding: 0 10px;
+                    line-height: 30px;
+                    font-size: 12px;
+                    color: #409eff;
+                    border: 1px solid #d9ecff;
+                    border-radius: 4px;
+                    margin: 0 10px 10px 0;
+                    box-sizing: border-box;
+                    white-space: nowrap;
+                    cursor: pointer;
                 }
-
-                display: flex;
-                align-items: center;
             }
         }
     }

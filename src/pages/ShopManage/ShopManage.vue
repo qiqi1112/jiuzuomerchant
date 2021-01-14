@@ -596,6 +596,7 @@ export default {
                         this.allRegRight = false;
                     } else {
                         this.$message.error(res.msg);
+                        this.goodsForm.bannerImageUrl = '';
                     }
                 } else {
                     const res = await this.$post('/merchant/store/goods/save', data);
@@ -606,6 +607,7 @@ export default {
                         this.allRegRight = false;
                     } else {
                         this.$message.error(res.msg);
+                        this.goodsForm.bannerImageUrl = '';
                     }
                 }
             })();
