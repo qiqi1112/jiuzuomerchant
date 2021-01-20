@@ -7,7 +7,7 @@ export default function init(userInfo,callbacks) {
     RongIMLib.RongIMClient.init(userInfo.appKey);
     
     var instance = RongIMClient.getInstance();
-
+    var disconnectNum = 1
     //连接状态监听器
     RongIMClient.setConnectionStatusListener({
         onChanged: function (status) {
@@ -30,7 +30,7 @@ export default function init(userInfo,callbacks) {
                     break;
                 case RongIMLib.ConnectionStatus.NETWORK_UNAVAILABLE:
                     console.log('网络不可用');
-                    alert('网络不可用,请刷新后连接聊天服务')
+                    store.commit('disconnectFun', disconnectNum +=1 );
                     break;
             }
         }

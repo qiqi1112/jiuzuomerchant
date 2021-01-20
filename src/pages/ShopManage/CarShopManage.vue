@@ -11,9 +11,7 @@
             <div class="head-handle clearfix">
                 <!-- 左边操作区域 -->
                 <el-row class="left-handle">
-                    <el-button type="primary" icon="el-icon-plus" @click="getAddGoodsTitleSort" style="margin-right: 10px"
-                        >添加商品</el-button
-                    >
+                    <el-button type="primary" icon="el-icon-plus" @click="addCars" style="margin-right: 10px">添加车辆</el-button>
                     <el-button
                         v-if="goodsData.length > 0"
                         type="danger"
@@ -30,80 +28,47 @@
 
                 <!-- 右边操作区域 -->
                 <div class="right-handle">
-                    <el-button type="primary" @click="handleSelGoodsType" class="mr10" v-if="goodsData.length > 0">APP展示选择</el-button>
+                    <!-- <el-button type="primary" @click="handleSelGoodsType" class="mr10" v-if="goodsData.length > 0">APP展示选择</el-button> -->
                     <el-input
                         v-model="searchName"
                         @keydown.13.native="searchGoodsInfo"
-                        placeholder="商品名称"
+                        placeholder="请输入车辆名称"
                         class="handle-input mr10"
                         clearable
                     ></el-input>
-                    <el-select v-model="value" placeholder="选择分类" class="mr10" style="width: 100px" clearable>
+                    <el-select v-model="value" placeholder="车辆品牌" class="mr10" style="width: 100px" clearable>
+                        <el-option v-for="item in carBrand" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                    <el-select v-model="value" placeholder="车辆型号" class="mr10" style="width: 100px" clearable>
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                    <el-select v-model="value" placeholder="车辆类型" class="mr10" style="width: 100px" clearable>
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                     <el-button type="primary" icon="el-icon-search" @click="searchGoodsInfo">搜索</el-button>
                 </div>
             </div>
 
-            <!-- 操作商品的对话框 -->
-            <el-dialog :visible.sync="dialogVisible" @close="handleCancel">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <!-- 编辑商品时 -->
-                    <el-tab-pane v-if="isUpdate" :label="activeName" :name="activeName"></el-tab-pane>
-                    <!-- 新增商品时 -->
-                    <el-tab-pane
-                        v-else
-                        :label="item.typeName"
-                        :name="item.typeName"
-                        v-for="(item, index) in titleArrList"
-                        :key="index"
-                    ></el-tab-pane>
-                </el-tabs>
 
-                <!-- 标签页组件信息 -->
-                <template>
-                    <handleShop :goodsForm="goodsForm" :activeNum="activeNum"></handleShop>
-                </template>
-
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="handleCancel">取 消</el-button>
-                    <el-button type="primary" @click="submitSetGoodsInfo">确 定</el-button>
-                </span>
-            </el-dialog>
-
-            <!-- APP展示商品分类弹窗 -->
-            <el-dialog :visible.sync="showTypeDialog" @close="showTypeDialog = false" class="show-type-dialog">
-                <span class="add-classify-title">请选择给用户展示的商品种类 <span style="color: #f00">（选中为展示分类）</span></span>
-
-                <el-checkbox v-model="item.hidden" v-for="(item, index) in goodsTypeList" :key="index">{{
-                    item.type | showAppGoodsType
-                }}</el-checkbox>
-
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="showTypeDialog = false">取 消</el-button>
-                    <el-button type="primary" @click="handleSureShowType">确 定</el-button>
-                </span>
-            </el-dialog>
-
-            <!-- 商品列表 -->
-            <div class="goodsList">
-                <div class="goods-box" v-for="(item, index) in goodsData" :key="index" @click="selectGoods">
-                    <el-checkbox v-if="isSelect" :data-id="item.id" class="checkbox"></el-checkbox>
-                    <img :src="showImgPrefix + item.listPicture" alt />
-                    <div class="goods-detail">
-                        <h4 title="商品名称">{{ item.name }}</h4>
-                        <p class="goods-price">
-                            售价：
-                            <span>￥{{ item.presentPrice }}</span>
-                            <s>￥{{ item.originalPrice }}</s>
-                        </p>
-                        <div class="goods-handle">
-                            <el-button type="primary" @click="handleEdit(item.id)">编辑</el-button>
-                            <el-button type="danger" @click="handleDelete(item.id)">删除</el-button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <el-table 
+                :data="tableData" border class="table" 
+                ref="multipleTable" 
+                header-cell-class-name="table-header" 
+            >
+                <el-table-column label="ID" fixed type="index" align="center" width="50"></el-table-column>
+                <el-table-column prop="title" min-width="200" align="center" label="车辆名称"></el-table-column>
+                <el-table-column prop="uri" min-width="200" align="center" label="车辆品牌"></el-table-column>  
+                <el-table-column prop="result" min-width="200" align="center" label="车辆型号"></el-table-column>
+                <el-table-column prop="order_state" min-width="100" align="center" label="车辆类型"></el-table-column>
+                <el-table-column prop="ip" min-width="200" align="center" label="车辆标签"></el-table-column>
+                <el-table-column prop="createTime" min-width="150" align="center" label="其他属性及价格"></el-table-column>  
+                <el-table-column label="操作" width="280" align="center" fixed="right">
+                    <template slot-scope="scope">
+                        <el-button type="primary" @click="lineDb(scope.row, scope.$index)">编辑</el-button>
+                        <el-button type="primary" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
 
             <!-- 翻页区域 -->
             <div>
@@ -119,365 +84,672 @@
                 ></el-pagination>
             </div>
         </div>
+
+        <!-- 编辑弹出框 -->
+        <el-dialog :visible.sync="editVisible" width="58%">
+            <el-form ref="form" :model="form" label-width="100px" label-position="left">
+                <div class="column">
+                    <span class="line lw2"></span>
+                    <span>车辆信息</span>
+                </div>
+                <div class="top_info">
+                    <div class="activity">
+                        <div class="in_act">
+                            <el-form-item label="选择品牌">
+                                <el-select v-model="carBrandValue" @change="changeCarBrand" filterable placeholder="请选择品牌">
+                                    <el-option
+                                    v-for="item in carBrand"
+                                    :key="item.id"
+                                    :label="item.brand"
+                                    :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+
+                            <el-form-item label="车辆型号">
+                                <el-select v-model="carModelValue" @change="changeCarModel" filterable placeholder="请选择车辆型号">
+                                    <el-option
+                                    v-for="item in carModel"
+                                    :key="item.id"
+                                    :label="item.modelName"
+                                    :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+
+                            <el-form-item label="车辆选择" v-show="carList.length>0">
+                                <div class="car_list">
+                                    <div class="car_box" v-for="(item,i) in carList" :key="i">
+                                        <div class="car_btn" @click="selectCarImage(item,i)">选择</div>
+                                        <el-image
+                                            :class="carListIndex == i?'car_active':''"
+                                            class="car_img"
+                                            :src="joinUrl + item.vehiclePicture" 
+                                            :preview-src-list="bigCarList">
+                                        </el-image>
+                                    </div>
+                                </div>
+                            </el-form-item>
+
+                            <el-form-item label="车辆类型" v-show="carListSelect">
+                                <span class="rm" >{{carListSelect.vehicleLabelName}}</span>
+                                <span>车辆属性：</span>
+                                <span>{{carListSelect.transmission}} · {{carListSelect.seatNum}}座 · {{carListSelect.displacement}}T</span>
+                            </el-form-item>
+
+                            <el-form-item label="车辆库存">
+                                <el-input v-model="inventory">
+                                    <template slot="append">辆</template>
+                                </el-input>
+                            </el-form-item>
+                          
+                            <el-form-item label="选择车辆标签">
+                                <span v-for="(item,i) in  carLab" :key="i" style="margin-right:10px">
+                                    <el-button :type="carLabIndex==i?'primary':''"  @click="selectCarLab(item,i)">{{item.labelName}}</el-button>
+                                </span>
+                                <span class="lm">标签说明：{{carLabIndex>=0?carLab[carLabIndex].labelExplain:'--'}}</span>
+                            </el-form-item>
+
+
+                            <el-form-item label="基础服务费">
+                                <el-input v-model="basicsServePrice">
+                                    <template slot="append">￥/天</template>
+                                </el-input>
+                                <label class="lm" for="">车行手续费：</label>
+                                <el-input v-model="carServePrice">
+                                    <template slot="append">￥</template>
+                                </el-input>
+                            </el-form-item>
+
+
+                            <div class="fx el-form-item">
+                                <div class="left_lab">本店车辆图片</div>  
+                                <div class="right_text">
+                                    <el-upload
+                                        v-loading="loading"
+                                        class="avatar-uploader"
+                                        action="fakeaction"
+                                        list-type="picture-card"
+                                        :on-preview="handlePictureCardPreview"
+                                        :http-request="uploadSectionFile"
+                                        :limit="5"
+                                        :auto-upload="false"
+                                        multiple
+                                        :file-list="carPicture"
+                                        :on-change="handleChange"
+                                        :on-remove="handleRemove"
+                                    >
+                                        <i class="el-icon-plus avatar-uploader-icon"></i>
+                                    </el-upload>
+                                    <el-dialog :visible.sync="dialogVisible">
+                                        <img width="100%" :src="dialogImageUrl" alt="" />
+                                    </el-dialog>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="column">
+                                <span class="line lw2"></span>
+                                <span>车辆租赁价格</span>  <span style="color:red">(APP用户最多租用30天的车)</span>
+                            </div>
+
+                            <div>
+                                <div class="btm_h fx">
+                                    <div class="f_l">
+                                        <label class="lab_width" for="">租赁时间</label>
+                                        <el-input v-model="leasePrice.startTime" @blur="monitorRentCarPriceWrite(leasePrice.startTime,1)">
+                                            <template  slot="append">≤天</template>
+                                        </el-input> 
+                                    </div>
+
+                                    <div class="f_r">
+                                        <label class="lab_width" for="">租赁价格</label>
+                                        <el-input v-model="leasePrice.startPrice">
+                                            <template slot="append">元/天</template>
+                                        </el-input>
+                                    </div>
+                                </div>
+
+
+                    
+                                <div class="btm_h pos_box">
+                                    <el-form :model="betweenNumberForm" ref="betweenNumberForm"  class="demo-dynamic" >
+                                        <el-form-item
+                                            v-for="(domain, index) in betweenNumberForm.domains"
+                                            :key="domain.key"
+                                            :prop="'domains.' + index + '.value'"
+                                        >
+                                            <div class="fx">
+                                                <div class="f_l ">
+                                                    <div class="label_mar">
+                                                        <el-input v-model="domain.betweenStarNum">
+                                                            <template slot="append">天</template>
+                                                        </el-input>
+                                                        <span> ＜天数≤ </span>
+                                                        <el-input v-model="domain.betweenEndNum">
+                                                            <template slot="append">天</template>
+                                                        </el-input>
+                                                    </div>
+                                                </div>
+
+                                                <div class="f_r">
+                                                    <label class="lab_width" for="">租赁价格</label>
+                                                    <el-input v-model="domain.betweenPriceNum">
+                                                        <template slot="append">元/天</template>
+                                                    </el-input>
+                                                </div>
+                                            </div>
+                                        </el-form-item>
+                                    </el-form>
+                                    <img @click="addBetweenNumber" class="addItem at1" src="../../assets/img/jia.png" alt="">
+                                    <img @click="minusBetweenNumber" class="minusItem mt1" src="../../assets/img/jian.png" alt="">
+                                </div>
+
+                                
+
+                                <div class="btm_h fx">
+                                    <div class="f_l ">
+                                        <div class="label_mar">
+                                            <el-input v-model="leasePrice.endTime" @blur="monitorRentCarPriceWrite(leasePrice.endTime,4)">
+                                                <template slot="append">≥天</template>
+                                            </el-input>
+                                        </div>
+                                    </div>
+
+                                    <div class="f_r">
+                                        <label class="lab_width" for="">租赁价格</label>
+                                        <el-input v-model="leasePrice.endPrice">
+                                            <template slot="append">元/天</template>
+                                        </el-input>
+                                    </div>
+                                </div>
+
+
+                                <div class="btm_h pos_box">
+                                    <el-form :model="specialNumberForm" ref="specialNumberForm"  class="demo-dynamic" >
+                                        <el-form-item
+                                            v-for="(domain, index) in specialNumberForm.domains"
+                                            :key="domain.key"
+                                            :prop="'domains.' + index + '.value'"
+                                        >
+                                            <div class="fx">
+                                                <div class="f_l">
+                                                    <label class="lab_width" for="">特殊价格</label>
+                                                    <el-date-picker
+                                                        v-model="domain.specialStarNum"
+                                                        type="date"
+                                                        placeholder="选择日期">
+                                                    </el-date-picker>
+                                                    <span> ＜天数≤ </span>
+                                                    <el-date-picker
+                                                        v-model="domain.specialEndNum"
+                                                        type="date"
+                                                        placeholder="选择日期">
+                                                    </el-date-picker>
+                                                </div>
+
+                                                <div class="f_r">
+                                                    <label class="lab_width" for="">租赁价格</label>
+                                                    <el-input v-model="domain.specialPriceNum">
+                                                        <template slot="append">元/天</template>
+                                                    </el-input>
+                                                </div>
+                                            </div>
+                                        </el-form-item>
+                                    </el-form>
+
+                                    <img @click="addSpecialNumber" class="addItem at1" src="../../assets/img/jia.png" alt="">
+                                    <img @click="minusSpecialNumber" class="minusItem mt1" src="../../assets/img/jian.png" alt="">
+                                </div>
+
+                                <div class="btm_h btns">
+                                    <el-button type="primary">重置租赁价格</el-button>
+                                    <el-button type="primary">确定</el-button>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="column">
+                                <span class="line lw2"></span>
+                                <span>车辆接送价格</span>
+                            </div>
+
+                   
+                            <div>
+                                <div class="btm_h fx">
+                                    <div class="f_l">
+                                        <label class="lab_width" for="">接送路程</label>
+                                        <el-input v-model="pickAndUp.startDistance">
+                                            <template slot="append">≤Km</template>
+                                        </el-input>
+                                    </div>
+
+                                    <div class="f_r">
+                                        <label class="lab_width" for="">租赁价格</label>
+                                        <el-input v-model="pickAndUp.startPrice">
+                                            <template slot="append">元/次</template>
+                                        </el-input>
+                                    </div>
+                                </div>
+
+
+                                <div class="btm_h fx pos_box">
+                                    <div class="f_l ">
+                                        <div class="">
+                                            <label class="lab_width" for="">接送路程</label>
+                                            <el-input>
+                                                <template slot="append">km/内</template>
+                                            </el-input>
+                                            <span> ＜里程≤ </span>
+                                            <el-input>
+                                                <template slot="append">km/内</template>
+                                            </el-input>
+                                        </div>
+                                    </div>
+
+                                    <div class="f_r">
+                                        <label class="lab_width" for="">租赁价格</label>
+                                        <el-input>
+                                            <template slot="append">元/次</template>
+                                        </el-input>
+                                    </div>
+
+                                    <img class="addItem at1" src="../../assets/img/jia.png" alt="">
+                                </div>
+
+
+
+                                <div class="btm_h fx">
+                                    <div class="f_l">
+                                        <label class="lab_width" for="">接送路程</label>
+                                        <el-input v-model="pickAndUp.endDistance">
+                                            <template slot="append">≥km</template>
+                                        </el-input>
+                                    </div>
+
+                                    <div class="f_r">
+                                        <label class="lab_width" for="">租赁价格</label>
+                                        <el-input v-model="pickAndUp.endPrice">
+                                            <template slot="append">元/次</template>
+                                        </el-input>
+                                    </div>
+                                </div>
+
+
+
+
+
+                                <div class="pos_box">
+                                    <div class="addSeg">
+                                        <div class="btm_h fx">
+                                            <div class="f_l">
+                                                <label class="lab_width" for="">特殊价格</label>
+                                                <el-input>
+                                                    <el-button slot="append" icon="el-icon-date"></el-button>
+                                                </el-input>
+                                                <span> ＜日期≤ </span>
+                                                <el-input>
+                                                    <el-button slot="append" icon="el-icon-date"></el-button>
+                                                </el-input>
+                                            </div>
+
+                                            <div class="f_r">
+                                                <label class="lab_width" for="">特殊日期里程</label>
+                                                <el-input>
+                                                    <template slot="append">km/内</template>
+                                                </el-input>
+                                                <span> ＜里程≤ </span>
+                                                <el-input>
+                                                    <template slot="append">km/内</template>
+                                                </el-input>
+                                            </div>
+                                        </div>
+                                        <div class="btm_h fx">
+                                            <div class="">
+                                                <label class="lab_width" for="">特殊日期价格</label>
+                                                <el-input>
+                                                    <template slot="append">元/次</template>
+                                                </el-input>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <img class="addItem at2" src="../../assets/img/jia.png" alt="">
+                                </div>
+
+
+
+
+                                <div class="btm_h btns">
+                                    <el-button type="primary">重置接送价格</el-button>
+                                    <el-button type="primary">确定</el-button>
+                                </div>
+                            </div>
+
+                            <hr>
+
+
+                        </div>
+                    </div>
+                </div>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">返回</el-button>
+                <el-button @click="saveCarInfo" type="primary">确 定</el-button
+                >
+            </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-import handleShop from './handleShop';
-
 export default {
-    components: {
-        handleShop
-    },
-
     data() {
         return {
-            showImgPrefix: this.$imgHead, //回显图片前缀
-            searchName: '', //商品名称输入框
-            value: '', //商品分类下拉框
-
-            dialogVisible: false, //操作商品的对话框开关
-            activeName: '', //默认展示的标签页名称
-            editActiveName: '', //编辑时展示的标签页
-
-            showTypeDialog: false, //APP展示商品分类开关
-            goodsTypeList: [], //该商家已有的商品种类列表
-            showTypeList: [], //要展示的商品种类列表
-
             // 表格数据分页相关属性
             dataListCount: 0, //默认当前要显示的数据条数
             currentPage: 1, //默认页码
-            pagesize: 16, //默认每页要显示多少条数据
-
+            pagesize: 10, //默认每页要显示多少条数据
             goodsData: [], //请求到的商品信息数组
-
-            goodId: '', //当前编辑的商品id
-
             activeNum: '', //标签页对应的下标（种类 1-套餐 2-威士忌 3-白兰地 4-伏特加 5-香槟 6-红酒 7-啤酒 8-鸡尾酒 9-小吃 10-其它 11-会员卡）
-
-            //商品信息
-            goodsForm: {
-                name: '', //名称
-                desc: '', //简介
-                originPrice: '', //原价
-                nowPrice: '', //现价
-                comboNowPrice: '', //套餐现价
-                statisticalPrice: '', //会员卡原价
-                checkedBanner: false, //商家广告banner位开关
-                checkedReco: false, //商家推荐位开关
-                area: '', //产地
-                year: '', //年份
-                goodWeight: 0, //商品排序
-                recoWeight: 0, //商家推荐位排序
-                bannerImageUrl: '', //广告图
-                recoImageUrl: '', //推荐位图
-                thumImageUrl: '', //缩略图
-                detailImageUrl: '', //详情图
-                tableData: [], //套餐中渲染单品数据
-
-                skuObj: {
-                    specName: '', //规格
-                    originalPrice: '', //规格原价
-                    presentPrice: '', //规格现价
-                    statisticalPrice: '', //新增的现价
-                    skuCode: '' //sku码
-                },
-
-                //新增商品规格
-                dynamicValidateForm: {
-                    domains: [
-                        // {
-                        //     specName: '', //规格
-                        //     originalPrice: '', //规格原价
-                        //     presentPrice: '', //规格现价
-                        //     statisticalPrice: '', //新增的现价
-                        //     skuCode: '' //sku码
-                        // }
-                    ]
-                },
-                skuCodeArr: [], //要删除的规格id数组
-                goodsIdList: [] //所有已选择的商品对应的id
-            },
-
             //商品分类下拉框
-            options: [
-                {
-                    label: '套餐 ',
-                    value: 1
-                },
-                {
-                    label: '威士忌',
-                    value: 2
-                },
-                {
-                    label: '白兰地',
-                    value: 3
-                },
-                {
-                    label: '伏特加',
-                    value: 4
-                },
-                {
-                    label: '香槟',
-                    value: 5
-                },
-                {
-                    label: '红酒',
-                    value: 6
-                },
-                {
-                    label: '啤酒',
-                    value: 7
-                },
-                {
-                    label: '鸡尾酒',
-                    value: 8
-                },
-                {
-                    label: '小吃',
-                    value: 9
-                },
-                {
-                    label: '其它',
-                    value: 10
-                },
-                {
-                    label: '会员卡',
-                    value: 11
-                }
-            ],
+            tableData:[],
+            value:'',
+            searchName:'',
+            isSelect:false,
+            wrapLoading:false,
+            editVisible:true,
+            form:{},
+            carPicture:[],
+            dialogImageUrl: '',
+            dialogVisible: false,
+            loading:false,
+            dialogImageUrl: '',
+            dialogVisible: false,
+            formData: [],
+            joinUrl: this.$imgHead,
+            options:[],
 
-            isUpdate: false, //是否为修改操作
-            isSelect: false, //是否要批量删除
-            deleteSelect: [], //批量删除的数组
-            requestStatus: true, //请求时的防抖标杆
+            carBrandLIst:[],//车辆品牌 用于列表展示
+            carModelLIst:[],//车辆型号 用于列表展示
+            carTypeLIst:[],//车辆类型 用于列表展示
+            carLabLIst:[],//车辆标签 用于列表展示
 
-            wrapLoading: false, //加载开关
 
-            titleArrList: [], //标签页标题信息
 
-            allRegRight: false //验证输入框输入内容的标杆
+            carBrandValue:'',//品牌选择器绑定值
+            carModelValue:'',//型号选择器绑定值
+
+            carBrand:[],//车辆品牌
+            carModel:[],//车辆型号
+            carType:[],//车辆类型
+            carLab:[],//车辆标签
+            carList:[], //详情页 选择品牌，型号后展示图片数组
+            bigCarList:[],//详情页 选择品牌，型号后展示图片数组 大图
+            carListIndex:null,//已选中的图片下标
+            carListSelect:"",//已选中的图片信息
+
+            inventory:'',//库存
+            carLabIndex:-1,//已选中的标签下标
+
+            basicsServePrice:'',//基础服务费
+            carServePrice:'',//车行服务费
+
+            leasePrice:{
+                startTime:'',//开始时间
+                endTime:'',//结束时间
+                startPrice:'',//开始钱
+                endPrice:'',//结束钱
+            },//租赁价格
+
+
+            betweenNumberForm:{
+                domains:[
+                    {
+                        betweenStarNum:'',
+                        betweenEndNum:'',
+                        betweenPriceNum:'',
+                    }
+                ]
+            },//租赁时间 中间 时间段
+
+            specialNumberForm:{
+                domains:[
+                    {
+                        specialStarNum:'',
+                        specialEndNum:'',
+                        specialPriceNum:'',
+                    }
+                ]
+            },//特殊时间 价格
+
+
+            pickAndUp:{
+                startDistance:'',//起始路程
+                endDistance:'',//结束路程
+                startPrice:'',//起始钱
+                endPrice:'',//结束钱
+            },//接送路程
+
+            distanceNumberForm:{
+                domains:[
+                    {
+                        distanceStarNum:'',
+                        distanceEndNum:'',
+                        distancePriceNum:'',
+                    }
+                ]
+            },//接送路程  距离/价格
+
+
+            distanceNumberForm:{
+                domains:[
+                    {
+                        distanceStarNum:'',
+                        distanceEndNum:'',
+                        distancePriceNum:'',
+                    }
+                ]
+            },//接送路程 特殊 距离/价格
         };
     },
 
+    created(){
+        this.getBrandType()
+    },
+
     methods: {
+        // 获取车辆品牌和型号 类型
+        getBrandType(){
+            this.$get('/merchant/store/vehicleGoods/getMsgBasic').then((res) => {
+                if (res.code === 0) {
+                    this.carBrand = res.data.adminBrandDTOS
+                    this.carType = res.data.adminLabelDTOS
+                    this.carLab = res.data.vehicleUseLabelDTOS
+                }
+            });
+        },
+
+        // 详情中 选择品牌
+        changeCarBrand(val){
+            for(let i=0;i<this.carBrand.length;i++){
+                if(this.carBrand[i].id == val){
+                    this.carListIndex = null
+                    this.carListSelect = ''
+                    // this.carLabIndex = null
+                    this.carModelValue = ''
+                    this.carList = []
+                    this.bigCarList = []
+                    this.carModel = this.carBrand[i].adminModelDTOS
+                    break
+                }
+            }
+        },
+
+        //详情中 选择型号
+        changeCarModel(val){
+            if(this.carBrandValue && val){
+                this.$post('/merchant/store/vehicleGoods/msgInfo',{
+	                brandId: this.carBrandValue,
+	                modelId: val
+                }).then((res) => {
+                    if (res.code === 0) {
+                        this.bigCarList = []
+                        this.carListIndex = null
+                        // this.carLabIndex = null
+                        this.carListSelect = ''
+                        res.data.forEach(v=>{
+                            this.bigCarList.push(this.joinUrl + v.vehiclePicture)
+                        })
+                        this.carList = res.data
+                    }
+                });
+            }
+        },
+        // 添加租赁价格  中间 时间段
+        addBetweenNumber() {
+            let betweenNumberForm = this.betweenNumberForm.domains
+            if(betweenNumberForm[betweenNumberForm.length-1].betweenStarNum == '' || betweenNumberForm[betweenNumberForm.length-1].betweenEndNum == ''){
+                this.$message({
+                    message: '请先输入本条信息，再添加',
+                    type: 'warning'
+                });
+                return
+            }
+
+            betweenNumberForm.push({
+                betweenStarNum:'',
+                betweenEndNum:'',
+                betweenPriceNum:'',
+            });
+        },
+        // 删除 租赁价格  中间 时间段  最后一条
+        minusBetweenNumber(){
+            if(this.betweenNumberForm.domains.length<=1){
+                return
+            }
+            this.betweenNumberForm.domains.splice(this.betweenNumberForm.domains.length-1, 1);
+        },
+
+
+        // 添加租赁价格 特殊 时间 
+        addSpecialNumber() {
+
+            let specialNumberForm = this.specialNumberForm.domains
+            if(specialNumberForm[specialNumberForm.length-1].specialStarNum == '' || specialNumberForm[specialNumberForm.length-1].specialEndNum == ''){
+                this.$message({
+                    message: '请先输入本条信息，再添加',
+                    type: 'warning'
+                });
+                return
+            }
+
+            specialNumberForm.push({
+                specialStarNum:'',
+                specialEndNum:'',
+                specialPriceNum:'',
+            });
+        },
+        // 删除 租赁价格 特殊  时间段  最后一条
+        minusSpecialNumber(){
+            if(this.specialNumberForm.domains.length<=1){
+                return
+            }
+            this.specialNumberForm.domains.splice(this.specialNumberForm.domains.length-1, 1);
+        },
+
+
+
+        // 选择车辆
+        selectCarImage(val,index){
+            this.carListIndex = index
+            this.carListSelect = val
+        },
+
+        // 选择标签  及 标签说明
+        selectCarLab(val,index){
+            this.carLabIndex = index
+        },
+
+        //编辑
+        addCars() {
+            this.editVisible = true;
+        },
         //搜索操作
         searchGoodsInfo() {
             this.currentPage = 1;
-            this.getGoodsInfo(); //请求数据
+            // this.getGoodsInfo(); //请求数据
         },
-
-        //APP展示选择按钮
-        handleSelGoodsType() {
-            this.$get('/merchant/store/goods/hiddenList').then((res) => {
-                if (res.code === 0) {
-                    this.showTypeDialog = true;
-                    this.goodsTypeList = res.data;
-                }
-            });
-        },
-
-        //要展示的商品分类弹窗中的确认按钮
-        handleSureShowType() {
-            let data = {
-                hiddenDTOS: this.goodsTypeList
-            };
-
-            this.$post('/merchant/store/goods/updateHidden', data).then((res) => {
-                if (res.code === 0) {
-                    this.$message.success('修改成功');
-                    this.showTypeDialog = false;
-                } else {
-                    this.$message.error(res.msg);
-                }
-            });
-        },
-
         //翻页操作
         handleCurrentChange(val) {
             this.currentPage = val; //将当前跳转的页码赋给显在页面上的页码
-
-            //防抖请求
-            if (this.requestStatus) {
-                this.requestStatus = false;
-                this.getGoodsInfo(); //请求翻页后的数据
-            }
         },
 
-        //批量删除选中操作
-        selectGoods(e) {
-            if (e.target.nodeName == 'INPUT') {
-                //将当前选中的商品的id加入到数组中
-                let id = e.target.parentNode.parentNode.dataset.id;
-                if (e.target.checked) {
-                    this.deleteSelect.push(id);
-                } else {
-                    //从数组中删除当前商品id
-                    let delId = this.deleteSelect.indexOf(id);
-                    this.deleteSelect.splice(delId, 1);
-                }
-            }
-        },
-
-        //确认删除选择的商品
-        sureDelAll() {
-            if (this.deleteSelect.length > 0) {
-                this.$confirm('确认要删除所选商品吗?', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-                        this.$post('/merchant/store/goods/batchDeleteGoods', this.deleteSelect).then((res) => {
-                            if (res.code === 0) {
-                                this.getGoodsInfo();
-                                this.$message.success('删除成功');
-                            } else {
-                                this.$message.error(res.msg);
-                            }
-                            this.cancelDelete();
-                            console.log(res);
+        // 监听车辆租赁  天数
+        monitorRentCarPriceWrite(value,classify){
+            switch (classify){
+                case 1:
+                    if(value>30){
+                        this.$message({
+                            showClose: true,
+                            message: '输入的天数不能大于30天',
+                            type: 'error'
                         });
-                    })
-                    .catch(() => {
-                        this.cancelDelete();
-                    });
-            } else {
-                this.$message.error('请选择要删除的商品');
+                    }
+                    break
+                case 4:
+                    let betweenNumberForm = this.betweenNumberForm.domains
+                    let last_data = betweenNumberForm[betweenNumberForm.length-1]
+                    let last_but_one = ''
+                    if(value>30){
+                        this.$message({
+                            showClose: true,
+                            message: '输入的天数不能大于30天',
+                            type: 'error'
+                        });
+                        return
+                    }
+
+                    if(betweenNumberForm.length <= 1){
+                        // 没有考虑  如果betweenNumberForm 没有添加完成  只有其中一个有值
+                        if(last_data.betweenEndNum == '' || last_data.betweenStarNum == ''){
+                            // 这里表示  租赁区间没有添加值  可直接判断 leasePrice.startTime 的值
+
+                            
+                        }        
+                    }else{
+                        if(last_data.betweenEndNum == '' || last_data.betweenStarNum == ''){
+                            // 这里表示  租赁区间最后一条没有添加值  可直接判断 倒数第二条
+                            last_but_one = betweenNumberForm[betweenNumberForm.length-2]
+
+                            
+                        }else{
+
+                        }  
+                    }
+                    
+                    break
             }
         },
 
-        //添加商品时的操作
-        getAddGoodsTitleSort() {
-            // 获取添加商品标题排序
-            this.$get('/merchant/store/goods/goodsStoreCount').then((res) => {
-                if (res.code === 0) {
-                    this.titleArrList = res.data;
-                    this.activeName = this.titleArrList[0].typeName;
-                    this.activeNum = this.titleArrList[0].type;
 
-                    this.isUpdate = false;
-                    this.dialogVisible = true;
-                } else {
-                    this.$message.error(res.msg);
-                }
-                console.log('标题排序', this.titleArrList);
-            });
-        },
 
-        //删除商品的初始化操作
-        cancelDelete() {
-            this.deleteSelect = [];
-            this.isSelect = false;
-        },
-
-        //关闭对话框操作
-        handleCancel() {
-            this.goodId = '';
-            this.dialogVisible = false;
-            this.activeName = '';
-            this.activeNum = '';
-
-            this.editActiveName = '';
-
-            this.isUpdate = false;
-            this.cancelDelete(); //初始化删除商品相关的操作
-            this.clearAllForm(); //清空所有表单
-        },
-
-        //清空所有表单
-        clearAllForm() {
-            this.goodsForm = {
-                name: '', //名称
-                desc: '', //简介
-                originPrice: '', //原价
-                nowPrice: '', //现价
-                comboNowPrice: '', //套餐现价
-                statisticalPrice: '', //会员卡原价
-                checkedBanner: false, //商家广告banner位开关
-                checkedReco: false, //商家推荐位开关
-                area: '', //产地
-                year: '', //年份
-                goodWeight: 0, //商品排序
-                recoWeight: 0, //商家推荐位排序
-                bannerImageUrl: '', //广告图
-                recoImageUrl: '', //推荐位图
-                thumImageUrl: '', //缩略图
-                detailImageUrl: '', //详情图
-                tableData: [], //套餐中渲染单品数据
-                goodsIdList: [], //所有已选择的商品对应的id
-
-                skuObj: {
-                    specName: '', //规格
-                    originalPrice: '', //规格原价
-                    presentPrice: '', //规格现价
-                    statisticalPrice: '', //新增的现价
-                    skuCode: '' //sku码
-                },
-
-                //新增商品规格
-                dynamicValidateForm: {
-                    domains: [
-                        // {
-                        //     specName: '', //规格
-                        //     originalPrice: '', //规格原价
-                        //     presentPrice: '', //规格现价
-                        //     statisticalPrice: '', //新增的现价
-                        //     skuCode: '' //sku码
-                        // }
-                    ]
-                },
-                skuCodeArr: [] //要删除的规格id数组
-            };
-        },
-
-        //标签页切换事件
-        handleClick(tab, event) {
-            //获取当前点击的标签页所对应的接口里的种类下标
-            this.titleArrList.forEach((item) => {
-                if (item.typeName == tab.name) {
-                    this.activeNum = item.type;
-                }
-            });
-
-            console.log('切换标签页操作', this.activeNum, this.activeName);
-
-            this.clearAllForm();
-        },
-
-        //单个商品删除
-        handleDelete(id) {
-            this.$confirm('确认要删除此商品吗?', '提示', {
-                type: 'warning'
+        saveCarInfo(){
+            console.log(this.carListSelect)
+            let carListImage = []
+            this.carPicture.forEach(v=>{
+                carListImage.push(v.name)
             })
-                .then(() => {
-                    this.$Delete(`/merchant/store/goods/deleteById/${id}`).then((res) => {
-                        if (res.code === 0) {
-                            this.getGoodsInfo(); //重新请求数据
-                            this.$message.success('删除成功');
-                        } else {
-                            this.$message.error(res.msg);
-                        }
-                    });
-                })
-                .catch(() => {});
-        },
-
-        //获取所有商品信息
-        getGoodsInfo() {
-            this.wrapLoading = true;
+            carListImage = carListImage.join(',')
             let data = {
-                pageNo: this.currentPage,
-                pageSize: this.pagesize,
-                type: this.value,
-                name: this.searchName
-            };
-            this.$post('/merchant/store/goods/goodsLimit', data).then((res) => {
-                if (res.code === 0) {
-                    this.dataListCount = res.data.total; //总数据条数
-                    this.goodsData = res.data.list; //所有数据
-                    this.requestStatus = true; //防抖开关
-                    this.wrapLoading = false;
-                }
-            });
+                basicCost : this.basicsServePrice,
+                serviceCharge : this.carServePrice,
+                imgs:carListImage,
+                vehicleMsgId : this.carListSelect.id
+            }
+            console.log(data)
         },
 
         //验证表单
@@ -544,142 +816,47 @@ export default {
                 }
             }
         },
-
-        //商品里的确认操作按钮
-        submitSetGoodsInfo() {
-            this.checkFormInfo();
-            if (this.allRegRight) {
-                this.setGoodsInfo();
-            }
-        },
-
-        //添加/修改商品
-        setGoodsInfo(active) {
-            if (this.activeNum != 1 && this.activeNum != 11) {
-                this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
-            }
-
-            let data = {
-                listPicture: this.goodsForm.thumImageUrl,
-                name: this.goodsForm.name,
-                originalPrice: this.goodsForm.originPrice,
-                recommendAdStatus:
-                    this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
-                recommendStatus: this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2),
-                synopsis: this.goodsForm.desc,
-                type: this.activeNum,
-                area: this.goodsForm.area,
-                deleteSkuList: this.goodsForm.skuCodeArr,
-                goodsSort: this.goodsForm.goodWeight,
-                id: this.goodId,
-                infoPicture: this.goodsForm.detailImageUrl,
-                presentPrice: this.goodsForm.nowPrice,
-                // statisticalPrice: this.goodsForm.statisticalPrice,
-                recommendAdPicture: this.goodsForm.bannerImageUrl,
-                recommendPicture: this.goodsForm.recoImageUrl,
-                recommendPictureSort: this.goodsForm.recoWeight,
-                setMealGoodsList: this.goodsForm.tableData,
-                skuList: this.goodsForm.dynamicValidateForm.domains,
-                statisticalPrice:
-                    this.activeNum == 1 ? this.goodsForm.comboNowPrice : this.activeNum == 11 ? this.goodsForm.statisticalPrice : '',
-                year: this.goodsForm.year
+        // 图片上传
+        uploadImg() {
+            let config = {
+                'Content-Type': 'multipart/form-data'
             };
-
-            // 判断传商品价格开关
-            (async () => {
-                if (this.isUpdate) {
-                    const res = await this.$put('/merchant/store/goods/update', data);
-                    if (res.code === 0) {
-                        this.getGoodsInfo();
-                        this.handleCancel();
-                        this.$message.success('修改成功');
-                        this.allRegRight = false;
-                    } else {
-                        this.$message.error(res.msg);
-                    }
-                } else {
-                    const res = await this.$post('/merchant/store/goods/save', data);
-                    if (res.code === 0) {
-                        this.getGoodsInfo();
-                        this.handleCancel();
-                        this.$message.success('添加成功');
-                        this.allRegRight = false;
-                    } else {
-                        this.$message.error(res.msg);
-                    }
-                }
-            })();
-        },
-
-        //商品编辑
-        handleEdit(id) {
-            this.$get(`/merchant/store/goods/getGoodsInfo/${id}`).then((result) => {
-                if (result.code === 0) {
-                    let res = result.data;
-                    this.isUpdate = true; //启用编辑模式
-                    this.dialogVisible = true; //对话框打开
-                    this.goodId = id; //获取商品操作的ID
-                    this.activeNum = res.type; //获取操作的分类下标
-
-                    //根据返回的商品分类下标展示其对应的分类名称
-                    this.options.forEach((item) => {
-                        if (item.value === res.type) {
-                            this.activeName = item.label;
-                        }
-                    });
-
-                    //商品信息
-                    this.goodsForm = {
-                        name: res.name, //名称
-                        desc: res.synopsis, //简介
-                        originPrice: res.originalPrice, //原价
-                        nowPrice: res.presentPrice, //现价
-                        comboNowPrice: res.statisticalPrice, //套餐现价
-                        statisticalPrice: res.statisticalPrice, //会员卡现价
-                        checkedBanner: res.recommendAdStatus === 1 ? true : false, //商家广告banner位开关
-                        checkedReco: res.recommendStatus === 1 ? true : false, //商家推荐位开关
-                        area: res.area, //产地
-                        year: res.year, //年份
-                        goodWeight: res.goodsSort, //商品排序
-                        recoWeight: res.recommendPictureSort, //商家推荐位排序
-                        bannerImageUrl: res.recommendAdPicture, //广告图
-                        recoImageUrl: res.recommendPicture, //推荐位图
-                        thumImageUrl: res.listPicture, //缩略图
-                        detailImageUrl: res.infoPicture, //详情图
-                        tableData: res.setMealGoodsList, //套餐中渲染单品数据
-
-                        skuObj: {
-                            specName: '', //规格
-                            originalPrice: '', //规格原价
-                            presentPrice: '', //规格现价
-                            statisticalPrice: '', //新增的现价
-                            skuCode: '' //sku码
-                        },
-
-                        //新增商品规格
-                        dynamicValidateForm: {
-                            domains: res.skuList
-                        },
-                        skuCodeArr: res.deleteSkuList, //要删除的规格id数组
-
-                        goodsIdList: res.setMealGoodsList.map((item) => item.goodsId) //套餐的已选择单品ID
+            let fromdata = new FormData();
+            fromdata.append('file', this.formData);
+            this.$file_post('/merchant/store/system/upload/create', fromdata, config).then((res) => {
+                if (res.code == 0) {
+                    let img = {
+                        name: res.data,
+                        url: this.joinUrl + res.data
                     };
+                    this.carPicture.push(img);
+                } else {
+                    this.$message.error(`图片上传失败，请刷新后再试`);
+                }
+                this.loading = false;
+            });
+        },
+        handleRemove(file, fileList) {
+            this.carPicture.forEach((i, index) => {
+                if (file.name == i.name) {
+                    this.carPicture.splice(index, 1);
                 }
             });
         },
-
-        //获取规格中的原价最小值
-        getMinVal() {
-            let newArr = this.goodsForm.dynamicValidateForm.domains.map((item) => {
-                return item.originalPrice;
-            });
-
-            return Math.min(...newArr); //返回最小值
+        handleChange(file, fileList) {
+            this.formData = file.raw;
+            this.loading = true;
+            this.uploadImg();
+        },
+        uploadSectionFile(file) {},
+        handlePictureCardPreview(file) {
+            this.dialogImageUrl = file.url;
+            this.dialogVisible = true;
         }
     },
 
     mounted() {
-        this.getGoodsInfo(); //请求首页数据
+        // this.getGoodsInfo(); //请求首页数据
     }
 };
 </script>
@@ -711,89 +888,164 @@ export default {
         }
     }
 }
-
-.goodsList {
-    display: flex;
-    flex-wrap: wrap;
-    .goods-box {
-        box-sizing: border-box;
-        width: 180px;
-        margin-bottom: 30px;
+.top_info{
+    .car_list{
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        flex-wrap: wrap;
+        .car_box{
+            width: 20%;
+            margin-right: 20px;
+            position: relative;
+            cursor: pointer;
+            .car_img{
+                width: 100%;
+            }
+            .car_btn{
+                font-size: 12px;
+                cursor: pointer;
+                position: absolute;
+                right: 0;
+                bottom: 11px;
+                z-index: 1;
+                background:#67c23a;
+                color: white;
+                height: 28px;
+                width: 50px;
+                text-align: center;
+            }
+        }
+        .car_active{
+            border: 4px solid #43c6ff;
+            box-sizing: border-box;
+        }
+    }
+    .lab_width{
+        width: 100px;
+        display: inline-block;
+    }
+    .lm{
+        margin-left: 150px;
+    }
+    
+    .rm{
+        margin-right: 150px;
+    }
+    .btm_h{
+        margin-bottom: 20px;
+    }
+    .add_btm_h{
+        margin-bottom: 10px;
+    }
+    .label_mar{
+        margin-left: 100px;
+    }
+    .fx{
+        display: flex;
+    }
+    .f_l{
+        flex: .5;
+    }
+    .f_r{
+        flex: .5;
+    }
+    .btns{
+        text-align: right;
+    }
+    .f_l_l,.f_l_m,.f_l_r{
+        flex: 1;
+    }
+    .addSeg{
+        padding-top: 10px;
+        border-top: 1px dashed #999999;
+    }
+    .addItem,.minusItem{
+        height: 32px;
+        width: 32px;
+        vertical-align: middle;
+        cursor: pointer;
+        position: absolute;
+        bottom: 0;
+        z-index: 1;
+    }
+    .at1{
+        left: 770px;
+    }
+    .mt1{
+        left: 820px;
+    }
+    .at2{
+        left: 240px;
+    }
+    .mt2{
+        left: 290px;
+    }
+    .pos_box{
         position: relative;
-        margin-right: 10px;
-        .checkbox {
-            position: absolute;
-            top: -1px;
-            right: 5%;
-        }
-
-        > img {
-            width: 90%;
-            height: 180px;
-            border-radius: 2px;
-        }
-
-        .goods-detail {
-            width: 90%;
-
-            > h4 {
-                font-size: 14px;
-                margin: 8px 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .goods-price {
-                font-size: 13px;
-                margin-bottom: 8px;
-
-                > span {
-                    margin-right: 6px;
-                }
-            }
-
-            .goods-handle {
+    }
+    
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409eff;
+    }
+    /deep/.el-upload--picture-card,
+    /deep/.el-upload-list__item {
+        width: 370px;
+        height: 192px;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 370px;
+        height: 192px;
+        line-height: 192px;
+        text-align: center;
+    }
+    .avatar {
+        width: 370px;
+        height: 192px;
+        display: inline-block;
+    }
+    /deep/.el-upload-list__item {
+        transition: none !important;
+    }
+    
+    /deep/.show-type-dialog {
+        .el-dialog {
+            width: 55%;
+    
+            .add-classify-title {
                 display: flex;
-                justify-content: space-around;
-                // justify-content: space-between;
-
-                .el-button--small,
-                .el-button--small.is-round {
-                    padding: 9px 24px;
-                }
+                align-items: center;
+                margin-bottom: 30px;
+            }
+    
+            .add-classify-title::before {
+                display: inline-block;
+                content: '';
+                width: 4px;
+                height: 20px;
+                margin-right: 10px;
+                background-color: #999;
+            }
+    
+            .el-checkbox {
+                margin-bottom: 20px;
             }
         }
     }
-}
-
-/deep/.show-type-dialog {
-    .el-dialog {
-        width: 55%;
-
-        .add-classify-title {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .add-classify-title::before {
-            display: inline-block;
-            content: '';
-            width: 4px;
-            height: 20px;
-            margin-right: 10px;
-            background-color: #999;
-        }
-
-        .el-checkbox {
-            margin-bottom: 20px;
-        }
+    .left_lab{
+        width: 100px;
     }
+    .right_text{
+        flex: 1;
+    }
+
 }
 
 .page {
@@ -811,14 +1063,49 @@ export default {
 }
 
 /deep/.el-dialog {
-    width: 70%;
+    width: 65%;
 }
-
+/deep/ .el-dialog {
+    min-width: 1100px;
+    height: 90vh;
+    overflow-y: scroll;
+    margin-top: 4vh!important;
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: rgb(230, 230, 230);
+        border-radius: 2px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #b1b1b1;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgb(187, 187, 187);
+    }
+    &::-webkit-scrollbar-corner {
+        background: #179a16;
+    }
+}
 /deep/.el-form-item__content {
     margin-left: 0 !important;
 }
 
 /deep/.el-dialog__header {
     padding: 0;
+}
+/deep/.el-input-group{
+    width: 110px;
+}
+/deep/.el-input__inner{
+    // padding: 0 10px;
+    min-width: 76px;
+}
+/deep/.el-icon-circle-close{
+    color: white;
+}
+/deep/.el-date-editor{
+    width: 140px;
 }
 </style>
