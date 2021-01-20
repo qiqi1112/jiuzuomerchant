@@ -3,10 +3,20 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
+//根据不同商家类型进行跳转到不同的首页
+const userInfo = localStorage.getItem('userInfo');
+let redirect = '';
+if (userInfo) {
+    const accountLocation = JSON.parse(userInfo).accountLocation;
+    redirect = accountLocation === 1 ? '/carMyShop' : '/index';
+} else {
+    redirect = '/login'
+}
+
 export default new Router({
     routes: [{
             path: '/',
-            redirect: '/index'
+            redirect
         },
         {
             path: '/',
@@ -33,6 +43,13 @@ export default new Router({
                     component: () => import( /* webpackChunkName: "carMyShop" */ '../pages/MyShop/CarMyShop.vue'),
                     meta: {
                         title: '车行信息'
+                    }
+                },
+                {
+                    path: '/upload',
+                    component: () => import( /* webpackChunkName: "upload" */ '../components/common/upload.vue'),
+                    meta: {
+                        title: '上传图片'
                     }
                 },
                 {

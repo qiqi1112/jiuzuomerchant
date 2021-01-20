@@ -1,19 +1,20 @@
 <template>
     <div id="map">
-        <div
-            class="seac_address"
-            v-loading="cityTrue"
-            element-loading-text="拼命加载中"
+        <!-- element-loading-text="拼命加载中"
             element-loading-spinner="el-icon-loading"
-            element-loading-background="rgba(0, 0, 0, 0.8)"
-        >
+            element-loading-background="rgba(0, 0, 0, 0.8)" -->
+        <div class="seac_address" v-loading="cityTrue">
+            <!-- 如果是租车行 -->
+            <div v-if="mapList.merchantType === 2" class="choose-area">
+                <el-cascader v-model="chooseValue" :options="cityList" @change="handleChange"></el-cascader>
+            </div>
             <span @click.stop class="pro_add">
                 <el-input v-model="fristForm.address" placeholder="请输入地址" @focus.stop="showFun(1)"></el-input>
                 <!-- <el-button @click="defGet" icon="el-icon-search" circle style="position: relative;left: -52px;border:none"></el-button> -->
             </span>
             <!-- <el-input v-model="fristForm.longitude" placeholder="经度" ></el-input>
             <el-input v-model="fristForm.latitude" placeholder="纬度" ></el-input>-->
-            <div class="city" @click.stop>
+            <div class="city" @click.stop v-if="mapList.merchantType === 1">
                 <span>{{ value }}</span>
                 <span class="changeCity" @click.stop="showCityFun()">切换城市</span>
                 <div class="cityList" v-if="showCity">
@@ -30,7 +31,7 @@
             <div class="dtl_add">
                 <el-input v-model="fristForm.dtl_address" @blur="trustAddress" placeholder="请输入详细地址"></el-input>
             </div>
-            <ul class="add_list" v-if="showList">
+            <ul :class="mapList.merchantType === 1 ? 'add_list merchant-type1' : 'add_list merchant-type2'" v-if="showList">
                 <div v-if="addressLists != ''">
                     <li @click="assignText(item)" v-for="(item, index) in addressLists" :key="index">
                         {{ item.title }}
@@ -39,8 +40,8 @@
                 </div>
                 <div v-else class="notAdd">没有相关地址~</div>
             </ul>
+            <div id="container" ref="container" :style="{ width: mapWidth, height: maiHeight }"></div>
         </div>
-        <div id="container" ref="container" :style="{ width: mapWidth, height: maiHeight }"></div>
     </div>
 </template>
 
@@ -56,8 +57,8 @@ export default {
             maiHeight: '',
             cityTrue: true,
             fristForm: {
-                longitude: '', //经度
-                latitude: '', //纬度
+                longitude: -1, //经度
+                latitude: -1, //纬度
                 address: '', //输入的地址
                 dtl_address: '' //详细地址
             },
@@ -69,11 +70,15 @@ export default {
             searchService: '',
             geocoder: '',
             // marker:'',//控件
-            markers: []
+            markers: [],
+
+            cityList: [], //返回的省市列表
+            chooseValue: [] //选择省市
         };
     },
     props: {
-        mapList: { type: Object }
+        mapList: { type: Object },
+        provAndCity: { type: Object }
     },
 
     computed: {
@@ -91,13 +96,20 @@ export default {
             if (this.mapList.searchAddress) {
                 this.fristForm.address = this.mapList.searchAddress;
             }
+
             if (this.mapList.trustAddress) {
                 this.fristForm.dtl_address = this.mapList.trustAddress;
             }
+
+            if (this.mapList.merchantType === 2) {
+                this.chooseProv();
+
+                if (this.provAndCity.province && this.provAndCity.city) {
+                    this.chooseValue.push(this.provAndCity.province, this.provAndCity.city);
+                }
+            }
         }
         this.city = city;
-
-        // console.log("zzz",this.mapList);
     },
     mounted() {
         this.mapTX();
@@ -121,6 +133,42 @@ export default {
         // }
     },
     methods: {
+        //获取后台返回的省份
+        chooseProv() {
+            this.$get('/merchant/store/vehicleStore/provinceList').then((res) => {
+                if (res.code === 0) {
+                    let result = res.data.map((item) => {
+                        let obj = {};
+                        obj.value = item.province;
+                        obj.label = item.province;
+
+                        let childrenList = [];
+                        item.areaDTOS.forEach((i) => {
+                            childrenList.push({
+                                value: i.city + i.id,
+                                label: i.city
+                            });
+                        });
+
+                        obj.children = childrenList;
+
+                        return obj;
+                    });
+
+                    this.cityList = result;
+                }
+            });
+        },
+
+        //选择完省市后的操作
+        handleChange(res) {
+            var pattern = new RegExp('[0-9]+');
+            var num = res[1].match(pattern);
+            let resCity = res[1].substr(0, num.index);
+            this.value = resCity;
+            this.$emit('child-city', this.chooseValue);
+        },
+
         // 没有 点击下拉菜单时默认赋值返回数据第一个
         // defGet(){
         //     if(this.add_info == ''){
@@ -135,7 +183,6 @@ export default {
         },
 
         childData() {
-            console.log(this.fristForm.dtl_address);
             this.add_info['trustAddress'] = this.fristForm.dtl_address;
             this.$emit('child-data', this.add_info);
         },
@@ -143,6 +190,8 @@ export default {
             this.$store.commit('change', 1);
         },
         showPosition(position) {
+            console.log('aaa', this.mapList);
+
             this.cityTrue = false;
             if (this.mapList) {
                 this.mapWidth = this.mapList.width ? this.mapList.width : '1000px';
@@ -157,9 +206,14 @@ export default {
                     this.fristForm.dtl_address = this.mapList.trustAddress;
                 }
             }
-            this.value = position.city;
-            this.fristForm.longitude = position.lng;
-            this.fristForm.latitude = position.lat;
+
+            //地图上的定位点
+            this.value = this.mapList.city === '' ? position.city : this.mapList.city;
+            this.fristForm.longitude = this.mapList.longitude === -1 ? position.lng : this.mapList.longitude;
+            this.fristForm.latitude = this.mapList.latitude === -1 ? position.lat : this.mapList.latitude;
+
+            //自动将地图界面定位到当前选中的地方
+            this.searchService.search();
         },
         showPositionErr(err) {
             this.cityTrue = false;
@@ -237,6 +291,7 @@ export default {
         },
         // 地图控件  展示
         mapControls(data) {
+            console.log('vvv', data);
             this.searchService.search(this.fristForm.address);
         },
         // 点击搜索结果赋值、
@@ -247,6 +302,7 @@ export default {
             this.fristForm.longitude = val.location.lng;
             this.fristForm.latitude = val.location.lat;
             this.fristForm.address = val.title;
+
             this.mapControls(this.add_info);
 
             this.childData();
@@ -359,11 +415,25 @@ export default {
 <style scoped lang='less'>
 #map {
     height: 100%;
+
+    .choose-area {
+        margin-bottom: 10px;
+    }
+
     /deep/ .seac_address {
         width: 1100px;
         width: 100%;
         margin-bottom: 20px;
         position: relative;
+
+        .merchant-type1 {
+            top: 40px;
+        }
+
+        .merchant-type2 {
+            top: 80px;
+        }
+
         .add_list {
             font-size: 13px;
             width: 300px;
@@ -374,7 +444,7 @@ export default {
             z-index: 10;
             box-shadow: 0 2px 5px #5a5a5a;
             border-radius: 5px;
-            top: 40px;
+            // top: 40px;
             li {
                 cursor: pointer;
                 line-height: 30px;

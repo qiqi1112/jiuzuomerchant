@@ -45,6 +45,8 @@ export default {
             this.$post('/merchant/store/login', data)
                 .then((res) => {
                     if (res.code === 0) {
+                        console.log(res);
+
                         let obj = {
                             phone: res.data.phone,
                             loginName: res.data.loginName,
@@ -53,12 +55,19 @@ export default {
                             rToken: res.data.rongToken,
                             storeName: res.data.storeName,
                             storeId: res.data.storeId,
-                            storeLocation: res.data.storeLocation
+                            storeLocation: res.data.storeLocation,
+                            accountLocation: res.data.accountLocation
                         };
 
                         localStorage.setItem('userInfo', JSON.stringify(obj));
                         this.$message.success('登录成功');
-                        this.$router.push('/index');
+
+                        //根据店铺类型进行跳转到不同的页面
+                        if (res.data.accountLocation === 1) {
+                            this.$router.push('/carMyShop');
+                        } else {
+                            this.$router.push('/index');
+                        }
                     } else {
                         this.$message.error(res.msg);
                     }

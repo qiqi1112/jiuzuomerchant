@@ -1,12 +1,17 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
-import {VueJsonp} from 'vue-jsonp'
+import {
+    VueJsonp
+} from 'vue-jsonp'
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import store from './store/store'
 import rongyun from '@/assets/js/rongyun'
 import emoji from '@/assets/js/emoji'
+
+import VueCropper from 'vue-cropper'
+Vue.use(VueCropper)
 
 // import libamr from '@/assets/js/libamr'
 // import rongIMVoice from '@/assets/js/rongIMVoice'
@@ -72,10 +77,9 @@ router.beforeEach((to, from, next) => {
     const role = JSON.parse(localStorage.getItem('userInfo')) || ''
     if (!role && to.path !== '/login') {
         next('/login');
-    }else if(role && to.path === '/login'){
+    } else if (role && to.path === '/login') {
         next('/index');
-    }
-    else {
+    } else {
         next()
     }
     return

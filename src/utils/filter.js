@@ -40,10 +40,10 @@ Vue.filter("seatType", function (oldVal) {
             newVal = '无要求';
             break;
         case 1:
-            newVal = '软座';
+            newVal = '卡座';
             break;
         case 2:
-            newVal = '硬座';
+            newVal = '散台';
             break;
     }
     return newVal;

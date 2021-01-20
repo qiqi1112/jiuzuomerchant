@@ -37,7 +37,7 @@
                             :onkeyup="(form.authCode = form.authCode.replace(/^(-1+)|[^\d]+/g, ''))"
                         ></el-input>
                         <el-button :type="waitTime ? '' : 'primary'" @click="sendCode" :disabled="waitTime">{{
-                            waitTime ? countDown : '发送'
+                            waitTime ? countDown + 's' : '发送'
                         }}</el-button>
                     </div>
                 </div>

@@ -117,7 +117,17 @@
                                                     <span>{{ day_mon == 1 ? '今日' : '本月' }}</span
                                                     >已售{{ val.sellNum }}瓶
                                                 </p>
-                                                <div class="pro" :style="{ width: val.sellNum>10000?val.sellNum/100:(val.sellNum>1000)?val.sellNum/10:val.sellNum + 'px' }"></div>
+                                                <div
+                                                    class="pro"
+                                                    :style="{
+                                                        width:
+                                                            val.sellNum > 10000
+                                                                ? val.sellNum / 100
+                                                                : val.sellNum > 1000
+                                                                ? val.sellNum / 10
+                                                                : val.sellNum + 'px'
+                                                    }"
+                                                ></div>
                                             </div>
                                         </li>
                                     </ul>
@@ -314,6 +324,7 @@ export default {
             };
             this.$post('/merchant/store/getHomePage', data).then((res) => {
                 this.topThree();
+
                 if (res.code == 0) {
                     if (!res.data) {
                         return;

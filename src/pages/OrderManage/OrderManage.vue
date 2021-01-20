@@ -554,8 +554,8 @@
                                     <!-- 座位类型 -->
                                     <div>
                                         <span>座位类型：</span>
-                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
-                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
+                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">卡座</el-radio>
+                                        <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">散台</el-radio>
                                     </div>
                                     <!-- 容纳人数 -->
                                     <div>

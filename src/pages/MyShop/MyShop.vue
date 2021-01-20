@@ -491,8 +491,8 @@
                             <!-- 座位类型 -->
                             <div style="display: flex">
                                 <span>座位类型：</span>
-                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">软座</el-radio>
-                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">硬座</el-radio>
+                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="1">卡座</el-radio>
+                                <el-radio :disabled="isReadonly" v-model="presentSeatInfo.softHardStatus" label="2">散台</el-radio>
                             </div>
                             <!-- 容纳人数 -->
                             <div style="display: flex">
@@ -1008,8 +1008,12 @@ export default {
                 width: '100%',
                 height: '300px',
                 status: true,
+                city: '',
                 searchAddress: '',
-                trustAddress: ''
+                trustAddress: '',
+                longitude: -1, //经度
+                latitude: -1, //纬度
+                merchantType: 1 //商家类型
             },
 
             showImgPrefix: this.$imgHead, //回显图片/视频的前缀
@@ -1039,8 +1043,8 @@ export default {
             districtCode: '', //区县编码
             searchAddress: '', //地址搜索框里的值
             trustAddress: '', //输入的详细地址
-            longitude: '', //经度
-            latitude: '', //纬度
+            longitude: -1, //经度
+            latitude: -1, //纬度
 
             servicePhoneArr: [], //客户电话回显数组
             servicePhone: '', //客服电话
@@ -1241,7 +1245,16 @@ export default {
                 this.$message.error('请上传商家布局图');
                 return;
             } else {
-                this.allRegRight = true;
+                let arr = this.servicePhoneArr;
+                for (let i = 0; i < arr.length; i++) {
+                    if (this.$regular.phone(arr[i]) === false) {
+                        this.$message.error('电话号码格式不正确，请重新输入');
+                        this.allRegRight = false;
+                        break;
+                    } else {
+                        this.allRegRight = true;
+                    }
+                }
             }
         },
 
@@ -1768,6 +1781,9 @@ export default {
         sendInfoToMap() {
             this.mapList.searchAddress = this.searchAddress;
             this.mapList.trustAddress = this.trustAddress;
+            this.mapList.city = this.city;
+            this.mapList.longitude = Number(this.longitude);
+            this.mapList.latitude = Number(this.latitude);
         },
 
         //点击编辑后的操作
@@ -2754,27 +2770,20 @@ export default {
                     console.log('当前店铺数据', res.data);
                 } else if (res.code === 600) {
                     if (!this.seatFloorDialog) {
-                        this.$confirm(res.msg, '提示', {
-                            confirmButtonText: '添加门店',
-                            cancelButtonText: '取消',
-                            type: 'warning'
-                        })
-                            .then(() => {
+                        this.$alert(res.msg, '创建店铺', {
+                            confirmButtonText: '添加信息',
+                            callback: (action) => {
                                 this.isReadonly = false;
                                 this.isLookKtvInfo = true;
                                 this.isUpdate = false;
-
                                 //如果有缓存就用缓存里的数据，否则就重新创建座位
                                 if (localStorage.getItem('storageInfo')) {
                                     this.getStorageInfo(); //获取缓存数据
                                 }
                                 this.wrapLoading = false;
-                            })
-                            .catch(() => {
-                                this.$router.push('/index');
-                            });
+                            }
+                        });
                     }
-                    this.wrapLoading = false;
                 }
             });
         },

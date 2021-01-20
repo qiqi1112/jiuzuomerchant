@@ -11,36 +11,8 @@
             router
             @select="gowhere"
         >
-            <template v-if="itemIndex === 1">
-                <template v-for="item in items">
-                    <template v-if="item.subs">
-                        <el-submenu :index="item.index" :key="item.index">
-                            <template slot="title">
-                                <i :class="item.icon"></i>
-                                <span slot="title">{{ item.title }}</span>
-                            </template>
-                            <template v-for="subItem in item.subs">
-                                <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
-                                    <template slot="title">{{ subItem.title }}</template>
-                                    <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">{{
-                                        threeItem.title
-                                    }}</el-menu-item>
-                                </el-submenu>
-                                <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}</el-menu-item>
-                            </template>
-                        </el-submenu>
-                    </template>
-                    <template v-else>
-                        <el-menu-item :index="item.index" :key="item.index">
-                            <i :class="item.icon"></i>
-                            <span slot="title">{{ item.title }}</span>
-                        </el-menu-item>
-                    </template>
-                </template>
-            </template>
-
-            <template v-if="itemIndex === 2">
-                <template v-for="item in carItems">
+            <template>
+                <template v-for="item in showItems">
                     <template v-if="item.subs">
                         <el-submenu :index="item.index" :key="item.index">
                             <template slot="title">
@@ -75,8 +47,8 @@ import bus from '../common/bus';
 export default {
     data() {
         return {
-            itemIndex: 2,
             collapse: false,
+            showItems: [],
             items: [
                 {
                     icon: 'el-icon-lx-home',
@@ -188,7 +160,6 @@ export default {
                     title: '财务管理'
                 }
             ],
-
             carItems: [
                 {
                     icon: 'el-icon-s-shop',
@@ -270,6 +241,14 @@ export default {
         const userInfo = localStorage.getItem('userInfo');
         if (userInfo) {
             const storeLocation = JSON.parse(userInfo).storeLocation;
+            const accountLocation = JSON.parse(userInfo).accountLocation;
+            //根据不同的商家类型展示不同的菜单栏
+            if (accountLocation === 1) {
+                this.showItems = this.carItems;
+            } else {
+                this.showItems = this.items;
+            }
+
             if (storeLocation === 3) {
                 this.items[5].index = 'ktv';
             }
