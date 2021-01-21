@@ -311,9 +311,26 @@ export default {
         },
         mute() {
             return this.$store.state.headerClickMute;
-        }
+        },
+
+        break() {
+            return this.$store.state.disconnect;
+        },
     },
     watch: {
+        break: {
+            handler(){
+                let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken;
+                let userInfo = {
+                    appKey: this.$rongyunKey,
+                    token: rToken
+                };
+                // // 获取会话列表
+                let callbacks = {};
+                init(userInfo, callbacks);
+            }
+        },
+
         headClick: {
             handler(val) {
                 val ? (this.showRoom = true) : (this.showRoom = false);

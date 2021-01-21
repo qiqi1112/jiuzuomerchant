@@ -16,6 +16,7 @@ const store = new Vuex.Store({
         headerClickMsg:false,//顶部点击消息  弹出 聊天页
         headerClickMute:false,//是否静音
         onloadOrder:1,//是否从 消息记录中点进 订单页
+        disconnect:1,//断开重连
     },
     getters:{
 
@@ -51,6 +52,10 @@ const store = new Vuex.Store({
         },
         onloadOrderFun(state,type){
             state.onloadOrder = type
+        },
+        // 断开重连
+        disconnectFun(state,num){
+            state.disconnect = num
         },
 
     },
