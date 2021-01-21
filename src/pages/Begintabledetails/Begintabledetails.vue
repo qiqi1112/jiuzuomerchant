@@ -2,7 +2,9 @@
     <div class="container" v-loading="wrapLoading">
         <div class="Begintabledetails">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
+                <el-breadcrumb-item>
+                    <i class="el-icon-lx-text"></i> 开台详情
+                </el-breadcrumb-item>
             </el-breadcrumb>
             <div class="crumbs">
                 <div>
@@ -13,8 +15,7 @@
                         :type="nowFloor == item.floor ? 'primary' : ''"
                         @click="changeShowFloor(item, index)"
                         class="add-floor"
-                        >{{ item.floor }}</el-button
-                    >
+                    >{{ item.floor }}</el-button>
                 </div>
                 <span></span>
             </div>
@@ -52,16 +53,26 @@
                                     @change="changeSeatNum"
                                 ></el-input-number>
                             </label>
-                        </p> -->
+                        </p>-->
                         <!-- 座位属性标题 -->
                         <div class="seat-title">
-                            <p v-for="(item, index) in seatAttOpt" :key="index" @click="changeStyle(item.style)">
+                            <p
+                                v-for="(item, index) in seatAttOpt"
+                                :key="index"
+                                @click="changeStyle(item.style)"
+                            >
                                 <span :class="item.class"></span>
                                 {{ item.name }}
                             </p>
                         </div>
                         <!-- 回显的座位图 -->
-                        <div v-if="x && y" class="seat-box" ref="seatBox" :style="{ width: 32 * y + 30 + 'px' }" style="overflow: hidden">
+                        <div
+                            v-if="x && y"
+                            class="seat-box"
+                            ref="seatBox"
+                            :style="{ width: 32 * y + 30 + 'px' }"
+                            style="overflow: hidden"
+                        >
                             <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
                                 <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
                                     <span
@@ -172,113 +183,139 @@
                             <div class="inventory-details">
                                 <h3>清单详情:</h3>
                                 <div class="right-details">
-                                <div class="details">
-                                    <span class="headers"> 座位信息 </span>
-                                    <div style="display: flex">
-                                        <div class="left">
-                                            <p>座位号：</p>
-                                            <p>容纳人数：</p>
-                                            <p>保留时间：</p>
-                                            <p>低消金额：</p>
-                                        </div>
-                                        <div class="right">
-                                            <p>{{ presentSeatInfo.seatCode }}座</p>
-                                            <p>{{ presentSeatInfo.numberOfPeople }}人</p>
-                                            <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
-                                            <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="details-two">
-                                    <span class="headers" style="display: inline-block; margin-bottom: 15px"> 酒水清单 </span>
-                                    <div
-                                        style="display: flex; justify-content: space-between; flex-wrap: nowrap"
-                                        v-for="(item, index) in presentSeatInfos.goodsList"
-                                        :key="index"
-                                    >
-                                        <div class="left water-left">
-                                            <p>
-                                                <span>{{ item.goodsName }}</span
-                                                ><br />
-
-                                                <span>× {{ item.quantity }}</span>
-                                            </p>
-                                        </div>
-                                        <div class="right">
-                                            <p style="margin-left: -165px">
-                                                <span>{{ item.activityPrice | returnFloat }}</span>
-                                                <span style="text-decoration: line-through; color: #888; margin-left: 10px">{{
-                                                    item.originalPrice | returnFloat
-                                                }}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="details-two">
-                                    <span class="headers" style="display: inline-block; margin: 15px 0"> 追加酒水清单 </span>
-                                    <div class="list-box add-drinks">
-                                        <div class="add-drink-list" v-for="(item, index) in presentSeatInfos.groupGoods" :key="index">
-                                            <div class="order-title">
-                                                <span>{{ item.groupName }}</span>
-                                                <span>{{ item.createTime }}</span>
+                                    <div class="details">
+                                        <span class="headers">座位信息</span>
+                                        <div style="display: flex">
+                                            <div class="left">
+                                                <p>座位号：</p>
+                                                <p>容纳人数：</p>
+                                                <p>保留时间：</p>
+                                                <p>低消金额：</p>
                                             </div>
+                                            <div class="right">
+                                                <p>{{ presentSeatInfo.seatCode }}座</p>
+                                                <p>{{ presentSeatInfo.numberOfPeople }}人</p>
+                                                <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
+                                                <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="details-two">
+                                        <span
+                                            class="headers"
+                                            style="display: inline-block; margin-bottom: 15px"
+                                        >酒水清单</span>
+                                        <div
+                                            style="display: flex; justify-content: space-between; flex-wrap: nowrap"
+                                            v-for="(item, index) in presentSeatInfos.goodsList"
+                                            :key="index"
+                                        >
+                                            <div class="left water-left">
+                                                <p>
+                                                    <span>{{ item.goodsName }}</span>
+                                                    <br />
 
-                                            <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
-                                                <div class="good-box">
-                                                    <div class="good-name">
-                                                        <span>{{ item2.goodsName }}</span><br />
-                                                        <span class="num">x{{ item2.quantity }}</span>
+                                                    <span>× {{ item.quantity }}</span>
+                                                </p>
+                                            </div>
+                                            <div class="right">
+                                                <p style="margin-left: -165px">
+                                                    <span>{{ item.activityPrice | returnFloat }}</span>
+                                                    <span
+                                                        style="text-decoration: line-through; color: #888; margin-left: 10px"
+                                                    >
+                                                        {{
+                                                        item.originalPrice | returnFloat
+                                                        }}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="details-two">
+                                        <span
+                                            class="headers"
+                                            style="display: inline-block; margin: 15px 0"
+                                        >追加酒水清单</span>
+                                        <div class="list-box add-drinks">
+                                            <div
+                                                class="add-drink-list"
+                                                v-for="(item, index) in presentSeatInfos.groupGoods"
+                                                :key="index"
+                                            >
+                                                <div class="order-title">
+                                                    <span>{{ item.groupName }}</span>
+                                                    <span>{{ item.createTime }}</span>
+                                                </div>
+
+                                                <div
+                                                    class="drink-list"
+                                                    v-for="(item2, index2) in item.goodsList"
+                                                    :key="index2"
+                                                >
+                                                    <div class="good-box">
+                                                        <div class="good-name">
+                                                            <span>{{ item2.goodsName }}</span>
+                                                            <br />
+                                                            <span class="num">x{{ item2.quantity }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <span>￥{{ item2.activityPrice }}</span>
+                                                        <span
+                                                            class="unline"
+                                                        >￥{{ item2.originalPrice }}</span>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <span>￥{{ item2.activityPrice }}</span>
-                                                    <span class="unline">￥{{ item2.originalPrice }}</span>
+                                                    <el-button
+                                                        :disabled="true"
+                                                        v-if="item.servedStatus == 0 || item.servedStatus == 1"
+                                                        type="primary"
+                                                    >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button>
+                                                    <el-button
+                                                        :disabled="true"
+                                                        v-if="item.servedStatus == 0 || item.servedStatus == 2"
+                                                        type="danger"
+                                                    >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <el-button
-                                                    :disabled="true"
-                                                    v-if="item.servedStatus == 0 || item.servedStatus == 1"
-                                                    type="primary"
-                                                    >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
-                                                >
-                                                <el-button
-                                                    :disabled="true"
-                                                    v-if="item.servedStatus == 0 || item.servedStatus == 2"
-                                                    type="danger"
-                                                    >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
-                                                >
+                                        </div>
+                                    </div>
+                                    <div class="details-two">
+                                        <span
+                                            class="headers"
+                                            style="display: inline-block; margin-bottom: 5px"
+                                        >优惠券</span>
+                                        <div style="display: flex">
+                                            <div class="left omit" style="width:100%">
+                                                <p>
+                                                    平台优惠券：
+                                                    <span>{{ presentSeatInfos.appDetails }}</span>
+                                                </p>
+                                                <p>
+                                                    商家优惠券：
+                                                    <span>{{ presentSeatInfos.storeDetails }}</span>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="details-two">
-                                    <span class="headers" style="display: inline-block; margin-bottom: 5px"> 优惠券 </span>
-                                    <div style="display: flex">
-                                        <div class="left" style="width:100%">
-                                            <p>
-                                                平台优惠券：<span>{{ presentSeatInfos.appDetails }}</span>
-                                            </p>
-                                            <p>
-                                                商家优惠券：<span>{{ presentSeatInfos.storeDetails }}</span>
-                                            </p>
+                                    <div class="details-two">
+                                        <div style="display: flex; margin-top: 30px">
+                                            <div class="left">
+                                                <p style="white-space: nowrap">经商家换座：</p>
+                                                <p>换座时间：</p>
+                                                <p>占座时间：</p>
+                                            </div>
+                                            <div class="right" style="margin-left:0">
+                                                <p>{{ presentSeatInfos.changeSeat }}</p>
+                                                <p>{{ presentSeatInfos.changeSeatTime }}</p>
+                                                <p
+                                                    v-if="presentSeatInfos.occupySeatTime==0"
+                                                >{{ presentSeatInfos.occupySeatTime }}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="details-two">
-                                    <div style="display: flex; margin-top: 30px">
-                                        <div class="left">
-                                            <p style="white-space: nowrap">经商家换座：</p>
-                                            <p>换座时间：</p>
-                                            <p>占座时间：</p>
-                                        </div>
-                                        <div class="right">
-                                            <p>{{ presentSeatInfos.replaceSeatCode }}</p>
-                                            <p>{{ presentSeatInfos.changeSeatTime }}</p>
-                                            <p v-if="presentSeatInfos.occupySeatTime==0">{{ presentSeatInfos.occupySeatTime }}</p>
-                                        </div>
-                                    </div>
-                                </div>
                                 </div>
                             </div>
                         </div>
@@ -387,7 +424,7 @@ export default {
         //清空座位外边框（定位当前座位）
         clearSeatBorder() {
             if (this.$refs.seatSpan) {
-                this.$refs.seatSpan.forEach((item) => {
+                this.$refs.seatSpan.forEach(item => {
                     item.classList.remove('border');
                 });
             }
@@ -396,7 +433,7 @@ export default {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
-            this.list.forEach((item) => {
+            this.list.forEach(item => {
                 if (item.floor === this.nowFloor) {
                     // item.layoutList.forEach((item2) => {
                     if (item.floor == item.floor && item.seatRow == seatRow && item.seatColumn == seatColumn) {
@@ -405,7 +442,7 @@ export default {
                         this.presentSeatInfo = item;
                         let newObj = this.presentSeatInfo;
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
-                        this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
+                        this.$get(`/merchant/store/getInfoBySeat/${code}`).then(res => {
                             // console.log(res);
                             if (res.code == 0) {
                                 if (res.data) {
@@ -432,11 +469,11 @@ export default {
             this.$nextTick(() => {
                 if (this.$refs.seatSpan) {
                     //遍历所有座位
-                    this.$refs.seatSpan.forEach((item) => {
+                    this.$refs.seatSpan.forEach(item => {
                         let x = item.dataset.indexx; //行
                         let y = item.dataset.indexy; //列
                         //根据返回的楼层对应的座位数组进行匹配，并替换当前座位的属性
-                        this.list.forEach((item2) => {
+                        this.list.forEach(item2 => {
                             if (item2.floor == this.nowFloor && item2.seatRow == x && item2.seatColumn == y) {
                                 item.className = `seat`;
                                 //可预订
@@ -467,7 +504,7 @@ export default {
         },
         //回显每个座位号时，不要带上楼层号1
         substrSeatNum() {
-            this.list.forEach((item) => {
+            this.list.forEach(item => {
                 const index = item.seatCode.indexOf('-');
                 if (index !== -1) {
                     item.seatCode = item.seatCode.substr(index + 1);
@@ -476,7 +513,7 @@ export default {
         },
         //回显店铺数据
         getStoreInfo() {
-            this.$post('/merchant/store/getStoreSeat').then((res) => {
+            this.$post('/merchant/store/getStoreSeat').then(res => {
                 if (res.code == 0) {
                     console.log(res);
                     this.wrapLoading = false;
@@ -527,11 +564,11 @@ export default {
             this.wrapLoading = true;
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
-            this.$post('/merchant/store/getStoreSeat', { floor: this.nowFloor }).then((res) => {
+            this.$post('/merchant/store/getStoreSeat', { floor: this.nowFloor }).then(res => {
                 console.log(res);
-                if(res.code===0){
+                if (res.code === 0) {
                     this.wrapLoading = false;
-                }else{
+                } else {
                     this.wrapLoading = false;
                     this.$message.error(res.msg);
                 }
@@ -552,6 +589,7 @@ export default {
             // this.showSeatAtt(index);
             // this.clickFlag = false;
             this.presentSeatInfo = '';
+            this.presentSeatInfos = '';
         },
         //回显店铺卡座数量（行和列数量）1
         getShopSeat(index) {
@@ -560,7 +598,7 @@ export default {
         },
         //对座位信息进行相关转换
         changeLayoutList(arr) {
-            arr.forEach((item) => {
+            arr.forEach(item => {
                 //将数值型转为字符型（软硬座）
                 if (item.softHardStatus) {
                     item.softHardStatus = item.softHardStatus.toString();
@@ -634,11 +672,11 @@ export default {
     padding-left: 19px;
     width: 435px;
     margin-top: -20px;
-    h3{
+    h3 {
         display: inline-block;
         height: 18px;
     }
-    .right-details{
+    .right-details {
         margin-top: 10px;
     }
     .details {
@@ -661,7 +699,15 @@ export default {
     }
     .details-two {
         width: 315px;
-        .water-left{
+        .omit {
+            p{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            }
+            
+        }
+        .water-left {
             height: 35px;
         }
         &:nth-child(3) {
@@ -708,7 +754,6 @@ export default {
             }
         }
         .drink-list {
-            
             display: flex;
             margin-bottom: 18px;
             .good-box {
@@ -870,11 +915,11 @@ export default {
             margin-right: 46px;
         }
     }
-    .order-num{
-         margin-top: 20px;
+    .order-num {
+        margin-top: 20px;
         padding-left: 19px;
         width: 280px;
-        .el-input{
+        .el-input {
             width: 280px;
         }
     }
