@@ -388,33 +388,32 @@ export default {
         //多选操作
         handleSelectionChange(val) {
             this.multipleSelection = val;
-            console.log(this.multipleSelection);
         },
 
         //一键审核
         aduitAll() {
-            // if(this.multipleSelection.length !== 0) {
+            if (this.multipleSelection.length !== 0) {
+                this.multipleSelection.forEach((item) => {
+                    if (item.examine === 0 || item.examine === 2) {
+                        this.auditIds.push(item.auditId);
+                    }
+                });
 
-            // }
-
-            this.tableData.forEach((item) => {
-                if (item.examine === 0 || item.examine === 2) {
-                    this.auditIds.push(item.auditId);
-                }
-            });
-
-            if (this.auditIds.length !== 0) {
-                this.$confirm('确定一键审核吗？', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-                        this.requestAudit();
+                if (this.auditIds.length !== 0) {
+                    this.$confirm('确认审核选中的订单吗？', '提示', {
+                        type: 'warning'
                     })
-                    .catch(() => {
-                        this.auditIds = [];
-                    });
+                        .then(() => {
+                            this.requestAudit();
+                        })
+                        .catch(() => {
+                            this.auditIds = [];
+                        });
+                } else {
+                    this.$message.error('暂无可审核的订单');
+                }
             } else {
-                this.$message.warning('暂无可审核的订单');
+                this.$message.error('请选择要审核的订单');
             }
         },
 

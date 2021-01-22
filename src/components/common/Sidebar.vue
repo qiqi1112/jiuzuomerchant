@@ -119,11 +119,11 @@ export default {
                         }
                     ]
                 },
-                {
-                    icon: 'el-icon-lx-text',
-                    index: 'service',
-                    title: '客服管理'
-                },
+                // {
+                //     icon: 'el-icon-lx-text',
+                //     index: 'service',
+                //     title: '客服管理'
+                // },
                 {
                     icon: 'iconfont icon-icon_rzhi side',
                     index: 'log',

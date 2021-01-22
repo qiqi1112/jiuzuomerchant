@@ -87,7 +87,7 @@
                 <el-table-column label="预定手机" min-width="140">
                     <template slot-scope="scope">
                         <el-link @click="getPhone(scope.row.orderNo)" type="primary"
-                            >{{ scope.row.contactTel | phoneNum }}<i class="el-icon-phone el-icon--right" style="margin-left: 10px"></i>
+                            >{{ scope.row.contactTel }}<i class="el-icon-phone el-icon--right" style="margin-left: 10px"></i>
                         </el-link>
                     </template>
                 </el-table-column>
@@ -1000,7 +1000,7 @@ export default {
             (async () => {
                 let res = await this.$get(`/merchant/store/order/${orderNo}/info`);
                 if (res.code === 0) {
-                    res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
+                    // res.data.contactTel = res.data.contactTel.replace(res.data.contactTel.slice(3, 7), '****');
                     this.form = res.data;
                     this.dialog = true;
                 }

@@ -725,7 +725,7 @@ export default {
     flex-wrap: wrap;
     .goods-box {
         box-sizing: border-box;
-        width: 180px;
+        width: 190px;
         margin-bottom: 30px;
         display: flex;
         flex-direction: column;
@@ -759,6 +759,8 @@ export default {
             .goods-price {
                 font-size: 13px;
                 margin-bottom: 8px;
+                // float: left;
+                display: flex;
 
                 > span {
                     margin-right: 6px;
