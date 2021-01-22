@@ -185,7 +185,7 @@
                     </p>
                     <p>
                         <span>*套餐原单价：</span>
-                        <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px" readonly></el-input>
+                        <el-input v-model="goodsForm.originPrice" style="width: 120px; margin-right: 20px"></el-input>
                         <span>*套餐现单价：</span>
                         <el-input v-model="goodsForm.comboNowPrice" style="width: 120px"></el-input>
                     </p>

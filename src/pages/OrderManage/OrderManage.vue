@@ -1452,7 +1452,7 @@ export default {
         justify-content: space-between;
 
         .info-box {
-            width: 50%;
+            width: 100%;
 
             .info1 {
                 display: flex;

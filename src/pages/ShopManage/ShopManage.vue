@@ -509,6 +509,12 @@ export default {
                     } else if (!this.goodsForm.comboNowPrice) {
                         this.$message.error('请输入套餐现单价');
                         return;
+                    } else if (!this.goodsForm.originPrice) {
+                        this.$message.error('请输入套餐原单价');
+                        return;
+                    } else if (+this.goodsForm.originPrice < +this.goodsForm.comboNowPrice) {
+                        this.$message.error('套餐现单价不能大于原单价');
+                        return;
                     } else {
                         this.allRegRight = true;
                     }

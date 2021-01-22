@@ -44,11 +44,19 @@
                     class="handle-input mr10"
                 ></el-input> -->
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" class="aduit-all" @click="aduitAll">一键审核</el-button>
+                <el-button type="warning" @click="aduitAll">批量审核</el-button>
             </div>
 
             <!-- 表格部分 -->
-            <el-table border ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%">
+            <el-table
+                border
+                ref="multipleTable"
+                :data="tableData"
+                tooltip-effect="dark"
+                @selection-change="handleSelectionChange"
+                style="width: 100%"
+            >
+                <el-table-column type="selection"></el-table-column>
                 <el-table-column label="ID" fixed type="index"></el-table-column>
                 <el-table-column prop="creatorName" label="订单发起人" min-width="120"></el-table-column>
                 <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
@@ -79,9 +87,13 @@
                         <span>{{ scope.row.payWay | payWay }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="paidAmount" label="实付金额"></el-table-column>
-                <el-table-column prop="payableAmount" label="商品原价"></el-table-column>
-                <el-table-column prop="details" label="优惠券"></el-table-column>
+
+                <el-table-column prop="payableAmount" label="订单原价"></el-table-column>
+                <el-table-column prop="orderDiscount" label="订单折扣价" min-width="90"></el-table-column>
+                <el-table-column prop="pointsPay" label="积分支付"></el-table-column>
+                <el-table-column prop="moneyPay" label="现金支付"></el-table-column>
+                <el-table-column prop="commissionPay" label="佣金支付"></el-table-column>
+
                 <el-table-column prop="remarks" label="备注信息" min-width="140"></el-table-column>
                 <el-table-column prop="createTime" label="订单发起时间" min-width="140"></el-table-column>
                 <el-table-column prop="paidTime" label="订单支付时间" min-width="140"></el-table-column>
@@ -120,7 +132,7 @@
                 <!-- 订单详情 -->
                 <span class="add-classify-title">订单信息</span>
                 <div class="basic-info">
-                    <el-form ref="form" class="info-wrap" :model="form" label-width="110px">
+                    <el-form ref="form" class="info-wrap" :model="form" label-width="90px">
                         <div class="info-box left">
                             <el-form-item label="预定用户：">
                                 <el-input v-model="form.contactName" readonly></el-input>
@@ -152,20 +164,30 @@
 
                             <div class="info2">
                                 <div>
-                                    <el-form-item label="实付金额：">
-                                        <el-input v-model="form.paidAmount" readonly>
+                                    <el-form-item label="订单原价：">
+                                        <el-input v-model="form.payableAmount" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="现金支付：">
+                                        <el-input v-model="form.cashPay" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="佣金支付：">
+                                        <el-input v-model="form.commissionPay" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
                                 </div>
                                 <div>
-                                    <el-form-item label="商品原价：">
-                                        <el-input v-model="form.payableAmount" readonly>
+                                    <el-form-item label="订单折扣价">
+                                        <el-input v-model="form.orderAmount" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
-                                    <el-form-item label="优惠券优惠：">
-                                        <el-input v-model="form.couponAmount" readonly>
+                                    <el-form-item label="积分支付：">
+                                        <el-input v-model="form.pointsPay" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
@@ -356,13 +378,25 @@ export default {
             pagesize: 10, //默认每页要显示多少条数据
             dialogFormVisible: false, //对话框的开启与隐藏
             form: {}, //订单详情表单
-            auditIds: [] //要提交审核的数组
+            auditIds: [], //要提交审核的数组
+
+            multipleSelection: [] //多选的数组
         };
     },
 
     methods: {
+        //多选操作
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+            console.log(this.multipleSelection);
+        },
+
         //一键审核
         aduitAll() {
+            // if(this.multipleSelection.length !== 0) {
+
+            // }
+
             this.tableData.forEach((item) => {
                 if (item.examine === 0 || item.examine === 2) {
                     this.auditIds.push(item.auditId);
@@ -614,7 +648,7 @@ export default {
         justify-content: space-between;
 
         .info-box {
-            width: 50%;
+            width: 100%;
 
             .info1 {
                 display: flex;
@@ -627,7 +661,7 @@ export default {
                 justify-content: space-between;
 
                 & > div:first-child {
-                    width: 40%;
+                    margin-right: 20px;
                 }
             }
 
@@ -726,10 +760,6 @@ export default {
             }
         }
     }
-}
-
-.aduit-all {
-    float: right;
 }
 
 /deep/ .el-textarea__inner {
