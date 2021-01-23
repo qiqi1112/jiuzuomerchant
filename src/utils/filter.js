@@ -198,6 +198,9 @@ Vue.filter("payWay", function (oldVal) {
         case 2:
             newVal = '会员积分';
             break;
+        case 3:
+            newVal = '混合支付';
+            break;
     }
     return newVal;
 })
