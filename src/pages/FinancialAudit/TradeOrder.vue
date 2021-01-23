@@ -507,6 +507,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-button--small{
+    width: 80px;
+}
 .shop-seat {
     display: flex;
 
