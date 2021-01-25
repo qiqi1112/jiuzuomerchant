@@ -23,37 +23,6 @@
                 <div class="shop-seat">
                     <!-- 左边座位展示 -->
                     <div class="left-box">
-                        <!-- 座位行数和列数 -->
-                        <!-- <p class="input-seat">
-                            <label style="margin-right: 30px">
-                                座位行数：
-                                <el-input-number
-                                    :step="1"
-                                    step-strictly
-                                    :disabled="isReadonly"
-                                    v-model="x"
-                                    :min="6"
-                                    style="width: 120px"
-                                    label="行数"
-                                    @blur="checkNull(x, '座位行数')"
-                                    @change="changeSeatNum"
-                                ></el-input-number>
-                            </label>
-                            <label style="margin-right: 30px">
-                                座位列数：
-                                <el-input-number
-                                    :step="1"
-                                    step-strictly
-                                    :disabled="isReadonly"
-                                    v-model="y"
-                                    :min="6"
-                                    style="width: 120px"
-                                    label="列数"
-                                    @blur="checkNull(y, '座位列数')"
-                                    @change="changeSeatNum"
-                                ></el-input-number>
-                            </label>
-                        </p>-->
                         <!-- 座位属性标题 -->
                         <div class="seat-title">
                             <p
@@ -99,7 +68,7 @@
                                     <el-input
                                         :disabled="isReadonly"
                                         v-model="presentSeatInfos.contactName"
-                                        placeholder="预定用户"
+                                        placeholder="预定用户..."
                                     ></el-input>
                                 </div>
                                 <div class="padd">
@@ -107,7 +76,7 @@
                                     <el-input
                                         :disabled="isReadonly"
                                         v-model="presentSeatInfos.contactTel"
-                                        placeholder="预定手机"
+                                        placeholder="预定手机..."
                                     ></el-input>
                                 </div>
                                 <div class="order-num">
@@ -115,7 +84,7 @@
                                     <el-input
                                         :disabled="isReadonly"
                                         v-model="presentSeatInfos.orderNo"
-                                        placeholder="订单号"
+                                        placeholder="订单号..."
                                     ></el-input>
                                 </div>
                                 <div class="order-num">
@@ -123,7 +92,7 @@
                                     <el-input
                                         :disabled="isReadonly"
                                         v-model="presentSeatInfos.remarks"
-                                        placeholder="预定备注信息"
+                                        placeholder="预定备注信息..."
                                         type="textarea"
                                         resize="none"
                                         :rows="4"
@@ -148,7 +117,7 @@
                                             class="smallInpss"
                                             :disabled="isReadonly"
                                             v-model="presentSeatInfos.paidAmount"
-                                            placeholder="实付金额"
+                                            placeholder="实付金额..."
                                         ></el-input>
                                     </div>
                                     <div>
@@ -157,7 +126,7 @@
                                             class="smallInps"
                                             :disabled="isReadonly"
                                             v-model="presentSeatInfos.payableAmount"
-                                            placeholder="商品原价"
+                                            placeholder="商品原价..."
                                         ></el-input>
                                     </div>
                                     <div>
@@ -166,7 +135,7 @@
                                             class="smallInp"
                                             :disabled="isReadonly"
                                             v-model="presentSeatInfos.couponAmount"
-                                            placeholder="优惠券优惠"
+                                            placeholder="优惠券优惠."
                                         ></el-input>
                                     </div>
                                 </div>
@@ -200,7 +169,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="details-two">
+                                    <div class="details-two WineList">
                                         <span
                                             class="headers"
                                             style="display: inline-block; margin-bottom: 15px"
@@ -291,11 +260,11 @@
                                             <div class="left omit" style="width:100%">
                                                 <p>
                                                     平台优惠券：
-                                                    <span>{{ presentSeatInfos.appDetails }}</span>
+                                                    <span>{{ presentSeatInfos.appDetails || '暂无' }}</span>
                                                 </p>
                                                 <p>
                                                     商家优惠券：
-                                                    <span>{{ presentSeatInfos.storeDetails }}</span>
+                                                    <span>{{ presentSeatInfos.storeDetails || '暂无' }}</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -308,11 +277,9 @@
                                                 <p>占座时间：</p>
                                             </div>
                                             <div class="right" style="margin-left:0">
-                                                <p>{{ presentSeatInfos.changeSeat }}</p>
-                                                <p>{{ presentSeatInfos.changeSeatTime }}</p>
-                                                <p
-                                                    v-if="presentSeatInfos.occupySeatTime==0"
-                                                >{{ presentSeatInfos.occupySeatTime }}</p>
+                                                <p>{{ presentSeatInfos.changeSeat || '暂无' }}</p>
+                                                <p>{{ presentSeatInfos.changeSeatTime || '暂无' }}</p>
+                                                <p>{{ presentSeatInfos.occupySeatTime || '暂无' }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -697,6 +664,9 @@ export default {
             }
         }
     }
+    .WineList{
+        padding-bottom: 10px;
+    }
     .details-two {
         width: 315px;
         .omit {
@@ -710,6 +680,7 @@ export default {
         .water-left {
             height: 35px;
         }
+        
         &:nth-child(3) {
             border-top: 1px solid #000;
             // border-bottom: 1px solid #000;
