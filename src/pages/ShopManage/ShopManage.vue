@@ -244,6 +244,26 @@ export default {
                 {
                     label: '会员卡',
                     value: 11
+                },
+                {
+                    label: '果酒',
+                    value: 12
+                },
+                {
+                    label: '利口酒',
+                    value: 13
+                },
+                {
+                    label: '朗姆酒',
+                    value: 14
+                },
+                {
+                    label: '金酒',
+                    value: 15
+                },
+                {
+                    label: '其他酒类',
+                    value: 16
                 }
             ],
 
