@@ -28,7 +28,6 @@
                             <p
                                 v-for="(item, index) in seatAttOpt"
                                 :key="index"
-                                @click="changeStyle(item.style)"
                             >
                                 <span :class="item.class"></span>
                                 {{ item.name }}
@@ -162,9 +161,15 @@
                                                 <p>低消金额：</p>
                                             </div>
                                             <div class="right">
-                                                <p>{{ presentSeatInfo.seatCode }}座</p>
-                                                <p>{{ presentSeatInfo.numberOfPeople }}人</p>
-                                                <p>最晚至 {{ presentSeatInfo.seatLatestReservationTime }}</p>
+                                                <p>
+                                                    <span v-show="presentSeatInfo.seatCode">{{ presentSeatInfo.seatCode +'座'}}</span>
+                                                </p>
+                                                <p>
+                                                     <span v-show="presentSeatInfo.numberOfPeople">{{ presentSeatInfo.numberOfPeople +'人'}}</span>
+                                                </p>
+                                                <p>
+                                                    <span v-show="presentSeatInfo.seatLatestReservationTime">{{'最晚至'+ presentSeatInfo.seatLatestReservationTime}}</span>
+                                                </p>
                                                 <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
                                             </div>
                                         </div>
@@ -654,6 +659,7 @@ export default {
         .left {
             p {
                 margin-bottom: 10px;
+                
             }
         }
         .right {
