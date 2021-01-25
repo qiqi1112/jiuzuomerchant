@@ -1465,7 +1465,7 @@ export default {
                 justify-content: space-between;
 
                 & > div:first-child {
-                    width: 40%;
+                    margin-right: 20px;
                 }
             }
 

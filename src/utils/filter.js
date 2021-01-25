@@ -346,6 +346,21 @@ Vue.filter("showAppGoodsType", function (oldVal) {
         case 11:
             newVal = '会员卡';
             break;
+        case 12:
+            newVal = '果酒';
+            break;
+        case 13:
+            newVal = '利口酒';
+            break;
+        case 14:
+            newVal = '朗姆酒';
+            break;
+        case 15:
+            newVal = '金酒';
+            break;
+        case 16:
+            newVal = '其他酒类';
+            break;
     }
     return newVal;
 })

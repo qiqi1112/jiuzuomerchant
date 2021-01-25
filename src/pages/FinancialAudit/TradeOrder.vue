@@ -76,7 +76,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="orderNo" label="总订单号" min-width="150"></el-table-column>
-                <el-table-column prop="orderId" label="订单号" min-width="150"></el-table-column>
+                <!-- <el-table-column prop="orderId" label="订单号" min-width="150"></el-table-column> -->
                 <el-table-column prop="payStatus" label="支付状态">
                     <template slot-scope="scope">
                         <span>{{ scope.row.payStatus | payStatus }}</span>
