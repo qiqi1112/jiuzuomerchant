@@ -89,10 +89,12 @@
                 </el-table-column>
 
                 <el-table-column prop="payableAmount" label="订单原价"></el-table-column>
+                <el-table-column prop="orderPresent" label="订单现价"></el-table-column>
                 <el-table-column prop="orderDiscount" label="订单折扣价" min-width="90"></el-table-column>
                 <el-table-column prop="pointsPay" label="积分支付"></el-table-column>
                 <el-table-column prop="moneyPay" label="现金支付"></el-table-column>
-                <el-table-column prop="commissionPay" label="佣金支付"></el-table-column>
+                <el-table-column prop="commissionPay" label="商品佣金"></el-table-column>
+                <el-table-column prop="adminCoupon" label="优惠券佣金" min-width="90"></el-table-column>
 
                 <el-table-column prop="remarks" label="备注信息" min-width="140"></el-table-column>
                 <el-table-column prop="createTime" label="订单发起时间" min-width="140"></el-table-column>
@@ -132,7 +134,7 @@
                 <!-- 订单详情 -->
                 <span class="add-classify-title">订单信息</span>
                 <div class="basic-info">
-                    <el-form ref="form" class="info-wrap" :model="form" label-width="90px">
+                    <el-form ref="form" class="info-wrap" :model="form" label-width="100px">
                         <div class="info-box left">
                             <el-form-item label="预定用户：">
                                 <el-input v-model="form.contactName" readonly></el-input>
@@ -169,25 +171,36 @@
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
+                                    <el-form-item label="订单现价：">
+                                        <el-input v-model="form.orderPresent" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
                                     <el-form-item label="现金支付：">
                                         <el-input v-model="form.cashPay" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
-                                    <el-form-item label="佣金支付：">
-                                        <el-input v-model="form.commissionPay" readonly>
-                                            <template slot="append">￥</template>
-                                        </el-input>
-                                    </el-form-item>
-                                </div>
-                                <div>
                                     <el-form-item label="订单折扣价">
                                         <el-input v-model="form.orderAmount" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
+                                </div>
+                                <div>
                                     <el-form-item label="积分支付：">
                                         <el-input v-model="form.pointsPay" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="商品佣金：">
+                                        <el-input v-model="form.commissionPay" readonly>
+                                            <template slot="append">￥</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="优惠券佣金：">
+                                        <el-input v-model="form.adminCoupon" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
@@ -506,7 +519,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-button--small{
+.el-button--small {
     width: 80px;
 }
 .shop-seat {
@@ -781,7 +794,7 @@ export default {
 
 /deep/ .search-seat {
     .el-dialog {
-        width: 70%;
+        width: 72%;
     }
 }
 
