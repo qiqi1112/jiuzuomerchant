@@ -222,10 +222,24 @@ export default new Router({
                     }
                 },
                 {
+                    path: '/staffManage',
+                    component: () => import( /* webpackChunkName: "staffManage" */ '../pages/StaffManage/StaffManage.vue'),
+                    meta: {
+                        title: '员工管理'
+                    }
+                },
+                {
                     path: '/carStaffManage',
                     component: () => import( /* webpackChunkName: "carStaffManage" */ '../pages/StaffManage/CarStaffManage.vue'),
                     meta: {
                         title: '员工管理'
+                    }
+                },
+                {
+                    path: '/financeManage',
+                    component: () => import( /* webpackChunkName: "financeManage" */ '../pages/FinanceManage/FinanceManage.vue'),
+                    meta: {
+                        title: '财务管理'
                     }
                 },
                 {

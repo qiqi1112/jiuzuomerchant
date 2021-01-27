@@ -105,7 +105,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="storeName" label="订单信息" min-width="100" fixed="right">
-                    <template slot-scope="scope">
+                    <template slot-scope="scope" v-if="scope.row.orderType !== 3">
                         <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row.orderNo)">查看订单</el-link>
                     </template>
                 </el-table-column>
