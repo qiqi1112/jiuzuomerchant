@@ -580,7 +580,7 @@ export default {
         },
 
         //添加/修改商品
-        setGoodsInfo(active) {
+        setGoodsInfo() {
             if (this.activeNum != 1 && this.activeNum != 11) {
                 this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
             }
