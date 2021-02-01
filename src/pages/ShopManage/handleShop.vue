@@ -364,23 +364,16 @@ export default {
     data() {
         return {
             showImgPrefix: this.$imgHead, //回显图片前缀
-
             thumImageBox: [], //会员卡卡片列表
-
             options: [], //输入框请求到的商品信息数组
             goodName: '', //选中的商品对应的信息
-
             antiStatus: true //防抖状态值
         };
     },
 
-    watch: {
+    mounted() {
         //如果切换到会员卡页面就加载会员卡卡片列表
-        activeNum(val) {
-            if (val == 11) {
-                this.getVipCard();
-            }
-        }
+        this.activeNum === 11 && this.getVipCard();
     },
 
     methods: {
