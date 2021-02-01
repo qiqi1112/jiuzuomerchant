@@ -170,7 +170,7 @@
                                                 <p>
                                                     <span v-show="presentSeatInfo.seatLatestReservationTime">{{'最晚至'+ presentSeatInfo.seatLatestReservationTime}}</span>
                                                 </p>
-                                                <p>{{ presentSeatInfos.minAmount | returnFloat }}</p>
+                                                <p>{{ presentSeatInfos.minAmount || presentSeatInfo.minConsumption }}</p>
                                             </div>
                                         </div>
                                     </div>
