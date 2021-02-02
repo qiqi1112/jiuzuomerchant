@@ -480,6 +480,7 @@ export default {
 
         //表格数据页码发生变化后
         handleCurrentChange(val) {
+            this.searchObj.searchOrderNum = '';
             this.currentPage = val;
             this.getOrderInfo(); //请求翻页后的数据
         },
