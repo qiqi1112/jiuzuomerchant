@@ -50,8 +50,12 @@
                                 <el-button @click.prevent="removeDomain(item)">
                                     <i class="el-icon-close"></i>
                                 </el-button>
-                                <el-button size="mini" :type="item.sellOut === 0 ? 'warning' : 'danger'" @click="handleSellOut(index, item)"
-                                    >{{ item.sellOut === 0 ? '售罄' : '已售罄' }}
+                                <el-button
+                                    v-if="item.sellOut !== undefined"
+                                    size="mini"
+                                    :type="item.sellOut === 0 ? 'warning' : 'danger'"
+                                    @click="handleSellOut(index, item)"
+                                    >{{ item.sellOut === 0 ? '未售罄' : '已售罄' }}
                                 </el-button>
                             </div>
                             <div>
