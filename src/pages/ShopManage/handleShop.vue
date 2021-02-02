@@ -50,6 +50,9 @@
                                 <el-button @click.prevent="removeDomain(item)">
                                     <i class="el-icon-close"></i>
                                 </el-button>
+                                <el-button size="mini" :type="item.sellOut === 0 ? 'warning' : 'danger'" @click="handleSellOut(index, item)"
+                                    >{{ item.sellOut === 0 ? '售罄' : '已售罄' }}
+                                </el-button>
                             </div>
                             <div>
                                 <el-input
@@ -149,7 +152,17 @@
                                 :key="index"
                                 :label="item.name"
                                 :value="
-                                    item.id + '+' + item.listPicture + '+' + item.name + '+' + item.originalPrice + '+' + item.presentPrice
+                                    item.id +
+                                    '+' +
+                                    item.listPicture +
+                                    '+' +
+                                    item.name +
+                                    '+' +
+                                    item.originalPrice +
+                                    '+' +
+                                    item.presentPrice +
+                                    '+' +
+                                    item.sellOut
                                 "
                             ></el-option>
                         </el-select>
@@ -176,9 +189,14 @@
                                     ></el-input-number>
                                 </template>
                             </el-table-column>
+                            <el-table-column label="状态" width="100">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.sellOut == 0 ? '未售罄' : '已售罄' }}</span>
+                                </template>
+                            </el-table-column>
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
-                                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">移除</el-button>
+                                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">移除</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -207,7 +225,7 @@
             </el-form>
 
             <!-- 放置广告位 -->
-            <template v-if="activeNum == 1 || activeNum == 9 || activeNum == 10 || activeNum == 11">
+            <!-- <template v-if="activeNum == 1 || activeNum == 9 || activeNum == 10 || activeNum == 11">
                 <p>
                     <el-checkbox
                         @change="removeBanner"
@@ -230,13 +248,13 @@
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
                 <span v-if="goodsForm.checkedBanner == 1">（*选填，请上传尺寸为351*140，格式为jpg/jpeg/png的图片）</span>
-            </template>
+            </template> -->
 
             <!-- 酒水上传广告图与推荐位图 -->
             <template v-if="activeNum != 1 && activeNum != 9 && activeNum != 10 && activeNum != 11">
                 <div class="drinks-update-box">
                     <!-- 广告图 -->
-                    <div class="banner-box">
+                    <!-- <div class="banner-box">
                         <el-checkbox
                             @change="removeBanner"
                             v-model="goodsForm.checkedBanner"
@@ -260,7 +278,7 @@
 
                             <span v-if="goodsForm.checkedBanner == 1">（*选填，请上传尺寸为351*140，格式为jpg/jpeg/png的图片）</span>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- 商家推荐位 -->
                     <div class="reco-box">
@@ -334,7 +352,7 @@
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </p>
-                    <span>（*请上传尺寸为351*181，格式为jpg/jpeg/png的图片）</span>
+                    <span>（*请上传尺寸为200*200，格式为jpg/jpeg/png的图片）</span>
                 </div>
             </template>
 
@@ -371,9 +389,11 @@ export default {
         };
     },
 
-    mounted() {
-        //如果切换到会员卡页面就加载会员卡卡片列表
-        this.activeNum === 11 && this.getVipCard();
+    watch: {
+        activeNum(val) {
+            //如果切换到会员卡页面就加载会员卡卡片列表
+            val == 11 && this.getVipCard();
+        }
     },
 
     methods: {
@@ -426,11 +446,11 @@ export default {
         },
 
         //关闭广告位操作
-        removeBanner() {
-            if (!this.goodsForm.checkedBanner) {
-                this.goodsForm.bannerImageUrl = '';
-            }
-        },
+        // removeBanner() {
+        //     if (!this.goodsForm.checkedBanner) {
+        //         this.goodsForm.bannerImageUrl = '';
+        //     }
+        // },
 
         //关闭商家推荐位操作
         removeReco() {
@@ -451,7 +471,8 @@ export default {
                 goodsName: goodInfoArr[2],
                 originalPrice: goodInfoArr[3],
                 presentPrice: goodInfoArr[4],
-                number: 1
+                number: 1,
+                sellOut: goodInfoArr[5]
             };
 
             this.goodsForm.goodsIdList.push(goodInfoArr[0]); //存入当前选择的商品id
@@ -499,8 +520,23 @@ export default {
             }
         },
 
+        //单品售罄
+        handleSellOut(index, item) {
+            let status = '';
+            item.sellOut === 0 ? (status = '售罄') : (status = '取消售罄');
+            this.$confirm(`确认${status}操作吗？`, '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    this.goodsForm.dynamicValidateForm.domains[index].sellOut === 0
+                        ? (this.goodsForm.dynamicValidateForm.domains[index].sellOut = 1)
+                        : (this.goodsForm.dynamicValidateForm.domains[index].sellOut = 0);
+                })
+                .catch(() => {});
+        },
+
         //移除商品列表里的商品
-        handleDelete(index, row) {
+        handleDelete(row) {
             //在表格中移除当前商品
             this.goodsForm.tableData.forEach((item, i) => {
                 if (row.goodsId == item.goodsId) {
@@ -584,13 +620,13 @@ export default {
         },
 
         //上传广告图
-        uploadBannerFiles(file) {
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
-                this.goodsForm.bannerImageUrl = res.data;
-            });
-        },
+        // uploadBannerFiles(file) {
+        //     let formData = new FormData();
+        //     formData.append('file', file.file);
+        //     this.$file_post(this.$fileUploadUrl, formData).then((res) => {
+        //         this.goodsForm.bannerImageUrl = res.data;
+        //     });
+        // },
 
         //上传推荐位图
         uploadRecoFiles(file) {
