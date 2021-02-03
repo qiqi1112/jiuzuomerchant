@@ -38,7 +38,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="startTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
-                <el-table-column prop="endTime" label="活动开始时间" min-width="220" align="center"></el-table-column>
+                <el-table-column prop="endTime" label="活动结束时间" min-width="220" align="center"></el-table-column>
                 <!-- <el-table-column label="标签" prop="labelsList" min-width="250" align="center">
                     <template slot-scope="scope">
                         <span class="lab_span" v-for="(item, index) in scope.row.labelsList" :key="index">{{ item }}</span>
