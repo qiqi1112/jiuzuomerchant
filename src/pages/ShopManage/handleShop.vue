@@ -255,7 +255,7 @@
             </template> -->
 
             <!-- 酒水上传广告图与推荐位图 -->
-            <template v-if="activeNum != 1 && activeNum != 9 && activeNum != 10 && activeNum != 11">
+            <template v-if="activeNum != 9 && activeNum != 10 && activeNum != 11">
                 <div class="drinks-update-box">
                     <!-- 广告图 -->
                     <!-- <div class="banner-box">

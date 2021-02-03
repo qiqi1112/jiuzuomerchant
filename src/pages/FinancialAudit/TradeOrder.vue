@@ -176,13 +176,13 @@
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
-                                    <el-form-item label="现金支付：">
-                                        <el-input v-model="form.cashPay" readonly>
+                                    <el-form-item label="订单折扣价">
+                                        <el-input v-model="form.orderAmount" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
-                                    <el-form-item label="订单折扣价">
-                                        <el-input v-model="form.orderAmount" readonly>
+                                    <el-form-item label="现金支付：">
+                                        <el-input v-model="form.cashPay" readonly>
                                             <template slot="append">￥</template>
                                         </el-input>
                                     </el-form-item>
