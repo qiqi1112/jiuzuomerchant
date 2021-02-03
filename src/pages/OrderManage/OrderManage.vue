@@ -97,7 +97,6 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="orderNo" label="总订单号" min-width="160"></el-table-column>
-                <el-table-column prop="orderId" label="订单号"></el-table-column>
                 <el-table-column prop="payStatus" label="支付状态">
                     <template slot-scope="scope">
                         <span>{{ scope.row.payStatus | payStatus }}</span>
@@ -115,14 +114,14 @@
                 <el-table-column prop="createTime" label="订单发起时间" min-width="140"></el-table-column>
                 <el-table-column prop="paidTime" label="订单支付时间" min-width="140"></el-table-column>
                 <el-table-column prop="storeName" label="订单信息" min-width="100" fixed="right">
-                    <template slot-scope="scope">
+                    <template slot-scope="scope" v-if="scope.row.orderType !== 3">
                         <el-link icon="el-icon-edit" @click="handleLookInfo(scope.row.orderNo)">查看订单</el-link>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="smsCode" label="验证码"></el-table-column> -->
                 <el-table-column label="操作" fixed="right" width="270">
                     <template slot-scope="scope">
-                        <!-- 如果订单有误，就报相关错误 -->
+                        <!-- 如果订单有误或是会员卡，就报相关错误 -->
                         <template v-if="scope.row.closedStatus === 1">{{ scope.row.closedReason }}</template>
 
                         <!-- 如果顾客是抢座，且已到店 -->
@@ -139,6 +138,8 @@
 
                         <!-- 如果顾客是抢座，但未到店 -->
                         <template v-else-if="scope.row.orderType === 2 && scope.row.status !== 4"></template>
+
+                        <template v-else-if="scope.row.orderType === 3">会员卡充值</template>
 
                         <!-- 其他订单 -->
                         <template v-else-if="scope.row.closedStatus === 0">

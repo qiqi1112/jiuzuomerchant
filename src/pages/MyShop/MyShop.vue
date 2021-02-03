@@ -301,8 +301,8 @@
                                 >(*请上传尺寸大小为351*181，格式为jpg/jpeg/png的图片）</span
                             >
                         </div>
-                        <!-- 店铺长图 -->
-                        <div class="botm" v-loading="imgLoading.loading4">
+                        <!-- 店铺logo-列表大图 -->
+                        <!-- <div class="botm" v-loading="imgLoading.loading4">
                             <p>店铺logo-列表大图</p>
                             <img v-if="isReadonly && logoImageUrl" :src="showImgPrefix + appShopImageUrl" class="avatar" />
                             <el-upload
@@ -320,7 +320,7 @@
                             <span style="word-break: break-all; display: block; width: 76%; margin-top: 10px; font-size: 12px">
                                 (*请上传尺寸大小为351*154，格式为jpg/jpeg/png的图片，用于展示位置变化）</span
                             >
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- 商家布局图 -->
@@ -1066,7 +1066,7 @@ export default {
 
             overallImageUrl: '', //商家布局图
             rowNumImageUrl: '', //排号横幅图
-            appShopImageUrl: '', //店铺长图
+            // appShopImageUrl: '', //店铺长图
 
             x: 6, //座位行数
             y: 6, //座位列数
@@ -1238,10 +1238,12 @@ export default {
             } else if (!this.rowNumImageUrl) {
                 this.$message.error('请上传排号横幅图');
                 return;
-            } else if (!this.appShopImageUrl) {
-                this.$message.error('请上传店铺长图');
-                return;
-            } else if (!this.overallImageUrl && this.shopLocaIndex != 3) {
+            }
+            // else if (!this.appShopImageUrl) {
+            //     this.$message.error('请上传店铺长图');
+            //     return;
+            // }
+            else if (!this.overallImageUrl && this.shopLocaIndex != 3) {
                 this.$message.error('请上传商家布局图');
                 return;
             } else {
@@ -1652,18 +1654,18 @@ export default {
         },
 
         //上传店铺长图
-        uploadAppShopFile(file) {
-            this.imgLoading.loading4 = true;
-            let formData = new FormData();
-            formData.append('file', file.file);
-            this.$file_post(this.$fileUploadUrl, formData).then((res) => {
-                if (res.code == 0) {
-                    this.appShopImageUrl = res.data;
-                    this.imgLoading.loading4 = false;
-                    this.$message.success('上传成功');
-                }
-            });
-        },
+        // uploadAppShopFile(file) {
+        //     this.imgLoading.loading4 = true;
+        //     let formData = new FormData();
+        //     formData.append('file', file.file);
+        //     this.$file_post(this.$fileUploadUrl, formData).then((res) => {
+        //         if (res.code == 0) {
+        //             this.appShopImageUrl = res.data;
+        //             this.imgLoading.loading4 = false;
+        //             this.$message.success('上传成功');
+        //         }
+        //     });
+        // },
 
         //图片上传失败时
         uploadError() {
@@ -1846,7 +1848,7 @@ export default {
             //要传的值
             let data = {
                 source: 1,
-                appListBigPicture: this.appShopImageUrl,
+                // appListBigPicture: this.appShopImageUrl,
                 city: this.city,
                 cassette: '6x6',
                 customerServicePhoneList: this.servicePhoneArr,
@@ -2684,7 +2686,7 @@ export default {
                 if (res.code === 0) {
                     let result = res.data;
                     this.shopId = result.id;
-                    this.appShopImageUrl = result.appListBigPicture;
+                    // this.appShopImageUrl = result.appListBigPicture;
                     this.cassette = result.cassette;
                     this.city = result.city;
                     this.servicePhoneArr = result.customerServicePhoneList;
@@ -2843,7 +2845,7 @@ export default {
                 bannerVideo: this.bannerVideo,
                 overallImageUrl: this.overallImageUrl,
                 rowNumImageUrl: this.rowNumImageUrl,
-                appShopImageUrl: this.appShopImageUrl,
+                // appShopImageUrl: this.appShopImageUrl,
                 x: this.x,
                 y: this.y,
                 list: this.list,
@@ -2889,7 +2891,7 @@ export default {
                 this.bannerVideo = storageInfo.bannerVideo;
                 this.overallImageUrl = storageInfo.overallImageUrl;
                 this.rowNumImageUrl = storageInfo.rowNumImageUrl;
-                this.appShopImageUrl = storageInfo.appShopImageUrl;
+                // this.appShopImageUrl = storageInfo.appShopImageUrl;
                 this.x = storageInfo.x;
                 this.y = storageInfo.y;
                 this.list = storageInfo.list;

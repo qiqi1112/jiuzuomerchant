@@ -163,13 +163,13 @@ export default {
                 nowPrice: '', //现价
                 comboNowPrice: '', //套餐现价
                 statisticalPrice: '', //会员卡原价
-                checkedBanner: false, //商家广告banner位开关
+                // checkedBanner: false, //商家广告banner位开关
                 checkedReco: false, //商家推荐位开关
                 area: '', //产地
                 year: '', //年份
                 goodWeight: 0, //商品排序
                 recoWeight: 0, //商家推荐位排序
-                bannerImageUrl: '', //广告图
+                // bannerImageUrl: '', //广告图
                 recoImageUrl: '', //推荐位图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
@@ -412,13 +412,13 @@ export default {
                 nowPrice: '', //现价
                 comboNowPrice: '', //套餐现价
                 statisticalPrice: '', //会员卡原价
-                checkedBanner: false, //商家广告banner位开关
+                // checkedBanner: false, //商家广告banner位开关
                 checkedReco: false, //商家推荐位开关
                 area: '', //产地
                 year: '', //年份
                 goodWeight: 0, //商品排序
                 recoWeight: 0, //商家推荐位排序
-                bannerImageUrl: '', //广告图
+                // bannerImageUrl: '', //广告图
                 recoImageUrl: '', //推荐位图
                 thumImageUrl: '', //缩略图
                 detailImageUrl: '', //详情图
@@ -458,7 +458,7 @@ export default {
                 }
             });
 
-            console.log('切换标签页操作', this.activeNum, this.activeName);
+            console.log('切换标签页操作', this.activeNum);
 
             this.clearAllForm();
         },
@@ -505,10 +505,12 @@ export default {
             if (!this.goodsForm.name) {
                 this.$message.error('请输入商品名称');
                 return;
-            } else if (this.goodsForm.checkedBanner === true && !this.goodsForm.bannerImageUrl) {
-                this.$message.error('请上传商店广告位图片');
-                return;
-            } else if (this.goodsForm.checkedReco === true && !this.goodsForm.recoImageUrl) {
+            }
+            // else if (this.goodsForm.checkedBanner === true && !this.goodsForm.bannerImageUrl) {
+            //     this.$message.error('请上传商店广告位图片');
+            //     return;
+            // }
+            else if (this.goodsForm.checkedReco === true && !this.goodsForm.recoImageUrl) {
                 this.$message.error('请上传商家推荐位图片');
                 return;
             } else if (!this.goodsForm.thumImageUrl) {
@@ -580,7 +582,7 @@ export default {
         },
 
         //添加/修改商品
-        setGoodsInfo(active) {
+        setGoodsInfo() {
             if (this.activeNum != 1 && this.activeNum != 11) {
                 this.goodsForm.originPrice = this.getMinVal(); //计算规格中最小的原价
             }
@@ -589,8 +591,9 @@ export default {
                 listPicture: this.goodsForm.thumImageUrl,
                 name: this.goodsForm.name,
                 originalPrice: this.goodsForm.originPrice,
-                recommendAdStatus:
-                    this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
+                // recommendAdStatus:
+                //     this.goodsForm.checkedBanner === true ? (this.goodsForm.checkedBanner = 1) : (this.goodsForm.checkedBanner = 2),
+                recommendAdStatus: 2, //写死的
                 recommendStatus: this.goodsForm.checkedReco == true ? (this.goodsForm.checkedReco = 1) : (this.goodsForm.checkedReco = 2),
                 synopsis: this.goodsForm.desc,
                 type: this.activeNum,
@@ -601,7 +604,7 @@ export default {
                 infoPicture: this.goodsForm.detailImageUrl,
                 presentPrice: this.goodsForm.nowPrice,
                 // statisticalPrice: this.goodsForm.statisticalPrice,
-                recommendAdPicture: this.goodsForm.bannerImageUrl,
+                // recommendAdPicture: this.goodsForm.bannerImageUrl,
                 recommendPicture: this.goodsForm.recoImageUrl,
                 recommendPictureSort: this.goodsForm.recoWeight,
                 setMealGoodsList: this.goodsForm.tableData,
@@ -622,7 +625,7 @@ export default {
                         this.allRegRight = false;
                     } else {
                         this.$message.error(res.msg);
-                        this.goodsForm.bannerImageUrl = '';
+                        // this.goodsForm.bannerImageUrl = '';
                     }
                 } else {
                     const res = await this.$post('/merchant/store/goods/save', data);
@@ -633,7 +636,7 @@ export default {
                         this.allRegRight = false;
                     } else {
                         this.$message.error(res.msg);
-                        this.goodsForm.bannerImageUrl = '';
+                        // this.goodsForm.bannerImageUrl = '';
                     }
                 }
             })();
@@ -656,7 +659,7 @@ export default {
                         }
                     });
 
-                    //商品信息
+                    //商品信息回显
                     this.goodsForm = {
                         name: res.name, //名称
                         desc: res.synopsis, //简介
@@ -664,13 +667,13 @@ export default {
                         nowPrice: res.presentPrice, //现价
                         comboNowPrice: res.statisticalPrice, //套餐现价
                         statisticalPrice: res.statisticalPrice, //会员卡现价
-                        checkedBanner: res.recommendAdStatus === 1 ? true : false, //商家广告banner位开关
+                        // checkedBanner: res.recommendAdStatus === 1 ? true : false, //商家广告banner位开关
                         checkedReco: res.recommendStatus === 1 ? true : false, //商家推荐位开关
                         area: res.area, //产地
                         year: res.year, //年份
                         goodWeight: res.goodsSort, //商品排序
                         recoWeight: res.recommendPictureSort, //商家推荐位排序
-                        bannerImageUrl: res.recommendAdPicture, //广告图
+                        // bannerImageUrl: res.recommendAdPicture, //广告图
                         recoImageUrl: res.recommendPicture, //推荐位图
                         thumImageUrl: res.listPicture, //缩略图
                         detailImageUrl: res.infoPicture, //详情图
