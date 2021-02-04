@@ -159,6 +159,7 @@
                                                 <p>容纳人数：</p>
                                                 <p>保留时间：</p>
                                                 <p>低消金额：</p>
+                                                <p>座位类型：</p>
                                             </div>
                                             <div class="right">
                                                 <p>
@@ -171,6 +172,7 @@
                                                     <span v-show="presentSeatInfo.seatLatestReservationTime">{{'最晚至'+ presentSeatInfo.seatLatestReservationTime}}</span>
                                                 </p>
                                                 <p>{{ presentSeatInfos.minAmount || presentSeatInfo.minConsumption }}</p>
+                                                <p>{{ presentSeatInfo.softHardStatus | seatType }}</p>
                                             </div>
                                         </div>
                                     </div>

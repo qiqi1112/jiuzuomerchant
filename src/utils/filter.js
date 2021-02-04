@@ -45,6 +45,9 @@ Vue.filter("seatType", function (oldVal) {
         case 2:
             newVal = '散台';
             break;
+        case 3:
+            newVal = '独立高脚凳';
+            break;
     }
     return newVal;
 })
