@@ -50,13 +50,13 @@
                                 <el-button @click.prevent="removeDomain(item)">
                                     <i class="el-icon-close"></i>
                                 </el-button>
-                                <el-button
+                                <!-- <el-button
                                     v-if="item.sellOut !== undefined"
                                     size="mini"
                                     :type="item.sellOut === 0 ? 'warning' : 'danger'"
                                     @click="handleSellOut(index, item)"
                                     >{{ item.sellOut === 0 ? '未售罄' : '已售罄' }}
-                                </el-button>
+                                </el-button> -->
                             </div>
                             <div>
                                 <el-input
@@ -193,11 +193,11 @@
                                     ></el-input-number>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="状态" width="100">
+                            <!-- <el-table-column label="状态" width="100">
                                 <template slot-scope="scope">
                                     <span>{{ scope.row.sellOut == 0 ? '未售罄' : '已售罄' }}</span>
                                 </template>
-                            </el-table-column>
+                            </el-table-column> -->
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
                                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">移除</el-button>
