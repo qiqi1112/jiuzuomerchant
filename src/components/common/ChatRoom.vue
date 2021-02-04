@@ -791,6 +791,7 @@ export default {
             } else {
                 timer = 0;
             }
+            
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
             var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;
@@ -1271,6 +1272,12 @@ export default {
         }
         let that = this;
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken;
+
+        if(!rToken){
+            this.$store.commit('showChat', false)
+            return
+        }
+
         var userInfo = {
             appKey: this.$rongyunKey,
             token: rToken
