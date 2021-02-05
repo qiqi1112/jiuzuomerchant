@@ -1394,7 +1394,7 @@ export default {
         beforeAvatarUpload(file) {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
-            // const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
+            const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG) {
@@ -1403,10 +1403,10 @@ export default {
             }
 
             //限制上传文件大小
-            // if (!isLt2M) {
-            //     this.$message.error('logo大小不能超过 1MB');
-            //     return false;
-            // }
+            if (!isLt2M) {
+                this.$message.error('logo大小不能超过 1MB');
+                return false;
+            }
         },
 
         //上传banner图之前的验证
@@ -1414,7 +1414,7 @@ export default {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
             const isMP4 = file.type === 'video/mp4';
-            // const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
+            const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG && !isMP4) {
@@ -1423,12 +1423,12 @@ export default {
             }
 
             //限制上传文件大小
-            // if (isJPG || isPNG) {
-            //     if (!isLt2M) {
-            //         this.$message.error('图片大小不能超过 1MB');
-            //         return false;
-            //     }
-            // }
+            if (isJPG || isPNG) {
+                if (!isLt2M) {
+                    this.$message.error('图片大小不能超过 1MB');
+                    return false;
+                }
+            }
 
             if (file.type === 'video/mp4') {
                 //限制上传视频个数
@@ -1476,7 +1476,7 @@ export default {
         beforeImgUpload(file) {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
-            // const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
+            const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG) {
@@ -1485,12 +1485,12 @@ export default {
             }
 
             //限制上传文件大小
-            // if (isJPG || isPNG) {
-            //     if (!isLt2M) {
-            //         this.$message.error('图片大小不能超过 1MB');
-            //         return false;
-            //     }
-            // }
+            if (isJPG || isPNG) {
+                if (!isLt2M) {
+                    this.$message.error('图片大小不能超过 1MB');
+                    return false;
+                }
+            }
         },
 
         //上传logo
@@ -2175,8 +2175,10 @@ export default {
 
         //ktv里的相关字符串转换方法
         ktvStrTran() {
-            console.log(this.ktvRoomList);
-            const newSeatArr = this.ktvRoomList.map((item) => {
+            const newSeatArr = this.ktvRoomList.map((i) => {
+                //深拷贝，避免干扰以前的数据
+                let item = this.$regular.deepClone(i);
+
                 if (item.sketchMap instanceof Array) {
                     item.sketchMap = item.sketchMap.join(','); //将包间示意图数组转成字符串传给后台
                 }
