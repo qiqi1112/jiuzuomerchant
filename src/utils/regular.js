@@ -2,7 +2,7 @@
  * @Author: xuxiao 
  * @Date: 2020-08-24 18:02:13 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2021-01-08 15:06:24
+ * @Last Modified time: 2021-02-05 15:44:16
  */
 
 import Message from "element-ui/packages/message/index.js";
@@ -176,6 +176,26 @@ function compress(base64String, w, quality) {
     });
 }
 
+//深拷贝
+function deepClone(origin, target = {}) {
+    const toStr = Object.prototype.toString;
+    for (let key in origin) {
+        if (key in origin) {
+            if (typeof origin[key] === 'object' && origin[key] !== null) {
+                if (toStr.call(origin[key]) === '[object Array]') {
+                    target[key] = [];
+                } else {
+                    target[key] = {};
+                }
+                deepClone(origin[key], target[key]);
+            } else {
+                target[key] = origin[key];
+            }
+        }
+    }
+    return target;
+}
+
 export default {
     phone,
     money,
@@ -188,5 +208,6 @@ export default {
     pureNumber,
     getBase64Image,
     compress,
-    bankAcountNum
+    bankAcountNum,
+    deepClone
 }

@@ -364,6 +364,9 @@ Vue.filter("showAppGoodsType", function (oldVal) {
         case 16:
             newVal = '其他酒类';
             break;
+        case 17:
+            newVal = '米酒';
+            break;
     }
     return newVal;
 })
@@ -385,6 +388,9 @@ Vue.filter("orderType", function (oldVal) {
             break;
         case 4:
             newVal = '线下添单';
+            break;
+        case 5:
+            newVal = '扣除20%手续费';
             break;
     }
     return newVal;
