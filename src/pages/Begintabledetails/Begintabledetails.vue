@@ -786,7 +786,7 @@ export default {
 ::-webkit-scrollbar-thumb {
     border-radius: 3px;
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    background-color: rgb(109, 63, 63);
+    background-color: rgb(36, 47, 66);
 }
 
 .shop-seat {
