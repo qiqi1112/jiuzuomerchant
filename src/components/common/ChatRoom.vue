@@ -189,12 +189,12 @@
                     <!--  -->
                     <div class="quick">
                         <div class="goods_list">
-                            <el-tabs v-model="activeName" @tab-click="handleClick" v-show="unInput">
-                                <el-tab-pane label="快捷回答" name="first">
+                            <el-tabs v-model="activeName" @tab-click="handleClick" >
+                                <!-- <el-tab-pane label="快捷回答" name="first" v-if="unInput">
                                     <ul class="one">
                                         <li @click="quickRrep(item)" v-for="(item, i) in oneList" :key="i">{{ item }}</li>
                                     </ul>
-                                </el-tab-pane>
+                                </el-tab-pane> -->
                                 <el-tab-pane label="联系官方" name="service">
                                     <div class="sves" v-for="(item, i) in service" :key="i" @click="createService(item)">
                                         <img :src="imgHead + item.headPortrait" alt="" />
@@ -351,7 +351,7 @@ export default {
                     lastObj = '';
                 arr = this.$store.state.newMsgArr;
                 lastObj = arr[arr.length - 1];
-                // console.log(lastObj);
+                console.log(lastObj);
                 if (lastObj.offLineMessage) {
                     return;
                 }
