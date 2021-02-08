@@ -264,6 +264,10 @@ export default {
                 {
                     label: '其他酒类',
                     value: 16
+                },
+                {
+                    label: '米酒',
+                    value: 17
                 }
             ],
 

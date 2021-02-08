@@ -57,7 +57,7 @@
                                 <div>
                                     <i class="el-icon-s-marketing"></i>
                                     <span class="info">预约座位</span>
-                                    <span>{{ item.seatType == 0 ? '无要求' : item.seatType == 1 ? '卡座' : '散台' }}</span>
+                                    <span>{{ item.seatType | seatType }}</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-release"></i>
@@ -104,7 +104,7 @@
                                 <div>
                                     <i class="el-icon-s-marketing"></i>
                                     <span class="info">预约座位</span>
-                                    <span>{{ item.seatType == 0 ? '无要求' : item.seatType == 1 ? '卡座' : '散台' }}</span>
+                                    <span>{{ item.seatType | seatType }}</span>
                                 </div>
                                 <div>
                                     <i class="el-icon-s-release"></i>

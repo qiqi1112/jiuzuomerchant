@@ -159,6 +159,7 @@
                                                 <p>容纳人数：</p>
                                                 <p>保留时间：</p>
                                                 <p>低消金额：</p>
+                                                <p>座位类型：</p>
                                             </div>
                                             <div class="right">
                                                 <p>
@@ -171,6 +172,7 @@
                                                     <span v-show="presentSeatInfo.seatLatestReservationTime">{{'最晚至'+ presentSeatInfo.seatLatestReservationTime}}</span>
                                                 </p>
                                                 <p>{{ presentSeatInfos.minAmount || presentSeatInfo.minConsumption }}</p>
+                                                <p>{{ presentSeatInfo.softHardStatus | seatType }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -784,7 +786,7 @@ export default {
 ::-webkit-scrollbar-thumb {
     border-radius: 3px;
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    background-color: rgb(109, 63, 63);
+    background-color: rgb(36, 47, 66);
 }
 
 .shop-seat {

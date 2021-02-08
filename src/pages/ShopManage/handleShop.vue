@@ -50,13 +50,13 @@
                                 <el-button @click.prevent="removeDomain(item)">
                                     <i class="el-icon-close"></i>
                                 </el-button>
-                                <el-button
+                                <!-- <el-button
                                     v-if="item.sellOut !== undefined"
                                     size="mini"
                                     :type="item.sellOut === 0 ? 'warning' : 'danger'"
                                     @click="handleSellOut(index, item)"
                                     >{{ item.sellOut === 0 ? '未售罄' : '已售罄' }}
-                                </el-button>
+                                </el-button> -->
                             </div>
                             <div>
                                 <el-input
@@ -193,11 +193,11 @@
                                     ></el-input-number>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="状态" width="100">
+                            <!-- <el-table-column label="状态" width="100">
                                 <template slot-scope="scope">
                                     <span>{{ scope.row.sellOut == 0 ? '未售罄' : '已售罄' }}</span>
                                 </template>
-                            </el-table-column>
+                            </el-table-column> -->
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
                                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">移除</el-button>
@@ -255,7 +255,7 @@
             </template> -->
 
             <!-- 酒水上传广告图与推荐位图 -->
-            <template v-if="activeNum != 1 && activeNum != 9 && activeNum != 10 && activeNum != 11">
+            <template v-if="activeNum != 9 && activeNum != 10 && activeNum != 11">
                 <div class="drinks-update-box">
                     <!-- 广告图 -->
                     <!-- <div class="banner-box">
@@ -432,7 +432,7 @@ export default {
         beforeImgUpload(file) {
             const isJPG = file.type === 'image/jpeg';
             const isPNG = file.type === 'image/png';
-            // const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
+            const isLt2M = file.size / 1024 / 1024 <= 1; //限制文件大小
 
             //限制上传文件格式
             if (!isJPG && !isPNG) {
@@ -441,12 +441,12 @@ export default {
             }
 
             //限制上传文件大小
-            // if (isJPG || isPNG) {
-            //     if (!isLt2M) {
-            //         this.$message.error('图片大小不能超过 1MB');
-            //         return false;
-            //     }
-            // }
+            if (isJPG || isPNG) {
+                if (!isLt2M) {
+                    this.$message.error('图片大小不能超过 1MB');
+                    return false;
+                }
+            }
         },
 
         //关闭广告位操作
