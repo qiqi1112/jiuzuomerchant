@@ -101,7 +101,7 @@ export default {
         //商家logo
         logo() {
             let logo = JSON.parse(localStorage.getItem('userInfo')).logo;
-            return logo ? this.$imgHead + logo : require('../../assets/favicon.png');
+            return logo ? this.$imgHead + logo : require('../../assets/head.png');
         }
     },
     created() {
