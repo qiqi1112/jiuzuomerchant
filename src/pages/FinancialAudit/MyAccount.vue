@@ -33,7 +33,7 @@
                 <el-form-item label="收款人姓名">
                     <el-input
                         readonly
-                        v-model="accountInfo.bankName"
+                        v-model.trim="accountInfo.bankName"
                         :placeholder="accountInfo.bankName === '' ? '暂无，请设置' : ''"
                     ></el-input>
                 </el-form-item>
@@ -61,6 +61,7 @@
                                 show-password
                                 placeholder="请输入收款密码"
                                 :onkeyup="(password = password.replace(/[^\w]/g, ''))"
+                                maxlength="8"
                             ></el-input>
                             <el-button type="primary" @click="checkPassword">验 证</el-button>
                         </div>
@@ -68,7 +69,7 @@
                 </template>
                 <template v-if="showSetAcount">
                     <div class="input-box">
-                        <el-input style="margin-bottom: 10px" v-model="form.bankName" placeholder="请输入姓名"></el-input>
+                        <el-input style="margin-bottom: 10px" v-model.trim="form.bankName" placeholder="请输入姓名"></el-input>
                         <el-input
                             style="margin-bottom: 10px"
                             :onkeyup="(form.bankAccount = form.bankAccount.replace(/^(0+)|[^\d]+/g, ''))"

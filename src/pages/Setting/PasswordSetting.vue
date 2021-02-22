@@ -21,6 +21,7 @@
                         v-model="form.password"
                         show-password
                         placeholder="请输入密码"
+                        maxlength="8"
                     ></el-input>
                     <el-input
                         style="margin-bottom: 10px"
@@ -28,6 +29,7 @@
                         v-model="form.surePassword"
                         show-password
                         placeholder="请确认密码"
+                        maxlength="8"
                     ></el-input>
                     <div class="auth-code">
                         <el-input
@@ -35,6 +37,7 @@
                             v-model="form.authCode"
                             placeholder="验证码"
                             :onkeyup="(form.authCode = form.authCode.replace(/^(-1+)|[^\d]+/g, ''))"
+                            maxlength="6"
                         ></el-input>
                         <el-button :type="waitTime ? '' : 'primary'" @click="sendCode" :disabled="waitTime">{{
                             waitTime ? countDown + 's' : '发送'

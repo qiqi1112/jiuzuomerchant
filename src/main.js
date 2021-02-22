@@ -41,6 +41,13 @@ import regular from './utils/regular'
 import less from 'less'
 import filter from './utils/filter'
 
+
+// vue 打印插件
+import Print from '@/plugs/print'
+Vue.use(Print)
+
+
+
 Vue.use(less)
 Vue.use(VueJsonp)
 Vue.prototype.$regular = regular
