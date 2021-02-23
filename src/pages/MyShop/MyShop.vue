@@ -554,7 +554,7 @@
                                         <!-- <div style="width: 50%">
                                             <span>最晚保留时间</span><br />
                                             <el-time-select
-                                                @change="checkLateTime(item.seatLatestReservationTime, index)"
+                                                @change="checkWeekLateTime(item.seatLatestReservationTime, index)"
                                                 style="width: 80%"
                                                 placeholder="最晚保留时间"
                                                 v-model="item.seatLatestReservationTime"
@@ -1295,9 +1295,18 @@ export default {
             }
         },
 
-        //最晚保留时间失去焦点验证
-        checkLateTime(item, ind) {
-            console.log(item);
+        //整体的最晚保留时间失去焦点验证
+        checkLateTime(item) {
+            if (!item) {
+                this.$message.error('保留最晚时间不能为空，默认将置为开始营业时间');
+                setTimeout(() => {
+                    this.presentSeatInfo.seatLatestReservationTime = this.startBussTime;
+                }, 300);
+            }
+        },
+
+        //每天的最晚保留时间失去焦点验证
+        checkWeekLateTime(item, ind) {
             if (!item) {
                 this.$message.error('保留最晚时间不能为空，默认将置为开始营业时间');
                 setTimeout(() => {
