@@ -351,9 +351,9 @@ export default {
                     lastObj = '';
                 arr = this.$store.state.newMsgArr;
                 lastObj = arr[arr.length - 1];
-                console.log(lastObj);
+                // console.log(lastObj);
 
-                that.lookOrder(lastObj);
+                that.lookOrderOne(lastObj);
 
                 if (lastObj.offLineMessage) {
                     return;
@@ -657,7 +657,6 @@ export default {
         },
          // 查看订单
         lookOrder(val) {
-            console.log(val)
             if(val.content.kind == 'JZ:MessageVieOrder'){
                 if (this.$route.path != '/nummanage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
@@ -677,6 +676,24 @@ export default {
             }
             this.showRoom = false;
         },
+
+        // 收到消息  刷新
+        lookOrderOne(val) {
+            if(val.content.kind == 'JZ:MessageVieOrder'){
+                if (this.$route.path == '/nummanage') {
+                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    this.$store.commit('onloadOrderFun', true);
+                }
+            }else{
+                if (this.$route.path == '/ordermanage') {
+                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    this.$store.commit('onloadOrderFun', true);
+                }
+            }
+            this.showRoom = false;
+        },
+
+
         showChat() {
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
             if (isClick == 'true') {
