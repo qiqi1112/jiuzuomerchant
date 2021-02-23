@@ -657,6 +657,7 @@ export default {
         },
          // 查看订单
         lookOrder(val) {
+            console.log(val)
             if(val.content.kind == 'JZ:MessageVieOrder'){
                 if (this.$route.path != '/nummanage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
