@@ -6,48 +6,52 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="stylesheet" href="//at.alicdn.com/t/font_830376_qzecyukz0s.css">
-  <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="../src/assets/favicon.ico" type="image/x-icon">
   <title>玖座平台-商家端</title>
   <!--引入Javascript API GL，参数说明参见下文-->
   <script src="https://map.qq.com/api/gljs?v=1.exp&key=UXBBZ-RELWI-JJXG2-5YBRI-XPWW3-D3FIJ"></script>
   <script src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
   <style>
-    .loading{
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: 10;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, .35);
+    .loading {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, .35);
     }
-    .load_text{
-        position: fixed;
-        width: 8.5rem;
-        height: 8.5rem;
-        left: calc(50% - 8.5rem/2);
-        top: calc(50% - 8.5rem/2);
-        z-index: 11;
-        /* background: #191D26; */
-        color: white;
-        border-radius: .21rem;
-        font-size: 1.5rem;
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
+
+    .load_text {
+      position: fixed;
+      width: 8.5rem;
+      height: 8.5rem;
+      left: calc(50% - 8.5rem/2);
+      top: calc(50% - 8.5rem/2);
+      z-index: 11;
+      /* background: #191D26; */
+      color: white;
+      border-radius: .21rem;
+      font-size: 1.5rem;
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      justify-content: center;
     }
-    .load_img{
-        width: 2.8rem;
-        height: 2.8rem;
-        animation: rotate 3s linear infinite;
-        margin-bottom: 10px;
+
+    .load_img {
+      width: 2.8rem;
+      height: 2.8rem;
+      animation: rotate 3s linear infinite;
+      margin-bottom: 10px;
     }
-    @keyframes rotate{
-      0%{
+
+    @keyframes rotate {
+      0% {
         transform: rotateZ(0deg);
       }
-      100%{
+
+      100% {
         transform: rotateZ(360deg);
       }
     }
@@ -55,13 +59,13 @@
 </head>
 
 <body>
-  
+
   <div id="app">
     <!-- <div>加载中...</div> -->
-    <div class="loading" >
+    <div class="loading">
       <div class="load_text">
-          <img class="load_img" src="./img/jiazai.png" alt="">
-          <div>加载中</div>    
+        <img class="load_img" src="./img/jiazai.png" alt="">
+        <div>加载中</div>
       </div>
     </div>
   </div>

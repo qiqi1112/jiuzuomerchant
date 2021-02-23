@@ -180,7 +180,10 @@ export default {
             //传给子组件的值
             propUserInfo: {
                 userId: '',
-                activeName: 'rowRecord'
+                activeName: 'rowRecord',
+                // dataListCount: 0, //默认当前要显示的数据条数
+                currentPage: 1 //默认显示的页码所在位置（第一页）
+                // pagesize: 6 //默认每页要显示多少条数据
             }
         };
     },
@@ -188,6 +191,14 @@ export default {
     watch: {
         activeName(newVal) {
             this.propUserInfo.activeName = newVal;
+        },
+
+        //如果标签页里的名称改变了，就将页码复原
+        'propUserInfo.activeName': {
+            handler() {
+                this.propUserInfo.currentPage = 1;
+            },
+            deep: true
         }
     },
 
@@ -221,6 +232,7 @@ export default {
         handleClose() {
             this.dialogFormVisible = false;
             this.activeName = 'rowRecord';
+            this.propUserInfo.currentPage = 1;
         },
 
         //搜索操作

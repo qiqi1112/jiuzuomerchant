@@ -249,6 +249,18 @@ export default new Router({
                         title: '财务管理'
                     }
                 },
+
+
+                {
+                    path: '/demo',
+                    component: () => import( /* webpackChunkName: "carFinanceManage" */ '../pages/OrderManage/demo.vue'),
+                    meta: {
+                        title: '打印示例'
+                    }
+                },
+
+
+
                 {
                     path: '/404',
                     component: () => import( /* webpackChunkName: "404" */ '../components/page/404.vue'),

@@ -30,7 +30,7 @@
                 header-cell-class-name="table-header"
                 @selection-change="handleSelectionChange"
             >
-                <el-table-column prop="id" label="ID" fixed width="180" align="center"></el-table-column>
+                <el-table-column label="ID" type="index" width="50" align="center" fixed="left"></el-table-column>
                 <el-table-column prop="name" min-width="200" label="活动主题"></el-table-column>
                 <el-table-column label="活动简介" min-width="200">
                     <template slot-scope="scope">
@@ -181,7 +181,10 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">返回</el-button>
-                <el-button type="primary" @click="saveEdit" v-if="dynamicValidateForm.examine == 0 || dynamicValidateForm.examine == 3 || dynamicValidateForm.examine == 2"
+                <el-button
+                    type="primary"
+                    @click="saveEdit"
+                    v-if="dynamicValidateForm.examine == 0 || dynamicValidateForm.examine == 3 || dynamicValidateForm.examine == 2"
                     >确 定</el-button
                 >
             </span>
