@@ -352,6 +352,9 @@ export default {
                 arr = this.$store.state.newMsgArr;
                 lastObj = arr[arr.length - 1];
                 console.log(lastObj);
+
+                that.lookOrder(lastObj);
+
                 if (lastObj.offLineMessage) {
                     return;
                 }
