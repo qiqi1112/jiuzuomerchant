@@ -8,8 +8,8 @@ module.exports = {
         open: true,
         proxy: {
             '/api': {
-                target: "http://192.168.31.100:8077",
-                // target: "http://192.168.31.197:8077",
+                target: "http://192.168.2.7:8077",
+                // target: "http://192.168.2.50:8077",
                 // target: 'https://storetest.cdhqht.com',
                 // target: 'https://store.cdhqht.com',
                 changeOrigin: true,
@@ -18,8 +18,8 @@ module.exports = {
                 }
             },
             '/file': {
-                // target: 'http://47.108.204.66:8078',
-                target: "http://192.168.31.100:8077",
+                target: "http://192.168.2.7:8077",
+                // target: "http://192.168.2.50:8077",
                 // target: 'https://storetest.cdhqht.com',
                 // target: 'https://store.cdhqht.com',
                 changeOrigin: true,
