@@ -663,7 +663,7 @@ export default {
                     this.$router.push('/nummanage');
                 } else {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    this.$store.commit('onloadOrderFun', true);
+                    // this.$store.commit('onloadOrderFun', true);
                 }
             }else{
                 if (this.$route.path != '/ordermanage') {
@@ -671,7 +671,7 @@ export default {
                     this.$router.push('/ordermanage');
                 } else {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    this.$store.commit('onloadOrderFun', true);
+                    // this.$store.commit('onloadOrderFun', true);
                 }
             }
             this.showRoom = false;
@@ -682,12 +682,12 @@ export default {
             if(val.content.kind == 'JZ:MessageVieOrder'){
                 if (this.$route.path == '/nummanage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    this.$store.commit('onloadOrderFun', true);
+                    // this.$store.commit('onloadOrderFun', true);
                 }
             }else{
                 if (this.$route.path == '/ordermanage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    this.$store.commit('onloadOrderFun', true);
+                    // this.$store.commit('onloadOrderFun', true);
                 }
             }
             this.showRoom = false;
