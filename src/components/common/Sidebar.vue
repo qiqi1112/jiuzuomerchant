@@ -60,6 +60,11 @@ export default {
                     index: 'myshop',
                     title: '我的店铺'
                 },
+                // {
+                //     icon: 'el-icon-s-shop',
+                //     index: 'seatManage',
+                //     title: '座位管理'
+                // },
                 {
                     icon: 'el-icon-goods',
                     index: 'shopmanage',
@@ -250,7 +255,13 @@ export default {
             }
 
             if (storeLocation === 3) {
-                this.items[5].index = 'ktv';
+                this.items.forEach((item, index) => {
+                    if (item.title === '开台详情') {
+                        // item.index = 'ktv';
+
+                        this.items.splice(index, 1);
+                    }
+                });
             }
         }
     },

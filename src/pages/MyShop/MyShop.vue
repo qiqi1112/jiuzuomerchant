@@ -163,7 +163,6 @@
                         <!-- 店铺人均消费 -->
                         <div class="per-con">
                             <p>店铺人均消费</p>
-                            <!-- @blur="checkPrice(perCon, 1)" -->
                             <el-input
                                 type="number"
                                 v-model="perCon"
@@ -462,6 +461,7 @@
                                 </div>
                             </template>
                         </div>
+                        
                         <!-- 座位属性 -->
                         <div class="right-box" v-if="list.length !== 0 && !seatFloorDialog && isClickSeat">
                             <p class="seat-detail">座位详情</p>
@@ -544,7 +544,8 @@
                                             <span>{{ item.weekIndex | dayOfWeek }}</span
                                             ><br />
                                             <el-input
-                                                @blur="checkPrice(item.price, 2, index)"
+                                                type="number"
+                                                @blur="checkPrice(item.price, 1, index)"
                                                 v-model="item.price"
                                                 style="width: 100%; margin-right: 6px"
                                                 :readonly="isReadonly"
@@ -714,7 +715,8 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
-                                            @blur="checkPrice(item.minConsumption, 4, index)"
+                                            type="number"
+                                            @blur="checkPrice(item.minConsumption, 2, index)"
                                             v-model="item.minConsumption"
                                             placeholder="最低消费"
                                             style="width: 50%"
@@ -783,6 +785,7 @@
                                     <div class="minCon">
                                         <span>最低消费：</span>
                                         <el-input
+                                            type="number"
                                             @blur="checkPrice(timeQuanObj.minConsumption, 3)"
                                             v-model="timeQuanObj.minConsumption"
                                             placeholder="最低消费"
@@ -1152,6 +1155,20 @@ export default {
         };
     },
     methods: {
+        //接收地图子组件传过来的参数
+        childData(data) {
+            if (data) {
+                this.longitude = data.location.lng;
+                this.latitude = data.location.lat;
+                this.province = data.ad_info.province;
+                this.city = data.ad_info.city;
+                this.district = data.ad_info.district;
+                this.districtCode = data.ad_info.adcode;
+                this.searchAddress = data.title;
+                this.trustAddress = data.trustAddress;
+            }
+        },
+
         //打开添加/修改楼层对话框
         addFloor() {
             this.checkFormInfo(); //验证所有输入的值
@@ -1268,16 +1285,13 @@ export default {
                 if (price < 0.1 || this.$regular.money(price) === false) {
                     switch (opt) {
                         case 1:
-                            this.perCon = 0.1;
+                            this.presentSeatInfo.weekPriceList[index].price = 0.1;
                             break;
                         case 2:
-                            this.presentSeatInfo.weekPriceList[index].price = 0.1;
+                            this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
                             break;
                         case 3:
                             this.timeQuanObj.minConsumption = 0.1;
-                            break;
-                        case 4:
-                            this.presentKtvInfo.roomTimeIntervalList[index].minConsumption = 0.1;
                             break;
                     }
                     if (price < 0.1) {
@@ -1296,7 +1310,7 @@ export default {
             }
         },
 
-        //整体的最晚保留时间失去焦点验证
+        //每个座位单独的最晚保留时间失去焦点验证
         checkLateTime(item) {
             if (!item) {
                 this.$message.error('保留最晚时间不能为空，默认将置为开始营业时间');
@@ -1320,20 +1334,6 @@ export default {
         checkNull(item, txt) {
             if (item === '' || item === undefined || item === null) {
                 this.$message.error(`${txt}不能为空`);
-            }
-        },
-
-        //接收地图子组件传过来的参数
-        childData(data) {
-            if (data) {
-                this.longitude = data.location.lng;
-                this.latitude = data.location.lat;
-                this.province = data.ad_info.province;
-                this.city = data.ad_info.city;
-                this.district = data.ad_info.district;
-                this.districtCode = data.ad_info.adcode;
-                this.searchAddress = data.title;
-                this.trustAddress = data.trustAddress;
             }
         },
 

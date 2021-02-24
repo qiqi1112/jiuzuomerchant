@@ -39,6 +39,13 @@ export default new Router({
                     }
                 },
                 {
+                    path: '/seatManage',
+                    component: () => import( /* webpackChunkName: "seatManage" */ '../pages/SeatManage/SeatManage.vue'),
+                    meta: {
+                        title: '座位管理'
+                    }
+                },
+                {
                     path: '/carMyShop',
                     component: () => import( /* webpackChunkName: "carMyShop" */ '../pages/MyShop/CarMyShop.vue'),
                     meta: {

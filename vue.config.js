@@ -11,7 +11,6 @@ module.exports = {
                 target: "http://192.168.2.7:8077",
                 // target: "http://192.168.2.50:8077",
                 // target: 'https://storetest.cdhqht.com',
-                // target: 'https://store.cdhqht.com',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''
@@ -21,7 +20,6 @@ module.exports = {
                 target: "http://192.168.2.7:8077",
                 // target: "http://192.168.2.50:8077",
                 // target: 'https://storetest.cdhqht.com',
-                // target: 'https://store.cdhqht.com',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/file': ''
