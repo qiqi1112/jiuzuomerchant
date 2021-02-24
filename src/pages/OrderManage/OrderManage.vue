@@ -779,7 +779,6 @@ export default {
         watchOnloadOrder: {
             handler(val) {
                 this.getOrderInfo();
-                console.log(2222222)
             },
             deep : true
         }

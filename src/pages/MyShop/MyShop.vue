@@ -163,8 +163,9 @@
                         <!-- 店铺人均消费 -->
                         <div class="per-con">
                             <p>店铺人均消费</p>
+                            <!-- @blur="checkPrice(perCon, 1)" -->
                             <el-input
-                                @blur="checkPrice(perCon, 1)"
+                                type="number"
                                 v-model="perCon"
                                 placeholder="人均消费"
                                 style="width: 70%; margin-right: 6px"
