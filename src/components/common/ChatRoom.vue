@@ -681,13 +681,21 @@ export default {
         lookOrderOne(val) {
             if(val.content.kind == 'JZ:MessageVieOrder'){
                 if (this.$route.path == '/nummanage') {
-                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    setTimeout(()=>{
+                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    },500)
                     // this.$store.commit('onloadOrderFun', true);
                 }
             }else{
                 if (this.$route.path == '/ordermanage') {
-                    this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    setTimeout(()=>{
+                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    },500)
                     // this.$store.commit('onloadOrderFun', true);
+                }else if(this.$route.path == '/begintabledetails'){
+                    setTimeout(()=>{
+                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    },500)
                 }
             }
             this.showRoom = false;

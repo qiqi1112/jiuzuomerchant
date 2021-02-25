@@ -348,6 +348,20 @@ export default {
             wrapLoading: true
         };
     },
+    watch: {
+        watchOnloadOrder: {
+            handler(val) {
+                this.getStoreInfo();
+            },
+            deep : true
+        }
+    },
+
+    computed: {
+        watchOnloadOrder() {
+            return this.$store.state.onloadOrder;
+        }
+    },
     created() {
         this.getStoreInfo(); //回显所有店铺数据
     },
