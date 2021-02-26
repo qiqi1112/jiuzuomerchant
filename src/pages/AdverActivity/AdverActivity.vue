@@ -97,10 +97,10 @@
                     <div class="activity">
                         <div class="in_act">
                             <el-form-item label="活动名称">
-                                <el-input v-model="dynamicValidateForm.dio_name"></el-input>
+                                <el-input v-model="dynamicValidateForm.dio_name" maxlength="30" show-word-limit></el-input>
                             </el-form-item>
                             <el-form-item label="活动简介">
-                                <el-input type="textarea" v-model="dynamicValidateForm.dio_introduce"></el-input>
+                                <el-input type="textarea" :autosize="{ minRows: 7, maxRows: 10}" v-model="dynamicValidateForm.dio_introduce" maxlength="120" show-word-limit></el-input>
                             </el-form-item>
                             <el-form-item label="活动时间">
                                 <el-date-picker
