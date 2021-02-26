@@ -43,7 +43,13 @@
                     <div class="right-info">
                         <p class="shop-name">
                             <span>店名：</span>
-                            <el-input v-model="shopName" placeholder="请输入店名" :readonly="isReadonly" clearable></el-input>
+                            <el-input
+                                maxlength="20"
+                                v-model="shopName"
+                                placeholder="请输入店名（20字以内）"
+                                :readonly="isReadonly"
+                                clearable
+                            ></el-input>
                         </p>
                         <p class="shop-brief">
                             <span>店铺简介：</span>
@@ -461,7 +467,7 @@
                                 </div>
                             </template>
                         </div>
-                        
+
                         <!-- 座位属性 -->
                         <div class="right-box" v-if="list.length !== 0 && !seatFloorDialog && isClickSeat">
                             <p class="seat-detail">座位详情</p>

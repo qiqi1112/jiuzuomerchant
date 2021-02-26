@@ -60,11 +60,11 @@ export default {
                     index: 'myshop',
                     title: '我的店铺'
                 },
-                // {
-                //     icon: 'el-icon-s-shop',
-                //     index: 'seatManage',
-                //     title: '座位管理'
-                // },
+                {
+                    icon: 'el-icon-s-shop',
+                    index: 'seatManage',
+                    title: '座位管理'
+                },
                 {
                     icon: 'el-icon-goods',
                     index: 'shopmanage',
@@ -254,11 +254,10 @@ export default {
                 this.showItems = this.items;
             }
 
+            //如果是Ktv商家，就隐藏下面的模块
             if (storeLocation === 3) {
                 this.items.forEach((item, index) => {
-                    if (item.title === '开台详情') {
-                        // item.index = 'ktv';
-
+                    if (item.title === '开台详情' || item.title === '座位管理') {
                         this.items.splice(index, 1);
                     }
                 });

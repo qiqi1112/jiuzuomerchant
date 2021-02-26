@@ -11,12 +11,15 @@
             <span class="all_unread" v-show="$store.state.headerUnread > 0">{{ $store.state.headerUnread }}</span>
         </div>
 
-        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close="closeDialog" >
-            <div id="service" v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg" 
-            v-loading="loadingChat"
-            element-loading-text="拼命加载中"
-            element-loading-spinner="el-icon-loading"
-            element-loading-background="rgba(0, 0, 0, 0.8)">
+        <el-dialog v-dialogDrag center :visible.sync="showRoom" width="65%" top="8vh" @close="closeDialog">
+            <div
+                id="service"
+                v-if="(showRoom && $store.state.showChatRoom) || $store.state.headerClickMsg"
+                v-loading="loadingChat"
+                element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)"
+            >
                 <div class="box">
                     <div class="people_list">
                         <ul>
@@ -119,7 +122,9 @@
                                                 <div class="headImg self_img">
                                                     <img v-if="item.content" :src="imgHead + item.content.portrait" alt="" />
                                                 </div>
-                                                <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">你撤回了一条消息</div>
+                                                <div class="withdraw" v-if="item.messageType == 'RecallCommandMessage'">
+                                                    你撤回了一条消息
+                                                </div>
                                             </div>
                                         </template>
                                     </div>
@@ -189,7 +194,7 @@
                     <!--  -->
                     <div class="quick">
                         <div class="goods_list">
-                            <el-tabs v-model="activeName" @tab-click="handleClick" >
+                            <el-tabs v-model="activeName" @tab-click="handleClick">
                                 <!-- <el-tab-pane label="快捷回答" name="first" v-if="unInput">
                                     <ul class="one">
                                         <li @click="quickRrep(item)" v-for="(item, i) in oneList" :key="i">{{ item }}</li>
@@ -269,7 +274,7 @@ export default {
             unInput: true,
             isMute: false,
             service: [], //客服
-            loadingChat:false
+            loadingChat: false
         };
     },
 
@@ -315,11 +320,11 @@ export default {
 
         break() {
             return this.$store.state.disconnect;
-        },
+        }
     },
     watch: {
         break: {
-            handler(){
+            handler() {
                 let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken;
                 let userInfo = {
                     appKey: this.$rongyunKey,
@@ -358,27 +363,27 @@ export default {
                 if (lastObj.offLineMessage) {
                     return;
                 }
-                try{
-                    if(lastObj.messageType != 'RecallCommandMessage' && lastObj.messageType != 'UnknownMessage' ){
+                try {
+                    if (lastObj.messageType != 'RecallCommandMessage' && lastObj.messageType != 'UnknownMessage') {
                         lastObj.content.content = RongIMLib.RongIMEmoji.emojiToHTML(lastObj.content.content);
-                    }else{
+                    } else {
                         if (lastObj.messageType == 'RecallCommandMessage') {
                             if (lastObj.targetId == this.now_user.targetId) {
                                 for (let i = 0; i < this.msgArr.length; i++) {
-                                    if(this.msgArr[i].messageUId == lastObj.content.messageUId){
-                                        this.msgArr.splice(i,1)
+                                    if (this.msgArr[i].messageUId == lastObj.content.messageUId) {
+                                        this.msgArr.splice(i, 1);
                                         // break;
                                     }
                                 }
                             }
                         }
-                    } 
-                }catch{
+                    }
+                } catch {
                     if (lastObj.messageType == 'RecallCommandMessage') {
                         if (lastObj.targetId == this.now_user.targetId) {
                             for (let i = 0; i < this.msgArr.length; i++) {
-                                if(this.msgArr[i].messageUId == lastObj.content.messageUId){
-                                    this.msgArr = this.msgArr.splice(i,1)
+                                if (this.msgArr[i].messageUId == lastObj.content.messageUId) {
+                                    this.msgArr = this.msgArr.splice(i, 1);
                                 }
                                 break;
                             }
@@ -404,8 +409,8 @@ export default {
                             }
                         });
                     } else if (lastObj.messageType == 'OrderMessage') {
-                        switch(lastObj.content.kind){
-                            case 'JZ:MessageCustomOrder' : //预约
+                        switch (lastObj.content.kind) {
+                            case 'JZ:MessageCustomOrder': //预约
                                 this.audioUrl = 'default/system/order.mp3';
                                 this.$notify.info({
                                     title: '提示',
@@ -418,7 +423,7 @@ export default {
                                     }
                                 });
                                 break;
-                            case 'JZ:MessageCancelOrder' : //取消
+                            case 'JZ:MessageCancelOrder': //取消
                                 this.audioUrl = 'default/system/system.mp3';
                                 this.$notify.info({
                                     title: '提示',
@@ -434,7 +439,7 @@ export default {
                             // case 'JZ:MessageOccupyOrder' : //占座
                             //     this.audioUrl = 'default/system/system.mp3';
                             //     break;
-                            case 'JZ:MessageReminderOrder' : //催单
+                            case 'JZ:MessageReminderOrder': //催单
                                 this.audioUrl = 'default/system/system.mp3';
                                 this.$notify.info({
                                     title: '提示',
@@ -447,7 +452,7 @@ export default {
                                     }
                                 });
                                 break;
-                            case 'JZ:MessageVieOrder' : //抢座
+                            case 'JZ:MessageVieOrder': //抢座
                                 this.audioUrl = 'default/system/order.mp3';
                                 this.$notify.info({
                                     title: '提示',
@@ -461,7 +466,6 @@ export default {
                                 });
                                 break;
                         }
-                        
                     } else if (lastObj.messageType == 'SystemMessage') {
                         this.audioUrl = 'default/system/system.mp3';
                         this.$notify.info({
@@ -655,9 +659,9 @@ export default {
         closeDialog() {
             this.$store.commit('headerClickMsgFun', false);
         },
-         // 查看订单
+        // 查看订单
         lookOrder(val) {
-            if(val.content.kind == 'JZ:MessageVieOrder'){
+            if (val.content.kind == 'JZ:MessageVieOrder') {
                 if (this.$route.path != '/nummanage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                     this.$router.push('/nummanage');
@@ -665,10 +669,10 @@ export default {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                     // this.$store.commit('onloadOrderFun', true);
                 }
-            }else{
-                if (this.$route.path != '/orderManage') {
+            } else {
+                if (this.$route.path != '/ordermanage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    this.$router.push('/orderManage');
+                    this.$router.push('/ordermanage');
                 } else {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                     // this.$store.commit('onloadOrderFun', true);
@@ -679,28 +683,27 @@ export default {
 
         // 收到消息  刷新
         lookOrderOne(val) {
-            if(val.content.kind == 'JZ:MessageVieOrder'){
+            if (val.content.kind == 'JZ:MessageVieOrder') {
                 if (this.$route.path == '/nummanage') {
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    },500)
+                    }, 500);
                     // this.$store.commit('onloadOrderFun', true);
                 }
-            }else{
-                if (this.$route.path == '/orderManage') {
-                    setTimeout(()=>{
+            } else {
+                if (this.$route.path == '/ordermanage') {
+                    setTimeout(() => {
                         this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    },500)
+                    }, 500);
                     // this.$store.commit('onloadOrderFun', true);
-                }else if(this.$route.path == '/begintabledetails'){
-                    setTimeout(()=>{
+                } else if (this.$route.path == '/begintabledetails') {
+                    setTimeout(() => {
                         this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    },500)
+                    }, 500);
                 }
             }
             this.showRoom = false;
         },
-
 
         showChat() {
             let isClick = document.querySelector('.chat_room').getAttribute('drag-flag');
@@ -712,7 +715,7 @@ export default {
             // this.conversation()
         },
         getChat(val, i) {
-            this.loadingChat = true
+            this.loadingChat = true;
             if (val.targetId == '10000' || val.targetId == '10001') {
                 this.unInput = false;
             } else {
@@ -724,9 +727,9 @@ export default {
             this.emojiShow = false;
             this.getMore = true;
             this.hasHistoryMsg = true;
-            setTimeout(()=>{
-                this.loadingChat = false
-            },12000)
+            setTimeout(() => {
+                this.loadingChat = false;
+            }, 12000);
             this.getAssignHis(1);
             this.$nextTick(this.scrollEnd);
         },
@@ -820,7 +823,7 @@ export default {
             } else {
                 timer = 0;
             }
-            
+
             var conversationType = RongIMLib.ConversationType.PRIVATE; //单聊, 其他会话选择相应的会话类型即可
             var targetId = this.now_user.targetId; // 想获取自己和谁的历史消息，targetId 赋值为对方的 Id
             var timestrap = timer; // 默认传 null，若从头开始获取历史消息，请赋值为 0, timestrap = 0;
@@ -848,16 +851,15 @@ export default {
                     let userInfo = res.data;
 
                     list.forEach((v, i) => {
-                        try{
-                            if(v.messageType != 'UnknownMessage' && v.messageType != 'RecallCommandMessage' ){
+                        try {
+                            if (v.messageType != 'UnknownMessage' && v.messageType != 'RecallCommandMessage') {
                                 v.content.content = RongIMLib.RongIMEmoji.emojiToHTML(v.content.content);
-                            } 
-                        }catch{
-                        }
+                            }
+                        } catch {}
                         // if(v.messageType == 'UnknownMessage' || v.messageType == 'RecallCommandMessage'){
                         // }else{
                         // }
-                            // 调用历史记录
+                        // 调用历史记录
                         if (v.messageDirection == 2) {
                             if (userInfo.id == '10001') {
                                 // 如果是订单消息
@@ -876,8 +878,7 @@ export default {
                         }
                         newArr.unshift(v);
                     });
-            
-                    
+
                     newArr.forEach((v) => {
                         this.msgArr.unshift(v);
                     });
@@ -890,9 +891,9 @@ export default {
                     }
                     this.scorllFalse = false;
                     this.getMore = false;
-                    this.loadingChat = false
+                    this.loadingChat = false;
                 } else {
-                    this.loadingChat = false
+                    this.loadingChat = false;
                     this.$message({ message: res.msg, type: 'warning' });
                 }
             });
@@ -1302,9 +1303,9 @@ export default {
         let that = this;
         let rToken = JSON.parse(localStorage.getItem('userInfo')).rToken;
 
-        if(!rToken){
-            this.$store.commit('showChat', false)
-            return
+        if (!rToken) {
+            this.$store.commit('showChat', false);
+            return;
         }
 
         var userInfo = {
@@ -1543,7 +1544,7 @@ export default {
                                 background: #dadada;
                             }
                         }
-                        .notMsgType{
+                        .notMsgType {
                             text-align: center;
                             margin-bottom: 12px;
                         }
