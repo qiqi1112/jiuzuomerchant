@@ -666,9 +666,9 @@ export default {
                     // this.$store.commit('onloadOrderFun', true);
                 }
             }else{
-                if (this.$route.path != '/ordermanage') {
+                if (this.$route.path != '/orderManage') {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    this.$router.push('/ordermanage');
+                    this.$router.push('/orderManage');
                 } else {
                     this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                     // this.$store.commit('onloadOrderFun', true);
@@ -687,7 +687,7 @@ export default {
                     // this.$store.commit('onloadOrderFun', true);
                 }
             }else{
-                if (this.$route.path == '/ordermanage') {
+                if (this.$route.path == '/orderManage') {
                     setTimeout(()=>{
                         this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                     },500)
