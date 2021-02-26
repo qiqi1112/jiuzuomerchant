@@ -375,6 +375,7 @@
                                 ></el-input>
                                 <el-button type="primary" @click="creatFloorList">添加</el-button>
                             </div>
+                            <span style="font-size: 12px; color: #f00">*输入完楼层后，点击添加按钮视为添加成功</span>
                         </div>
                         <div slot="footer" class="dialog-footer">
                             <el-button @click="handleCancelEditFloor">取 消</el-button>

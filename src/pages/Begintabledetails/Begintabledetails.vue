@@ -2,9 +2,7 @@
     <div class="container" v-loading="wrapLoading">
         <div class="Begintabledetails">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>
-                    <i class="el-icon-lx-text"></i> 开台详情
-                </el-breadcrumb-item>
+                <el-breadcrumb-item> <i class="el-icon-lx-text"></i> 开台详情 </el-breadcrumb-item>
             </el-breadcrumb>
             <div class="crumbs">
                 <div>
@@ -15,7 +13,8 @@
                         :type="nowFloor == item.floor ? 'primary' : ''"
                         @click="changeShowFloor(item, index)"
                         class="add-floor"
-                    >{{ item.floor }}</el-button>
+                        >{{ item.floor }}</el-button
+                    >
                 </div>
                 <span></span>
             </div>
@@ -25,22 +24,13 @@
                     <div class="left-box">
                         <!-- 座位属性标题 -->
                         <div class="seat-title">
-                            <p
-                                v-for="(item, index) in seatAttOpt"
-                                :key="index"
-                            >
+                            <p v-for="(item, index) in seatAttOpt" :key="index">
                                 <span :class="item.class"></span>
                                 {{ item.name }}
                             </p>
                         </div>
                         <!-- 回显的座位图 -->
-                        <div
-                            v-if="x && y"
-                            class="seat-box"
-                            ref="seatBox"
-                            :style="{ width: 32 * y + 30 + 'px' }"
-                            style="overflow: hidden"
-                        >
+                        <div v-if="x && y" class="seat-box" ref="seatBox" :style="{ width: 32 * y + 30 + 'px' }" style="overflow: hidden">
                             <div v-for="(itemY, indexY) in Number(y)" :key="indexY">
                                 <div v-for="(itemX, indexX) in Number(x)" :key="indexX">
                                     <span
@@ -80,11 +70,7 @@
                                 </div>
                                 <div class="order-num">
                                     <span>订单号:</span>
-                                    <el-input
-                                        :disabled="isReadonly"
-                                        v-model="presentSeatInfos.orderNo"
-                                        placeholder="订单号..."
-                                    ></el-input>
+                                    <el-input :disabled="isReadonly" v-model="presentSeatInfos.orderNo" placeholder="订单号..."></el-input>
                                 </div>
                                 <div class="order-num">
                                     <span>预定备注信息:</span>
@@ -163,13 +149,17 @@
                                             </div>
                                             <div class="right">
                                                 <p>
-                                                    <span v-show="presentSeatInfo.seatCode">{{ presentSeatInfo.seatCode +'座'}}</span>
+                                                    <span v-show="presentSeatInfo.seatCode">{{ presentSeatInfo.seatCode + '座' }}</span>
                                                 </p>
                                                 <p>
-                                                     <span v-show="presentSeatInfo.numberOfPeople">{{ presentSeatInfo.numberOfPeople +'人'}}</span>
+                                                    <span v-show="presentSeatInfo.numberOfPeople">{{
+                                                        presentSeatInfo.numberOfPeople + '人'
+                                                    }}</span>
                                                 </p>
                                                 <p>
-                                                    <span v-show="presentSeatInfo.seatLatestReservationTime">{{'最晚至'+ presentSeatInfo.seatLatestReservationTime}}</span>
+                                                    <span v-show="presentSeatInfo.seatLatestReservationTime">{{
+                                                        '最晚至' + presentSeatInfo.seatLatestReservationTime
+                                                    }}</span>
                                                 </p>
                                                 <p>{{ presentSeatInfos.minAmount || presentSeatInfo.minConsumption }}</p>
                                                 <p>{{ presentSeatInfo.softHardStatus | seatType }}</p>
@@ -177,10 +167,7 @@
                                         </div>
                                     </div>
                                     <div class="details-two WineList">
-                                        <span
-                                            class="headers"
-                                            style="display: inline-block; margin-bottom: 15px"
-                                        >酒水清单</span>
+                                        <span class="headers" style="display: inline-block; margin-bottom: 15px">酒水清单</span>
                                         <div
                                             style="display: flex; justify-content: space-between; flex-wrap: nowrap"
                                             v-for="(item, index) in presentSeatInfos.goodsList"
@@ -197,38 +184,23 @@
                                             <div class="right">
                                                 <p style="margin-left: -165px">
                                                     <span>{{ item.activityPrice | returnFloat }}</span>
-                                                    <span
-                                                        style="text-decoration: line-through; color: #888; margin-left: 10px"
-                                                    >
-                                                        {{
-                                                        item.originalPrice | returnFloat
-                                                        }}
+                                                    <span style="text-decoration: line-through; color: #888; margin-left: 10px">
+                                                        {{ item.originalPrice | returnFloat }}
                                                     </span>
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="details-two">
-                                        <span
-                                            class="headers"
-                                            style="display: inline-block; margin: 15px 0"
-                                        >追加酒水清单</span>
+                                        <span class="headers" style="display: inline-block; margin: 15px 0">追加酒水清单</span>
                                         <div class="list-box add-drinks">
-                                            <div
-                                                class="add-drink-list"
-                                                v-for="(item, index) in presentSeatInfos.groupGoods"
-                                                :key="index"
-                                            >
+                                            <div class="add-drink-list" v-for="(item, index) in presentSeatInfos.groupGoods" :key="index">
                                                 <div class="order-title">
                                                     <span>{{ item.groupName }}</span>
                                                     <span>{{ item.createTime }}</span>
                                                 </div>
 
-                                                <div
-                                                    class="drink-list"
-                                                    v-for="(item2, index2) in item.goodsList"
-                                                    :key="index2"
-                                                >
+                                                <div class="drink-list" v-for="(item2, index2) in item.goodsList" :key="index2">
                                                     <div class="good-box">
                                                         <div class="good-name">
                                                             <span>{{ item2.goodsName }}</span>
@@ -238,9 +210,7 @@
                                                     </div>
                                                     <div>
                                                         <span>￥{{ item2.activityPrice }}</span>
-                                                        <span
-                                                            class="unline"
-                                                        >￥{{ item2.originalPrice }}</span>
+                                                        <span class="unline">￥{{ item2.originalPrice }}</span>
                                                     </div>
                                                 </div>
                                                 <div>
@@ -248,23 +218,22 @@
                                                         :disabled="true"
                                                         v-if="item.servedStatus == 0 || item.servedStatus == 1"
                                                         type="primary"
-                                                    >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button>
+                                                        >{{ item.servedStatus == 1 ? '已上桌' : '上桌' }}</el-button
+                                                    >
                                                     <el-button
                                                         :disabled="true"
                                                         v-if="item.servedStatus == 0 || item.servedStatus == 2"
                                                         type="danger"
-                                                    >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button>
+                                                        >{{ item.servedStatus == 2 ? '已售罄' : '售罄' }}</el-button
+                                                    >
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="details-two">
-                                        <span
-                                            class="headers"
-                                            style="display: inline-block; margin-bottom: 5px"
-                                        >优惠券</span>
+                                        <span class="headers" style="display: inline-block; margin-bottom: 5px">优惠券</span>
                                         <div style="display: flex">
-                                            <div class="left omit" style="width:100%">
+                                            <div class="left omit" style="width: 100%">
                                                 <p>
                                                     平台优惠券：
                                                     <span>{{ presentSeatInfos.appDetails || '暂无' }}</span>
@@ -283,7 +252,7 @@
                                                 <p>换座时间：</p>
                                                 <p>占座时间：</p>
                                             </div>
-                                            <div class="right" style="margin-left:0">
+                                            <div class="right" style="margin-left: 0">
                                                 <p>{{ presentSeatInfos.changeSeat || '暂无' }}</p>
                                                 <p>{{ presentSeatInfos.changeSeatTime || '暂无' }}</p>
                                                 <p>{{ presentSeatInfos.occupySeatTime || '暂无' }}</p>
@@ -307,7 +276,12 @@ export default {
             y: 6, //座位列数
             seatAttOpt: [
                 {
-                    name: '已预订',
+                    name: '禁用',
+                    style: 'lock-book',
+                    class: 'lock-book'
+                },
+                {
+                    name: '不可预订',
                     style: 'notBook',
                     class: 'not-book'
                 },
@@ -317,19 +291,19 @@ export default {
                     class: 'can-book'
                 },
                 {
+                    name: '已预订',
+                    style: 'isBook',
+                    class: 'is-book'
+                },
+                {
                     name: '舞台',
                     style: 'stageBook',
                     class: 'stage-book'
                 },
                 {
-                    name: '已到店',
+                    name: '过道',
                     style: 'aisleBook',
                     class: 'aisle-book'
-                },
-                {
-                    name: '不可预定',
-                    style: 'aisleBooks',
-                    class: 'aisle-books'
                 }
             ],
             floorList: [],
@@ -353,7 +327,7 @@ export default {
             handler(val) {
                 this.getStoreInfo();
             },
-            deep : true
+            deep: true
         }
     },
 
@@ -412,7 +386,7 @@ export default {
         //清空座位外边框（定位当前座位）
         clearSeatBorder() {
             if (this.$refs.seatSpan) {
-                this.$refs.seatSpan.forEach(item => {
+                this.$refs.seatSpan.forEach((item) => {
                     item.classList.remove('border');
                 });
             }
@@ -421,7 +395,7 @@ export default {
             let seatRow = Number(e.target.dataset.indexx); //行
             let seatColumn = Number(e.target.dataset.indexy); //列
 
-            this.list.forEach(item => {
+            this.list.forEach((item) => {
                 if (item.floor === this.nowFloor) {
                     // item.layoutList.forEach((item2) => {
                     if (item.floor == item.floor && item.seatRow == seatRow && item.seatColumn == seatColumn) {
@@ -430,7 +404,7 @@ export default {
                         this.presentSeatInfo = item;
                         let newObj = this.presentSeatInfo;
                         let code = this.nowFloor + '-' + this.presentSeatInfo.seatCode;
-                        this.$get(`/merchant/store/getInfoBySeat/${code}`).then(res => {
+                        this.$get(`/merchant/store/getInfoBySeat/${code}`).then((res) => {
                             // console.log(res);
                             if (res.code == 0) {
                                 if (res.data) {
@@ -457,32 +431,35 @@ export default {
             this.$nextTick(() => {
                 if (this.$refs.seatSpan) {
                     //遍历所有座位
-                    this.$refs.seatSpan.forEach(item => {
+                    this.$refs.seatSpan.forEach((item) => {
                         let x = item.dataset.indexx; //行
                         let y = item.dataset.indexy; //列
                         //根据返回的楼层对应的座位数组进行匹配，并替换当前座位的属性
-                        this.list.forEach(item2 => {
+                        this.list.forEach((item2) => {
                             if (item2.floor == this.nowFloor && item2.seatRow == x && item2.seatColumn == y) {
-                                item.className = `seat`;
+                                //禁用
+                                if (item2.seatAttribute == 0) {
+                                    item.className = `seat lockBook`;
+                                }
+                                //不可预订
+                                if (item2.seatAttribute == 1) {
+                                    item.className = `seat notBook`;
+                                }
                                 //可预订
                                 if (item2.seatAttribute == 2) {
                                     item.className = `seat canBook`;
                                 }
-                                //过道与不可预定
-                                if (item2.seatAttribute == 1 || item2.seatType == 3) {
-                                    item.className = `seat aisleBooks`;
-                                }
                                 //已预订
-                                if (item2.seatAttribute == 4) {
-                                    item.className = `seat notBook`;
+                                if (item2.seatAttribute == 3 || item2.seatAttribute == 4) {
+                                    item.className = `seat isBook`;
+                                }
+                                //过道
+                                if (item2.seatType == 3) {
+                                    item.className = `seat aisleBook`;
                                 }
                                 //舞台
                                 if (item2.seatType == 4) {
                                     item.className = `seat stageBook`;
-                                }
-                                //已到店
-                                if (item2.to_Shop == 1) {
-                                    item.className = `seat aisleBook`;
                                 }
                             }
                         });
@@ -492,7 +469,7 @@ export default {
         },
         //回显每个座位号时，不要带上楼层号1
         substrSeatNum() {
-            this.list.forEach(item => {
+            this.list.forEach((item) => {
                 const index = item.seatCode.indexOf('-');
                 if (index !== -1) {
                     item.seatCode = item.seatCode.substr(index + 1);
@@ -501,7 +478,7 @@ export default {
         },
         //回显店铺数据
         getStoreInfo() {
-            this.$post('/merchant/store/getStoreSeat').then(res => {
+            this.$post('/merchant/store/getStoreSeat').then((res) => {
                 if (res.code == 0) {
                     console.log(res);
                     this.wrapLoading = false;
@@ -552,7 +529,7 @@ export default {
             this.wrapLoading = true;
             this.isClickSeat = false;
             this.nowFloor = item.floor; //当前操作的楼层
-            this.$post('/merchant/store/getStoreSeat', { floor: this.nowFloor }).then(res => {
+            this.$post('/merchant/store/getStoreSeat', { floor: this.nowFloor }).then((res) => {
                 console.log(res);
                 if (res.code === 0) {
                     this.wrapLoading = false;
@@ -586,7 +563,7 @@ export default {
         },
         //对座位信息进行相关转换
         changeLayoutList(arr) {
-            arr.forEach(item => {
+            arr.forEach((item) => {
                 //将数值型转为字符型（软硬座）
                 if (item.softHardStatus) {
                     item.softHardStatus = item.softHardStatus.toString();
@@ -675,7 +652,6 @@ export default {
         .left {
             p {
                 margin-bottom: 10px;
-                
             }
         }
         .right {
@@ -686,23 +662,22 @@ export default {
             }
         }
     }
-    .WineList{
+    .WineList {
         padding-bottom: 10px;
     }
     .details-two {
         width: 315px;
         .omit {
-            p{
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            p {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
-            
         }
         .water-left {
             height: 35px;
         }
-        
+
         &:nth-child(3) {
             border-top: 1px solid #000;
             // border-bottom: 1px solid #000;
@@ -814,7 +789,7 @@ export default {
         .seat-title {
             display: flex;
             justify-content: space-between;
-            width: 400px;
+            width: 500px;
             margin-bottom: 20px;
 
             > p {
@@ -931,8 +906,19 @@ export default {
     cursor: pointer;
     border: 1px solid #ddd;
 }
+
+.lock-book {
+    background-color: #800080 !important;
+    border: 1px solid transparent !important;
+}
+
 .not-book {
     background-color: #e6a23c !important;
+    border: 1px solid transparent !important;
+}
+
+.is-book {
+    background-color: #409eff !important;
     border: 1px solid transparent !important;
 }
 
@@ -944,14 +930,23 @@ export default {
     border: 1px solid transparent !important;
 }
 
-.aisle-books {
+.aisle-book {
     background-color: #999 !important;
     border: 1px solid transparent !important;
 }
-.aisle-book {
-    background-color: #87cefa !important;
-    border: 1px solid transparent !important;
+
+.lockBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #800080 !important;
+    cursor: pointer;
 }
+
 .notBook {
     display: block;
     width: 20px;
@@ -961,6 +956,18 @@ export default {
     margin-right: 10px;
     border: 1px solid transparent;
     background-color: #e6a23c !important;
+    cursor: pointer;
+}
+
+.isBook {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #409eff !important;
     cursor: pointer;
 }
 
@@ -987,10 +994,6 @@ export default {
     background-color: #008000 !important;
     cursor: pointer;
 }
-.aisleBooks {
-    background-color: #999 !important;
-    border: 1px solid transparent !important;
-}
 
 .aisleBook {
     display: block;
@@ -1000,7 +1003,7 @@ export default {
     margin-bottom: 10px;
     margin-right: 10px;
     border: 1px solid transparent;
-    background-color: #87cefa !important;
+    background-color: #999 !important;
     cursor: pointer;
 }
 </style>
