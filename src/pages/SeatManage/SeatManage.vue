@@ -182,16 +182,18 @@ export default {
                 return;
             }
 
-            this.confirmFn(txt).then(() => {
-                this.$put(`/merchant/store/storeSeatStatus/${seat}/${status}`).then((res) => {
-                    if (res.code === 0) {
-                        this.getStoreInfo();
-                        this.$message.success('更改成功');
-                    } else {
-                        this.$message.error(res.msg);
-                    }
-                });
-            });
+            this.confirmFn(txt)
+                .then(() => {
+                    this.$put(`/merchant/store/storeSeatStatus/${seat}/${status}`).then((res) => {
+                        if (res.code === 0) {
+                            this.getStoreInfo();
+                            this.$message.success('更改成功');
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    });
+                })
+                .catch(() => {});
         },
 
         //confirm弹窗
