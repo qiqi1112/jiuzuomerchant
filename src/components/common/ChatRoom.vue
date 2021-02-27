@@ -683,29 +683,32 @@ export default {
 
         // 收到消息  刷新
         lookOrderOne(val) {
-            if (val.content.kind == 'JZ:MessageVieOrder') {
-                if (this.$route.path == '/nummanage') {
-                    setTimeout(() => {
-                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    }, 500);
-                    // this.$store.commit('onloadOrderFun', true);
-                }
-            } else {
-                if (this.$route.path == '/ordermanage') {
-                    setTimeout(() => {
-                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    }, 500);
-                    // this.$store.commit('onloadOrderFun', true);
-                } else if (this.$route.path == '/begintabledetails') {
-                    setTimeout(() => {
-                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    }, 500);
-                } else if (this.$route.path == '/seatManage') {
-                    setTimeout(() => {
-                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-                    }, 500);
-                }
-            }
+            setTimeout(() => {
+                this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+            }, 500);
+            // if (val.content.kind == 'JZ:MessageVieOrder') {
+            //     if (this.$route.path == '/nummanage') {
+            //         setTimeout(() => {
+            //             this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+            //         }, 500);
+            //         // this.$store.commit('onloadOrderFun', true);
+            //     }
+            // } else {
+            //     if (this.$route.path == '/orderManage') {
+            //         setTimeout(() => {
+            //             this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+            //         }, 500);
+            //         // this.$store.commit('onloadOrderFun', true);
+            //     } else if (this.$route.path == '/begintabledetails') {
+            //         setTimeout(() => {
+            //             this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+            //         }, 500);
+            //     } else if (this.$route.path == '/seatManage') {
+            //         setTimeout(() => {
+            //             this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+            //         }, 500);
+            //     }
+            // }
             this.showRoom = false;
         },
 
