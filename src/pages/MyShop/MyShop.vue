@@ -357,6 +357,7 @@
                             <div v-for="(item, index) in list" :key="index">
                                 <span>楼层名称：</span>
                                 <el-input
+                                    maxlength="4"
                                     v-model="item.floor"
                                     placeholder="如：1楼"
                                     style="width: 30%; margin-right: 10px"
@@ -368,6 +369,7 @@
                             <div v-if="list.length < 5">
                                 <span>楼层名称：</span>
                                 <el-input
+                                    maxlength="4"
                                     v-model="floorName"
                                     placeholder="如：1楼"
                                     style="width: 30%; margin-right: 10px"
@@ -619,18 +621,18 @@
                                     <el-option v-for="item in ktvTypeOpt" :key="item.id" :label="item.name" :value="item.id"></el-option>
                                 </el-select>
                             </div>
-                            <!-- <div>
+                            <div>
                                 <span>包间描述：</span>
                                 <el-input
                                     type="textarea"
                                     :rows="3"
                                     placeholder="请输入包间描述，非必传"
-                                    v-model="presentKtvInfo.roomDesc"
+                                    v-model="presentKtvInfo.roomDetail"
                                     :readonly="isReadonly"
                                     maxlength="120"
                                     show-word-limit
                                 ></el-input>
-                            </div> -->
+                            </div>
                             <!-- 包间所属 -->
                             <!-- <div>
                                 <span>包间所属：</span>
@@ -1144,7 +1146,7 @@ export default {
             presentKtvInfo: {
                 floor: '', //所属楼层
                 roomTypeId: '', //包间类型
-                roomDesc: '', //包间描述
+                roomDetail: '', //包间描述
                 // roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
