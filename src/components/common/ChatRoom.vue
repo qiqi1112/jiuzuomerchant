@@ -700,6 +700,10 @@ export default {
                     setTimeout(() => {
                         this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
                     }, 500);
+                } else if (this.$route.path == '/seatManage') {
+                    setTimeout(() => {
+                        this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
+                    }, 500);
                 }
             }
             this.showRoom = false;

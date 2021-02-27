@@ -127,6 +127,20 @@ export default {
             nowFloor: '' //当前正在操作的楼层名
         };
     },
+    watch: {
+        watchOnloadOrder: {
+            handler(val) {
+                this.getStoreInfo();
+            },
+            deep: true
+        }
+    },
+
+    computed: {
+        watchOnloadOrder() {
+            return this.$store.state.onloadOrder;
+        }
+    },
 
     methods: {
         //切换楼层，楼层对应的行列跟着切换
