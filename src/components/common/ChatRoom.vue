@@ -685,7 +685,7 @@ export default {
         lookOrderOne(val) {
             setTimeout(() => {
                 this.$store.commit('onloadOrderFun', (this.$store.state.onloadOrder += 1));
-            }, 500);
+            }, 800);
             // if (val.content.kind == 'JZ:MessageVieOrder') {
             //     if (this.$route.path == '/nummanage') {
             //         setTimeout(() => {
