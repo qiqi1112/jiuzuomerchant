@@ -162,7 +162,7 @@ export default {
                         this.$message.success('退出成功');
                         this.$router.push('/login');
                         RongIMClient.getInstance().logout(); //退出登录
-                        // RongIMClient.getInstance().disconnect(); //断开链接
+                        RongIMClient.getInstance().disconnect(); //断开链接
                     },
                     (err) => {
                         console.log(err);
