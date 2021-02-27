@@ -619,6 +619,18 @@
                                     <el-option v-for="item in ktvTypeOpt" :key="item.id" :label="item.name" :value="item.id"></el-option>
                                 </el-select>
                             </div>
+                            <!-- <div>
+                                <span>包间描述：</span>
+                                <el-input
+                                    type="textarea"
+                                    :rows="3"
+                                    placeholder="请输入包间描述，非必传"
+                                    v-model="presentKtvInfo.roomDesc"
+                                    :readonly="isReadonly"
+                                    maxlength="120"
+                                    show-word-limit
+                                ></el-input>
+                            </div> -->
                             <!-- 包间所属 -->
                             <!-- <div>
                                 <span>包间所属：</span>
@@ -1132,6 +1144,7 @@ export default {
             presentKtvInfo: {
                 floor: '', //所属楼层
                 roomTypeId: '', //包间类型
+                roomDesc: '', //包间描述
                 // roomAttribute: '1', //包间所属
                 roomNumber: 1, //包间数量
                 capacity: 1, //容纳人数
@@ -3675,6 +3688,15 @@ export default {
                     height: 80px;
                     line-height: 80px;
                 }
+            }
+
+            /deep/ .el-textarea__inner {
+                resize: none !important;
+                line-height: 1.9;
+            }
+
+            .el-textarea {
+                width: 50%;
             }
         }
 
