@@ -54,7 +54,7 @@ api_request.interceptors.response.use(
       localStorage.removeItem('userInfo');
       router.push("/login");
       RongIMClient.getInstance().logout(); //退出登录
-      // RongIMClient.getInstance().disconnect(); //断开链接
+      RongIMClient.getInstance().disconnect(); //断开链接
       // Message.error(response.data.msg);
       return Promise.reject(response.data);
     }
