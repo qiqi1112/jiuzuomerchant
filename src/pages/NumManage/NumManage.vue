@@ -609,7 +609,8 @@ export default {
                     // this.callNext = true
                     this.getData();
                 } else {
-                    this.$message.error(res.data);
+                    this.$message.error(res.msg);
+                    this.getData();
                 }
             });
         },
