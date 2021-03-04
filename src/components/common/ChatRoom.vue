@@ -356,7 +356,7 @@ export default {
                     lastObj = '';
                 arr = this.$store.state.newMsgArr;
                 lastObj = arr[arr.length - 1];
-                // console.log(lastObj);
+                console.log(lastObj);
 
                 that.lookOrderOne(lastObj);
 
