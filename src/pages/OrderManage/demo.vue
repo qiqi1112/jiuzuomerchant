@@ -15,7 +15,7 @@
                 <p>嘻嘻嘻</p>
             </div> -->
 
-            <!-- <div ref="print">
+            <!-- <div ref="print" style="width: 300px">
                 <h1>大家好</h1>
                 <h2>大家好</h2>
                 <h6>大家好</h6>

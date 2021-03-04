@@ -27,6 +27,7 @@
                         <div class="sku-list">
                             <div v-for="(item, index) in goodsForm.dynamicValidateForm.domains" :key="index">
                                 <el-input
+                                    maxlength="4"
                                     v-model="item.specName"
                                     placeholder="规格（如：一瓶）"
                                     style="width: 132px; margin-right: 10px"
@@ -60,6 +61,7 @@
                             </div>
                             <div>
                                 <el-input
+                                    maxlength="4"
                                     v-model="goodsForm.skuObj.specName"
                                     placeholder="规格（如：一瓶）"
                                     style="width: 132px; margin-right: 10px"
