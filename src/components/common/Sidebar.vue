@@ -61,7 +61,7 @@ export default {
                     title: '我的店铺'
                 },
                 {
-                    icon: 'el-icon-s-shop',
+                    icon: 'iconfont icon-zuowei side',
                     index: 'seatManage',
                     title: '座位管理'
                 },

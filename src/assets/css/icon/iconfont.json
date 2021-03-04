@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5912736",
+      "name": "座位",
+      "font_class": "zuowei",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    },
+    {
+      "icon_id": "11987027",
+      "name": "减",
+      "font_class": "jian",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
       "icon_id": "10156373",
       "name": "喇叭",
       "font_class": "laba",
