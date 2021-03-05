@@ -463,7 +463,7 @@
                                                 :data-indexY="indexY + 1"
                                                 class="seat"
                                                 @click="changeStauts($event, seatStyle)"
-                                                @contextmenu.prevent="changeStauts($event, 'canBook')"
+                                                @contextmenu.prevent="changeStauts($event, 'aisleBook')"
                                             ></span>
                                         </div>
                                     </div>
@@ -2116,9 +2116,12 @@ export default {
         //回显店铺卡座数量（行和列数量）
         getShopSeat(index) {
             if (this.list.length !== 0) {
-                let seat = this.list[index].cassettes.split('x');
-                this.x = +seat[0];
-                this.y = +seat[1];
+                this.x = this.list[index].layoutList[this.list[index].layoutList.length - 1].seatRow;
+                this.y = this.list[index].layoutList[this.list[index].layoutList.length - 1].seatColumn;
+
+                // let seat = this.list[index].cassettes.split('x');
+                // this.x = +seat[0];
+                // this.y = +seat[1];
             }
         },
 
@@ -2349,14 +2352,16 @@ export default {
                     layoutList.push({
                         minConsumption: 0,
                         numberOfPeople: 1,
-                        seatAttribute: 2,
+                        // seatAttribute: 2,
+                        seatAttribute: 1,
                         seatCode: j + '-' + i,
                         floor: this.floorName,
                         floorPower: this.list.length,
                         seatColumn: i,
                         seatRow: j,
                         seatLatestReservationTime: this.startBussTime == '' ? '00:00' : this.startBussTime,
-                        seatType: 1,
+                        // seatType: 1,
+                        seatType: 3,
                         softHardStatus: '1',
                         weekPriceList: [
                             {
