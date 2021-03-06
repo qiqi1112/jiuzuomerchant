@@ -6,7 +6,7 @@
             </el-breadcrumb>
         </div>
 
-        <div class="container">
+        <div class="container" v-loading="wrapLoading">
             <!-- 头部模块 -->
             <div class="handle-box">
                 <el-input
@@ -64,6 +64,7 @@
                 <el-table-column prop="contactName" label="预订用户" min-width="120"></el-table-column>
                 <el-table-column :label="storeLocation == 3 ? '包间类型' : '座位号'" min-width="120">
                     <template slot-scope="scope">
+                        <!-- 抢座状态 -->
                         <el-button
                             v-if="
                                 scope.row.orderType === 2 &&
@@ -75,8 +76,16 @@
                             type="primary"
                             >设定座位</el-button
                         >
+
+                        <!-- 预定桌状态 -->
                         <el-link
-                            v-else-if="scope.row.status == 4 && scope.row.closedStatus !== 1 && storeLocation != 3"
+                            v-else-if="
+                                scope.row.status != 2 &&
+                                scope.row.status != 5 &&
+                                scope.row.status != 6 &&
+                                scope.row.closedStatus != 1 &&
+                                storeLocation != 3
+                            "
                             @click="editSeat(scope.row)"
                             type="primary"
                             >{{ scope.row.seatCode }}</el-link
@@ -771,7 +780,8 @@ export default {
 
             allSeatDetailInfo: [], //所有座位详细信息
             presentSeatInfo: {}, //当前座位对应的详细信息
-            isClickSeat: false //展示当前座位的详细信息开关
+            isClickSeat: false, //展示当前座位的详细信息开关
+            wrapLoading: false
         };
     },
 
@@ -780,7 +790,7 @@ export default {
             handler(val) {
                 this.getOrderInfo();
             },
-            deep : true
+            deep: true
         }
     },
 
@@ -805,35 +815,40 @@ export default {
 
         //修改座位号/包间号
         editSeat(row) {
+            this.wrapLoading = true;
             this.upSeatId = row.id;
             let data = {
                 value: this.seatNum
             };
-            this.$post('/merchant/store/order/seatOrRoomList', data).then((res) => {
-                if (res.code === 0) {
-                    //如果是非KTV
-                    if (this.storeLocation != 3) {
-                        if (res.data.seatName.length === 0) {
-                            this.$message.error('暂无可修改的座位号');
-                            return;
-                        } else {
-                            this.seatOrRoomList = res.data.seatName;
-                            this.seatDia = true;
+            this.$post('/merchant/store/order/seatOrRoomList', data)
+                .then((res) => {
+                    if (res.code === 0) {
+                        //如果是非KTV
+                        if (this.storeLocation != 3) {
+                            if (res.data.seatName.length === 0) {
+                                this.$message.error('暂无可修改的座位号');
+                                return;
+                            } else {
+                                this.seatOrRoomList = res.data.seatName;
+                                this.seatDia = true;
+                            }
                         }
-                    }
 
-                    //如果是KTV店铺
-                    if (this.storeLocation == 3) {
-                        if (res.data.esKtvRoomDTOS.length === 0) {
-                            this.$message.error('暂无可修改的包间号');
-                            return;
-                        } else {
-                            this.seatOrRoomList = res.data.esKtvRoomDTOS;
-                            this.seatDia = true;
+                        //如果是KTV店铺
+                        if (this.storeLocation == 3) {
+                            if (res.data.esKtvRoomDTOS.length === 0) {
+                                this.$message.error('暂无可修改的包间号');
+                                return;
+                            } else {
+                                this.seatOrRoomList = res.data.esKtvRoomDTOS;
+                                this.seatDia = true;
+                            }
                         }
                     }
-                }
-            });
+                })
+                .finally(() => {
+                    this.wrapLoading = false;
+                });
         },
 
         //确认修改座位号/包间号
