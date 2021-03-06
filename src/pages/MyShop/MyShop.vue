@@ -2446,14 +2446,16 @@ export default {
                     layoutList.push({
                         minConsumption: 0,
                         numberOfPeople: 1,
-                        seatAttribute: 2,
+                        // seatAttribute: 2,
+                        seatAttribute: 1,
                         seatCode: j + '-' + i,
                         floor: this.nowFloor,
                         floorPower: this.nowFloorPower,
                         seatColumn: i,
                         seatRow: j,
                         seatLatestReservationTime: this.endBussTime == '' ? '00:00' : this.endBussTime,
-                        seatType: 1,
+                        // seatType: 1,
+                        seatType: 3,
                         softHardStatus: '1',
                         weekPriceList: [
                             {
@@ -2559,7 +2561,6 @@ export default {
         //对ktv信息进行相关转换
         changeKtvList(arr) {
             if (arr.length !== 0) {
-                console.log('vvvv', arr);
                 arr.forEach((item) => {
                     //赠品json字符串转为数组对象
                     if (item.snacks) {
@@ -3863,16 +3864,28 @@ export default {
     border: 1px solid transparent !important;
 }
 
+// .seat {
+//     display: block;
+//     width: 20px;
+//     height: 20px;
+//     border-radius: 4px;
+//     background-color: #fff;
+//     margin-bottom: 10px;
+//     margin-right: 10px;
+//     cursor: pointer;
+//     border: 1px solid #ddd;
+// }
+
 .seat {
     display: block;
     width: 20px;
     height: 20px;
     border-radius: 4px;
-    background-color: #fff;
     margin-bottom: 10px;
     margin-right: 10px;
+    border: 1px solid transparent;
+    background-color: #999 !important;
     cursor: pointer;
-    border: 1px solid #ddd;
 }
 
 .border {
