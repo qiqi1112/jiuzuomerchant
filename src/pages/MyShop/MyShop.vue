@@ -2115,7 +2115,7 @@ export default {
 
         //回显店铺卡座数量（行和列数量）
         getShopSeat(index) {
-            if (this.list.length !== 0) {
+            if (this.list.length !== 0 && this.shopLocaIndex != 3) {
                 this.x = this.list[index].layoutList[this.list[index].layoutList.length - 1].seatRow;
                 this.y = this.list[index].layoutList[this.list[index].layoutList.length - 1].seatColumn;
 
@@ -2751,6 +2751,8 @@ export default {
                     this.shopBrief = result.synopsis;
                     this.trustAddress = result.trustAddress;
                     this.shopTypeArr = result.type.split(',');
+
+                    console.log('zzzzz', result.ktvRoomList);
                     this.ktvRoomList = result.ktvRoomList;
                     this.ktvList = result.list; //回显时根据楼层分类列表专用
                     this.list = result.list;
